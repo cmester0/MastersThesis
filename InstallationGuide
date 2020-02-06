@@ -1,0 +1,6 @@
+cabal install agda
+
+sudo apt-get install agda-mode
+sudo apt-get install agda-stdlib
+
+add ~/.cabal/bin/ to PATH
