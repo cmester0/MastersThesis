@@ -59,50 +59,48 @@ module itree where
   mutual
     data itree {ℓ : Level} (Event : Type ℓ -> Type (ℓ-suc ℓ)) (Result : Type ℓ) : Type (ℓ-suc ℓ) where
       Ret : Result -> itree Event Result
-      Tau : ▹itree Event Result -> itree {ℓ = ℓ} Event Result
-      Vis : {Answer : Type ℓ} -> Event Answer -> (Answer -> ▹itree Event Result) -> itree {ℓ = ℓ} Event Result
+      Tau : itree Event Result -> itree Event Result
+      Vis : {Answer : Type ℓ} -> Event Answer -> (Answer -> itree Event Result) -> itree {ℓ = ℓ} Event Result
+      
+    -- record asdf {ℓ : Level} (Event : Type ℓ -> Type (ℓ-suc ℓ)) (Result : Type ℓ) : Type (ℓ-suc (ℓ-suc ℓ)) where
+    --   field
+    --     exit : itree Event Result
+    --     Tau : itree Event Result ≡ itree Event Result
 
-    record ▹itree {ℓ : Level} (Event : Type ℓ -> Type (ℓ-suc ℓ)) (Result : Type ℓ) : Type (ℓ-suc ℓ) where
-      coinductive
-      constructor now
-      field
-        step : itree {ℓ = ℓ} Event Result
-
+  -- asdfasd : ∀ x -> Tau x ≡ x
+  -- asdfasd (Ret a) = λ i → {!!}
+  
+  data bot {ℓ} : Type ℓ where
+  
   -- Examples
   data IO : Type₀ → Type₁ where
     Input : IO ℕ
     Output : (x : ℕ) -> IO Unit
 
-  data void : Type₀ where
+  -- mutual
+  --   spin : itree IO ⊥
+  --   spin = Tau spin
 
-  data bot {ℓ} : Type ℓ where
+  -- echo : asdf IO ⊥
+  -- asdf.exit echo = Vis Input λ x -> Vis (Output x) λ _ → {!!}
+  -- asdf.Tau echo = λ i -> transp {!!} {!!} {!!}
 
+  -- mutual    
+  --   echo : itree IO ⊥
+  --   echo = Vis Input λ x -> Vis (Output x) λ _ → Tau echo
+
+  -- -- The following seems wrong
   mutual
-    spin-step : ▹itree IO void
-    ▹itree.step spin-step = spin
-  
-    spin = Tau spin-step
+    bind : ∀ {ℓ} {E} {A} {B} -> itree {ℓ = ℓ} E A -> (A -> itree E B) -> itree E B
+    bind (Ret r) k = k r
+    bind (Tau t) k = Tau (bind t k)
+    bind (Vis e f) k = Vis e (λ x -> bind (f x) k)
 
-  mutual
-    echo-step : ▹itree IO void
-    ▹itree.step echo-step = echo
-
-    echo : itree IO void
-    echo = Vis Input (λ { x ->
-           now (Vis (Output x) (λ { _ ->
-           now (Tau echo-step) }))})
- 
-  -- spin : itree IO void
-  -- spin = Tau (now (♯ spin))
-  
-  -- The following seems wrong
-  -- bind₀ : ∀ {ℓ} {E} {A} {B} -> itree {ℓ = ℓ} E A -> (A -> ∞ (itree {ℓ = ℓ} E B)) -> ∞ (itree {ℓ = ℓ} E B)
-  -- bind₀ (Ret r) k = k r
-  -- bind₀ (Tau t) k = ♯ Tau (bind₀ (♭ t) k)
-  -- bind₀ (Vis e f) k = ♯ Vis e (λ x -> bind₀ (♭ (f x)) k)
-
-  -- bind : ∀ {ℓ} {E} {A} {B} -> itree {ℓ = ℓ} E A -> (A -> ∞ (itree E B)) -> itree E B
-  -- bind t k = ♭ (bind₀ t k)
+-- now (Vis e (λ x -> bind (▹itree.step (f x)) k))
+    -- bind (Vis e f) k = now (Vis e (λ x -> bind (▹itree.step (f x)) k))
+    
+    -- bind : ∀ {ℓ} {E} {A} {B} -> itree {ℓ = ℓ} E A -> (A -> ▹itree E B) -> itree E B
+    -- bind t k = bind₀ t k
 
   -- _#_ = bind
 
@@ -139,14 +137,31 @@ module itree where
   -- eutt : ∀ {E} {A B} {r} -> itree E A -> itree E B -> Type₁
   -- eutt {r = r} = euttF {r = r} (♯ eutt {r = r})
 
-  -- _≈_ : {ℓ : Level} {Event : Type ℓ -> Type (ℓ-suc ℓ)} {Result : Type ℓ} -> itree Event Result -> itree Event Result -> Type (ℓ-suc ℓ)
-  -- _≈_ {ℓ} {Event} (Ret a) (Ret b) = a ≡ b -> (Ret {Event = Event} a) ≡ (Ret b) -- EqRet
-  -- _≈_ {ℓ} {Event} {Result} (Tau a) (Tau b) = ♭ a ≡ ♭ b
-  -- _≈_ {ℓ} {Event} {Result} (Vis {A} a f) (Vis {B} b g) = (p : A ≡ B) -> PathP (λ i -> Event (p i)) a b -> PathP (λ i -> p i -> ∞ (itree Event Result)) f g -> Path (itree Event Result) (Vis a f) (Vis b g) -- EqVis
-  -- _≈_ {ℓ} {Event} {Result} (Tau a) b = (∀ (x : itree Event Result) -> Path (itree Event Result) (Tau (♯ x)) x) -> Path (itree Event Result) (♭ a) b -> Path (itree Event Result) (Tau a) b -- EqTauR
-  -- _≈_ {ℓ} {Event} {Result} a (Tau b) = Path (itree Event Result) a (♭ b) -> Path (itree Event Result) a (Tau b) -- EqTauL
-  -- _≈_ (Ret a) (Vis b g) = bot
-  -- _≈_ (Vis a f) (Ret b) = bot    
+  postulate
+    ≡Tau : ∀ {ℓ E A} (t : itree {ℓ = ℓ} E A) -> Tau t ≡ t
+
+  _≈_ : {ℓ : Level} {Event : Type ℓ -> Type (ℓ-suc ℓ)} {Result : Type ℓ} -> itree Event Result -> itree Event Result -> Type (ℓ-suc ℓ)
+  _≈_ {ℓ} {Event} (Ret a) (Ret b) = a ≡ b -> (Ret {Event = Event} a) ≡ (Ret b) -- EqRet
+  _≈_ {ℓ} {Event} {Result} (Tau a) (Tau b) = a ≡ b
+  _≈_ {ℓ} {Event} {Result} (Vis {A} a f) (Vis {B} b g) = (p : A ≡ B) -> PathP (λ i -> Event (p i)) a b -> PathP (λ i -> p i -> itree Event Result) f g -> Path (itree Event Result) (Vis a f) (Vis b g) -- EqVis
+  _≈_ {ℓ} {Event} {Result} (Tau a) b = (∀ (x : itree Event Result) -> Path (itree Event Result) (Tau x) x) -> Path (itree Event Result) a b -> Path (itree Event Result) (Tau a) b -- EqTauR
+  _≈_ {ℓ} {Event} {Result} a (Tau b) = Path (itree Event Result) a b -> Path (itree Event Result) a (Tau b) -- EqTauL
+  _≈_ (Ret a) (Vis b g) = bot
+  _≈_ (Vis a f) (Ret b) = bot
+
+  postulate
+    ≈Tau : ∀ {ℓ E A} (t : itree {ℓ = ℓ} E A) -> Tau t ≈ t
+    ≈Tau-bind : ∀ {ℓ E A B} t (k : A -> itree {ℓ = ℓ} E B) ->
+                  bind (Tau t) k ≈ Tau (bind t k)
+    ≈Vis-bind : ∀ {ℓ E A B} (e : E A) (k1 : A -> itree {ℓ = ℓ} E B) (k2 : _ -> itree {ℓ = ℓ} E B) -> bind (Vis e k1) k2 ≈ Vis e (λ y -> bind (k1 y) k2)
+
+  asdf : ∀ {ℓ E A} (t : itree {ℓ = ℓ} E A) -> bind t (λ x -> Ret x) ≡ t
+  asdf (Ret a) = λ i → Ret a
+  asdf (Tau t) = λ i → {!!}
+  asdf (Vis a f) = λ i → Vis {!!} {!!}
+
+  -- ≈Tau2 : ∀ {ℓ E A} (t1 t2 : itree {ℓ = ℓ} E A) -> t1 ≈ t2 -> Tau t1 ≈ Tau t2
+  -- ≈Tau2 t1 t2 p = λ i → {!!}
 
   -- ≈Ret : ∀ A B -> (t1 : A) (t2 : B) -> A ≡ B -> t1 ≡ t2 -> Ret t1 ≡ Ret t2
   -- ≈Ret t1 t2 = λ i -> ?
