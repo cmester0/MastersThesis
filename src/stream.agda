@@ -1,11 +1,11 @@
-{-# OPTIONS --cubical --guardedness --safe --copatterns #-}  
+{-# OPTIONS --cubical --safe --guardedness --copatterns #-}
 
 module stream where
 
   open import Cubical.Foundations.Everything
   open import Cubical.Core.Everything
 
-  open import Cubical.Data.Nat as ℕ using (ℕ)
+  open import Cubical.Data.Nat as ℕ using (ℕ ; suc)
   open import Cubical.Data.Empty
   open import Cubical.Data.Unit
   open import Cubical.Data.Prod
@@ -28,7 +28,7 @@ module stream where
   -- General definition
   stream-n-tl : ∀ {A} -> ℕ -> stream A -> stream A
   stream-n-tl 0 s = s
-  stream-n-tl (ℕ.suc n) s = stream-tl (stream-n-tl n s)
+  stream-n-tl (suc n) s = stream-tl (stream-n-tl n s)
 
   stream-nth : ∀ {A} -> ℕ -> stream A -> A
   stream-nth n s = stream-hd (stream-n-tl n s)
@@ -80,13 +80,13 @@ module stream where
   const'-stream : ∀ (n : ℕ) -> stream ℕ
   const'-stream n = mapS (λ _ -> n) zero-stream
 
-  asdf : ∀ n -> const-stream n ≈ const'-stream n
-  ≈head (asdf n) = refl
-  ≈tail (asdf n) = asdf n
+  const-eq : ∀ n -> const-stream n ≈ const'-stream n
+  ≈head (const-eq n) = refl
+  ≈tail (const-eq n) = const-eq n
 
-  asdfs : ∀ n -> const-stream n ≈ const'-stream n
-  ≈head (asdfs n) = refl
-  ≈tail (asdfs n) = record { ≈head = refl ; ≈tail = asdf n }
+  const-eq-2 : ∀ n -> const-stream n ≈ const'-stream n
+  ≈head (const-eq-2 n) = refl
+  ≈tail (const-eq-2 n) = record { ≈head = refl ; ≈tail = const-eq n }
 
   mapS-id : ∀ {A} {xs : stream A} → mapS (λ x → x) xs ≡ xs
   head (mapS-id {xs = xs} i) = stream-hd xs
@@ -94,9 +94,9 @@ module stream where
 
   nat-stream' : ∀ (n : ℕ) -> stream ℕ
   nat-stream' n .head = n
-  nat-stream' n .tails = λ { _ tt -> nat-stream' (ℕ.suc n) }
+  nat-stream' n .tails = λ { _ tt -> nat-stream' (suc n) }
 
   nat-stream = nat-stream' 0
 
-  asd : stream-nth 50 nat-stream ≡ 50
-  asd = refl
+  nat-stream-equality-test : stream-nth 100 nat-stream ≡ 100
+  nat-stream-equality-test = refl
