@@ -47,35 +47,53 @@ module itree2 where
   -- Equality / Bisimularity --
   -----------------------------
 
+  -- -- Equality
+  -- record _,_≅_ {E} {R S : Set₀} (p : R ≡ S) (_ : itree E R) (_ : itree E S) : Set₁ where
+  --   inductive
+  --   field
+  --     EqRet : (a : R) (b : S) -> PathP (λ i -> p i) a b
+  --     EqTau : (t1 : ▹ itree E R) (t2 : ▹ itree E S) -> ▸ (λ x ->  p , (t1 x) ≅ (t2 x))
+  --     EqVis1 : ∀ {A B : _} -> {q : A ≡ B} -> (e : E A) -> (t : E B) -> PathP (λ i -> E (q i)) e t -- -> ∀ y -> Σ B (λ z -> ▸ (λ x ->  p , k1 y x ≅ k2 z x))
+  --     EqVis2 : ∀ {A B : _} -> {q : A ≡ B} -> (k1 : A -> ▹ (itree E R)) -> (k2 : B -> ▹ (itree E S)) -> ∀ (x : A) -> ▸ (λ t → p , k1 x t ≅ k2 (subst (λ x₁ → x₁) q x) t)
+
+  -- open _, _≅_  
+
+  -- -- Equality
+  -- data eqitF {E : Type₀ -> Type₁} {R1 R2 : Type₀} {RR : R1 -> R2 -> Set} (b1 b2 : Bool) vlco (sim : itree E R1 -> itree E R2 -> Set₁) : itree E R1 -> itree E R2 -> Set₁ where
+  --   EqRet : ∀ r1 r2 -> (REL : RR r1 r2) -> eqitF b1 b2 vlco sim (Ret r1) (Ret r2)
+  --   EqTau : ∀ m1 m2 -> (REL : sim m1 m2) -> eqitF b1 b2 vlco sim (Tau (next m1)) (Tau (next m2))
+  --   EqVis : ∀ {u} (e : E u) k1 k2 -> (REL : ∀ v → vlco sim (k1 v) (k2 v)) -> eqitF b1 b2 vlco sim (Vis e k1) (Vis e k2)
+  --   EqTauL : ∀ t1 ot2 -> (REL : eqitF b1 b2 vlco sim t1 ot2) -> eqitF b1 b2 vlco sim (Tau (next t1)) ot2 -- (CHECK: b1)
+  --   EqTauR : ∀ ot1 t2 -> (REL : eqitF b1 b2 vlco sim ot1 t2) -> eqitF b1 b2 vlco sim ot1 (Tau (next t2)) -- (CHECK: b2)
+
+  -- eqit-pre : ∀ {E : Type₀ -> Type₁} {R1 R2 : Type₀} b1 b2 vlco sim -> itree E R1 -> itree E R2 -> Set₁
+  -- eqit-pre b1 b2 vlco sim t1 t2 = eqitF b1 b2 vlco sim t1 t2
+
+  -- id : ∀ {A : Set₀} -> A -> A
+  -- id x = x
+
+  -- eqit : ∀ {E : Type₀ -> Type₁} {R1 R2 : Type₀} -> (b1 b2 : Bool) -> itree E R1 -> itree E R2 -> Set₁
+  -- eqit b1 b2 = (fix λ x → (eqit-pre b1 b2 id)) {!!}
+
+  -- eq-tree = eqit false false
+
   -- Equality
-  data _≅_ {E} {R : Set₀} : (itree E R -> itree E R -> Set₁) where
-    EqRet : (a b : R) -> a ≡ b -> (Ret a) ≅ (Ret b)
-    EqTau : (t1 t2 : ▹ itree E R) -> ▸ (λ x -> t1 x ≅ t2 x) -> (Tau t1) ≅ (Tau t2)
-    EqVis : ∀ {A : _} -> (e : E A) -> (k1 k2 : A -> ▹ (itree E R)) -> k1 ≡ k2 -> (Vis e k1) ≅ (Vis e k2)
+  data _,_≅_ {E} {R S : Set₀} (p : R ≡ S) : itree E R -> itree E S -> Set₁ where
+    EqRet : (a : R) (b : S) -> PathP (λ i -> p i) a b -> p , Ret a ≅ Ret b
+    EqTau : (t1 : ▹ itree E R) (t2 : ▹ itree E S) -> ▸ (λ x ->  p , (t1 x) ≅ (t2 x)) -> p , Tau t1 ≅ Tau t2
+    EqVis : ∀ {A B} -> (u : A ≡ B) -> (e : E A) (t : E B) (w : PathP (λ i -> E (u i)) e t) -> (k1 : A -> ▹ (itree E R)) -> (k2 : B -> ▹ (itree E S)) -> PathP (λ i -> u i → ▹ itree E (p i)) k1 k2 -> p , Vis e k1 ≅ Vis t k2
 
-  -- bisimularity
-  bisim : ∀ {E R} -> {r s : itree E R} -> r ≅ s -> r ≡ s
-  bisim (EqRet _ _ p) = λ i → Ret (p i)
-  bisim (EqTau t1 t2 p) = λ i → Tau λ x → bisim (p x) i
-  bisim (EqVis e k1 k2 p) = λ i → Vis e (p i)
+  mutual
+    bisim : ∀ {E R} -> {r s : itree E R} -> refl , r ≅ s -> r ≡ s
+    bisim (EqRet t1 t2 q) i = Ret (q i)
+    bisim (EqTau t1 t2 q) i = Tau λ x → bisim (q x) i
+    bisim {E = E} {R = R}  (EqVis u e t w k1 k2 q) i = Vis (w i) λ x x₁ → q i x x₁
 
-  TODO0 : ∀ {E R} -> {r s : R} -> Ret {E = E} r ≡ Ret s -> r ≡ s
-  TODO0 = {!!}
-
-  TODO1 : ∀ {E R} -> {t1 t2 : ▹ itree E R} -> Tau t1 ≡ Tau t2 -> t1 ≡ t2
-  TODO1 = {!!}
-
-  TODO2 : ∀ {E R A B} {e : E A} {t : E B} {f : A -> ▹ itree E R} {g : B -> ▹ itree E R} -> Path (itree E R) (Vis e f) (Vis t g) -> A ≡ B
-  TODO2 = {!!}
-
-  misib : ∀ {E R} -> {r s : itree E R} -> r ≡ s -> r ≅ s
-  misib {r = Ret r} {s = Ret s} p = EqRet r s (TODO0 p)
-  misib {r = Tau t1} {s = Tau t2} p = EqTau t1 t2 (λ x → misib λ i → TODO1 p i x)
-  misib {r = Vis {A = A} e f} {s = Vis {A = B} t g} p = subst {!!} (TODO2 p) {!!}
-  
-
-  -- postulate
-  --   misib : ∀ {E R} -> {r s : itree E R} -> r ≡ s -> r ≅ s
+    misib : ∀ {E R} -> {r s : itree E R} -> r ≡ s -> refl , r ≅ s
+    misib {r = Ret rr} {s = Ret ss} p = EqRet rr ss (λ i → {!!})
+    misib {r = Tau t1} {s = Tau t2} p = EqTau t1 t2 λ x → {!!}
+    misib {r = Vis {A = A} e f} {s = Vis {A = B} t g} p = EqVis {!!} e t (λ i → {!!}) f g λ i x x₁ → {!!}
+    misib _ = {!!}  
 
   -- iso1 : {A : Type₀} → {x y : stream A} → (p : x ≡ y) → bisim (misib p) ≡ p
   -- head  (iso1 p i j)       = stream-hd (p j)
@@ -86,50 +104,48 @@ module itree2 where
   -- iso2 (EqVis e k1 k2 p) = {!!}
   -- iso2 (EqTau t1 t2 p) = {!!}
 
-  -- path≃bisim : ∀ {E R} → {x y : itree E R} → (x ≡ y) ≃ (x ≅ y)
+  -- path≃bisim : ∀ {E R} → {x y : itree E R} → (x ≡ y) ≃ (refl , x ≅ y)
   -- path≃bisim = isoToEquiv (iso misib bisim iso2 iso1)
 
   -- path≡bisim : {A : Type₀} → {x y : stream A} → (x ≡ y) ≡ (x ≈ y)
   -- path≡bisim = ua path≃bisim
 
+  -- itree-≅-tau : ∀ {E R} (t1 t2 : ▹ itree E R) -> t1 ≡ t2 -> Tau t1 ≡ Tau t2
+  -- itree-≅-tau t1 t2 p = λ i -> funExt⁻ {f = Tau} {g = Tau} refl (p i) i
 
-  itree-≅-tau : ∀ {E R} (t1 t2 : ▹ itree E R) -> t1 ≡ t2 -> Tau t1 ≡ Tau t2
-  itree-≅-tau t1 t2 p = λ i -> funExt⁻ {f = Tau} {g = Tau} refl (p i) i
+  -- -- TODO'S:
+  -- postulate
+  --   sim_convert : ∀ {E A B} {R : Set₀} -> ▹ (itree E A -> itree E B -> Set₁) -> (R -> ▹ itree E A) -> (R -> ▹ itree E B) -> Set₁
+  --   -- sim_convert = ∀ (v : R) -> sim ⊛ (k1 v) ⊛ (k2 v)
+  --   -- sim_convert = (transp k1) ≡ k2
 
-
-  -- TODO'S:
-  postulate
-    sim_convert : ∀ {E A B} {R : Set₀} -> ▹ (itree E A -> itree E B -> Set₁) -> (R -> ▹ itree E A) -> (R -> ▹ itree E B) -> Set₁
-    -- sim_convert = ∀ (v : R) -> sim ⊛ (k1 v) ⊛ (k2 v)
-    -- sim_convert = (transp k1) ≡ k2
-
-    k1k2 : ∀ {E A} {R : Set₀} -> (f : R -> ▹ itree E A) -> (sim : ▹ (itree E A → itree E A → Set₁)) -> sim_convert sim f f
+  --   k1k2 : ∀ {E A} {R : Set₀} -> (f : R -> ▹ itree E A) -> (sim : ▹ (itree E A → itree E A → Set₁)) -> sim_convert sim f f
 
   -- Equality
-  data euttF {E} {A B : Set₀} {r : A -> B -> Set₀} (sim : ▹ (itree E A -> itree E B -> Set₁)) : (itree E A -> itree E B -> Set₁) where
-    EqRet : (a : A) -> (b : B) -> (REL : r a b) -> euttF sim (Ret a) (Ret b)
-    EqVis : {R : Set₀} -> (e : E R) -> (k1 : R -> ▹ (itree E A)) -> (k2 : R -> ▹ (itree E B)) -> (REL : sim_convert sim k1 k2) -> euttF sim (Vis e k1) (Vis e k2)
-    EqTau : (t1 : itree E A) -> (t2 : itree E B) -> euttF sim (Tau (next t1)) (Tau (next t2)) -- -> (REL : sim t1 t2)
-    EqTauL : (t1 : itree E A) -> (ot2 : itree E B) -> (REL : euttF {r = r} sim t1 ot2) -> euttF sim (Tau (next t1)) ot2
-    EqTauR : (ot1 : itree E A) -> (t2 : itree E B) -> (REL : euttF {r = r} sim ot1 t2) -> euttF sim ot1 (Tau (next t2))
+  -- data euttF {E} {A B : Set₀} {r : A -> B -> Set₀} (sim : ▹ (itree E A -> itree E B -> Set₁)) : (itree E A -> itree E B -> Set₁) where
+  --   EqRet : (a : A) -> (b : B) -> (REL : r a b) -> euttF sim (Ret a) (Ret b)
+  --   EqVis : {R : Set₀} -> (e : E R) -> (k1 : R -> ▹ (itree E A)) -> (k2 : R -> ▹ (itree E B)) -> (REL : sim_convert sim k1 k2) -> euttF sim (Vis e k1) (Vis e k2)
+  --   EqTau : (t1 : itree E A) -> (t2 : itree E B) -> euttF sim (Tau (next t1)) (Tau (next t2)) -- -> (REL : sim t1 t2)
+  --   EqTauL : (t1 : itree E A) -> (ot2 : itree E B) -> (REL : euttF {r = r} sim t1 ot2) -> euttF sim (Tau (next t1)) ot2
+  --   EqTauR : (ot1 : itree E A) -> (t2 : itree E B) -> (REL : euttF {r = r} sim ot1 t2) -> euttF sim ot1 (Tau (next t2))
   
   -- k1k2m : ∀ {E A B} {R : Set₀} -> (k1 : R -> ▹ itree E A) (k2 : R -> ▹ itree E B) -> (p : A ≡ B) -> PathP (λ x → R → ▹ itree E (p x)) k1 k2
   -- k1k2m = λ k1 k2 p x x₁ x₂ → {!!}
 
-  eutt : ∀ {E R S} (rel : R -> S -> Set₀) -> itree E R -> itree E S -> Set₁
-  eutt rel = fix (euttF {r = rel})
+  -- eutt : ∀ {E R S} (rel : R -> S -> Set₀) -> itree E R -> itree E S -> Set₁
+  -- eutt rel = fix (euttF {r = rel})
 
-  _≈_ : ∀ {E} {R}  -> itree E R -> itree E R -> Set₁
-  _≈_ {R = R} = eutt _≡_
+  -- _≈_ : ∀ {E} {R}  -> itree E R -> itree E R -> Set₁
+  -- _≈_ {R = R} = eutt _≡_
 
-  _≈'_ : ∀ {E : Set₀ -> Set₁} {R : Set₀}  -> (itree E R -> itree E R -> Set₁)
-  _≈'_ {E = E} {R = R} = euttF {r = _≡_} (next _≈_)
+  -- _≈'_ : ∀ {E : Set₀ -> Set₁} {R : Set₀}  -> (itree E R -> itree E R -> Set₁)
+  -- _≈'_ {E = E} {R = R} = euttF {r = _≡_} (next _≈_)
 
-  fix-unfold : ∀ {E R S} (rel : R -> S -> Set₀) -> eutt {E} {R} {S} rel ≡ euttF {E} {R} {S} {r = rel} (next (eutt rel))
-  fix-unfold rel = fix-eq euttF
+  -- fix-unfold : ∀ {E R S} (rel : R -> S -> Set₀) -> eutt {E} {R} {S} rel ≡ euttF {E} {R} {S} {r = rel} (next (eutt rel))
+  -- fix-unfold rel = fix-eq euttF
 
-  ≈unfold : ∀ {E R} -> _≈_ {E = E} {R = R} ≡ _≈'_
-  ≈unfold = fix-eq euttF
+  -- ≈unfold : ∀ {E R} -> _≈_ {E = E} {R = R} ≡ _≈'_
+  -- ≈unfold = fix-eq euttF
 
   -- rewrites : ∀ b c -> b ≈ c -> b ≈' c
   -- rewrites b c p = {!!}  
@@ -193,35 +209,44 @@ module itree2 where
   -- itree-≈tau : ∀ {E R} (t : itree E R) -> Tau (next t) ≈ t
   -- itree-≈tau (Ret r) = {!!}
 
-  asdf : ∀ {E} {R} {t1 t2 : itree E R} {k1 k2 : R -> itree E R} -> t1 ≅ t2 -> (∀ x -> k1 x ≅ k2 x) -> bind t1 k1 ≅ bind t2 k2
-  asdf p q = {!!}
+  -- asdf : ∀ {E} {R} {t1 t2 : itree E R} {k1 k2 : R -> itree E R} -> t1 ≅ t2 -> (∀ x -> k1 x ≅ k2 x) -> bind t1 k1 ≅ bind t2 k2
+  -- asdf p q = {!!}
 
-  -- Examples
-  data IO : Type₀ → Type₁ where
-    Input : IO ℕ
-    Output : (x : ℕ) -> IO Unit
+  -- -- Examples
+  -- data IO : Type₀ → Type₁ where
+  --   Input : IO ℕ
+  --   Output : (x : ℕ) -> IO Unit
 
-  -- Spin definition
-  spin-pre : ▹ itree IO ⊥ -> itree IO ⊥
-  spin-pre spin = Tau spin
+  -- -- Spin definition
+  -- spin-pre : ▹ itree IO ⊥ -> itree IO ⊥
+  -- spin-pre spin = Tau spin
 
-  spin : itree IO ⊥
-  spin = fix spin-pre
+  -- spin : itree IO ⊥
+  -- spin = fix spin-pre
 
-  spin-unroll : spin ≡ spin-pre (next spin)
-  spin-unroll = fix-eq spin-pre
+  -- spin-unroll : spin ≡ spin-pre (next spin)
+  -- spin-unroll = fix-eq spin-pre
 
-  -- Echo definition
-  echo-pre : ▹ itree IO ⊥ -> itree IO ⊥
-  echo-pre echo = fix λ y -> (Vis Input λ x -> next (Vis (Output x) λ _ → next (Tau echo)))
+  -- -- Echo definition
+  -- echo-pre : ▹ itree IO ⊥ -> itree IO ⊥
+  -- echo-pre echo = Vis Input λ x -> next (Vis (Output x) λ _ → next (Tau echo))
 
-  echo : itree IO ⊥
-  echo = fix echo-pre
+  -- echo : itree IO ⊥
+  -- echo = fix echo-pre
 
-  echo-unroll : echo ≡ echo-pre (next echo)
-  echo-unroll = fix-eq echo-pre
+  -- echo-unroll : echo ≡ echo-pre (next echo)
+  -- echo-unroll = fix-eq echo-pre
 
-  -- Echo definition trigger
-  echo2-pre : ▹ itree IO ⊥ -> itree IO ⊥
-  echo2-pre echo2 = bind (trigger Input) λ x -> bind (trigger (Output x)) λ _ → Tau echo2
+  -- -- Echo definition trigger
+  -- echo2-pre : ▹ itree IO ⊥ -> itree IO ⊥
+  -- echo2-pre echo2 = bind (trigger Input) λ x -> bind (trigger (Output x)) λ _ → Tau echo2
 
+  -- echo2 : itree IO ⊥
+  -- echo2 = fix echo2-pre
+
+  -- -- forever
+  -- forever : ∀ {E R S} -> (t : itree E R) -> itree E S
+  -- forever t = fix λ x → bind t λ _ → Tau x
+
+  -- echo3 : itree IO ⊥
+  -- echo3 = forever (Vis Input λ x -> next (Vis (Output x) λ u → next (Ret u)))
