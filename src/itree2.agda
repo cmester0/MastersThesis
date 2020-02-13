@@ -47,26 +47,49 @@ module itree2 where
   -- Equality / Bisimularity --
   -----------------------------
 
-  -- record euttF {ℓ} {E : Set ℓ -> Set (ℓ-suc ℓ)} {R S : Set ℓ} {rel : R -> S -> Set} (sim : ▹ (itree {ℓ} E R -> itree {ℓ} E S -> Set (ℓ-suc ℓ))) (_ : itree {ℓ = ℓ} E R) (_ : itree E S) : Set (ℓ-suc ℓ) where -- itree E R -> itree E S -> Set ℓ
-  --   coinductive
-  --   field
-  --     EqRet : ∀ (r : R) (s : S) (REL : rel r s) → euttF {rel = rel} sim (Ret r) (Ret s)
-  --     EqVis : ∀ {A : Set ℓ} (e : E A) (k1 : A -> ▹ itree E R) (k2 : A -> ▹ itree E S) -> euttF {rel = rel} sim (Vis e k1) (Vis e k2)
-  --     EqTau : ∀ (t1 : itree E R) (t2 : itree E S) -> euttF {rel = rel} sim (Tau (next t1)) (Tau (next t2))
-  --     EqTauL : ∀ t1 ot2 -> euttF {rel = rel} sim t1 ot2 -> euttF {rel = rel} sim (Tau (next t1)) ot2
-  --     EqTauR : ∀ ot1 t2 -> euttF {rel = rel} sim ot1 t2 -> euttF {rel = rel} sim ot1 (Tau (next t2))
-
   -- Equality
-  data _≅_ {E} {A : Set₀} : (itree E A -> itree E A -> Set₁) where -- 
-    EqRet : (a b : A) -> a ≡ b -> (Ret a) ≅ (Ret b) -- (REL : r a b)
-    EqVis : {R : _} -> (e : E R) -> (k1 k2 : R -> ▹ (itree E A)) -> k1 ≡ k2 -> (Vis e k1) ≅ (Vis e k2)
-    EqTau : (t1 t2 : itree E A) -> t1 ≅ t2 -> (Tau (next t1)) ≅ (Tau (next t2))
+  data _≅_ {E} {R : Set₀} : (itree E R -> itree E R -> Set₁) where
+    EqRet : (a b : R) -> a ≡ b -> (Ret a) ≅ (Ret b)
+    EqTau : (t1 t2 : itree E R) -> t1 ≅ t2 -> (Tau (next t1)) ≅ (Tau (next t2))
+    EqVis : {A : _} -> (e : E A) -> (k1 k2 : A -> ▹ (itree E R)) -> k1 ≡ k2 -> (Vis e k1) ≅ (Vis e k2)
 
   -- bisimularity
-  bisim : ∀ {E R} -> (r s : itree E R) -> r ≅ s -> r ≡ s
-  bisim r s (EqRet _ _ p) = λ i → Ret (p i)
-  bisim r s (EqVis e k1 k2 p) = λ i → Vis e (p i)
-  bisim r s (EqTau t1 t2 p) = λ i → Tau (next (bisim t1 t2 p i))
+  bisim : ∀ {E R} -> {r s : itree E R} -> r ≅ s -> r ≡ s
+  bisim (EqRet _ _ p) = λ i → Ret (p i)
+  bisim (EqTau t1 t2 p) = λ i → Tau (next (bisim p i)) -- r = t1, s = t2
+  bisim (EqVis e k1 k2 p) = λ i → Vis e (p i)
+
+  TODO0 : ∀ {E R} -> {r s : R} -> Ret {E = E} r ≡ Ret s -> r ≡ s
+  TODO0 = {!!}
+
+  misib : ∀ {E R} -> {r s : itree E R} -> r ≡ s -> r ≅ s
+  misib {r = Ret r} {s = Ret s} p = EqRet r s (TODO0 p)
+  misib {r = Tau t1} {s = Tau t2} p = {!!}
+  misib {r = Ret r} {s = Ret s} p = {!!}
+  
+
+  -- postulate
+  --   misib : ∀ {E R} -> {r s : itree E R} -> r ≡ s -> r ≅ s
+
+  -- iso1 : {A : Type₀} → {x y : stream A} → (p : x ≡ y) → bisim (misib p) ≡ p
+  -- head  (iso1 p i j)       = stream-hd (p j)
+  -- tails (iso1 p i j) tt tt = iso1 (λ i → stream-tl (p i)) i j
+
+  iso2 : ∀ {E R} → {x y : itree E R} → (p : x ≅ y) → misib (bisim p) ≡ p
+  iso2 (EqRet r s p) = λ i → {!!}
+  iso2 (EqVis e k1 k2 p) = {!!}
+  iso2 (EqTau t1 t2 p) = {!!}
+
+  -- path≃bisim : ∀ {E R} → {x y : itree E R} → (x ≡ y) ≃ (x ≅ y)
+  -- path≃bisim = isoToEquiv (iso misib bisim iso2 iso1)
+
+  -- path≡bisim : {A : Type₀} → {x y : stream A} → (x ≡ y) ≡ (x ≈ y)
+  -- path≡bisim = ua path≃bisim
+
+
+  itree-≅-tau : ∀ {E R} (t1 t2 : ▹ itree E R) -> t1 ≡ t2 -> Tau t1 ≡ Tau t2
+  itree-≅-tau t1 t2 p = λ i -> funExt⁻ {f = Tau} {g = Tau} refl (p i) i
+
 
   -- TODO'S:
   postulate
@@ -120,22 +143,33 @@ module itree2 where
 
   -- Monad Laws
 
-  itree-M1 : ∀ {E R} (k : R -> itree E R) (v : R) -> bind' (Ret v) k ≅ k v
-  itree-M1 k v = {!!}
+  -- itree-M1 : ∀ {E R} (k : R -> itree E R) (v : R) -> bind' (Ret v) k ≅ k v
+  -- itree-M1 k v = {!!}
 
-  itree-M2 : ∀ {E R} (t : itree E R) -> bind' t Ret ≅ t
-  itree-M2 (Ret r) = EqRet r r refl
-  itree-M2 (Tau t) = {!!}
-  itree-M2 (Vis e f) = {!!}
+  -- itree-M2 : ∀ {E R} (t : itree E R) -> bind' t Ret ≅ t
+  -- itree-M2 (Ret r) = EqRet r r refl
+  -- itree-M2 (Tau t) = {!!}
+  -- itree-M2 (Vis e f) = {!!}
 
-  itree-M3 : ∀ {E R} (k : R -> itree E R) (v : R) -> (k v) ≅ (bind' (Ret v) k)
-  itree-M3 k v = {!!}
+  -- itree-M3 : ∀ {E R} (k : R -> itree E R) (v : R) -> (k v) ≅ (bind' (Ret v) k)
+  -- itree-M3 k v = {!!}
   
   -- Congruence
 
-  itree-≅-tau : ∀ {E R} (t1 t2 : itree E R) -> t1 ≅ t2 -> Tau (next t1) ≅ Tau (next t2)
-  itree-≅-tau t1 t2 p  = EqTau t1 t2 p
+  -- itree-≅-tau : ∀ {E R} (t1 t2 : itree E R) -> t1 ≅ t2 -> Tau (next t1) ≅ Tau (next t2)
+  -- itree-≅-tau t1 t2 p  = EqTau t1 t2 p
+
+  -- itree-≅-next-tau : ∀ {E R} (t1 t2 : ▹ itree E R) -> t1 ≡ t2 -> Tau t1 ≅ Tau t2
+  -- itree-≅-next-tau t1 t2 p  = EqTau t1 t2 p
   
+
+  -- Equality relations
+  -- ≅refl : ∀ {E R} (t : itree E R) -> t ≅ t
+  -- ≅refl (Ret r) = EqRet r r refl
+  -- ≅refl (Tau t) = {!!}
+  -- ≅refl (Vis e f) = {!!}
+
+
   -- itree-≈refl : ∀ {E R} (t : itree E R) -> t ≈' t
   -- itree-≈refl (Ret r) = EqRet r r refl
   -- itree-≈refl (Tau n) = EqTau ? ?
