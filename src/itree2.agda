@@ -50,22 +50,28 @@ module itree2 where
   -- Equality
   data _≅_ {E} {R : Set₀} : (itree E R -> itree E R -> Set₁) where
     EqRet : (a b : R) -> a ≡ b -> (Ret a) ≅ (Ret b)
-    EqTau : (t1 t2 : itree E R) -> t1 ≅ t2 -> (Tau (next t1)) ≅ (Tau (next t2))
-    EqVis : {A : _} -> (e : E A) -> (k1 k2 : A -> ▹ (itree E R)) -> k1 ≡ k2 -> (Vis e k1) ≅ (Vis e k2)
+    EqTau : (t1 t2 : ▹ itree E R) -> ▸ (λ x -> t1 x ≅ t2 x) -> (Tau t1) ≅ (Tau t2)
+    EqVis : ∀ {A : _} -> (e : E A) -> (k1 k2 : A -> ▹ (itree E R)) -> k1 ≡ k2 -> (Vis e k1) ≅ (Vis e k2)
 
   -- bisimularity
   bisim : ∀ {E R} -> {r s : itree E R} -> r ≅ s -> r ≡ s
   bisim (EqRet _ _ p) = λ i → Ret (p i)
-  bisim (EqTau t1 t2 p) = λ i → Tau (next (bisim p i)) -- r = t1, s = t2
+  bisim (EqTau t1 t2 p) = λ i → Tau λ x → bisim (p x) i
   bisim (EqVis e k1 k2 p) = λ i → Vis e (p i)
 
   TODO0 : ∀ {E R} -> {r s : R} -> Ret {E = E} r ≡ Ret s -> r ≡ s
   TODO0 = {!!}
 
+  TODO1 : ∀ {E R} -> {t1 t2 : ▹ itree E R} -> Tau t1 ≡ Tau t2 -> t1 ≡ t2
+  TODO1 = {!!}
+
+  TODO2 : ∀ {E R A B} {e : E A} {t : E B} {f : A -> ▹ itree E R} {g : B -> ▹ itree E R} -> Path (itree E R) (Vis e f) (Vis t g) -> A ≡ B
+  TODO2 = {!!}
+
   misib : ∀ {E R} -> {r s : itree E R} -> r ≡ s -> r ≅ s
   misib {r = Ret r} {s = Ret s} p = EqRet r s (TODO0 p)
-  misib {r = Tau t1} {s = Tau t2} p = {!!}
-  misib {r = Ret r} {s = Ret s} p = {!!}
+  misib {r = Tau t1} {s = Tau t2} p = EqTau t1 t2 (λ x → misib λ i → TODO1 p i x)
+  misib {r = Vis {A = A} e f} {s = Vis {A = B} t g} p = subst {!!} (TODO2 p) {!!}
   
 
   -- postulate
@@ -75,10 +81,10 @@ module itree2 where
   -- head  (iso1 p i j)       = stream-hd (p j)
   -- tails (iso1 p i j) tt tt = iso1 (λ i → stream-tl (p i)) i j
 
-  iso2 : ∀ {E R} → {x y : itree E R} → (p : x ≅ y) → misib (bisim p) ≡ p
-  iso2 (EqRet r s p) = λ i → {!!}
-  iso2 (EqVis e k1 k2 p) = {!!}
-  iso2 (EqTau t1 t2 p) = {!!}
+  -- iso2 : ∀ {E R} → {x y : itree E R} → (p : x ≅ y) → misib (bisim p) ≡ p
+  -- iso2 (EqRet r s p) = λ i → {!!}
+  -- iso2 (EqVis e k1 k2 p) = {!!}
+  -- iso2 (EqTau t1 t2 p) = {!!}
 
   -- path≃bisim : ∀ {E R} → {x y : itree E R} → (x ≡ y) ≃ (x ≅ y)
   -- path≃bisim = isoToEquiv (iso misib bisim iso2 iso1)
