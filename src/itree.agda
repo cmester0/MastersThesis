@@ -13,6 +13,8 @@ module itree where
   open import Later
   open import Cubical.Data.Prod
 
+  a = _≃_
+
   data itreeF {E : Set₀ -> Set₁} {R : Set₀} (itree : Set₁) : Set₁ where
     RetF : (r : R) -> itreeF itree
     TauF : (t : itree) -> itreeF itree

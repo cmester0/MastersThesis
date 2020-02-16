@@ -78,21 +78,37 @@ module itree2 where
   -- eq-tree = eqit false false
 
   -- Equality
-  data _,_≅_ {E} {R S : Set₀} (p : R ≡ S) : itree E R -> itree E S -> Set₁ where
-    EqRet : (a : R) (b : S) -> PathP (λ i -> p i) a b -> p , Ret a ≅ Ret b
-    EqTau : (t1 : ▹ itree E R) (t2 : ▹ itree E S) -> ▸ (λ x ->  p , (t1 x) ≅ (t2 x)) -> p , Tau t1 ≅ Tau t2
-    EqVis : ∀ {A B} -> (u : A ≡ B) -> (e : E A) (t : E B) (w : PathP (λ i -> E (u i)) e t) -> (k1 : A -> ▹ (itree E R)) -> (k2 : B -> ▹ (itree E S)) -> PathP (λ i -> u i → ▹ itree E (p i)) k1 k2 -> p , Vis e k1 ≅ Vis t k2
+  data _≅_ {E} {R} : itree E R -> itree E R -> Set₁ where
+    EqRet : (a b : R) -> a ≡ b -> Ret a ≅ Ret b
+    EqTau : (t1 : ▹ itree E R) (t2 : ▹ itree E R) -> ▸ (λ x ->  (t1 x) ≅ (t2 x)) -> Tau t1 ≅ Tau t2
+    EqVis : ∀ {A B} -> (u : A ≡ B) -> (e : E A) (t : E B) (w : PathP (λ i -> E (u i)) e t) -> (k1 : A -> ▹ (itree E R)) -> (k2 : B -> ▹ (itree E R)) -> PathP (λ i -> u i → ▹ itree E R) k1 k2 -> Vis e k1 ≅ Vis t k2
 
   mutual
-    bisim : ∀ {E R} -> {r s : itree E R} -> refl , r ≅ s -> r ≡ s
+    bisim : ∀ {E R} -> {r s : itree E R} -> r ≅ s -> r ≡ s
     bisim (EqRet t1 t2 q) i = Ret (q i)
     bisim (EqTau t1 t2 q) i = Tau λ x → bisim (q x) i
     bisim {E = E} {R = R}  (EqVis u e t w k1 k2 q) i = Vis (w i) λ x x₁ → q i x x₁
 
-    misib : ∀ {E R} -> {r s : itree E R} -> r ≡ s -> refl , r ≅ s
-    misib {r = Ret rr} {s = Ret ss} p = EqRet rr ss (λ i → {!!})
-    misib {r = Tau t1} {s = Tau t2} p = EqTau t1 t2 λ x → {!!}
-    misib {r = Vis {A = A} e f} {s = Vis {A = B} t g} p = EqVis {!!} e t (λ i → {!!}) f g λ i x x₁ → {!!}
+    todo0 : ∀ {E} {R} {rr ss : R} -> Ret {E = E} rr ≡ Ret ss -> rr ≡ ss
+    todo0 = {!!}
+
+    todo2 : ∀ {E} {R} {t1 t2 : ▹ itree E R} -> Tau t1 ≡ Tau t2 -> t1 ≡ t2
+    todo2 = {!!}
+
+    todo3 : ∀ {E} {R} {A B} {e : E A} {t : E B} {f : A -> ▹ itree E R} {g : B -> ▹ itree E R} -> Vis e f ≡ Vis t g -> A ≡ B
+    todo3 = {!!}
+
+    todo4 : ∀ {E} {R} {A B} {e : E A} {t : E B} {f : A -> ▹ itree E R} {g : B -> ▹ itree E R} -> (p : Vis e f ≡ Vis t g) -> PathP (λ i → E (todo3 p i)) e t
+    todo4 = {!!}
+
+    todo5 : ∀ {E} {R} {A B} {e : E A} {t : E B} {f : A -> ▹ itree E R} {g : B -> ▹ itree E R} -> (p : Vis e f ≡ Vis t g) -> PathP (λ i → todo3 p i → ▹ itree E R) f g
+    todo5 = {!!}
+
+
+    misib : ∀ {E R} -> {r s : itree E R} -> r ≡ s -> r ≅ s
+    misib {r = Ret rr} {s = Ret ss} p = EqRet rr ss (todo0 p)
+    misib {r = Tau t1} {s = Tau t2} p = EqTau t1 t2 λ x → misib (λ i -> todo2 p i x)
+    misib {r = Vis {A = A} e f} {s = Vis {A = B} t g} p = EqVis (todo3 p) e t (todo4 p) f g {!!}
     misib _ = {!!}  
 
   -- iso1 : {A : Type₀} → {x y : stream A} → (p : x ≡ y) → bisim (misib p) ≡ p
