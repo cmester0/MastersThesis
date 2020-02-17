@@ -226,7 +226,7 @@ and further
 \section{ITrees}
 Now we should have all the knowledge needed to make ITrees using \texttt{M}-types. We define ITrees by the container:
 \begin{equation}
-  \container{S} = \left( \unit+\type{R}+\sum_{\type{A}:\universe{\mathcal{U}}} (\type{E}~\type{A}) ~~,~~ \lambda\left\{ \texttt{inl}~(\texttt{inl}~\_) \rightarrow \unit ~;~ \texttt{inr}~(\texttt{inl}~\_) \rightarrow \empt ~;~ \texttt{inr} (\type{A},\_)  \rightarrow \type{A} \right\} \right)
+  \container{S} = \left( \unit+\type{R}+\sum_{\type{A}:\universe{\mathcal{U}}} (\type{E}~\type{A}) ~~,~~ \lambda\left\{ \texttt{inl}~(\texttt{inl}~\_) \rightarrow \unit ~;~ \texttt{inl}~(\texttt{inr}~\_) \rightarrow \empt ~;~ \texttt{inr} (\type{A},\_)  \rightarrow \type{A} \right\} \right)
 \end{equation}
 Then the (reduced) polynomial functor becomes
 \begin{equation}
@@ -236,7 +236,7 @@ Giving us the diagram
 \begin{figure}[h]
   \centering
   \begin{tikzcd}[row sep=large,column sep=large]
-    \type{R} \ar[ddrr,"\term{\texttt{Ret}}"'] \ar[r,"\term{\texttt{inr}}\,\circ\,\term{\texttt{inl}}"] & \type{\texttt{M}} + \type{R} + \sum_{\type{A} : \universe{\mathcal{U}}} (\type{E}~\type{A} \times (\type{A} \rightarrow \type{\texttt{M}})) & & \sum_{\type{A} : \universe{U}} \type{E}~\type{A} \times (\type{A} \rightarrow \type{\mathtt{M}}) \ar[ll,"\term{\texttt{inr}}"'] \ar[ddl,"\term{\texttt{Vis}}"] \\
+    \type{R} \ar[ddrr,"\term{\texttt{Ret}}"'] \ar[r,"\term{\texttt{inl}}\,\circ\,\term{\texttt{inr}}"] & \type{\texttt{M}} + \type{R} + \sum_{\type{A} : \universe{\mathcal{U}}} (\type{E}~\type{A} \times (\type{A} \rightarrow \type{\texttt{M}})) & & \sum_{\type{A} : \universe{U}} \type{E}~\type{A} \times (\type{A} \rightarrow \type{\mathtt{M}}) \ar[ll,"\term{\texttt{inr}}"'] \ar[ddl,"\term{\texttt{Vis}}"] \\
     & & \type{\texttt{M}} \ar[ul,"\term{\texttt{inl}}\,\circ\,\term{\texttt{inl}}"'] \ar[d,"\term{\texttt{Tau}}"'] \\
     & & \type{\texttt{M}} \ar[uul,"\term{\texttt{out}}"]
   \end{tikzcd}
