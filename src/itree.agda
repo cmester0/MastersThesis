@@ -82,17 +82,14 @@ tree E R = M (tree-S E R)
 tree-ret : ∀ {E} {R}  -> R -> tree E R
 tree-ret {E} {R} r = in-fun (inl r , λ ())
 
-tree-vis : ∀ {E} {R}  -> ∀ {A} -> E A × (A -> tree E R) -> tree E R
-tree-vis {E} {R} {A} (e , k) = in-fun (inr (A , e) , k )
+tree-vis : ∀ {E} {R}  -> ∀ {A} -> E A -> (A -> tree E R) -> tree E R
+tree-vis {A = A} e k = in-fun (inr (A , e) , k )
 
 -- ITREES
 record ITree (E : Set₀ -> Set₁) (R : Set₀) : Set₁ where
   coinductive
   field
     ValueIT : ITree E R ⊎ (Σ Set (λ A -> E A × (A -> ITree E R)) ⊎ R)
-
-itree-S : ∀ {E : Set₀ -> Set₁} {R : Set₀} -> Container
-itree-S {E} {R} = ((Unit ⊎ R) ⊎ Σ Set (λ A -> E A)) -,- (λ { (inl (inl _)) -> Unit ; (inl (inr _)) -> ⊥ ; (inr (A , e)) -> A } )
 
 open ITree
 
@@ -105,6 +102,25 @@ ValueIT (Tau t) = inl t
 Vis : {E : Set -> Set₁} {R : Set} {A : Set} -> E A -> (A -> ITree E R) -> ITree E R
 ValueIT (Vis {A = A} e k) = inr (inl (A , e , k))
 
+itree-S : ∀ (E : Set₀ -> Set₁) (R : Set₀) -> Container
+itree-S E R = ((Unit ⊎ R) ⊎ Σ Set (λ A -> E A)) -,- (λ { (inl (inl _)) -> Unit ; (inl (inr _)) -> ⊥ ; (inr (A , e)) -> A } )
+
+itree :  ∀ (E : Set₀ -> Set₁) (R : Set₀) -> Set₁
+itree E R = M (itree-S E R)
+
+tau : {E : Set₀ -> Set₁} -> {R : Set₀} -> itree E R -> itree E R
+tau t = in-fun (inl (inl tt) , λ x → t)
+
+vis : ∀ {E} {R}  -> ∀ {A} -> E A -> (A -> itree E R) -> itree E R
+vis {A = A} e k = in-fun (inr (A , e) , k )
+
+ret : ∀ {E} {R}  -> R -> itree E R
+ret {E} {R} r = in-fun (inl (inr r) , λ ())
+
 {-# NON_TERMINATING #-}
-echo : ITree IO Unit
-echo = Vis Input λ x → Vis (Output x) λ x₁ → Tau echo
+Echo : ITree IO Unit
+Echo = Vis Input λ x → Vis (Output x) λ _ → Tau Echo
+
+{-# NON_TERMINATING #-}
+echo : itree IO Unit
+echo = vis Input λ x → vis (Output x) λ _ → tau echo
