@@ -1,0 +1,302 @@
+\documentclass[twoside,11pt,openright]{report}
+
+% \usepackage[latin1]{inputenc}
+\usepackage[english]{babel}
+\usepackage{a4}
+\usepackage{latexsym}
+\usepackage{amssymb}
+\usepackage{amsmath}
+\usepackage{epsfig}
+\usepackage[T1]{fontenc}
+% \usepackage{mathptmx} % Use Times New Romans as font?
+\usepackage{color}
+\usepackage{epstopdf}
+\usepackage{microtype}
+\usepackage[hidelinks]{hyperref}
+\usepackage[useregional]{datetime2}
+\DTMlangsetup[en-US]{showdayofmonth=false}
+\usepackage{lipsum}
+
+\renewcommand*\sfdefault{lmss}
+\renewcommand*\ttdefault{txtt}
+% \newcommand{\todo}[1]{{\color[rgb]{.5,0,0}\textbf{$\blacktriangleright$#1$\blacktriangleleft$}}}
+
+% Custom packages added:
+
+\usepackage{todonotes} % \todo command
+\usepackage{proof} % \infer command
+\usepackage{fullpage}
+\usepackage{tikz-cd}
+
+% Custom commands
+
+\newcommand*{\set}[1]{\left\{#1\right\}}
+\newcommand*{\term}[1]{\textcolor{green!70!black}{#1}}
+\newcommand*{\type}[1]{\textcolor{red}{#1}}
+\newcommand*{\container}[1]{\textcolor{blue}{#1}}
+\newcommand*{\universe}[1]{\textcolor{orange}{#1}}
+\newcommand*{\unit}{\type{\textbf{1}}}
+
+\begin{document}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\pagestyle{empty} 
+\pagenumbering{roman} 
+\vspace*{\fill}\noindent{\rule{\linewidth}{1mm}\\[4ex]
+{\Huge\sf Higher Order Categorical Semantics}\\[2ex]
+{\huge\sf Lasse Letager Hansen, 201912345}\\[2ex]
+\noindent\rule{\linewidth}{1mm}\\[4ex]
+\noindent{\Large\sf Master's Thesis, Computer Science\\[1ex] 
+\today \\[1ex] Advisor: Bas Spitters\\[15ex]}\\[\fill]}
+\epsfig{file=logo.eps}\clearpage
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\pagestyle{plain}
+\chapter*{Abstract}
+\addcontentsline{toc}{chapter}{Abstract}
+
+\todo[inline]{in English\dots}
+
+\chapter*{Resum\'e}
+\addcontentsline{toc}{chapter}{Resum\'e}
+
+\todo[inline]{in Danish\dots}
+
+\chapter*{Acknowledgments}
+\addcontentsline{toc}{chapter}{Acknowledgments}
+
+\todo[inline]{\dots}
+
+\vspace{2ex}
+\begin{flushright}
+  \emph{Lasse Letager Hansen,}\\
+  \emph{Aarhus, \today.}
+\end{flushright}
+
+\tableofcontents
+\cleardoublepage
+\pagenumbering{arabic}
+\setcounter{secnumdepth}{2}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\chapter{Introduction}
+\label{ch:intro}
+
+\todo[inline]{motivate and explain the problem to be addressed}
+
+\todo[inline]{example of a citation: \cite{DBLP:conf/sas/ChristensenMS03}}
+\todo[inline]{get your bibtex entries from \url{https://dblp.org/}}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\chapter{M-types}
+\label{ch:m-types}
+
+\section{Containers / Signatures}
+A Container (or Signature) is a pair \(\container{S} = (\type{A},\type{B})\) of types \(\vdash \type{A} : \universe{\mathcal{U}}\) and \(\term{a} : \type{A} \vdash \type{B}(\term{a}) : \universe{\mathcal{U}}\). From a container we can define a polynomial functor, defined for objects (types) as
+\begin{equation}
+  \begin{aligned}
+    P_{\container{S}} &: \universe{\mathcal{U}} \rightarrow \universe{\mathcal{U}} \\
+    P(\type{X}) := P_{\container{S}}(\type{X}) &= \sum_{\term{a} : \type{A}} \type{B}(\term{a}) \rightarrow \type{X}
+  \end{aligned}
+\end{equation}
+and for a function \(\term{f} : \type{X} \rightarrow \type{Y}\) as
+\begin{equation}
+  \begin{aligned}
+    P\term{f} &: P\type{X} \rightarrow P\type{Y} \\
+    P\term{f}(\term{a},\term{g}) &= (a, \term{f} \circ \term{g})
+  \end{aligned}
+\end{equation}
+As an example lets look at type for streams over the type \(A\), defined using the container \(\container{S} = (\type{A},\unit)\), applying the polynomial functor we get
+\begin{equation}
+  P_{\container{S}}(\type{X}) = \sum_{\term{a} : \type{A}} \unit \rightarrow \type{X}
+\end{equation}
+since we are working in a Category with exponentials we get \(\unit \rightarrow \type{X} \equiv \type{X}^{\unit} \equiv \type{X}\), furthermore \(\unit\) and \(\type{X}\) does not depend on \(\type{A}\) here, so this will be equivalent to the definition
+\begin{equation}
+  P_{\container{S}}(\type{X}) = \type{A} \times \type{X}
+\end{equation}
+Now we define the coalgebra for this functor with type
+\begin{equation}
+  \mathtt{Coalg}_{\container{S}} = \sum_{\type{C} : \universe{\mathcal{U}}} \type{C} \rightarrow P\type{C}
+\end{equation}
+and morphisms
+\begin{equation}
+  \begin{aligned}
+    \_\Rightarrow\_ &: \mathtt{Coalg}_{\container{S}} \rightarrow \mathtt{Coalg}_{\container{S}} \\
+    (\type{C},\term{\gamma}) \Rightarrow (\type{D},\term{\delta}) &= \sum_{\term{f} : \type{C} \rightarrow \type{D}} \term{\delta} \circ \term{f} = P \term{f} \circ \term{\gamma}
+  \end{aligned}
+\end{equation}
+\(\mathtt{M}\)-types can now be defined from a container \(\container{S}\) as the type \(\type{\mathtt{M}}\) such that \((\type{\mathtt{M}},\term{\mathtt{out}} : \type{\mathtt{M}} \rightarrow P_{\container{S}}\type{\mathtt{M}})\) fulfills the property
+\begin{equation}
+  \mathtt{Final}_{\container{S}} := \sum_{(\type{X},\term{\rho}) : \mathtt{Coalg}_{\container{S}}} \prod_{{(\type{C},\term{\rh\gamma}) : \mathtt{Coalg}_{\container{S}}}} \mathtt{isContr}((\type{C},\term{\gamma}) \Rightarrow (\type{X},\term{\rho}))
+\end{equation}
+that is \(\prod_{(\type{C},\term{\gamma}) : \mathtt{Coalg}_{\container{S}}} \mathtt{isContr}((C,\gamma) \Rightarrow (\type{\mathtt{M}},\term{\mathtt{out}}))\). We denote this construction of the type \(\type{\texttt{M}}\), as \(\texttt{M}(\type{A},\type{B})\) or \(\texttt{M}\container{S}\).
+\\ \\
+If we continue our example for streams this will give us the \(\mathtt{M}\)-type, we can see that \(P_{\container{S}}(\type{\mathtt{M}}) = \type{A} \times \type{\mathtt{M}}\), meaning we have the following diagram,
+\begin{figure}[h]
+  \centering
+  \begin{tikzcd}[row sep=large,column sep=large]
+    \type{A} & \type{A} \times \type{\mathtt{M}} \ar[l,"\term{\pi_1}"'] \ar[r,"\term{\pi_2}"] & M \\
+    & \type{\texttt{M}} \ar[ul,"\term{\texttt{hd}}"] \ar[u,"\term{\texttt{out}}"'] \ar[ur,"\term{\texttt{tl}}"']
+  \end{tikzcd}
+  \caption{M-types of streams}
+\end{figure}
+where \texttt{out} is an isomorphism (because of the finality of the coalgebra), with inverse \(\mathtt{in} : P_{\container{S}}\type{\mathtt{M}} \rightarrow \type{\mathtt{M}}\). We now have a semantic for the rules we would expect for streams, if we let \(\mathtt{cons} = \mathtt{in}\) and \(\mathtt{Stream}~\type{A} = \mathtt{M}(\type{A},\unit)\),
+\begin{equation}
+  \infer[\mathtt{E}_{\mathtt{hd}}]{\term{\mathtt{hd}}~\term{s} : \type{A}}{\vdash \type{A} : \universe{\mathcal{U}} & \term{s} : \mathtt{Stream}~\type{A}}
+\end{equation}
+\begin{equation}
+  \infer[\mathtt{E}_{\mathtt{tl}}]{\term{\mathtt{tl}}~\term{s} : \mathtt{Stream}~\type{A}}{\vdash \type{A} : \universe{\mathcal{U}} & \term{s} : \mathtt{Stream}~\type{A}}
+\end{equation}
+\begin{equation}
+  \infer[\mathtt{I}_{\mathtt{cons}}]{\term{\mathtt{cons}}~\term{x}~\term{xs} : \mathtt{Stream}~\type{A}}{\vdash \type{A} : \universe{\mathcal{U}} & \term{x} : \type{A} & \term{xs} : \mathtt{Stream}~\type{A}}
+\end{equation}
+
+\section{ITrees as \texttt{M}-types}
+We want the following rules for ITrees
+\begin{equation}
+  \infer [\mathtt{I}_\mathtt{Ret}]{\mathtt{Ret}~r : \mathtt{itree}~\mathtt{Event}~\mathtt{Result}}{r : \mathtt{Result}e}
+\end{equation}
+\begin{equation}
+  \infer[\mathtt{I}_\mathtt{Vis}]{\mathtt{Vis}~A~a~f : \mathtt{itree}~\mathtt{Event}~\mathtt{Result}}{A : \mathtt{Type} & a : \mathtt{Event}~A & f : \mathtt{A} \rightarrow \triangleright~\mathtt{itree}~\mathtt{Event}~\mathtt{Result}}.
+\end{equation}
+Elimination rules
+\begin{equation}
+  \infer[\mathtt{E}_\mathtt{Tau}]{\mathtt{Tau}~t : \mathtt{itree}~\mathtt{Event}~\mathtt{Result}}{t : \triangleright~\mathtt{itree}~\mathtt{Event}~\mathtt{Result}}.
+\end{equation}
+
+We start by looking at itree without the (Vis : ) constructor
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\chapter{Guarded Cubical Type Theory (GCTT)}
+\label{ch:itree}
+
+\section{Marin L\"of Type Theory / Intuitionistic Type Theory (MLTT)}
+
+\section{Higher Order Category Theory}
+
+\section{Homotopy Theory (HT)}
+
+\section{Homotopy Type Theory (HoTT)}
+
+\section{Cubical Type Theory (CTT)}
+
+\section{Guarded Type Theory (GTT)}
+
+\section{Guarded Cubical Type Theory (GCTT)}
+Semantics is based on \(\widehat{\mathbb{C} \times \omega}\) The category of cubes \(\mathbb{C}\) is the opposite of the Kleisli category of the free De Morgan algebra monad on finite set.
+\begin{equation}
+  (\triangleright(X))(I,n) = \begin{cases} \set{\star} & n = 0 \\ X(I,m) & n = m + 1 \end{cases}
+\end{equation}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\chapter{Interaction Trees (ITrees)}
+\label{ch:itree}
+
+\section{M-types}
+\label{ch:itree:mtypes}
+
+Given a container of type
+\begin{equation}
+  \infer{(A,B) : \mathtt{Container}}{A : \mathtt{Type} & a : A \vdash B : \mathtt{Type}}  
+\end{equation}
+then M-types are given as
+\begin{equation}
+  \infer{M(A,B) : \mathtt{Container}}{A : Type & B : Type}  
+\end{equation}
+where nodes a given by type \(a : A\) and subtrees are given as \(B(a) \rightarrow M(A,B)\) ...
+\\ \\
+Example: We want to show how streams can be defined using containers / signatures and \(M\)-types. We know that streams are the final coalgebra for the functor \((Stream,tail)\)
+
+\section{Definitions}
+\label{ch:itree:definitions}
+
+In the following definitions, we will let \(\mathtt{Event} : \mathtt{Type} \rightarrow \mathtt{Type}\) and \(\mathtt{Result} : \mathtt{Type}\). \\ Introduction rules
+\begin{equation}
+  \infer [\mathtt{I}_\mathtt{Ret}]{\mathtt{Ret}~r : \mathtt{itree}~\mathtt{Event}~\mathtt{Result}}{r : \mathtt{Result}e}
+\end{equation}
+\begin{equation}
+  \infer[\mathtt{I}_\mathtt{Vis}]{\mathtt{Vis}~A~a~f : \mathtt{itree}~\mathtt{Event}~\mathtt{Result}}{A : \mathtt{Type} & a : \mathtt{Event}~A & f : \mathtt{A} \rightarrow \triangleright~\mathtt{itree}~\mathtt{Event}~\mathtt{Result}}.
+\end{equation}
+Elimination rules
+\begin{equation}
+  \infer[\mathtt{E}_\mathtt{Tau}]{\mathtt{Tau}~t : \mathtt{itree}~\mathtt{Event}~\mathtt{Result}}{t : \triangleright~\mathtt{itree}~\mathtt{Event}~\mathtt{Result}}.
+\end{equation}
+Where we define:
+\begin{equation}
+  \infer{\mathtt{now}~t : \triangleright~\mathtt{itree}}{t : \mathtt{itree}}
+\end{equation}
+\begin{equation}
+  \infer{\mathtt{exit}~t : \mathtt{itree}}{t : \triangleright \mathtt{itree}}
+\end{equation}
+\begin{equation}
+  \infer{\mathtt{step}~t : \triangleright~\mathtt{itree}}{t : \triangleright~\mathtt{itree}}
+\end{equation}
+We now want to define strong bisimulation of ITrees as
+\begin{align}
+  a \equiv b &\rightarrow \mathtt{Ret}~a \equiv \mathtt{Ret}~b \label{eq:ret_path} \\
+  a \equiv_{\triangleright} b &\rightarrow \mathtt{Tau}~(\mathtt{next}~a) \equiv \mathtt{Tau}~(\mathtt{next}~b) \label{eq:tau_path} \\
+  a \equiv b &\rightarrow a \equiv \mathtt{Tau}~(\mathtt{next}~b) \label{eq:tau_r_path} \\
+  a \equiv b &\rightarrow \mathtt{Tau}~(\mathtt{next}~a) \equiv b \label{eq:tau_l_path} \\
+  (p : A \equiv_{Type} B) \rightarrow a \equiv_p b \rightarrow f \equiv_{\textcolor{red}{\triangleright?}} g &\rightarrow \mathtt{Vis}~A~a~f \equiv \mathtt{Vis}~B~b~g \label{eq:vis_path}
+\end{align}
+We then want to weaken the definition, to say that \(\mathtt{Tau}~t \approx t\), that is we want to show
+\begin{equation}
+  \mathtt{Tau}~(\mathtt{next}~t) \equiv t,
+\end{equation}
+but by \eqref{eq:tau_l_path} we just have to show
+\begin{equation}
+  \triangleright~t \equiv t
+\end{equation}
+we can take the fixed point of apply \texttt{Tau}, giving us the element after some (possibly infinite) operations. This can makes two programs one terminating and another not terminating path equal but not judgmentally equal. If we want to preserve termination sensitivity we have to ???.
+\\ \\
+We define tau as the fixpoint of \(Tau = \mathtt{fix}~x.\triangleright[y \leftarrow x].y\) ?? (Problem).
+\[Tau = \triangleright[y \leftarrow dfix^0~x.\triangleright[y \leftarrow x].y].y\]
+\\ \\
+We can build a path between \(t\) and \(\mathtt{Tau}\)
+\\ \\
+Negative variance for \texttt{Tau}.
+
+\section{Category Theory Diagrams}
+Definition of Vis:
+\begin{center}
+  \begin{tikzcd}
+    E~R \times_{itree~E~R} R \ar[dr,"vis"] & R \ar[d,"k"] \\
+    E~R \ar[r] & \texttt{itree}~E~R
+  \end{tikzcd}
+\end{center}
+
+\chapter{The Great Ideas}
+\label{ch:main}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\chapter{Conclusion}
+\label{ch:conclusion}
+
+\todo[inline]{conclude on the problem statement from the introduction}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\cleardoublepage
+\addcontentsline{toc}{chapter}{Bibliography}
+\bibliographystyle{plain} 
+\bibliography{refs}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\cleardoublepage
+\appendix
+\chapter{The Technical Details}
+
+\todo[inline]{\dots}
+
+\end{document}
+

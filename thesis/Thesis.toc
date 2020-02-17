@@ -1,0 +1,24 @@
+\babel@toc {english}{}
+\contentsline {chapter}{Abstract}{iii}{chapter*.1}
+\contentsline {chapter}{Resum\'e}{v}{chapter*.3}
+\contentsline {chapter}{Acknowledgments}{vii}{chapter*.5}
+\contentsline {chapter}{\numberline {1}Introduction}{1}{chapter.1}
+\contentsline {chapter}{\numberline {2}M-types}{3}{chapter.2}
+\contentsline {section}{\numberline {2.1}Containers / Signatures}{3}{section.2.1}
+\contentsline {section}{\numberline {2.2}ITrees as \texttt {M}-types}{4}{section.2.2}
+\contentsline {chapter}{\numberline {3}Guarded Cubical Type Theory (GCTT)}{5}{chapter.3}
+\contentsline {section}{\numberline {3.1}Marin L\"of Type Theory / Intuitionistic Type Theory (MLTT)}{5}{section.3.1}
+\contentsline {section}{\numberline {3.2}Higher Order Category Theory}{5}{section.3.2}
+\contentsline {section}{\numberline {3.3}Homotopy Theory (HT)}{5}{section.3.3}
+\contentsline {section}{\numberline {3.4}Homotopy Type Theory (HoTT)}{5}{section.3.4}
+\contentsline {section}{\numberline {3.5}Cubical Type Theory (CTT)}{5}{section.3.5}
+\contentsline {section}{\numberline {3.6}Guarded Type Theory (GTT)}{5}{section.3.6}
+\contentsline {section}{\numberline {3.7}Guarded Cubical Type Theory (GCTT)}{5}{section.3.7}
+\contentsline {chapter}{\numberline {4}Interaction Trees (ITrees)}{7}{chapter.4}
+\contentsline {section}{\numberline {4.1}M-types}{7}{section.4.1}
+\contentsline {section}{\numberline {4.2}Definitions}{7}{section.4.2}
+\contentsline {section}{\numberline {4.3}Category Theory Diagrams}{8}{section.4.3}
+\contentsline {chapter}{\numberline {5}The Great Ideas}{9}{chapter.5}
+\contentsline {chapter}{\numberline {6}Conclusion}{11}{chapter.6}
+\contentsline {chapter}{Bibliography}{13}{section*.11}
+\contentsline {chapter}{\numberline {A}The Technical Details}{15}{appendix.A}

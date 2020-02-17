@@ -1,18 +1,16 @@
-{-# OPTIONS --cubical --safe --guardedness #-}
+{-# OPTIONS --cubical --guardedness --allow-unsolved-metas #-} --safe
 module M where
 
 open import Cubical.Foundations.Prelude
 open import Cubical.Foundations.Equiv
 open import Cubical.Foundations.Isomorphism
+open import Cubical.Foundations.Function
 
 open import Cubical.Data.Unit
 open import Cubical.Data.Prod
 open import Cubical.Data.Nat as ℕ using (ℕ ; suc ; _+_ )
-open import Cubical.Data.Sum
-open import Cubical.Foundations.Function
 
-open import Cubical.Foundations.Id using (Id)
-
+-- Definitions
 record Container {ℓ} : Set (ℓ-suc ℓ) where
   constructor _-,-_
   field
@@ -60,9 +58,35 @@ Z = λ (X : ℕ -> Set) (l : ∀ (n : ℕ) -> X n -> X (suc n)) -> Σ ((n : ℕ)
 shift-chain : ∀ {ℓ} -> Chain {ℓ} -> Chain {ℓ}
 shift-chain = λ X,π -> ((λ x → X X,π (suc x)) ,, λ {n} → π X,π {suc n})
 
+helper0 : ∀ {ℓ} {X,π : Chain {ℓ}} -> L (shift-chain X,π) ≡ (Σ (X X,π 0) λ x₀ → Σ ((n : ℕ) → X X,π (suc n)) λ y → (π X,π (y 0) ≡ x₀) × ((n : ℕ) → π X,π (y (suc n)) ≡ y n))
+helper0 = λ i → {!!}
+
+helper1 : ∀ {ℓ} {X,π : Chain {ℓ}} -> (Σ (X X,π 0) λ x₀ → Σ ((n : ℕ) → X X,π (suc n)) λ y → (π X,π (y 0) ≡ x₀) × ((n : ℕ) → π X,π (y (suc n)) ≡ y n)) ≡
+                                      (Σ ((n : ℕ) → X X,π n) λ x → (π X,π (x 1) ≡ x 0) × ((n : ℕ) → π X,π (x (suc (suc n))) ≡ x (suc n))) -- π X,π (x 0) ≡ x 0 ?????
+                                                                           ---- ^ should be a zero , by paper !! (this is wrong!)
+helper1 = λ i → {!!}
+
+helper2 : ∀ {ℓ} {X,π : Chain {ℓ}} -> (Σ ((n : ℕ) → X X,π n) λ x → (π X,π (x 1) ≡ x 0) × ((n : ℕ) → π X,π (x (suc (suc n))) ≡ x (suc n))) ≡
+                                      L X,π
+helper2 = λ i → {!!}
+
 -- Lemma 12
 L-unique : ∀ {ℓ} -> {X,π : Chain {ℓ}} -> L (shift-chain X,π) ≡ L X,π
-L-unique = {!!}
+L-unique {X,π = X,π} = λ i →
+  compPath-filler
+    {x = L (shift-chain X,π)}
+    {y = Σ (X X,π 0) λ x₀ → Σ ((n : ℕ) → X X,π (suc n)) λ y → (π X,π (y 0) ≡ x₀) × ((n : ℕ) → π X,π (y (suc n)) ≡ y n)} 
+    {z = L X,π}
+    (helper0 {X,π = X,π})
+    (λ j ->
+      compPath-filler
+        {x = Σ (X X,π 0) λ x₀ → Σ ((n : ℕ) → X X,π (suc n)) λ y → (π X,π (y 0) ≡ x₀) × ((n : ℕ) → π X,π (y (suc n)) ≡ y n)}
+        {y = Σ ((n : ℕ) → X X,π n) λ x → (π X,π (x 1) ≡ x 0) × ((n : ℕ) → π X,π (x (suc (suc n))) ≡ x (suc n))} 
+        {z = L X,π}
+        (helper1 {X,π = X,π})
+        (helper2 {X,π = X,π})
+        j j)
+    i i
 
 ! : ∀ {ℓ} {A : Set ℓ} (x : A) -> Lift {ℓ-zero} {ℓ} Unit
 ! x = lift tt
@@ -82,25 +106,17 @@ X (sequence {ℓ} S) n = sequence-pre₀ {ℓ} S n
 M : ∀ {ℓ} -> Container {ℓ} → Set ℓ
 M = L ∘ sequence
 
-Ms : Container → Set
-Ms = L ∘ shift-chain ∘ sequence
-
-L,π : ∀ {ℓ} -> Container {ℓ} -> Container
-L,π S = (M S -,- λ x -> X (sequence S) 0)
-
-α : ∀ {ℓ} -> {c : Chain {ℓ}} -> L c -> L (shift-chain c)
-α = {!!}
-
 PX,Pπ : ∀ {ℓ} (S : Container {ℓ}) -> Chain
-PX,Pπ S = (λ z → P₀ {S = S} (X (sequence S) z)) ,, λ x → P₁ (λ z → z) (π (sequence S) x) -- TODO: ID func?
+PX,Pπ S = (λ z → P₀ {S = S} (X (sequence S) z)) ,, (λ x → P₁ (λ z → z) (π (sequence S) x)) -- TODO: Id func?
 
 -- Lemma 13
 α-iso : ∀ {ℓ} {S : Container {ℓ}} -> M S ≡ P₀ {S = S} (L (PX,Pπ S))
 α-iso {S = S} = {!!}
 
 helper : ∀ {ℓ} {S} -> P₀ {ℓ} {S = S} (L (PX,Pπ S)) ≡ P₀ {S = S} (M S)
-helper {S = S} = {!!} -- L-unique {sequence S}
+helper {ℓ} {S = S} = {!!} -- λ i → P₀ {ℓ} (L-unique {ℓ} {X,π = sequence {ℓ} S} i)
 
+-- P commutes with limits
 shift : ∀ {ℓ} {S : Container {ℓ}} -> M S ≡ P₀ {S = S} (M S)
 shift {S = S} = λ i -> compPath-filler {x = M S} {y = P₀ {S = S} (L (PX,Pπ S))} {z = P₀ {S = S} (M S)} α-iso helper i i
 
@@ -110,7 +126,7 @@ in-fun {S = S} a = transp (λ i → shift {S = S} (~ i)) i0 a
 out-fun : ∀ {ℓ} {S : Container {ℓ}} -> M S -> P₀ {S = S} (M S)
 out-fun {S = S} a = transp (λ i → shift {S = S} i) i0 a
 
--- bisimulation
+-- bisimulation (TODO)
 record bisimulation (S : Container) (R : Coalg₀ {S = S} -> Coalg₀ {S = S} -> Set₀) : Set₁ where
   field
     αᵣ : let R⁻ = Σ (Coalg₀ {S}) (λ a -> Σ (Coalg₀ {S}) (λ b -> R a b)) in R⁻ -> P₀ {S = {!!}} R⁻
@@ -118,134 +134,4 @@ record bisimulation (S : Container) (R : Coalg₀ {S = S} -> Coalg₀ {S = S} ->
 coinduction : ∀ (S : Container) -> ∀ (R : Coalg₀ {S = S} -> Coalg₀ {S = S} -> Set₀) -> bisimulation S R -> ∀ m m' -> R m m' -> m ≡ m'
 coinduction S R x m m' rel = λ i → {!!}
 
--- Stream example
 
-stream-S : ∀ A -> Container
-stream-S A = (A -,- (λ _ → Unit))
-
-stream : ∀ (A : Set₀) -> Set₀
-stream A = M (stream-S A)
-
-cons : ∀ {A} -> A -> stream A -> stream A
-cons x xs = in-fun (x , λ { tt -> xs } )
-
-hd : ∀ {A} -> stream A -> A
-hd {A} S = out-fun S .fst
-
-tl : ∀ {A} -> stream A -> stream A
-tl {A} S = out-fun S .snd tt
-
-record Stream A : Set₀ where
-  coinductive
-  field
-    head : A
-    tail : Stream A
-
-open Stream
-
-stream-to-Stream : ∀ {A} -> stream A -> Stream A
-head (stream-to-Stream s) = hd s
-tail (stream-to-Stream s) = stream-to-Stream (tl s)
-
-Stream-to-stream : ∀ {A} -> Stream A -> stream A
-Stream-to-stream {A} S = cons (head S) (Stream-to-stream {A} (tail S))
-
-stream-equiv : ∀ {A} -> isEquiv (stream-to-Stream {A})
-stream-equiv = {!!}
-
--- itrees (and buildup examples)
-
-record Delay (R) : Set₀ where
-  coinductive
-  field
-    ValueD : Delay R ⊎ R
-
-open Delay
-
-RetD : ∀ {R : Set₀} -> R -> Delay R
-ValueD (RetD r) = inr r
-
-TauD : ∀ {R : Set₀} -> Delay R -> Delay R
-ValueD (TauD t) = inl t
-
-delay-S : ∀ (R : Set₀) -> Container
-delay-S R = (R -,- λ { _ -> Unit })
-
-delay : ∀ R -> Set₀
-delay R = M (delay-S R)
-
-delay-ret-S : ∀ {R : Set₀} -> R -> delay R
-delay-ret-S r = {!!}
-
-delay-ret : ∀ {R : Set₀} -> R -> delay R
-delay-ret r = in-fun (r , λ x → {!!}) 
-
-delay-tau : ∀ {R} -> delay R -> delay R
-delay-tau S = out-fun S .snd {!!}
-
--- delay examples
-spin : ∀ {R} -> Delay R
-ValueD spin = inl spin
-
-delay-once : ∀ {R} -> R -> Delay R
-delay-once r = TauD (RetD r)
-
-delay-twice : ∀ {R} -> R -> Delay R
-delay-twice r = TauD (TauD (TauD (TauD (RetD r))))
-
--- TREES
-record Tree (E : Set₀ -> Set₀) (R : Set₀) : Set₁ where
-  coinductive
-  field
-    ValueT : Σ Set (λ A -> E A × (A -> Tree E R)) ⊎ R
-
-open Tree
-
-TreeRet : ∀ {E} {R} -> R -> Tree E R
-ValueT (TreeRet r) = inr r
-
-TreeVis : ∀ {E} {R} -> ∀ {A} -> E A -> (A -> Tree E R) -> Tree E R
-ValueT (TreeVis {A = A} e k) = inl (A , e , k)
-
-tree-S : (E : Set₀ -> Set₁) (R : Set₀) -> Container {ℓ = ℓ-suc ℓ-zero}
-tree-S E R = (Container {ℓ = ℓ-zero} -,- λ (x : Container {ℓ = ℓ-zero}) -> R ⊎ Σ Set (λ A -> E A × (A -> M x)))
-
-tree : (E : Set₀ -> Set₁) (R : Set₀) -> Set₁
-tree E R = M (tree-S E R)
-
-tree2 : (E : Set₀ -> Set₁) (R : Set₀) -> {t : tree E R} -> Set
-tree2 E R {t} = M (out-fun t .fst)
-
-tree-ret : ∀ {E} {R}  -> R -> tree2 E R
-tree-ret r = in-fun (r , λ x → {!!})
-
--- tree-vis : ∀ {E} {R} -> ∀ {A} -> E A -> (A -> tree E R) -> tree E R
--- tree-vis {A = A} e k = out-fun {!!} .snd (A , e , {!!})
-
--- ITREES
-record ITree (E : Set₀ -> Set₁) (R : Set₀) : Set₁ where
-  coinductive
-  field
-    ValueIT : ITree E R ⊎ (Σ Set (λ A -> E A × (A -> ITree E R)) ⊎ R)
-
--- itree : ∀ {E : Set₀ -> Set₁} {R : Set₀} -> Set₁
--- itree {E} {R} = M (Unit -,- λ { tt -> ? ⊎ (Σ Set (λ A -> E A × (A -> ?)) ⊎ R) } )
-
-open ITree
-
-Ret : {E : Set -> Set₁} {R : Set} -> R -> ITree E R
-ValueIT (Ret r) = inr (inr r)
-
-Tau : {E : Set -> Set₁} {R : Set} -> ITree E R -> ITree E R
-ValueIT (Tau t) = inl t
-
-Vis : {E : Set -> Set₁} {R : Set} {A : Set} -> E A -> (A -> ITree E R) -> ITree E R
-ValueIT (Vis {A = A} e k) = inr (inl (A , e , k))
-
--- Examples
-data IO : Type₀ → Type₁ where
-  Input : IO ℕ
-  Output : (x : ℕ) -> IO Unit
-
-echo : ITree IO Unit
-echo = Vis Input λ x → Vis (Output x) λ x₁ → Tau echo
