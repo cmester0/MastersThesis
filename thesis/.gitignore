@@ -1,5 +1,6 @@
 _build/
-*.agdai*.aux
+*.agdai
+*.aux
 *.glo
 *.idx
 *.log
