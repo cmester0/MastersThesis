@@ -23,9 +23,11 @@
 
 % Custom packages added:
 
+\usepackage{fullpage}
+\setlength\marginparwidth{0.7in}
+
 \usepackage{todonotes} % \todo command
 \usepackage{proof} % \infer command
-\usepackage{fullpage}
 \usepackage{tikz-cd}
 
 % Custom commands
@@ -36,6 +38,7 @@
 \newcommand*{\container}[1]{\textcolor{blue}{#1}}
 \newcommand*{\universe}[1]{\textcolor{orange}{#1}}
 \newcommand*{\unit}{\type{\textbf{1}}}
+\newcommand*{\empt}{\type{\textbf{0}}}
 
 \begin{document}
 
@@ -131,7 +134,7 @@ and morphisms
 \end{equation}
 \(\mathtt{M}\)-types can now be defined from a container \(\container{S}\) as the type \(\type{\mathtt{M}}\) such that \((\type{\mathtt{M}},\term{\mathtt{out}} : \type{\mathtt{M}} \rightarrow P_{\container{S}}\type{\mathtt{M}})\) fulfills the property
 \begin{equation}
-  \mathtt{Final}_{\container{S}} := \sum_{(\type{X},\term{\rho}) : \mathtt{Coalg}_{\container{S}}} \prod_{{(\type{C},\term{\rh\gamma}) : \mathtt{Coalg}_{\container{S}}}} \mathtt{isContr}((\type{C},\term{\gamma}) \Rightarrow (\type{X},\term{\rho}))
+  \mathtt{Final}_{\container{S}} := \sum_{(\type{X},\term{\rho}) : \mathtt{Coalg}_{\container{S}}} \prod_{{(\type{C},\term{\term{\gamma}}) : \mathtt{Coalg}_{\container{S}}}} \mathtt{isContr}((\type{C},\term{\gamma}) \Rightarrow (\type{X},\term{\rho}))
 \end{equation}
 that is \(\prod_{(\type{C},\term{\gamma}) : \mathtt{Coalg}_{\container{S}}} \mathtt{isContr}((C,\gamma) \Rightarrow (\type{\mathtt{M}},\term{\mathtt{out}}))\). We denote this construction of the type \(\type{\texttt{M}}\), as \(\texttt{M}(\type{A},\type{B})\) or \(\texttt{M}\container{S}\).
 \\ \\
@@ -139,142 +142,106 @@ If we continue our example for streams this will give us the \(\mathtt{M}\)-type
 \begin{figure}[h]
   \centering
   \begin{tikzcd}[row sep=large,column sep=large]
-    \type{A} & \type{A} \times \type{\mathtt{M}} \ar[l,"\term{\pi_1}"'] \ar[r,"\term{\pi_2}"] & M \\
+    \type{A} & \type{A} \times \type{\mathtt{M}} \ar[l,"\term{\pi_1}"'] \ar[r,"\term{\pi_2}"] & \type{\mathtt{M}} \\
     & \type{\texttt{M}} \ar[ul,"\term{\texttt{hd}}"] \ar[u,"\term{\texttt{out}}"'] \ar[ur,"\term{\texttt{tl}}"']
   \end{tikzcd}
   \caption{M-types of streams}
 \end{figure}
 where \texttt{out} is an isomorphism (because of the finality of the coalgebra), with inverse \(\mathtt{in} : P_{\container{S}}\type{\mathtt{M}} \rightarrow \type{\mathtt{M}}\). We now have a semantic for the rules we would expect for streams, if we let \(\mathtt{cons} = \mathtt{in}\) and \(\mathtt{Stream}~\type{A} = \mathtt{M}(\type{A},\unit)\),
 \begin{equation}
-  \infer[\mathtt{E}_{\mathtt{hd}}]{\term{\mathtt{hd}}~\term{s} : \type{A}}{\vdash \type{A} : \universe{\mathcal{U}} & \term{s} : \mathtt{Stream}~\type{A}}
+  \infer[\mathtt{E}_{\mathtt{hd}}]{\term{\mathtt{hd}}~\term{s} : \type{A}}{\type{A} : \universe{\mathcal{U}} & \term{s} : \mathtt{Stream}~\type{A}}
 \end{equation}
 \begin{equation}
-  \infer[\mathtt{E}_{\mathtt{tl}}]{\term{\mathtt{tl}}~\term{s} : \mathtt{Stream}~\type{A}}{\vdash \type{A} : \universe{\mathcal{U}} & \term{s} : \mathtt{Stream}~\type{A}}
+  \infer[\mathtt{E}_{\mathtt{tl}}]{\term{\mathtt{tl}}~\term{s} : \mathtt{Stream}~\type{A}}{\type{A} : \universe{\mathcal{U}} & \term{s} : \mathtt{Stream}~\type{A}}
 \end{equation}
 \begin{equation}
-  \infer[\mathtt{I}_{\mathtt{cons}}]{\term{\mathtt{cons}}~\term{x}~\term{xs} : \mathtt{Stream}~\type{A}}{\vdash \type{A} : \universe{\mathcal{U}} & \term{x} : \type{A} & \term{xs} : \mathtt{Stream}~\type{A}}
+  \infer[\mathtt{I}_{\mathtt{cons}}]{\term{\mathtt{cons}}~\term{x}~\term{xs} : \mathtt{Stream}~\type{A}}{\type{A} : \universe{\mathcal{U}} & \term{x} : \type{A} & \term{xs} : \mathtt{Stream}~\type{A}}
 \end{equation}
 
 \section{ITrees as \texttt{M}-types}
+
+\subsection{Delay Monad}
 We want the following rules for ITrees
 \begin{equation}
-  \infer [\mathtt{I}_\mathtt{Ret}]{\mathtt{Ret}~r : \mathtt{itree}~\mathtt{Event}~\mathtt{Result}}{r : \mathtt{Result}e}
+  \infer [\mathtt{I}_\mathtt{Ret}]{\mathtt{Ret}~\term{r} : \mathtt{itree}~\type{E}~\type{R}}{r : \type{R}}
 \end{equation}
 \begin{equation}
-  \infer[\mathtt{I}_\mathtt{Vis}]{\mathtt{Vis}~A~a~f : \mathtt{itree}~\mathtt{Event}~\mathtt{Result}}{A : \mathtt{Type} & a : \mathtt{Event}~A & f : \mathtt{A} \rightarrow \triangleright~\mathtt{itree}~\mathtt{Event}~\mathtt{Result}}.
+  \infer[\mathtt{I}_\mathtt{Vis}]{\mathtt{Vis}~\term{a}~\term{f} : \mathtt{itree}~\type{E}~\type{R}}{\type{A} : \universe{\mathcal{U}} & \term{a} : \type{E}~\type{A} & \term{f} : \type{A} \rightarrow \texttt{itree}~\type{E}~\type{R}}.
 \end{equation}
 Elimination rules
 \begin{equation}
-  \infer[\mathtt{E}_\mathtt{Tau}]{\mathtt{Tau}~t : \mathtt{itree}~\mathtt{Event}~\mathtt{Result}}{t : \triangleright~\mathtt{itree}~\mathtt{Event}~\mathtt{Result}}.
+  \infer[\mathtt{E}_\mathtt{Tau}]{\mathtt{Tau}~\term{t} : \mathtt{itree}~\type{E}~\type{R}}{\term{t} : \mathtt{itree}~\type{E}~\type{R}}.
 \end{equation}
-
-We start by looking at itree without the (Vis : ) constructor
-
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-\chapter{Guarded Cubical Type Theory (GCTT)}
-\label{ch:itree}
-
-\section{Marin L\"of Type Theory / Intuitionistic Type Theory (MLTT)}
-
-\section{Higher Order Category Theory}
-
-\section{Homotopy Theory (HT)}
-
-\section{Homotopy Type Theory (HoTT)}
-
-\section{Cubical Type Theory (CTT)}
-
-\section{Guarded Type Theory (GTT)}
-
-\section{Guarded Cubical Type Theory (GCTT)}
-Semantics is based on \(\widehat{\mathbb{C} \times \omega}\) The category of cubes \(\mathbb{C}\) is the opposite of the Kleisli category of the free De Morgan algebra monad on finite set.
+We start by looking at \texttt{itree}s without the \texttt{Vis} constructor, this type is also know as the delay monad \todo{check this statement}. We say this type is given by \(\container{S} = (\unit + \type{R},\lambda \{ \texttt{inl}~\_ \rightarrow \unit~;~\texttt{inr}~\_ \rightarrow \empt \})\) equal to \(\mathtt{M}\container{S}\), we then get the polynomial functor
 \begin{equation}
-  (\triangleright(X))(I,n) = \begin{cases} \set{\star} & n = 0 \\ X(I,m) & n = m + 1 \end{cases}
+  P_{\container{S}}(\type{X}) = \sum_{\term{x} : \unit + \type{R}} \lambda \{ \texttt{inl}~\_ \rightarrow \unit ; \texttt{inr}~\_ \rightarrow \empt\}~\term{x} \rightarrow \type{X}
 \end{equation}
-
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-\chapter{Interaction Trees (ITrees)}
-\label{ch:itree}
-
-\section{M-types}
-\label{ch:itree:mtypes}
-
-Given a container of type
+This type is equal to the type:
 \begin{equation}
-  \infer{(A,B) : \mathtt{Container}}{A : \mathtt{Type} & a : A \vdash B : \mathtt{Type}}  
+  P_{\container{S}}(\type{X}) = \type{X} + \type{R} \times (\empt \rightarrow \type{X})
 \end{equation}
-then M-types are given as
+we know that \(\empt \rightarrow \type{X} \equiv \unit\), so we can further reduce to
 \begin{equation}
-  \infer{M(A,B) : \mathtt{Container}}{A : Type & B : Type}  
+  P_{\container{S}}(\type{X}) = \type{X} + \type{R}
 \end{equation}
-where nodes a given by type \(a : A\) and subtrees are given as \(B(a) \rightarrow M(A,B)\) ...
-\\ \\
-Example: We want to show how streams can be defined using containers / signatures and \(M\)-types. We know that streams are the final coalgebra for the functor \((Stream,tail)\)
-
-\section{Definitions}
-\label{ch:itree:definitions}
-
-In the following definitions, we will let \(\mathtt{Event} : \mathtt{Type} \rightarrow \mathtt{Type}\) and \(\mathtt{Result} : \mathtt{Type}\). \\ Introduction rules
-\begin{equation}
-  \infer [\mathtt{I}_\mathtt{Ret}]{\mathtt{Ret}~r : \mathtt{itree}~\mathtt{Event}~\mathtt{Result}}{r : \mathtt{Result}e}
-\end{equation}
-\begin{equation}
-  \infer[\mathtt{I}_\mathtt{Vis}]{\mathtt{Vis}~A~a~f : \mathtt{itree}~\mathtt{Event}~\mathtt{Result}}{A : \mathtt{Type} & a : \mathtt{Event}~A & f : \mathtt{A} \rightarrow \triangleright~\mathtt{itree}~\mathtt{Event}~\mathtt{Result}}.
-\end{equation}
-Elimination rules
-\begin{equation}
-  \infer[\mathtt{E}_\mathtt{Tau}]{\mathtt{Tau}~t : \mathtt{itree}~\mathtt{Event}~\mathtt{Result}}{t : \triangleright~\mathtt{itree}~\mathtt{Event}~\mathtt{Result}}.
-\end{equation}
-Where we define:
-\begin{equation}
-  \infer{\mathtt{now}~t : \triangleright~\mathtt{itree}}{t : \mathtt{itree}}
-\end{equation}
-\begin{equation}
-  \infer{\mathtt{exit}~t : \mathtt{itree}}{t : \triangleright \mathtt{itree}}
-\end{equation}
-\begin{equation}
-  \infer{\mathtt{step}~t : \triangleright~\mathtt{itree}}{t : \triangleright~\mathtt{itree}}
-\end{equation}
-We now want to define strong bisimulation of ITrees as
-\begin{align}
-  a \equiv b &\rightarrow \mathtt{Ret}~a \equiv \mathtt{Ret}~b \label{eq:ret_path} \\
-  a \equiv_{\triangleright} b &\rightarrow \mathtt{Tau}~(\mathtt{next}~a) \equiv \mathtt{Tau}~(\mathtt{next}~b) \label{eq:tau_path} \\
-  a \equiv b &\rightarrow a \equiv \mathtt{Tau}~(\mathtt{next}~b) \label{eq:tau_r_path} \\
-  a \equiv b &\rightarrow \mathtt{Tau}~(\mathtt{next}~a) \equiv b \label{eq:tau_l_path} \\
-  (p : A \equiv_{Type} B) \rightarrow a \equiv_p b \rightarrow f \equiv_{\textcolor{red}{\triangleright?}} g &\rightarrow \mathtt{Vis}~A~a~f \equiv \mathtt{Vis}~B~b~g \label{eq:vis_path}
-\end{align}
-We then want to weaken the definition, to say that \(\mathtt{Tau}~t \approx t\), that is we want to show
-\begin{equation}
-  \mathtt{Tau}~(\mathtt{next}~t) \equiv t,
-\end{equation}
-but by \eqref{eq:tau_l_path} we just have to show
-\begin{equation}
-  \triangleright~t \equiv t
-\end{equation}
-we can take the fixed point of apply \texttt{Tau}, giving us the element after some (possibly infinite) operations. This can makes two programs one terminating and another not terminating path equal but not judgmentally equal. If we want to preserve termination sensitivity we have to ???.
-\\ \\
-We define tau as the fixpoint of \(Tau = \mathtt{fix}~x.\triangleright[y \leftarrow x].y\) ?? (Problem).
-\[Tau = \triangleright[y \leftarrow dfix^0~x.\triangleright[y \leftarrow x].y].y\]
-\\ \\
-We can build a path between \(t\) and \(\mathtt{Tau}\)
-\\ \\
-Negative variance for \texttt{Tau}.
-
-\section{Category Theory Diagrams}
-Definition of Vis:
-\begin{center}
-  \begin{tikzcd}
-    E~R \times_{itree~E~R} R \ar[dr,"vis"] & R \ar[d,"k"] \\
-    E~R \ar[r] & \texttt{itree}~E~R
+meaning we get the following diagram.
+\begin{figure}[h]
+  \centering
+  \begin{tikzcd}[row sep=large,column sep=large]
+    \type{R} \ar[dr,"\term{\texttt{now}}"'] \ar[r,"\term{\texttt{inl}}"] & \type{R} + \type{\mathtt{M}}  & \type{\mathtt{M}} \ar[l,"\term{\texttt{inr}}"'] \ar[dl,"\term{\texttt{later}}"] \\
+    & \type{\texttt{M}} \ar[u,"\term{\texttt{out}}"']
   \end{tikzcd}
-\end{center}
+  \caption{Delay monad}
+\end{figure}
+What this diagram says is that we can define the operations \(\term{\mathtt{now}}\) and \(\term{\mathtt{later}}\) using \(\term{\mathtt{in}} = \term{\mathtt{out}}^{-1}\) together with the injections \(\term{\mathtt{inl}}\) and \(\term{\mathtt{inr}}\). \todo{(Later = Tau, Ret = Now)}
 
-\chapter{The Great Ideas}
-\label{ch:main}
+\subsection{Tree}
+Now lets look at the example where we remove the \(\mathtt{Tau}\) constructor. We let
+\begin{equation}
+\container{S} = \left(\type{R} + \sum_{\type{A} : \universe{\mathcal{U}}} \type{E}~\type{A}~,~\lambda \{ \texttt{inl}~\_ \rightarrow \empt ~;~ \texttt{inr}~(\type{A},\term{e}) \rightarrow \type{A} \} \right).
+\end{equation}
+This will give us the polynomial functor:
+\begin{equation}
+  P_{\container{S}}(\type{X}) = \sum_{\term{x} : \type{R} + \sum_{\type{A} : \universe{\mathcal{U}}} \type{E}~\type{A}} \lambda \{ \texttt{inl}~\_ \rightarrow \empt ~;~ \texttt{inr}~(\type{A},\term{e}) \rightarrow \type{A} \}~\term{x} \rightarrow \type{X}
+\end{equation}
+which simplifies to
+\begin{equation}
+  P_{\container{S}}(\type{X}) = (\type{R} \times (\empt \rightarrow \type{X})) + (\sum_{\type{A} : \universe{\mathcal{U}}} \type{E}~\type{A} \times (\type{A} \rightarrow \type{X}))
+\end{equation}
+and further
+\begin{equation}
+  P_{\container{S}}(\type{X}) = \type{R} + \sum_{\type{A} : \universe{\mathcal{U}}} \type{E}~\type{A} \times (\type{A} \rightarrow \type{X})
+\end{equation}
+
+\begin{figure}[h]
+  \centering
+  \begin{tikzcd}[row sep=large,column sep=large]
+    \type{R} \ar[dr,"\term{\texttt{Ret}}"'] \ar[r,"\term{\texttt{inl}}"] & \type{R} + \sum_{\type{A} : \universe{U}} \type{E}~\type{A} \times (\type{A} \rightarrow \type{\mathtt{M}})  & \sum_{\type{A} : \universe{U}} \type{E}~\type{A} \times (\type{A} \rightarrow \type{\mathtt{M}}) \ar[l,"\term{\texttt{inr}}"'] \ar[dl,"\term{\texttt{Vis}}"] \\
+    & \type{\texttt{M}} \ar[u,"\term{\texttt{out}}"]
+  \end{tikzcd}
+  \caption{TODO: ???}
+\end{figure}
+\noindent Again we can define \texttt{Ret} and \texttt{Vis} using the \texttt{in} functor.
+
+\section{ITrees}
+Now we should have all the knowledge needed to make ITrees using \texttt{M}-types. We define ITrees by the container:
+\begin{equation}
+  \container{S} = \left( \unit+\type{R}+\sum_{\type{A}:\universe{\mathcal{U}}} (\type{E}~\type{A}) ~~,~~ \lambda\left\{ \texttt{inl}~(\texttt{inl}~\_) \rightarrow \unit ~;~ \texttt{inr}~(\texttt{inl}~\_) \rightarrow \empt ~;~ \texttt{inr} (\type{A},\_)  \rightarrow \type{A} \right\} \right)
+\end{equation}
+Then the (reduced) polynomial functor becomes
+\begin{equation}
+  P_{\container{S}}(\type{X}) = \type{X} + \type{R} + \sum_{\type{A} : \universe{\mathcal{U}}} ((\type{E}~\type{A}) \times (\type{A} \rightarrow \type{X}))
+\end{equation}
+Giving us the diagram
+\begin{figure}[h]
+  \centering
+  \begin{tikzcd}[row sep=large,column sep=large]
+    \type{R} \ar[ddrr,"\term{\texttt{Ret}}"'] \ar[r,"\term{\texttt{inr}}\,\circ\,\term{\texttt{inl}}"] & \type{\texttt{M}} + \type{R} + \sum_{\type{A} : \universe{\mathcal{U}}} (\type{E}~\type{A} \times (\type{A} \rightarrow \type{\texttt{M}})) & & \sum_{\type{A} : \universe{U}} \type{E}~\type{A} \times (\type{A} \rightarrow \type{\mathtt{M}}) \ar[ll,"\term{\texttt{inr}}"'] \ar[ddl,"\term{\texttt{Vis}}"] \\
+    & & \type{\texttt{M}} \ar[ul,"\term{\texttt{inl}}\,\circ\,\term{\texttt{inl}}"'] \ar[d,"\term{\texttt{Tau}}"'] \\
+    & & \type{\texttt{M}} \ar[uul,"\term{\texttt{out}}"]
+  \end{tikzcd}
+  \caption{TODO: ???}
+\end{figure}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 

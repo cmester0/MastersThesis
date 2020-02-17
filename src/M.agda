@@ -11,18 +11,18 @@ open import Cubical.Data.Prod
 open import Cubical.Data.Nat as ℕ using (ℕ ; suc ; _+_ )
 
 -- Definitions
-record Container {ℓ} : Set (ℓ-suc ℓ) where
+record Container {ℓ} {ℓ'} : Set (ℓ-suc (ℓ-max ℓ ℓ')) where
   constructor _-,-_
   field
     A : Set ℓ
-    B : A -> Set ℓ
+    B : A -> Set ℓ'
 
 open Container
 
-P₀ : ∀ {ℓ} -> ∀ {S : Container {ℓ = ℓ}} -> Set ℓ -> Set ℓ
+P₀ : ∀ {ℓ} {ℓ'} -> ∀ {S : Container {ℓ = ℓ} {ℓ' = ℓ'}} -> Set (ℓ-max ℓ ℓ') -> Set (ℓ-max ℓ ℓ')
 P₀ {S = S} = λ X -> Σ (A S) λ x → (B S x) -> X
 
-P₁ : ∀ {ℓ} {S : Container} {X Y : Set ℓ} -> (f : X -> Y) -> P₀ {S = S} X -> P₀ {S = S} Y
+P₁ : ∀ {ℓ} {ℓ'} {S : Container {ℓ} {ℓ'}} {X Y : Set (ℓ-max ℓ ℓ')} -> (f : X -> Y) -> P₀ {S = S} X -> P₀ {S = S} Y
 P₁ {S} f = λ { (a , g) -> a , f ∘ g }
 
 Coalg₀ : ∀ {S : Container} -> Set₁
@@ -91,47 +91,47 @@ L-unique {X,π = X,π} = λ i →
 ! : ∀ {ℓ} {A : Set ℓ} (x : A) -> Lift {ℓ-zero} {ℓ} Unit
 ! x = lift tt
 
-sequence-pre₀ : ∀ {ℓ} -> Container {ℓ} -> ℕ -> Set ℓ
+sequence-pre₀ : ∀ {ℓ} {ℓ'} -> Container {ℓ} {ℓ'} -> ℕ -> Set (ℓ-max ℓ ℓ')
 sequence-pre₀ S 0 = Lift Unit
 sequence-pre₀ S (suc n) = P₀ {S = S} (sequence-pre₀ S n)
 
-sequence-pre₁ : ∀ {ℓ} -> (S : Container {ℓ}) -> {n : ℕ} -> sequence-pre₀ S (suc n) -> sequence-pre₀ S n
-sequence-pre₁ {ℓ} S {0} = ! {ℓ}
+sequence-pre₁ : ∀ {ℓ} {ℓ'} -> (S : Container {ℓ} {ℓ'}) -> {n : ℕ} -> sequence-pre₀ S (suc n) -> sequence-pre₀ S n
+sequence-pre₁ {ℓ} {ℓ'} S {0} = ! {ℓ-max ℓ ℓ'}
 sequence-pre₁ S {suc n} = P₁ (sequence-pre₁ S {n})
 
-sequence : ∀ {ℓ} -> Container {ℓ} -> Chain {ℓ}
-X (sequence {ℓ} S) n = sequence-pre₀ {ℓ} S n
-π (sequence {ℓ} S) {n} = sequence-pre₁ {ℓ} S
+sequence : ∀ {ℓ} {ℓ'} -> Container {ℓ} {ℓ'} -> Chain {ℓ-max ℓ ℓ'}
+X (sequence {ℓ} {ℓ'} S) n = sequence-pre₀ {ℓ} {ℓ'} S n
+π (sequence {ℓ} {ℓ'} S) {n} = sequence-pre₁ {ℓ} S
 
-M : ∀ {ℓ} -> Container {ℓ} → Set ℓ
+M : ∀ {ℓ} {ℓ'} -> Container {ℓ} {ℓ'} → Set (ℓ-max ℓ ℓ')
 M = L ∘ sequence
 
-PX,Pπ : ∀ {ℓ} (S : Container {ℓ}) -> Chain
-PX,Pπ S = (λ z → P₀ {S = S} (X (sequence S) z)) ,, (λ x → P₁ (λ z → z) (π (sequence S) x)) -- TODO: Id func?
+PX,Pπ : ∀ {ℓ} {ℓ'} (S : Container {ℓ} {ℓ'}) -> Chain
+PX,Pπ {ℓ} {ℓ'} S = (λ z → P₀ {S = S} (X (sequence S) z)) ,, (λ x → P₁ {ℓ} {ℓ'} (λ z → z) (π (sequence S) x)) -- TODO: Id func?
 
 -- Lemma 13
-α-iso : ∀ {ℓ} {S : Container {ℓ}} -> M S ≡ P₀ {S = S} (L (PX,Pπ S))
+α-iso : ∀ {ℓ} {ℓ'} {S : Container {ℓ} {ℓ'}} -> M S ≡ P₀ {S = S} (L (PX,Pπ S))
 α-iso {S = S} = {!!}
 
-helper : ∀ {ℓ} {S} -> P₀ {ℓ} {S = S} (L (PX,Pπ S)) ≡ P₀ {S = S} (M S)
+helper : ∀ {ℓ} {ℓ'} {S} -> P₀ {ℓ} {ℓ'} {S = S} (L (PX,Pπ S)) ≡ P₀ {S = S} (M S)
 helper {ℓ} {S = S} = {!!} -- λ i → P₀ {ℓ} (L-unique {ℓ} {X,π = sequence {ℓ} S} i)
 
 -- P commutes with limits
-shift : ∀ {ℓ} {S : Container {ℓ}} -> M S ≡ P₀ {S = S} (M S)
+shift : ∀ {ℓ} {ℓ'} {S : Container {ℓ} {ℓ'}} -> M S ≡ P₀ {S = S} (M S)
 shift {S = S} = λ i -> compPath-filler {x = M S} {y = P₀ {S = S} (L (PX,Pπ S))} {z = P₀ {S = S} (M S)} α-iso helper i i
 
-in-fun : ∀ {ℓ} {S : Container {ℓ}} -> P₀ {S = S} (M S) -> M S
+in-fun : ∀ {ℓ} {ℓ'} {S : Container {ℓ} {ℓ'}} -> P₀ {S = S} (M S) -> M S
 in-fun {S = S} a = transp (λ i → shift {S = S} (~ i)) i0 a
 
-out-fun : ∀ {ℓ} {S : Container {ℓ}} -> M S -> P₀ {S = S} (M S)
+out-fun : ∀ {ℓ} {ℓ'} {S : Container {ℓ} {ℓ'}} -> M S -> P₀ {S = S} (M S)
 out-fun {S = S} a = transp (λ i → shift {S = S} i) i0 a
 
 -- bisimulation (TODO)
-record bisimulation (S : Container) (R : Coalg₀ {S = S} -> Coalg₀ {S = S} -> Set₀) : Set₁ where
-  field
-    αᵣ : let R⁻ = Σ (Coalg₀ {S}) (λ a -> Σ (Coalg₀ {S}) (λ b -> R a b)) in R⁻ -> P₀ {S = {!!}} R⁻
+-- record bisimulation {ℓ} {ℓ'} (S : Container {ℓ} {ℓ'}) (R : Coalg₀ {S = S} -> Coalg₀ {S = S} -> Set₀) : Set₁ where
+--   field
+--     αᵣ : let R⁻ = Σ (Coalg₀ {S}) (λ a -> Σ (Coalg₀ {S}) (λ b -> R a b)) in R⁻ -> P₀ {S = {!!}} R⁻
 
-coinduction : ∀ (S : Container) -> ∀ (R : Coalg₀ {S = S} -> Coalg₀ {S = S} -> Set₀) -> bisimulation S R -> ∀ m m' -> R m m' -> m ≡ m'
-coinduction S R x m m' rel = λ i → {!!}
+-- coinduction : ∀ (S : Container) -> ∀ (R : Coalg₀ {S = S} -> Coalg₀ {S = S} -> Set₀) -> bisimulation S R -> ∀ m m' -> R m m' -> m ≡ m'
+-- coinduction S R x m m' rel = λ i → {!!}
 
 
