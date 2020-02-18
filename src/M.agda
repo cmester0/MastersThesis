@@ -48,83 +48,31 @@ open Chain
 L : ∀ {ℓ} -> Chain {ℓ} → Set ℓ
 L (x ,, pi) = Σ ((n : ℕ) → x n) λ x → (n : ℕ) → pi {n = n} (x (suc n)) ≡ x n
 
-Cone : ∀ (A : Set₀) -> ∀ (_ : Chain) -> Set₁
-Cone A (X ,, pi) = (A → L (X ,, pi)) ≡ (Σ ((n : ℕ) → A → X n) λ f → (n : ℕ) → pi ∘ f (suc n) ≡ f n)
-
-Z = λ {ℓ} (X : ℕ -> Set ℓ) (l : ∀ (n : ℕ) -> X n -> X (suc n)) -> Σ ((n : ℕ) → X n) λ x → (n : ℕ) → x (suc n) ≡ l n (x n)
-
-lemma11 : ∀ {ℓ} (X : ℕ -> Set ℓ) (l : ∀ (n : ℕ) -> X n -> X (suc n)) -> Z X l ≡ X 0 -- ∀ (f : Z X l -> X 0) -> isEquiv f
-lemma11 X l f = {!!}
-
 shift-chain : ∀ {ℓ} -> Chain {ℓ} -> Chain {ℓ}
 shift-chain = λ X,π -> ((λ x → X X,π (suc x)) ,, λ {n} → π X,π {suc n})
 
-lemma11-helper : ∀ {ℓ} {X,π : Chain {ℓ}} -> ∀ (y : (n : ℕ) -> X X,π n -> X X,π (suc n)) -> Z (X X,π) y ≡ X X,π 0
-lemma11-helper {X,π = X,π} = lemma11 (X X,π)
+postulate -- TODO
+  combine : ∀ {ℓ} (X : ℕ -> Set ℓ) (p : ∀ {n} -> (X (suc n)) -> (X n) -> Set ℓ)  ->
+    (Σ (X 0) λ x₀ → Σ ((n : ℕ) → X (suc n)) λ y → (p (y 0) x₀) × ((n : ℕ) → p (y (suc n)) (y n))) ≡
+                   (Σ ((n : ℕ) → X n)       λ x → (p (x 1) (x 0)) × ((n : ℕ) → p (x (suc (suc n))) (x (suc n))))
 
--- (Σ (X X,π 0) λ z -> S z) ≡ 
-
-helper10 : ∀ {ℓ} {X,π : Chain {ℓ}} -> ∀ (S : X X,π 0 -> Set ℓ) -> ((z : X X,π 0) -> isContr (S z)) -> ((Σ (X X,π 0) λ z -> S z) ≡ X X,π 0)
-helper10 S cont = λ i → {!!}
-
-helper11 : ∀ {ℓ} {X,π : Chain {ℓ}} -> (y : (n : ℕ) → X X,π (suc n)) -> (z : X X,π 0) -> isContr (π X,π (y 0) ≡ z)
-helper11 z = {!!}
-
-helper12 : ∀ {ℓ} {X,π : Chain {ℓ}} -> (y : (n : ℕ) → X X,π (suc n)) -> (Σ (X X,π 0) λ z -> (π X,π (y 0) ≡ z)) ≡ (X X,π 0)
-helper12 {X,π = X,π} y = helper10 {X,π = X,π} (λ z → π X,π (y 0) ≡ z) (helper11 {X,π = X,π} y)
-
-helper20 : Unit × Unit ≃ Unit
-helper20 = (λ x → tt) , record { equiv-proof = λ { tt → ((tt , tt) , refl) , λ { ( (tt , tt) , r) -> λ i → (tt , tt) , r } } }
-
-helper17 : (Unit × Unit) ≡ Unit
-helper17 = ua helper20
-
-helper25 : ∀ {ℓ} {X,π : Chain {ℓ}} (A : Set ℓ) -> ((X X,π 0) × A) ≃ A
-helper25 = {!!}
-
-helper26 : ∀ {ℓ} {X,π : Chain {ℓ}} {A B : Set ℓ} -> B ≡ (X X,π 0) -> ((X X,π 0) × A) ≡ A -> (B × A) ≡ A
-helper26 p q = λ i -> {!!}
-
-helper14 : ∀ {ℓ} {X,π : Chain {ℓ}} {B : Set ℓ} {A : Set ℓ} -> B ≡ (X X,π 0) -> (B × A) ≡ A
-helper14 {X,π = X,π} {A = A} p = λ i ->(helper26 {X,π = X,π} p (ua (helper25 {X,π = X,π} A))) i
-
-helper13 : ∀ {ℓ} {X,π : Chain {ℓ}} -> (Σ ((n : ℕ) → X X,π (suc n)) λ y →                                           ((n : ℕ) → π X,π (y (suc n)) ≡ y n)) ≡
-                                      (Σ ((n : ℕ) → X X,π (suc n)) λ y → (Σ (X X,π 0) λ x₀ → (π X,π (y 0) ≡ x₀)) × ((n : ℕ) → π X,π (y (suc n)) ≡ y n))
-helper13 {X,π = X,π} = λ i → Σ ((n : ℕ) → X X,π (suc n)) λ y → helper14 {X,π = X,π} {B = Σ (X X,π 0) λ x₀ → π X,π (y 0) ≡ x₀} {A = ((n : ℕ) → π X,π (y (suc n)) ≡ y n)} (helper12 {X,π = X,π} y) (~ i)
-
-helper24 : ∀ {ℓ} {X,π : Chain {ℓ}} {X Y : Set ℓ} {p : X -> Y} {A : ∀ y -> Set ℓ} ->
-               (Σ X λ y → (Σ Y λ x₀ → (p y ≡ x₀)) × A y)  ≡
-  (Σ Y λ x₀ → (Σ X λ y →              (p y ≡ x₀)  × A y))
-helper24 = {!!}
-
-helper23 : ∀ {ℓ} {X,π : Chain {ℓ}} {A : ∀ y -> Set ℓ} ->
-                      (Σ ((n : ℕ) → X X,π (suc n)) λ y → (Σ (X X,π 0) λ x₀ → (π X,π (y 0) ≡ x₀)) × A y) ≡
-  (Σ (X X,π 0) λ x₀ → (Σ ((n : ℕ) → X X,π (suc n)) λ y →                     (π X,π (y 0) ≡ x₀) × A y))
-helper23 {X,π = X,π} = helper24 {X,π = X,π}
-
-helper15 : ∀ {ℓ} {X,π : Chain {ℓ}} -> (                    Σ ((n : ℕ) → X X,π (suc n)) λ y → (Σ (X X,π 0) λ x₀ → (π X,π (y 0) ≡ x₀)) × ((n : ℕ) → π X,π (y (suc n)) ≡ y n)) ≡
-                                       (Σ (X X,π 0) λ x₀ → Σ ((n : ℕ) → X X,π (suc n)) λ y →                      (π X,π (y 0) ≡ x₀)  × ((n : ℕ) → π X,π (y (suc n)) ≡ y n))
-helper15 {X,π = X,π} = λ i → helper23 {X,π = X,π} {A = λ y → (n : ℕ) → π X,π (y (suc n)) ≡ y n} i
+  intro : ∀ {ℓ} {X Y : Set ℓ} (p : X -> Set ℓ) (q : X -> Y -> Set ℓ) -> (Σ X λ a ->         p a) ≡
+                                                             (Σ Y (λ b -> Σ X λ a -> q a b × p a))
+                                                             
+  combine2 : ∀ {ℓ} (X : ℕ -> Set ℓ) -> (p : ∀ {n} -> (X (suc n)) -> (X n) -> Set ℓ) -> (y : (n : ℕ) -> X n) ->
+    p (y 1) (y 0) × ((n : ℕ) → p (y (suc (suc n))) (y (suc n))) ≡ ((n : ℕ) → p (y (suc n)) (y n))
 
 helper0 : ∀ {ℓ} {X,π : Chain {ℓ}} -> (                    Σ ((n : ℕ) → X X,π (suc n)) λ y →                      ((n : ℕ) → π X,π (y (suc n)) ≡ y n)) ≡
                                       (Σ (X X,π 0) λ x₀ → Σ ((n : ℕ) → X X,π (suc n)) λ y → (π X,π (y 0) ≡ x₀) × ((n : ℕ) → π X,π (y (suc n)) ≡ y n))
-helper0 {X,π = X,π} =
-  λ i → compPath-filler
-    {x = Σ ((n : ℕ) → X X,π (suc n)) λ y → (n : ℕ) → π X,π (y (suc n)) ≡ y n}
-    {y = Σ ((n : ℕ) → X X,π (suc n)) λ y → (Σ (X X,π 0) (λ x₀ → π X,π (y 0) ≡ x₀)) × ((n : ℕ) → π X,π (y (suc n)) ≡ y n)}
-    {z = Σ (X X,π 0) λ x₀ → Σ ((n : ℕ) → X X,π (suc n)) λ y → (π X,π (y 0) ≡ x₀) × ((n : ℕ) → π X,π (y (suc n)) ≡ y n)}
-    (helper13 {X,π = X,π})
-    (helper15 {X,π = X,π})
-    i i
+helper0 {X,π = X,π} = intro {X = ((n : ℕ) → X X,π (suc n))} {Y = (X X,π 0)} (λ y → (n : ℕ) → π X,π (y (suc n)) ≡ y n) λ y x₀ → π X,π (y 0) ≡ x₀
 
 helper1 : ∀ {ℓ} {X,π : Chain {ℓ}} -> (Σ (X X,π 0) λ x₀ → Σ ((n : ℕ) → X X,π (suc n)) λ y → (π X,π (y 0) ≡ x₀) × ((n : ℕ) → π X,π (y (suc n)) ≡ y n)) ≡
-                                      (                   Σ ((n : ℕ) → X X,π n)      λ x → (π X,π (x 1) ≡ x 0) × ((n : ℕ) → π X,π (x (suc (suc n))) ≡ x (suc n))) -- π X,π (x 0) ≡ x 0 ?????
-                                                                           ---- ^ should be a zero , by paper !! (this is wrong!)
-helper1 = λ i → {!!}
+                                      (                   Σ ((n : ℕ) → X X,π n)      λ x → (π X,π (x 1) ≡ x 0) × ((n : ℕ) → π X,π (x (suc (suc n))) ≡ x (suc n)))
+helper1 {X,π = X,π} = combine (X X,π) λ a b -> π X,π a ≡ b
 
 helper2 : ∀ {ℓ} {X,π : Chain {ℓ}} -> (Σ ((n : ℕ) → X X,π n) λ x → (π X,π (x 1) ≡ x 0) × ((n : ℕ) → π X,π (x (suc (suc n))) ≡ x (suc n))) ≡
                                       L X,π
-helper2 = λ i → {!!}
+helper2 {X,π = X,π} = λ i → Σ ((n : ℕ) → X X,π n) λ x → combine2 (X X,π) (λ a b → π X,π a ≡ b) x i
 
 -- Lemma 12
 L-unique : ∀ {ℓ} -> {X,π : Chain {ℓ}} -> L (shift-chain X,π) ≡ L X,π
