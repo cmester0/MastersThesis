@@ -38,8 +38,8 @@ ValueD (TauD t) = inl t
 delay : (R : Set₀) -> Set₀
 delay R = M ((λ x → Unit ⊎ R) , λ { _ (inr _) _ → ⊥ ; _ (inl tt) _ -> Unit } ) tt
 
-delay-ret : {R : Set₀} -> R -> delay R
-delay-ret r = in
+-- delay-ret : {R : Set₀} -> R -> delay R
+-- delay-ret r = in
 
 -- delay-ret : {R : Set₀} -> R -> delay R
 -- delay-ret r = {!!} (inr r , λ ())

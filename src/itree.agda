@@ -48,9 +48,40 @@ delay-tau S = in-fun (inl tt , λ x → S)
 spin : ∀ {R} -> Delay R
 ValueD spin = inl spin
 
+data delay≈ {R} : delay R -> delay R -> Set where
+  delay-ret≈ : (r s : R) -> r ≡ s -> delay≈ (delay-ret r) (delay-ret s)
+  delay-tau≈ : (t u : delay R) -> delay≈ t u -> delay≈ (delay-tau t) (delay-tau u)
+
+open delay≈
+open bisimulation
+
+delay-bisim : ∀ {R} -> bisimulation (delay-S R) M-coalg
+R delay-bisim = delay≈
+αᵣ delay-bisim = λ x → inl tt , λ x₁ → ((λ n → {!!}) , (λ n i → {!!})) , (({!!} , (λ n i → {!!})) , {!!})
+rel₁ delay-bisim = {!!}
+rel₂ delay-bisim = {!!}
+
+ret2 : delay ℕ
+ret2 = delay-tau (delay-ret 2)
+
+ret3 : delay ℕ
+ret3 = delay-tau (delay-ret 2)
+
+ret2≡ret3 : ret2 ≡ ret3
+ret2≡ret3 = coinduction (delay-S ℕ) delay-bisim ret2 ret3 (delay-tau≈ (delay-ret 2) (delay-ret 2) (delay-ret≈ 2 2 refl))
+
 {-# NON_TERMINATING #-}
+spins : ∀ {R} -> delay R
+spins {R} = delay-tau {R = R} spins
+
 spin2 : ∀ {R} -> delay R
-spin2 {R} = delay-tau {R = R} spin2
+spin2 {R} = delay-tau {R = R} spins
+
+spin3 : ∀ {R} -> delay R
+spin3 {R} = delay-tau {R = R} spins
+
+spin2≡spin3 : ∀ {R} -> spin2 {R} ≡ spin3
+spin2≡spin3 {R = R} = coinduction (delay-S R) delay-bisim spin2 spin3 (delay-tau≈ spins spins {!!})
 
 delay-once : ∀ {R} -> R -> Delay R
 delay-once r = TauD (RetD r)
