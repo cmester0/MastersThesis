@@ -73,8 +73,10 @@ ValueT (TreeRet r) = inr r
 TreeVis : ∀ {E} {R} -> ∀ {A} -> E A -> (A -> Tree E R) -> Tree E R
 ValueT (TreeVis {A = A} e k) = inl (A , e , k)
 
-tree-S : (E : Set₀ -> Set₁) (R : Set₀) -> Container 
-tree-S E R = (R ⊎ Σ Set (λ A -> E A)) -,- (λ { (inl _) -> ⊥ ; (inr (A , e)) -> A } )
+data ⊥₁ : Set₁ where
+
+tree-S : (E : Set₀ -> Set₁) (R : Set₀) -> Container {ℓ-suc ℓ-zero}
+tree-S E R = (R ⊎ Σ Set (λ A -> E A)) -,- (λ { (inl _) -> ⊥₁ ; (inr (A , e)) -> Lift A } )
 
 tree : (E : Set₀ -> Set₁) (R : Set₀) -> Set₁
 tree E R = M (tree-S E R)
@@ -83,7 +85,7 @@ tree-ret : ∀ {E} {R}  -> R -> tree E R
 tree-ret {E} {R} r = in-fun (inl r , λ ())
 
 tree-vis : ∀ {E} {R}  -> ∀ {A} -> E A -> (A -> tree E R) -> tree E R
-tree-vis {A = A} e k = in-fun (inr (A , e) , k )
+tree-vis {A = A} e k = in-fun (inr (A , e) , λ { (lift x) -> k x } )
 
 -- ITREES
 record ITree (E : Set₀ -> Set₁) (R : Set₀) : Set₁ where
@@ -102,8 +104,8 @@ ValueIT (Tau t) = inl t
 Vis : {E : Set -> Set₁} {R : Set} {A : Set} -> E A -> (A -> ITree E R) -> ITree E R
 ValueIT (Vis {A = A} e k) = inr (inl (A , e , k))
 
-itree-S : ∀ (E : Set₀ -> Set₁) (R : Set₀) -> Container
-itree-S E R = ((Unit ⊎ R) ⊎ Σ Set (λ A -> E A)) -,- (λ { (inl (inl _)) -> Unit ; (inl (inr _)) -> ⊥ ; (inr (A , e)) -> A } )
+itree-S : ∀ (E : Set₀ -> Set₁) (R : Set₀) -> Container {ℓ-suc ℓ-zero}
+itree-S E R = ((Unit ⊎ R) ⊎ Σ Set (λ A -> E A)) -,- (λ { (inl (inl _)) -> Lift Unit ; (inl (inr _)) -> ⊥₁ ; (inr (A , e)) -> Lift A } )
 
 itree :  ∀ (E : Set₀ -> Set₁) (R : Set₀) -> Set₁
 itree E R = M (itree-S E R)
@@ -112,7 +114,7 @@ tau : {E : Set₀ -> Set₁} -> {R : Set₀} -> itree E R -> itree E R
 tau t = in-fun (inl (inl tt) , λ x → t)
 
 vis : ∀ {E} {R}  -> ∀ {A} -> E A -> (A -> itree E R) -> itree E R
-vis {A = A} e k = in-fun (inr (A , e) , k )
+vis {A = A} e k = in-fun (inr (A , e) , λ { (lift x) -> k x } )
 
 ret : ∀ {E} {R}  -> R -> itree E R
 ret {E} {R} r = in-fun (inl (inr r) , λ ())

@@ -12,30 +12,19 @@ open import Cubical.Data.Prod
 open import Cubical.Data.Nat as ℕ using (ℕ ; suc ; _+_ )
 
 -- Definitions
-record Container {ℓ} {ℓ'} : Set (ℓ-suc (ℓ-max ℓ ℓ')) where
+record Container {ℓ : Level} : Set (ℓ-suc ℓ) where
   constructor _-,-_
   field
     A : Set ℓ
-    B : A -> Set ℓ'
+    B : A -> Set ℓ
 
 open Container
 
-P₀ : ∀ {ℓ} {ℓ'} -> ∀ {S : Container {ℓ = ℓ} {ℓ' = ℓ'}} -> Set (ℓ-max ℓ ℓ') -> Set (ℓ-max ℓ ℓ')
+P₀ : ∀ {ℓ} -> ∀ {S : Container {ℓ}} -> Set ℓ -> Set ℓ
 P₀ {S = S} = λ X -> Σ (A S) λ x → (B S x) -> X
 
-P₁ : ∀ {ℓ} {ℓ'} {S : Container {ℓ} {ℓ'}} {X Y : Set (ℓ-max ℓ ℓ')} -> (f : X -> Y) -> P₀ {S = S} X -> P₀ {S = S} Y
+P₁ : ∀ {ℓ} {S : Container {ℓ}} {X Y : Set ℓ} -> (f : X -> Y) -> P₀ {S = S} X -> P₀ {S = S} Y
 P₁ {S} f = λ { (a , g) -> a , f ∘ g }
-
-Coalg₀ : ∀ {S : Container} -> Set₁
-Coalg₀ {S = S} = Σ Set₀ λ C → C → P₀ {S = S} C  
-
-Coalg₁ : ∀ {S : Container} -> Coalg₀ {S = S} -> Coalg₀ {S = S} -> Set₀
-Coalg₁ {S = S} (C , γ) (D , δ) = Σ (C → D) λ f → δ ∘ f ≡ (P₁ f) ∘ γ
-
-_⇒_ = Coalg₁
-
-Final : ∀ {S : Container} -> Set₁
-Final {S = S} = Σ (Coalg₀ {S = S}) λ X,ρ → ∀ (C,γ : Coalg₀) -> isContr (C,γ ⇒ X,ρ)
 
 record Chain {ℓ} : Set (ℓ-suc ℓ) where
   constructor _,,_
@@ -62,18 +51,6 @@ postulate -- TODO
   combine2 : ∀ {ℓ} (X : ℕ -> Set ℓ) -> (p : ∀ {n} -> (X (suc n)) -> (X n) -> Set ℓ) -> (y : (n : ℕ) -> X n) ->
     p (y 1) (y 0) × ((n : ℕ) → p (y (suc (suc n))) (y (suc n))) ≡ ((n : ℕ) → p (y (suc n)) (y n))
 
-helper0 : ∀ {ℓ} {X,π : Chain {ℓ}} -> (                    Σ ((n : ℕ) → X X,π (suc n)) λ y →                      ((n : ℕ) → π X,π (y (suc n)) ≡ y n)) ≡
-                                      (Σ (X X,π 0) λ x₀ → Σ ((n : ℕ) → X X,π (suc n)) λ y → (π X,π (y 0) ≡ x₀) × ((n : ℕ) → π X,π (y (suc n)) ≡ y n))
-helper0 {X,π = X,π} = intro {X = ((n : ℕ) → X X,π (suc n))} {Y = (X X,π 0)} (λ y → (n : ℕ) → π X,π (y (suc n)) ≡ y n) λ y x₀ → π X,π (y 0) ≡ x₀
-
-helper1 : ∀ {ℓ} {X,π : Chain {ℓ}} -> (Σ (X X,π 0) λ x₀ → Σ ((n : ℕ) → X X,π (suc n)) λ y → (π X,π (y 0) ≡ x₀) × ((n : ℕ) → π X,π (y (suc n)) ≡ y n)) ≡
-                                      (                   Σ ((n : ℕ) → X X,π n)      λ x → (π X,π (x 1) ≡ x 0) × ((n : ℕ) → π X,π (x (suc (suc n))) ≡ x (suc n)))
-helper1 {X,π = X,π} = combine (X X,π) λ a b -> π X,π a ≡ b
-
-helper2 : ∀ {ℓ} {X,π : Chain {ℓ}} -> (Σ ((n : ℕ) → X X,π n) λ x → (π X,π (x 1) ≡ x 0) × ((n : ℕ) → π X,π (x (suc (suc n))) ≡ x (suc n))) ≡
-                                      L X,π
-helper2 {X,π = X,π} = λ i → Σ ((n : ℕ) → X X,π n) λ x → combine2 (X X,π) (λ a b → π X,π a ≡ b) x i
-
 -- Lemma 12
 L-unique : ∀ {ℓ} -> {X,π : Chain {ℓ}} -> L (shift-chain X,π) ≡ L X,π
 L-unique {X,π = X,π} = λ i →
@@ -81,61 +58,109 @@ L-unique {X,π = X,π} = λ i →
     {x = L (shift-chain X,π)}
     {y = Σ (X X,π 0) λ x₀ → Σ ((n : ℕ) → X X,π (suc n)) λ y → (π X,π (y 0) ≡ x₀) × ((n : ℕ) → π X,π (y (suc n)) ≡ y n)} 
     {z = L X,π}
-    (helper0 {X,π = X,π})
+    (intro {X = ((n : ℕ) → X X,π (suc n))} {Y = (X X,π 0)} (λ y → (n : ℕ) → π X,π (y (suc n)) ≡ y n) λ y x₀ → π X,π (y 0) ≡ x₀)
     (λ j ->
       compPath-filler
         {x = Σ (X X,π 0) λ x₀ → Σ ((n : ℕ) → X X,π (suc n)) λ y → (π X,π (y 0) ≡ x₀) × ((n : ℕ) → π X,π (y (suc n)) ≡ y n)}
         {y = Σ ((n : ℕ) → X X,π n) λ x → (π X,π (x 1) ≡ x 0) × ((n : ℕ) → π X,π (x (suc (suc n))) ≡ x (suc n))} 
         {z = L X,π}
-        (helper1 {X,π = X,π})
-        (helper2 {X,π = X,π})
+        (combine (X X,π) λ a b -> π X,π a ≡ b)
+        (λ i → Σ ((n : ℕ) → X X,π n) λ x → combine2 (X X,π) (λ a b → π X,π a ≡ b) x i)
         j j)
     i i
 
 ! : ∀ {ℓ} {A : Set ℓ} (x : A) -> Lift {ℓ-zero} {ℓ} Unit
 ! x = lift tt
 
-sequence-pre₀ : ∀ {ℓ} {ℓ'} -> Container {ℓ} {ℓ'} -> ℕ -> Set (ℓ-max ℓ ℓ')
+sequence-pre₀ : ∀ {ℓ} -> Container {ℓ} -> ℕ -> Set ℓ -- (ℓ-max ℓ ℓ')
 sequence-pre₀ S 0 = Lift Unit
 sequence-pre₀ S (suc n) = P₀ {S = S} (sequence-pre₀ S n)
 
-sequence-pre₁ : ∀ {ℓ} {ℓ'} -> (S : Container {ℓ} {ℓ'}) -> {n : ℕ} -> sequence-pre₀ S (suc n) -> sequence-pre₀ S n
-sequence-pre₁ {ℓ} {ℓ'} S {0} = ! {ℓ-max ℓ ℓ'}
+sequence-pre₁ : ∀ {ℓ} -> (S : Container {ℓ}) -> {n : ℕ} -> sequence-pre₀ S (suc n) -> sequence-pre₀ S n
+sequence-pre₁ {ℓ} S {0} = ! {ℓ}
 sequence-pre₁ S {suc n} = P₁ (sequence-pre₁ S {n})
 
-sequence : ∀ {ℓ} {ℓ'} -> Container {ℓ} {ℓ'} -> Chain {ℓ-max ℓ ℓ'}
-X (sequence {ℓ} {ℓ'} S) n = sequence-pre₀ {ℓ} {ℓ'} S n
-π (sequence {ℓ} {ℓ'} S) {n} = sequence-pre₁ {ℓ} S
+sequence : ∀ {ℓ} -> Container {ℓ} -> Chain {ℓ} -- {ℓ-max ℓ ℓ'}
+X (sequence {ℓ} S) n = sequence-pre₀ {ℓ} S n
+π (sequence {ℓ} S) {n} = sequence-pre₁ {ℓ} S
 
-M : ∀ {ℓ} {ℓ'} -> Container {ℓ} {ℓ'} → Set (ℓ-max ℓ ℓ')
+M : ∀ {ℓ} -> Container {ℓ} → Set ℓ -- Set (ℓ-max ℓ ℓ')
 M = L ∘ sequence
 
-PX,Pπ : ∀ {ℓ} {ℓ'} (S : Container {ℓ} {ℓ'}) -> Chain
-PX,Pπ {ℓ} {ℓ'} S = (λ z → P₀ {S = S} (X (sequence S) z)) ,, (λ x → P₁ {ℓ} {ℓ'} (λ z → z) (π (sequence S) x)) -- TODO: Id func?
+PX,Pπ : ∀ {ℓ} (S : Container {ℓ}) -> Chain
+PX,Pπ {ℓ} S =
+  (λ z → P₀ {S = S} (X (sequence S) z)) ,,
+  (λ x → P₁ {ℓ} (λ z → z) (π (sequence S) x)) -- TODO: Id func?
+
+postulate
+  swap-Σ-∀ : ∀ {ℓ} (X : ℕ -> Set ℓ) (A : Set ℓ) (B : A -> Set ℓ) (p : {n : ℕ} -> Σ A (λ a -> B a -> X (suc n)) -> Σ A (λ a -> B a -> X n) -> Set ℓ) ->
+    (Σ (∀ (n : ℕ) -> Σ A (λ a -> B a -> X n)) (λ w -> (n : ℕ) -> p (w (suc n)) (w n))) ≡
+    (Σ ((n : ℕ) → A) λ a → Σ ((n : ℕ) → B (a n) → X n) λ u → (n : ℕ) -> p (a (suc n) , u (suc n)) (a n , u n))
+  
 
 -- Lemma 13
-α-iso : ∀ {ℓ} {ℓ'} {S : Container {ℓ} {ℓ'}} -> M S ≡ P₀ {S = S} (L (PX,Pπ S))
-α-iso {S = S} = {!!}
-
-helper : ∀ {ℓ} {ℓ'} {S} -> P₀ {ℓ} {ℓ'} {S = S} (L (PX,Pπ S)) ≡ P₀ {S = S} (M S)
-helper {ℓ} {S = S} = {!!} -- λ i → P₀ {ℓ} (L-unique {ℓ} {X,π = sequence {ℓ} S} i)
+α-iso : ∀ {ℓ} {S : Container {ℓ}} -> L (PX,Pπ S) ≡ P₀ {S = S} (M S) -- L^P ≡ PL
+α-iso {S = S} = λ i ->
+  compPath-filler
+  {x = L (PX,Pπ S)}
+  {y = (Σ ((n : ℕ) → A S) λ a → Σ ((n : ℕ) → B S (a n) → X (sequence S) n) λ u → (n : ℕ) -> P₁ (π (sequence S)) (a (suc n) , u (suc n)) ≡ (a n , u n))}
+  {z = P₀ {S = S} (M S)}
+  (swap-Σ-∀ (X (sequence S)) (A S) (B S) λ a b → P₁ (π (sequence S)) a ≡ b)
+  {!!} -- equality of pairs, lemma 11, (Universal property of L)
+  i i
 
 -- P commutes with limits
-shift : ∀ {ℓ} {ℓ'} {S : Container {ℓ} {ℓ'}} -> M S ≡ P₀ {S = S} (M S)
-shift {S = S} = λ i -> compPath-filler {x = M S} {y = P₀ {S = S} (L (PX,Pπ S))} {z = P₀ {S = S} (M S)} α-iso helper i i
+shift : ∀ {ℓ} {S : Container {ℓ}} -> P₀ {S = S} (M S) ≡ M S
+shift {S = S} = λ i ->
+  compPath-filler
+    {x = P₀ {S = S} (M S)}
+    {y = L (PX,Pπ S)} --  P₀ {S = S} (L (PX,Pπ S))
+    {z = M S}
+      (sym α-iso) -- lemma 13
+      (L-unique {X,π = sequence S})    -- lemma 12
+      i i
+-- compPath-filler {x = M S} {y = P₀ {S = S} (L (PX,Pπ S))} {z = P₀ {S = S} (M S)} α-iso helper i i
 
-in-fun : ∀ {ℓ} {ℓ'} {S : Container {ℓ} {ℓ'}} -> P₀ {S = S} (M S) -> M S
-in-fun {S = S} a = transp (λ i → shift {S = S} (~ i)) i0 a
+in-fun : ∀ {ℓ} {S : Container {ℓ}} -> P₀ {S = S} (M S) -> M S
+in-fun {S = S} = transp (λ i → shift {S = S} i) i0
 
-out-fun : ∀ {ℓ} {ℓ'} {S : Container {ℓ} {ℓ'}} -> M S -> P₀ {S = S} (M S)
-out-fun {S = S} a = transp (λ i → shift {S = S} i) i0 a
+out-fun : ∀ {ℓ} {S : Container {ℓ}} -> M S -> P₀ {S = S} (M S)
+out-fun {S = S} = transp (λ i → shift {S = S} (~ i)) i0
+
+-- contractible (F is the final coalgebra)
+
+Coalg₀ : ∀ {ℓ} {S : Container {ℓ}} -> Set (ℓ-suc ℓ)
+Coalg₀ {ℓ} {S = S} = Σ (Set ℓ) λ C → C → P₀ {S = S} C  
+
+Coalg₁ : ∀ {ℓ} {S : Container {ℓ}} -> Coalg₀ {S = S} -> Coalg₀ {S = S} -> Set ℓ
+Coalg₁ {S = S} (C , γ) (D , δ) = Σ (C → D) λ f → δ ∘ f ≡ (P₁{S = S} f) ∘ γ
+
+_⇒_ = Coalg₁
+
+Final : ∀ {ℓ} {S : Container {ℓ}} -> Set (ℓ-suc ℓ)
+Final {S = S} = Σ (Coalg₀ {S = S}) λ X,ρ → ∀ (C,γ : Coalg₀ {S = S}) -> isContr (_⇒_ {S = S} (C,γ) (X,ρ))
+
+Ms : ∀ {ℓ} -> (S : Container {ℓ}) -> Container {ℓ}
+Ms S = M S -,- λ x → P₀ {S = S} (M S)
+
+M-coalg : ∀ {ℓ} {S : Container {ℓ}} -> Coalg₀ {S = S}
+M-coalg {S = S} = (M S) , (λ x -> out-fun x)
+
+-- U : ∀ {S} -> (C,γ : Coalg₀ {S = S}) -> ?
+-- U C,γ = Σ (C,γ .fst → L) ?
+
+M-final-coalg : ∀ {ℓ} {S : Container {ℓ}} -> Final {S = S}
+M-final-coalg {S = S} = M-coalg {S = S} , λ C,γ → {!!} , {!!}
 
 -- bisimulation (TODO)
--- record bisimulation {ℓ} {ℓ'} (S : Container {ℓ} {ℓ'}) (R : Coalg₀ {S = S} -> Coalg₀ {S = S} -> Set₀) : Set₁ where
---   field
---     αᵣ : let R⁻ = Σ (Coalg₀ {S}) (λ a -> Σ (Coalg₀ {S}) (λ b -> R a b)) in R⁻ -> P₀ {S = {!!}} R⁻
+record bisimulation {ℓ} (S : Container {ℓ}) (C,γ : Coalg₀ {S = S}) (R : C,γ .fst -> C,γ .fst -> Set₀) : Set ℓ where
+  coinductive
+  field
+    αᵣ : let R⁻ = Σ (C,γ .fst) (λ a -> Σ (C,γ .fst) (λ b -> R a b)) in
+          R⁻ -> P₀ {S = S} R⁻ 
 
--- coinduction : ∀ (S : Container) -> ∀ (R : Coalg₀ {S = S} -> Coalg₀ {S = S} -> Set₀) -> bisimulation S R -> ∀ m m' -> R m m' -> m ≡ m'
--- coinduction S R x m m' rel = λ i → {!!}
+
+-- coinduction : ∀ {ℓ} (S : Container {ℓ}) -> (R : M S -> M S -> Set₀) -> bisimulation S (M S, ?) R -> ∀ m m' -> R m m' -> m ≡ m'
+-- coinduction S C,γ R x m m' rel = λ i → {!!}
 
 
