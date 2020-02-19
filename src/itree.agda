@@ -1,4 +1,4 @@
-{-# OPTIONS --cubical --guardedness  #-} --safe
+{-# OPTIONS --cubical --guardedness #-} --safe
 
 module itree where
 
@@ -13,25 +13,7 @@ open import Cubical.Data.Bool
 open import Cubical.Foundations.Function
 open import Cubical.Foundations.Prelude
 
--- Data types used in examples
-data IO : Type₀ → Type₁ where
-  Input : IO ℕ
-  Output : (x : ℕ) -> IO Unit
-
 -- itrees (and buildup examples)
-record Delay (R) : Set₀ where
-  coinductive
-  field
-    ValueD : Delay R ⊎ R
-
-open Delay
-
-RetD : {R : Set₀} -> R -> Delay R
-ValueD (RetD r) = inr r
-
-TauD : {R : Set₀} -> Delay R -> Delay R
-ValueD (TauD t) = inl t
-
 delay-S : (R : Set₀) -> Container
 delay-S R = (Unit ⊎ R) -,- λ { (inr _) -> ⊥ ; (inl tt) -> Unit }
 
@@ -44,68 +26,10 @@ delay-ret r = in-fun (inr r , λ ())
 delay-tau : {R : Set₀} -> delay R -> delay R
 delay-tau S = in-fun (inl tt , λ x → S)
 
--- delay examples
-spin : ∀ {R} -> Delay R
-ValueD spin = inl spin
-
-data delay≈ {R} : delay R -> delay R -> Set where
-  delay-ret≈ : (r s : R) -> r ≡ s -> delay≈ (delay-ret r) (delay-ret s)
-  delay-tau≈ : (t u : delay R) -> delay≈ t u -> delay≈ (delay-tau t) (delay-tau u)
-
-open delay≈
-open bisimulation
-
-delay-bisim : ∀ {R} -> bisimulation (delay-S R) M-coalg
-R delay-bisim = delay≈
-αᵣ delay-bisim = λ x → inl tt , λ x₁ → ((λ n → {!!}) , (λ n i → {!!})) , (({!!} , (λ n i → {!!})) , {!!})
-rel₁ delay-bisim = {!!}
-rel₂ delay-bisim = {!!}
-
-ret2 : delay ℕ
-ret2 = delay-tau (delay-ret 2)
-
-ret3 : delay ℕ
-ret3 = delay-tau (delay-ret 2)
-
-ret2≡ret3 : ret2 ≡ ret3
-ret2≡ret3 = coinduction (delay-S ℕ) delay-bisim ret2 ret3 (delay-tau≈ (delay-ret 2) (delay-ret 2) (delay-ret≈ 2 2 refl))
-
-{-# NON_TERMINATING #-}
-spins : ∀ {R} -> delay R
-spins {R} = delay-tau {R = R} spins
-
-spin2 : ∀ {R} -> delay R
-spin2 {R} = delay-tau {R = R} spins
-
-spin3 : ∀ {R} -> delay R
-spin3 {R} = delay-tau {R = R} spins
-
-spin2≡spin3 : ∀ {R} -> spin2 {R} ≡ spin3
-spin2≡spin3 {R = R} = coinduction (delay-S R) delay-bisim spin2 spin3 (delay-tau≈ spins spins {!!})
-
-delay-once : ∀ {R} -> R -> Delay R
-delay-once r = TauD (RetD r)
-
-delay-twice : ∀ {R} -> R -> Delay R
-delay-twice r = TauD (TauD (TauD (TauD (RetD r))))
-
--- TREES
-
-record Tree (E : Set₀ -> Set₁) (R : Set₀) : Set₁ where
-  coinductive
-  field
-    ValueT : Σ Set (λ A -> E A × (A -> Tree E R)) ⊎ R
-
-open Tree
-
-TreeRet : ∀ {E} {R} -> R -> Tree E R
-ValueT (TreeRet r) = inr r
-
-TreeVis : ∀ {E} {R} -> ∀ {A} -> E A -> (A -> Tree E R) -> Tree E R
-ValueT (TreeVis {A = A} e k) = inl (A , e , k)
-
+-- Bottom element raised
 data ⊥₁ : Set₁ where
 
+-- TREES
 tree-S : (E : Set₀ -> Set₁) (R : Set₀) -> Container {ℓ-suc ℓ-zero}
 tree-S E R = (R ⊎ Σ Set (λ A -> E A)) -,- (λ { (inl _) -> ⊥₁ ; (inr (A , e)) -> Lift A } )
 
@@ -119,22 +43,6 @@ tree-vis : ∀ {E} {R}  -> ∀ {A} -> E A -> (A -> tree E R) -> tree E R
 tree-vis {A = A} e k = in-fun (inr (A , e) , λ { (lift x) -> k x } )
 
 -- ITREES
-record ITree (E : Set₀ -> Set₁) (R : Set₀) : Set₁ where
-  coinductive
-  field
-    ValueIT : ITree E R ⊎ (Σ Set (λ A -> E A × (A -> ITree E R)) ⊎ R)
-
-open ITree
-
-Ret : {E : Set -> Set₁} {R : Set} -> R -> ITree E R
-ValueIT (Ret r) = inr (inr r)
-
-Tau : {E : Set -> Set₁} {R : Set} -> ITree E R -> ITree E R
-ValueIT (Tau t) = inl t
-
-Vis : {E : Set -> Set₁} {R : Set} {A : Set} -> E A -> (A -> ITree E R) -> ITree E R
-ValueIT (Vis {A = A} e k) = inr (inl (A , e , k))
-
 itree-S : ∀ (E : Set₀ -> Set₁) (R : Set₀) -> Container {ℓ-suc ℓ-zero}
 itree-S E R = ((Unit ⊎ R) ⊎ Σ Set (λ A -> E A)) -,- (λ { (inl (inl _)) -> Lift Unit ; (inl (inr _)) -> ⊥₁ ; (inr (A , e)) -> Lift A } )
 
@@ -149,11 +57,3 @@ vis {A = A} e k = in-fun (inr (A , e) , λ { (lift x) -> k x } )
 
 ret : ∀ {E} {R}  -> R -> itree E R
 ret {E} {R} r = in-fun (inl (inr r) , λ ())
-
-{-# NON_TERMINATING #-}
-Echo : ITree IO Unit
-Echo = Vis Input λ x → Vis (Output x) λ _ → Tau Echo
-
-{-# NON_TERMINATING #-}
-echo : itree IO Unit
-echo = vis Input λ x → vis (Output x) λ _ → tau echo
