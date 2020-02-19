@@ -1,8 +1,6 @@
-{-# OPTIONS --cubical --guardedness  #-} --safe
+{-# OPTIONS --cubical --guardedness --safe #-}
 
 module itree2 where
-
-open import Cubical.Codata.M
 
 open import Cubical.Data.Unit
 open import Cubical.Data.Prod
@@ -13,36 +11,62 @@ open import Cubical.Data.Bool
 open import Cubical.Foundations.Function
 open import Cubical.Foundations.Prelude
 
--- Data types used in examples
-data IO : Type₀ → Type₁ where
-  Input : IO ℕ
-  Output : (x : ℕ) -> IO Unit
-
--- itrees (and buildup examples)
-record Delay (R) : Set₀ where
+-- Delay
+record Delay (R : Set₀) : Set₁ where
   coinductive
   field
     ValueD : Delay R ⊎ R
 
 open Delay
 
-RetD : {R : Set₀} -> R -> Delay R
-ValueD (RetD r) = inr r
+DelayIT : Set₀ -> Set₁
+DelayIT R = Delay R ⊎ R -- delay inner type
 
-TauD : {R : Set₀} -> Delay R -> Delay R
-ValueD (TauD t) = inl t
+TauD : ∀ {R} -> DelayIT R -> DelayIT R
+TauD t = inl record {ValueD = t}
 
--- delay-S : (R : Set₀) -> {!!}
--- delay-S R = (Unit ⊎ R) , λ { (inr _) -> ⊥ ; (inl tt) -> Unit }
+TauD' : ∀ {R} -> Delay R -> DelayIT R
+TauD' t = inl t
 
-delay : (R : Set₀) -> Set₀
-delay R = M ((λ x → Unit ⊎ R) , λ { _ (inr _) _ → ⊥ ; _ (inl tt) _ -> Unit } ) tt
+RetD : ∀ {R} -> R -> DelayIT R
+RetD r = inr r
 
--- delay-ret : {R : Set₀} -> R -> delay R
--- delay-ret r = in
+-- Tree
+record Tree (E : Set₀ -> Set₁) (R : Set₀) : Set₁ where
+  coinductive
+  field
+    ValueT : Σ Set (λ A -> E A × (A -> Tree E R)) ⊎ R
 
--- delay-ret : {R : Set₀} -> R -> delay R
--- delay-ret r = {!!} (inr r , λ ())
+open Tree
 
--- delay-tau : {R : Set₀} -> delay R -> delay R
--- delay-tau S = {!!} (inl tt , λ x → S)
+TreeIT : ∀ (E : Set₀ -> Set₁) (R : Set₀) -> Set₁ -- tree inner type
+TreeIT E R = Σ Set (λ A -> E A × (A -> Tree E R)) ⊎ R
+
+TreeRet : ∀ {E} {R} -> R -> Tree E R
+ValueT (TreeRet r) = inr r
+
+TreeVis : ∀ {E} {R} -> ∀ {A} -> E A -> (A -> TreeIT E R) -> TreeIT E R
+TreeVis {A = A} e k = inl (A , e , λ x -> record { ValueT = k x } )
+
+-- ITree
+record ITree (E : Set₀ -> Set₁) (R : Set₀) : Set₁ where
+  coinductive
+  field
+    ValueIT : ITree E R ⊎ (Σ Set (λ A -> E A × (A -> ITree E R)) ⊎ R)
+
+open ITree
+
+ITree-IT : ∀ (E : Set₀ -> Set₁) (R : Set₀) -> Set₁
+ITree-IT E R = ITree E R ⊎ (Σ Set (λ A -> E A × (A -> ITree E R)) ⊎ R) -- itree inner type
+
+Ret : {E : Set -> Set₁} {R : Set} -> R -> ITree-IT E R
+Ret = inr ∘ inr
+
+Tau : {E : Set -> Set₁} {R : Set} -> ITree-IT E R -> ITree-IT E R
+Tau t = inl record { ValueIT = t}
+
+Tau' : {E : Set -> Set₁} {R : Set} -> ITree E R -> ITree-IT E R
+Tau' t = inl t
+
+Vis : {E : Set -> Set₁} {R : Set} -> ∀ {A} -> E A -> (A -> ITree-IT E R)  -> ITree-IT E R
+Vis {A = A} e k = inr (inl (A , e , λ x -> record { ValueIT = k x } ))
