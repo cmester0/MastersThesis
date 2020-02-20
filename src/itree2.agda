@@ -1,4 +1,4 @@
-{-# OPTIONS --cubical --guardedness --safe #-}
+{-# OPTIONS --cubical --guardedness  #-} --safe
 
 module itree2 where
 
@@ -70,3 +70,24 @@ Tau' t = inl t
 
 Vis : {E : Set -> Set₁} {R : Set} -> ∀ {A} -> E A -> (A -> ITree-IT E R)  -> ITree-IT E R
 Vis {A = A} e k = inr (inl (A , e , λ x -> record { ValueIT = k x } ))
+
+Vis' : {E : Set -> Set₁} {R : Set} -> ∀ {A} -> E A -> (A -> ITree E R)  -> ITree-IT E R
+Vis' {A = A} e k = inr (inl (A , e , k ))
+
+{-# NON_TERMINATING #-}
+Bind : ∀ {E R S} -> ITree-IT E R -> (R -> ITree-IT E S) -> ITree-IT E S
+Bind (inr (inr r)) k = k r
+Bind (inl t) k = Tau (Bind (ValueIT t) k)
+Bind (inr (inl (A , e , k))) k' = Vis e λ x → Bind (ValueIT (k x)) k'
+
+-- {-# NON_TERMINATING #-}
+-- Bind : ∀ {E R S} -> ITree E R -> (R -> ITree E S) -> ITree-IT E S
+-- Bind S k = case ValueIT S of λ { (inr (inr r)) → ValueIT (k r)
+--                                  ; (inl t) -> inl (record { ValueIT = Bind t k })
+--                                  ; (inr (inl (A , e , k'))) -> inr (inl ( A , e , λ x → record { ValueIT = Bind (k' x) k } ))} -- Tau' (Bind t k)
+
+Trigger : ∀ {E} {R} -> (e : E R) -> ITree-IT E R
+Trigger e = Vis e Ret
+
+Trigger' : ∀ {E} {R} -> (e : E R) -> ITree E R
+ValueIT (Trigger' e) = Vis e Ret

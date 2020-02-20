@@ -44,7 +44,7 @@ tree-vis {A = A} e k = in-fun (inr (A , e) , λ { (lift x) -> k x } )
 
 -- ITREES
 itree-S : ∀ (E : Set₀ -> Set₁) (R : Set₀) -> Container {ℓ-suc ℓ-zero}
-itree-S E R = ((Unit ⊎ R) ⊎ Σ Set (λ A -> E A)) -,- (λ { (inl (inl _)) -> Lift Unit ; (inl (inr _)) -> ⊥₁ ; (inr (A , e)) -> Lift A } )
+itree-S E R = ((Unit ⊎ R) ⊎ Σ Set E) -,- (λ { (inl (inl _)) -> Lift Unit ; (inl (inr _)) -> ⊥₁ ; (inr (A , e)) -> Lift A } )
 
 itree :  ∀ (E : Set₀ -> Set₁) (R : Set₀) -> Set₁
 itree E R = M (itree-S E R)
@@ -57,3 +57,16 @@ vis {A = A} e k = in-fun (inr (A , e) , λ { (lift x) -> k x } )
 
 ret : ∀ {E} {R}  -> R -> itree E R
 ret {E} {R} r = in-fun (inl (inr r) , λ ())
+
+-- Bind operations
+
+-- bind-helper : ∀ {E : Set -> Set₁} {R S : Set} -> (R -> itree E S) -> ((Unit ⊎ R) ⊎ Σ Set E) -> itree E S
+-- bind-helper k (inl (inl tt)) = tau {!!}
+-- bind-helper k (inl (inr r)) = k r
+-- bind-helper k (inr (A , e)) = vis e λ x → bind-helper k (k x)
+
+-- bind : ∀ {E} {R} {S} -> itree E R -> (R -> itree E S) -> itree E S
+-- bind {E} {R} {S} t k = bind-helper k (out-fun {S = itree-S E R} t .fst)
+
+trigger : ∀ {E R} -> E R -> itree E R
+trigger e = vis e λ x → ret x

@@ -33,12 +33,13 @@
 % Custom commands
 
 \newcommand*{\set}[1]{\left\{#1\right\}}
-\newcommand*{\term}[1]{\textcolor{green!70!black}{#1}}
-\newcommand*{\type}[1]{\textcolor{red}{#1}}
-\newcommand*{\container}[1]{\textcolor{blue}{#1}}
-\newcommand*{\universe}[1]{\textcolor{orange}{#1}}
+\newcommand*{\term}[1]{\textcolor{blue!80!black}{#1}}
+\newcommand*{\type}[1]{\textcolor{magenta!90!black}{#1}}
+\newcommand*{\container}[1]{\textcolor{red}{#1}}
+\newcommand*{\universe}[1]{\textcolor{orange!80!black}{#1}}
 \newcommand*{\unit}{\type{\textbf{1}}}
 \newcommand*{\empt}{\type{\textbf{0}}}
+\newcommand*{\coalg}[2]{#1\texttt{-}#2}
 
 \begin{document}
 
@@ -90,7 +91,7 @@
 
 \todo[inline]{motivate and explain the problem to be addressed}
 
-\todo[inline]{example of a citation: \cite{DBLP:conf/sas/ChristensenMS03}}
+\todo[inline]{example of a citation: \cite{amin2018}}
 \todo[inline]{get your bibtex entries from \url{https://dblp.org/}}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -223,7 +224,7 @@ and further
 \end{figure}
 \noindent Again we can define \texttt{Ret} and \texttt{Vis} using the \texttt{in} functor.
 
-\section{ITrees}
+\subsection{ITrees}
 Now we should have all the knowledge needed to make ITrees using \texttt{M}-types. We define ITrees by the container:
 \begin{equation}
   \container{S} = \left( \unit+\type{R}+\sum_{\type{A}:\universe{\mathcal{U}}} (\type{E}~\type{A}) ~~,~~ \lambda\left\{ \texttt{inl}~(\texttt{inl}~\_) \rightarrow \unit ~;~ \texttt{inl}~(\texttt{inr}~\_) \rightarrow \empt ~;~ \texttt{inr} (\type{A},\_)  \rightarrow \type{A} \right\} \right)
@@ -243,6 +244,41 @@ Giving us the diagram
   \caption{TODO: ???}
 \end{figure}
 
+\section{Coinduction priciple of M-types}
+We can now construct a bisimulation: forall coalgebras \(\coalg{\type{C}}{\term{\gamma}} : \mathtt{Coalg}_{\container{S}}\), if we have a relation \(\term{\mathcal{R}} : \type{C} \rightarrow \type{C} \rightarrow \universe{\mathcal{U}}\), and a type \(\type{\overline{\mathcal{R}}} = \sum_{\term{a} : \type{C}} \sum_{\term{b} : \type{C}} \term{\mathcal{R}}~\term{a}~\term{b}\), such that \(\type{\overline{\mathcal{R}}}\) and \(\term{\alpha}_{\type{\overline{\mathcal{R}}}} : \type{\overline{\mathcal{R}}} \rightarrow P(\type{\overline{\mathcal{R}}})\) makes a P-coalgebra \(\coalg{\type{\overline{\mathcal{R}}}}{\term{\alpha}_{\type{\overline{\mathcal{R}}}}} : \mathtt{Coalg}_{\container{S}}\), such that the following diagram commutes (where \(\Rightarrow\) are P-coalgebra morphisms).
+
+\begin{figure}[h]
+  \centering
+  \begin{tikzcd}[row sep=huge,column sep=huge]
+    \coalg{\type{C}}{\term{\gamma}} & \coalg{\type{\overline{\mathcal{R}}}}{\term{\alpha}_{\type{\overline{\mathcal{R}}}}} \ar[l,Rightarrow,"{\pi_1}^{\type{\overline{\mathcal{R}}}}"'] \ar[r,Rightarrow,"{\pi_2}^{\type{\overline{\mathcal{R}}}}"] & \coalg{\type{C}}{\term{\gamma}}
+  \end{tikzcd}
+\end{figure}
+\noindent Furthermore for any bisimulation over a final P-coalgebra \(\coalg{\type{\mathtt{M}}}{\term{\mathtt{out}}}:\mathtt{Coalg}_{\container{S}}\) we have the following diagram,
+
+\begin{figure}[h]
+  \centering
+  \begin{tikzcd}[row sep=huge,column sep=huge]
+    \coalg{\type{\texttt{M}}}{\term{\texttt{out}}} & \coalg{\type{\overline{\mathcal{R}}}}{\term{\alpha}_{\type{\overline{\mathcal{R}}}}} \ar[l,Rightarrow,"{\pi_1}^{\type{\overline{\mathcal{R}}}}"'] \ar[r,Rightarrow,"{\pi_2}^{\type{\overline{\mathcal{R}}}}"] & \coalg{\type{\texttt{M}}}{\term{\texttt{out}}}
+  \end{tikzcd}
+\end{figure}
+\noindent where \(\pi_1^{\type{\overline{\mathcal{R}}}} = ~! = \pi_2^{\type{\overline{\mathcal{R}}}}\), which means given \(\term{r} : \term{\mathcal{R}}(\term{m},\term{m'})\) we get \(\term{m} = \pi_1^{\type{\overline{\mathcal{R}}}} (\term{m}, \term{m'}, \term{r}) = \pi_2^{\type{\overline{\mathcal{R}}}} (\term{m}, \term{m'}, \term{r}) = \term{m'}\).
+
+% \ar[d,"\texttt{out}"{name=out1}]
+% \ar[Rightarrow,from=alpha, to=out1, "(rel_1 ; \pi_1)"']
+
+\subsection{Bisimulation of ITrees}
+We define our bisimulation coalgebra from the strong bisimulation relation \(\mathcal{R}\), defined by the following rules.
+\begin{equation}
+  \infer[\mathtt{EqRet}]{\mathtt{Ret}~\term{a} \cong \mathtt{Ret}~\term{b}}{\term{a},\term{b} : \type{R} & \term{a} \equiv_{\type{R}} \term{b}}
+\end{equation}
+\begin{equation}
+  \infer[\mathtt{EqTau}]{\mathtt{Tau}~\term{t} \cong \mathtt{Tau}~\term{u}}{\term{t},\term{u} : \mathtt{itree}~\type{E}~\type{R} & \term{t} \cong \term{u}}
+\end{equation}
+\begin{equation}
+  \infer[\mathtt{EqVis}]{\mathtt{Vis}~\term{e}~\term{k_1} \cong \mathtt{Tau}~\term{e}~\term{k_2}}{\type{A} : \universe{\mathcal{U}} & \term{e} : \type{E}~\type{A} & \term{k_1},\term{k_2} : \type{A} \rightarrow \mathtt{itree}~\type{E}~\type{R} & \term{t} \cong \term{u}}
+\end{equation}
+Now we just need to define \(\term{\alpha}_{\type{\overline{\mathcal{R}}}}\) \todo{define the \(\alpha_{\overline{R}}\) function}. Now we have a bisimulation relation, which is equivalent to equality, using what we showed in the previous section.
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \chapter{Conclusion}
@@ -255,7 +291,7 @@ Giving us the diagram
 \cleardoublepage
 \addcontentsline{toc}{chapter}{Bibliography}
 \bibliographystyle{plain} 
-\bibliography{refs}
+\bibliography{Thesis}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 

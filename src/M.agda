@@ -92,11 +92,13 @@ PX,Pπ {ℓ} S =
   (λ z → P₀ {S = S} (X (sequence S) z)) ,,
   (λ x → P₁ {ℓ} (λ z → z) (π (sequence S) x)) -- TODO: Id func?
 
-postulate
+postulate -- TODO
   swap-Σ-∀ : ∀ {ℓ} (X : ℕ -> Set ℓ) (A : Set ℓ) (B : A -> Set ℓ) (p : {n : ℕ} -> Σ A (λ a -> B a -> X (suc n)) -> Σ A (λ a -> B a -> X n) -> Set ℓ) ->
     (Σ (∀ (n : ℕ) -> Σ A (λ a -> B a -> X n)) (λ w -> (n : ℕ) -> p (w (suc n)) (w n))) ≡
-    (Σ ((n : ℕ) → A) λ a → Σ ((n : ℕ) → B (a n) → X n) λ u → (n : ℕ) -> p (a (suc n) , u (suc n)) (a n , u n))
-  
+    (Σ ((n : ℕ) → A) λ a → Σ ((n : ℕ) → B (a n) → X n) λ u → (n : ℕ) -> p (a (suc n) , u (suc n)) (a n , u n))  
+
+  todo-rules : ∀ {ℓ} (S : Container {ℓ}) -> (Σ ((n : ℕ) → A S) λ a → Σ ((n : ℕ) → B S (a n) → X (sequence S) n) λ u → (n : ℕ) -> P₁ {S = S} (π (sequence S)) (a (suc n) , u (suc n)) ≡ (a n , u n)) ≡ P₀ {S = S} (M S)
+  -- equality of pairs, lemma 11, (Universal property of L)
 
 -- Lemma 13
 α-iso : ∀ {ℓ} {S : Container {ℓ}} -> L (PX,Pπ S) ≡ P₀ {S = S} (M S) -- L^P ≡ PL
@@ -106,7 +108,7 @@ postulate
   {y = (Σ ((n : ℕ) → A S) λ a → Σ ((n : ℕ) → B S (a n) → X (sequence S) n) λ u → (n : ℕ) -> P₁ (π (sequence S)) (a (suc n) , u (suc n)) ≡ (a n , u n))}
   {z = P₀ {S = S} (M S)}
   (swap-Σ-∀ (X (sequence S)) (A S) (B S) λ a b → P₁ (π (sequence S)) a ≡ b)
-  {!!} -- equality of pairs, lemma 11, (Universal property of L)
+  (todo-rules S)
   i i
 
 -- P commutes with limits
@@ -114,81 +116,14 @@ shift : ∀ {ℓ} {S : Container {ℓ}} -> P₀ {S = S} (M S) ≡ M S
 shift {S = S} = λ i ->
   compPath-filler
     {x = P₀ {S = S} (M S)}
-    {y = L (PX,Pπ S)} --  P₀ {S = S} (L (PX,Pπ S))
+    {y = L (PX,Pπ S)}
     {z = M S}
-      (sym α-iso) -- lemma 13
-      (L-unique {X,π = sequence S})    -- lemma 12
+      (sym α-iso)                   -- lemma 13
+      (L-unique {X,π = sequence S}) -- lemma 12
       i i
--- compPath-filler {x = M S} {y = P₀ {S = S} (L (PX,Pπ S))} {z = P₀ {S = S} (M S)} α-iso helper i i
-
+      
 in-fun : ∀ {ℓ} {S : Container {ℓ}} -> P₀ {S = S} (M S) -> M S
 in-fun {S = S} = transp (λ i → shift {S = S} i) i0
 
 out-fun : ∀ {ℓ} {S : Container {ℓ}} -> M S -> P₀ {S = S} (M S)
 out-fun {S = S} = transp (λ i → shift {S = S} (~ i)) i0
-
--- contractible (F is the final coalgebra)
-
-Coalg₀ : ∀ {ℓ} {S : Container {ℓ}} -> Set (ℓ-suc ℓ)
-Coalg₀ {ℓ} {S = S} = Σ (Set ℓ) λ C → C → P₀ {S = S} C  
-
-Coalg₁ : ∀ {ℓ} {S : Container {ℓ}} -> Coalg₀ {S = S} -> Coalg₀ {S = S} -> Set ℓ
-Coalg₁ {S = S} (C , γ) (D , δ) = Σ (C → D) λ f → δ ∘ f ≡ (P₁{S = S} f) ∘ γ
-
-_⇒_ = Coalg₁
-
-Final : ∀ {ℓ} {S : Container {ℓ}} -> Set (ℓ-suc ℓ)
-Final {S = S} = Σ (Coalg₀ {S = S}) λ X,ρ → ∀ (C,γ : Coalg₀ {S = S}) -> isContr (_⇒_ {S = S} (C,γ) (X,ρ))
-
-Ms : ∀ {ℓ} -> (S : Container {ℓ}) -> Container {ℓ}
-Ms S = M S -,- λ x → P₀ {S = S} (M S)
-
-M-coalg : ∀ {ℓ} {S : Container {ℓ}} -> Coalg₀ {S = S}
-M-coalg {S = S} = (M S) , (λ x -> out-fun x)
-
-M-final-coalg : ∀ {ℓ} {S : Container {ℓ}} -> Final {S = S}
-M-final-coalg {S = S} = M-coalg {S = S} , λ C,γ → {!!} , λ y i → {!!} -- U is contractible
-
-unfold : ∀ {ℓ} {S : Container {ℓ}} -> (X,ρ : Final {S = S}) -> (C,γ : Coalg₀ {S = S}) -> (C,γ .fst) -> (X,ρ .fst .fst)  -- unique function into final coalg
-unfold = {!!}
-
--- bisimulation (TODO)
-record bisimulation {ℓ} (S : Container {ℓ}) (C,γ : Coalg₀ {S = S}) : Set (ℓ-max (ℓ-suc ℓ-zero) ℓ) where  
-  coinductive
-  field
-    R : C,γ .fst -> C,γ .fst -> Set₀
-    αᵣ :    let R⁻ = Σ (C,γ .fst) (λ a -> Σ (C,γ .fst) (λ b -> R a b)) in   R⁻ -> P₀ {S = S} R⁻
-    rel₁ : let R⁻ = Σ (C,γ .fst) (λ a -> Σ (C,γ .fst) (λ b -> R a b)) in let π₁ = (λ (x : R⁻) -> x .fst) in      (C,γ .snd) ∘ π₁ ≡ P₁ π₁ ∘ αᵣ
-    rel₂ : let R⁻ = Σ (C,γ .fst) (λ a -> Σ (C,γ .fst) (λ b -> R a b)) in let π₂ = (λ (x : R⁻) -> x .snd .fst) in (C,γ .snd) ∘ π₂ ≡ P₁ π₂ ∘ αᵣ
-
-open bisimulation
-
-R⁻ : ∀ {ℓ} {S : Container {ℓ}} (sim : bisimulation S M-coalg) -> Set ℓ
-R⁻ {S = S} sim = Σ (M S) (λ a -> Σ (M S) (λ b -> (R sim) a b))
-
-R⁻-coalg : ∀ {ℓ} {S : Container {ℓ}} (sim : bisimulation S M-coalg) -> Coalg₀ {S = S}
-R⁻-coalg sim = R⁻ sim , αᵣ sim
-
-final-property₁ : ∀ {ℓ} (S : Container {ℓ}) -> (sim : bisimulation S M-coalg) ->
-  let π₁ = (λ (x : R⁻ sim) -> x .fst) in
-    π₁ ≡ unfold M-final-coalg (R⁻-coalg sim)
-final-property₁ S sim = {!!}
-
-final-property₂ : ∀ {ℓ} (S : Container {ℓ}) -> (sim : bisimulation S M-coalg) ->
-  let π₂ = (λ (x : R⁻ sim) -> x .snd .fst) in
-    π₂ ≡ unfold M-final-coalg (R⁻-coalg sim)
-final-property₂ S sim = {!!}
-
-final-property : ∀ {ℓ} (S : Container {ℓ}) -> (sim : bisimulation S M-coalg) ->
-  let π₁ = (λ (x : R⁻ sim) -> x .fst) in
-  let π₂ = (λ (x : R⁻ sim) -> x .snd .fst) in
-    π₁ ≡ π₂
-final-property S sim = λ i ->
-  let π₁ = (λ (x : R⁻ sim) -> x .fst) in
-  let π₂ = (λ (x : R⁻ sim) -> x .snd .fst) in
-    compPath-filler {x = π₁} {y = unfold M-final-coalg (R⁻-coalg sim)} {z = π₂} (final-property₁ S sim) (sym (final-property₂ S sim)) i i
-
-coinduction : ∀ {ℓ} (S : Container {ℓ}) -> (sim : bisimulation S M-coalg) -> ∀ (m m' : M S) -> (R sim) m m' -> m ≡ m' -- m ≡ π₁(m,m',r) ≡ π₂(m,m',r) ≡ m'
-coinduction S sim m m' r = λ i -> funExt⁻ (final-property S sim) (m , (m' , r)) i
-
-

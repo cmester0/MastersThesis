@@ -1,4 +1,6 @@
 _build/
+auto/
+_region_.tex
 *.agdai
 *.aux
 *.glo

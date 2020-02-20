@@ -23,7 +23,6 @@ data IO : Type₀ → Type₁ where
   Input : IO ℕ
   Output : (x : ℕ) -> IO Unit
 
-
 --------------------
 -- Delay examples --
 --------------------
@@ -64,3 +63,9 @@ ValueIT Spin = Tau' Spin
 {-# NON_TERMINATING #-}
 echo : itree IO Unit
 echo = vis Input λ x → vis (Output x) λ _ → tau echo
+
+{-# NON_TERMINATING #-}
+Echo2 : ITree IO ⊥
+ValueIT Echo2 = Bind (Trigger Input) λ x → Bind (Trigger (Output x)) λ { tt -> Tau' Echo2 }
+
+-- Bind' (Trigger Input) λ x → Bind' (Trigger (Output x)) λ x₁ → Tau' Echo2
