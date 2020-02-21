@@ -10,8 +10,6 @@ open import Cubical.Foundations.Function
 open import Cubical.Foundations.Univalence
 
 open import Cubical.Data.Unit
-open import Cubical.Data.Prod
-open import Cubical.Data.Nat as ℕ using (ℕ ; suc ; _+_ )
 
 -- contractible (F is the final coalgebra)
 
@@ -23,26 +21,42 @@ Coalg₁ {S = S} (C , γ) (D , δ) = Σ (C → D) λ f → δ ∘ f ≡ (P₁{S 
 
 _⇒_ = Coalg₁
 
-Final : ∀ {ℓ} {S : Container {ℓ}} -> Set (ℓ-suc ℓ)
-Final {S = S} = Σ (Coalg₀ {S = S}) λ X,ρ → ∀ (C,γ : Coalg₀ {S = S}) -> isContr (_⇒_ {S = S} (C,γ) (X,ρ))
-
 Ms : ∀ {ℓ} -> (S : Container {ℓ}) -> Container {ℓ}
 Ms S = M S -,- λ x → P₀ {S = S} (M S)
 
 M-coalg : ∀ {ℓ} {S : Container {ℓ}} -> Coalg₀ {S = S}
 M-coalg {S = S} = (M S) , out-fun
 
-M-final-coalg : ∀ {ℓ} {S : Container {ℓ}} -> Final {S = S}
-M-final-coalg {S = S} = {!!} -- M-coalg {S = S} , λ C,γ → {!!} , λ y i → {!!} -- U is contractible
+Final : ∀ {ℓ} {S : Container {ℓ}} -> Set (ℓ-suc ℓ)
+Final {S = S} = Σ (Coalg₀ {S = S}) λ X,ρ → ∀ (C,γ : Coalg₀ {S = S}) -> isContr (_⇒_ {S = S} (C,γ) (X,ρ))
 
-unfold : ∀ {ℓ} {S : Container {ℓ}} -> (X,ρ : Final {S = S}) -> (C,γ : Coalg₀ {S = S}) -> (C,γ .fst) -> (X,ρ .fst .fst)  -- unique function into final coalg
-unfold X,ρ C,γ y = X,ρ .snd C,γ .fst .fst y
+unfold : ∀ {ℓ} {S : Container {ℓ}} -> (X,ρ : Final {S = S}) -> (C,γ : Coalg₀ {S = S}) -> (_⇒_ {S = S} (C,γ) (X,ρ .fst))  -- unique function into final coalg
+unfold X,ρ C,γ = X,ρ .snd C,γ .fst
+
+unfold-function : ∀ {ℓ} {S : Container {ℓ}} -> (X,ρ : Final {S = S}) -> (C,γ : Coalg₀ {S = S}) -> (C,γ .fst) -> (X,ρ .fst .fst)  -- unique function into final coalg
+unfold-function X,ρ C,γ y = (unfold X,ρ C,γ) .fst y
+
+U : ∀ {ℓ} {S : Container {ℓ}} {C,γ : Coalg₀ {S = S}} -> Set ℓ
+U {S = S} {C,γ = C,γ} = Σ (C,γ .fst -> M S) λ f → out-fun ∘ f ≡ P₁ f ∘ C,γ .snd
+
+postulate -- TODO
+  U-is-Unit : ∀ {ℓ} {S : Container {ℓ}} {C,γ : Coalg₀ {S = S}} -> (U {C,γ = C,γ} ≡ Lift Unit)
+
+contr-is-ext : ∀ {ℓ} {A B : Set ℓ} -> A ≡ B -> isContr A ≡ isContr B
+contr-is-ext p = λ i -> isContr (p i)
+
+U-contr : ∀ {ℓ} {S : Container {ℓ}} {C,γ : Coalg₀ {S = S}} -> ∀ (x : U {C,γ = C,γ}) -> isContr (U {C,γ = C,γ})
+U-contr x = transp (λ i -> (sym (contr-is-ext U-is-Unit)) i) i0 (lift tt , λ { (lift tt) -> refl })
+
+-- Finality
+M-final-coalg : ∀ {ℓ} {S : Container {ℓ}} -> Final {S = S}
+M-final-coalg {S = S} = M-coalg , λ C,γ → transp (λ i → (sym U-is-Unit) i) i0 (lift tt) , λ y → U-contr {C,γ = C,γ} y .snd y
 
 final-coalg-property : ∀ {ℓ} {S : Container {ℓ}} -> (F1 F2 : Final {S = S}) -> F1 ≡ F2
-final-coalg-property  F1 F2 = λ i → {!!} -- follows from contractability ?
+final-coalg-property  F1 F2 = λ i → {!!}
 
 final-coalg-property-2 : ∀ {ℓ} {S : Container {ℓ}} -> (C : Coalg₀ {S = S}) -> (F : Final {S = S}) -> ∀ (f g : C ⇒ F .fst) -> f ≡ g
-final-coalg-property-2 C F f g = λ i -> {!!} -- follows from contractability
+final-coalg-property-2 C F f g = λ i -> compPath-filler (sym (F .snd C .snd f))  (F .snd C .snd g) i i -- follows from contractability
 
 -- bisimulation
 record bisimulation {ℓ} (S : Container {ℓ}) (C,γ : Coalg₀ {S = S}) : Set (ℓ-suc ℓ) where  
@@ -70,12 +84,12 @@ record bisimulation {ℓ} (S : Container {ℓ}) (C,γ : Coalg₀ {S = S}) : Set 
   prod₂ : R⁻-coalg ⇒ C,γ
   prod₂ = π₂ , rel₂
 
-open bisimulation
+open bisimulation public
 
 open Container
 
 final-property : ∀ {ℓ} (S : Container {ℓ}) -> (sim : bisimulation S M-coalg) -> prod₁ sim ≡ prod₂  sim
-final-property S sim = final-coalg-property-2 (R⁻-coalg sim) M-final-coalg (prod₁ sim) (prod₂ sim)
+final-property S sim = final-coalg-property-2 {S = S} (R⁻-coalg sim) (M-final-coalg {S = S}) (prod₁ sim) (prod₂ sim)
 
 final-property-2 : ∀ {ℓ} (S : Container {ℓ}) -> (sim : bisimulation S M-coalg) -> π₁ sim ≡ π₂  sim
 final-property-2 S sim = λ i -> final-property S sim i .fst
@@ -84,8 +98,5 @@ coinduction : ∀ {ℓ} (S : Container {ℓ}) -> (sim : bisimulation S M-coalg) 
 coinduction S sim m m' r = λ i -> funExt⁻ (final-property-2 S sim) (m , (m' , r)) i
 
 bisim-helper : ∀ {ℓ} {S : Container {ℓ}} -> bisimulation S M-coalg
-bisim-helper {S = S} = record { R = _≡_ ; αᵣ = λ x → (out-fun {S = S} (x .fst) .fst) , λ x₁ → x .fst , x .snd ; rel₁ = λ i → λ a → {!!} , (λ x → {!!} , {!!}) ; rel₂ = {!!} }
-
--- Σ (M S .fst) (λ a -> Σ (M S .fst) (λ b -> a ≡ b))
--- Σ (M S .fst) (λ a -> Σ (M S .fst) (λ b -> R a b))
+bisim-helper {S = S} = record { R = _≡_ ; αᵣ = {!!} ; rel₁ = {!!} ; rel₂ = {!!} }
 

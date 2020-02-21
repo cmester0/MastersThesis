@@ -3,6 +3,7 @@
 module itree where
 
 open import M
+open import Coalg
 
 open import Cubical.Data.Unit
 open import Cubical.Data.Prod
@@ -52,21 +53,32 @@ itree E R = M (itree-S E R)
 tau : {E : Set₀ -> Set₁} -> {R : Set₀} -> itree E R -> itree E R
 tau t = in-fun (inl (inl tt) , λ x → t)
 
-vis : ∀ {E} {R}  -> ∀ {A} -> E A -> (A -> itree E R) -> itree E R
+vis : ∀ {E} {R}  -> ∀ {A : Set} -> E A -> (A -> itree E R) -> itree E R
 vis {A = A} e k = in-fun (inr (A , e) , λ { (lift x) -> k x } )
 
 ret : ∀ {E} {R}  -> R -> itree E R
 ret {E} {R} r = in-fun (inl (inr r) , λ ())
 
+--------------------
+
+vis2 : {E : Set -> Set₁} {R : Set} -> ∀ {A} -> E A -> (A -> P₀ {S = itree-S E R} (itree E R))  -> P₀ {S = itree-S E R} (itree E R)
+vis2 {A = A} e k = inr (A , e) , λ { (lift x) -> in-fun (k x) }
+
+tau' : {E : Set -> Set₁} {R : Set} -> itree E R -> P₀ {S = itree-S E R} (itree E R)
+tau' t = inl (inl tt) , λ x -> t
+
+vis' : {E : Set -> Set₁} {R : Set} -> ∀ {A} -> E A -> (A -> itree E R)  -> P₀ {S = itree-S E R} (itree E R)
+vis' {A = A} e k = inr (A , e) , λ { (lift x) -> k x }
+
 -- Bind operations
+{-# TERMINATING #-}
+bind-helper : ∀ {E : Set -> Set₁} {R S : Set} -> (R -> itree E S) -> P₀ {S = itree-S E R} (itree E R) -> itree E S
+bind-helper k (inl (inl tt), b) = tau (bind-helper k (out-fun (b (lift tt))))
+bind-helper k (inl (inr r), _) = k r
+bind-helper k (inr (A , e), k') = vis e λ (x : A) → bind-helper k (out-fun (k' (lift x)))
 
--- bind-helper : ∀ {E : Set -> Set₁} {R S : Set} -> (R -> itree E S) -> ((Unit ⊎ R) ⊎ Σ Set E) -> itree E S
--- bind-helper k (inl (inl tt)) = tau {!!}
--- bind-helper k (inl (inr r)) = k r
--- bind-helper k (inr (A , e)) = vis e λ x → bind-helper k (k x)
-
--- bind : ∀ {E} {R} {S} -> itree E R -> (R -> itree E S) -> itree E S
--- bind {E} {R} {S} t k = bind-helper k (out-fun {S = itree-S E R} t .fst)
+bind : ∀ {E} {R} {S} -> itree E R -> (R -> itree E S) -> itree E S
+bind {E} {R} {S} t k = bind-helper k (out-fun {S = itree-S E R} t)
 
 trigger : ∀ {E R} -> E R -> itree E R
 trigger e = vis e λ x → ret x

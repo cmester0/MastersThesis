@@ -5,6 +5,7 @@ open import itree
 open import itree2
 open import M
 open import itree-examples
+open import Coalg
 
 open import Cubical.Data.Unit
 open import Cubical.Data.Prod
@@ -14,8 +15,6 @@ open import Cubical.Data.Empty
 open import Cubical.Data.Bool
 open import Cubical.Foundations.Function
 open import Cubical.Foundations.Prelude
-
-open bisimulation
 
 data itree≈ {E} {R} : itree E R -> itree E R -> Set₁ where
   EqRet : ∀ r s -> r ≡ s -> itree≈ (ret r) (ret s)

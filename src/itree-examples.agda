@@ -54,18 +54,30 @@ ValueD SpinD = TauD' SpinD
 -- Itree examples --
 --------------------
 
-Echo : ITree IO Unit
-ValueIT Echo = Vis (Input) λ x → Vis (Output x) λ x₁ → Tau' Echo
+Echo : ITree IO ⊥
+ValueIT Echo = Vis (Input) λ x → Vis (Output x) λ _ → Tau' Echo
 
-Spin : ITree IO Unit
+Spin : ITree IO ⊥
 ValueIT Spin = Tau' Spin
 
 {-# NON_TERMINATING #-}
-echo : itree IO Unit
+echo : itree IO ⊥
 echo = vis Input λ x → vis (Output x) λ _ → tau echo
+
+{-# NON_TERMINATING #-}
+echo2 : itree IO ⊥
+echo2 = in-fun (vis2 Input λ x → vis2 (Output x) λ _ → tau' echo2)
+
+{-# NON_TERMINATING #-}
+spin2 : itree IO ⊥
+spin2 = in-fun (tau' spin2)
+
+{-# NON_TERMINATING #-}
+echo3 : itree IO ⊥
+echo3 = bind (trigger Input) λ x → bind (trigger (Output x)) λ { tt -> tau echo3 }
 
 {-# NON_TERMINATING #-}
 Echo2 : ITree IO ⊥
 ValueIT Echo2 = Bind (Trigger Input) λ x → Bind (Trigger (Output x)) λ { tt -> Tau' Echo2 }
 
--- Bind' (Trigger Input) λ x → Bind' (Trigger (Output x)) λ x₁ → Tau' Echo2
+-- echo3 : Bind' (Trigger Input) λ x → Bind' (Trigger (Output x)) λ x₁ → Tau' Echo2
