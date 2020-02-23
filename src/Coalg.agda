@@ -4,14 +4,9 @@ module Coalg where
 open import M
 
 open import Cubical.Foundations.Prelude
-open import Cubical.Foundations.Equiv
-open import Cubical.Foundations.Isomorphism
-open import Cubical.Foundations.Function
-open import Cubical.Foundations.Univalence
+open import Cubical.Foundations.Function using ( _∘_ )
 
 open import Cubical.Data.Unit
-
--- contractible (F is the final coalgebra)
 
 Coalg₀ : ∀ {ℓ} {S : Container {ℓ}} -> Set (ℓ-suc ℓ)
 Coalg₀ {ℓ} {S = S} = Σ (Set ℓ) λ C → C → P₀ {S = S} C  
@@ -39,64 +34,73 @@ unfold-function X,ρ C,γ y = (unfold X,ρ C,γ) .fst y
 U : ∀ {ℓ} {S : Container {ℓ}} {C,γ : Coalg₀ {S = S}} -> Set ℓ
 U {S = S} {C,γ = C,γ} = Σ (C,γ .fst -> M S) λ f → out-fun ∘ f ≡ P₁ f ∘ C,γ .snd
 
-postulate -- TODO
-  U-is-Unit : ∀ {ℓ} {S : Container {ℓ}} {C,γ : Coalg₀ {S = S}} -> (U {C,γ = C,γ} ≡ Lift Unit)
+transp-and-back : ∀ {A B} (f : A ≡ B) -> transport (sym f) ∘ transport f ≡ (λ x -> x)
+transp-and-back f = λ i -> {!!}
 
-contr-is-ext : ∀ {ℓ} {A B : Set ℓ} -> A ≡ B -> isContr A ≡ isContr B
-contr-is-ext p = λ i -> isContr (p i)
+-- in-out-inv : ∀ {ℓ} {S : Container {ℓ}} -> (in-fun ∘ out-fun {S = S}) ≡ λ x -> x
+-- in-out-inv = λ i a → transp (λ i → shift {S = S} i) i0 (transp (λ i → shift {S = S} (~ i)) i0 a)
 
-U-contr : ∀ {ℓ} {S : Container {ℓ}} {C,γ : Coalg₀ {S = S}} -> ∀ (x : U {C,γ = C,γ}) -> isContr (U {C,γ = C,γ})
-U-contr x = transp (λ i -> (sym (contr-is-ext U-is-Unit)) i) i0 (lift tt , λ { (lift tt) -> refl })
+U-is-Unit : ∀ {ℓ} {S : Container {ℓ}} {C,γ : Coalg₀ {S = S}} -> (U {C,γ = C,γ} ≡ Lift Unit)
+U-is-Unit = λ i → {!!}
 
--- Finality
-M-final-coalg : ∀ {ℓ} {S : Container {ℓ}} -> Final {S = S}
-M-final-coalg {S = S} = M-coalg , λ C,γ → transp (λ i → (sym U-is-Unit) i) i0 (lift tt) , λ y → U-contr {C,γ = C,γ} y .snd y
+-- postulate -- TODO
+--   U-is-Unit : ∀ {ℓ} {S : Container {ℓ}} {C,γ : Coalg₀ {S = S}} -> (U {C,γ = C,γ} ≡ Lift Unit)
 
-final-coalg-property : ∀ {ℓ} {S : Container {ℓ}} -> (F1 F2 : Final {S = S}) -> F1 ≡ F2
-final-coalg-property  F1 F2 = λ i → {!!}
+-- contr-is-ext : ∀ {ℓ} {A B : Set ℓ} -> A ≡ B -> isContr A ≡ isContr B
+-- contr-is-ext p = λ i -> isContr (p i)
 
-final-coalg-property-2 : ∀ {ℓ} {S : Container {ℓ}} -> (C : Coalg₀ {S = S}) -> (F : Final {S = S}) -> ∀ (f g : C ⇒ F .fst) -> f ≡ g
-final-coalg-property-2 C F f g = λ i -> compPath-filler (sym (F .snd C .snd f))  (F .snd C .snd g) i i -- follows from contractability
+-- U-contr : ∀ {ℓ} {S : Container {ℓ}} {C,γ : Coalg₀ {S = S}} -> ∀ (x : U {C,γ = C,γ}) -> isContr (U {C,γ = C,γ})
+-- U-contr x = transp (λ i -> (sym (contr-is-ext U-is-Unit)) i) i0 (lift tt , λ { (lift tt) -> refl })
 
--- bisimulation
-record bisimulation {ℓ} (S : Container {ℓ}) (C,γ : Coalg₀ {S = S}) : Set (ℓ-suc ℓ) where  
-  coinductive
-  field R : C,γ .fst -> C,γ .fst -> Set ℓ
-  R⁻ = Σ (C,γ .fst) (λ a -> Σ (C,γ .fst) (λ b -> R a b))
+-- -- Finality
+-- M-final-coalg : ∀ {ℓ} {S : Container {ℓ}} -> Final {S = S}
+-- M-final-coalg {S = S} = M-coalg , λ C,γ → transp (λ i → (sym U-is-Unit) i) i0 (lift tt) , λ y → U-contr {C,γ = C,γ} y .snd y
 
-  π₁ : R⁻ -> C,γ .fst
-  π₁ = fst
+-- final-coalg-property : ∀ {ℓ} {S : Container {ℓ}} -> (F1 F2 : Final {S = S}) -> F1 ≡ F2
+-- final-coalg-property  F1 F2 = λ i → {!!}
+
+-- final-coalg-property-2 : ∀ {ℓ} {S : Container {ℓ}} -> (C : Coalg₀ {S = S}) -> (F : Final {S = S}) -> ∀ (f g : C ⇒ F .fst) -> f ≡ g
+-- final-coalg-property-2 C F f g = λ i -> compPath-filler (sym (F .snd C .snd f))  (F .snd C .snd g) i i -- follows from contractability
+
+-- -- bisimulation
+-- record bisimulation {ℓ} (S : Container {ℓ}) (C,γ : Coalg₀ {S = S}) : Set (ℓ-suc ℓ) where  
+--   coinductive
+--   field R : C,γ .fst -> C,γ .fst -> Set ℓ
+--   R⁻ = Σ (C,γ .fst) (λ a -> Σ (C,γ .fst) (λ b -> R a b))
+
+--   π₁ : R⁻ -> C,γ .fst
+--   π₁ = fst
   
-  π₂ : R⁻ -> C,γ .fst
-  π₂ = fst ∘ snd
+--   π₂ : R⁻ -> C,γ .fst
+--   π₂ = fst ∘ snd
   
-  field
-    αᵣ : R⁻ -> P₀ {S = S} R⁻
-    rel₁ : (C,γ .snd) ∘ π₁ ≡ P₁ π₁ ∘ αᵣ
-    rel₂ : (C,γ .snd) ∘ π₂ ≡ P₁ π₂ ∘ αᵣ
+--   field
+--     αᵣ : R⁻ -> P₀ {S = S} R⁻
+--     rel₁ : (C,γ .snd) ∘ π₁ ≡ P₁ π₁ ∘ αᵣ
+--     rel₂ : (C,γ .snd) ∘ π₂ ≡ P₁ π₂ ∘ αᵣ
 
-  R⁻-coalg : Coalg₀
-  R⁻-coalg = R⁻ , αᵣ
+--   R⁻-coalg : Coalg₀
+--   R⁻-coalg = R⁻ , αᵣ
   
-  prod₁ : R⁻-coalg ⇒ C,γ
-  prod₁ = π₁ , rel₁
+--   prod₁ : R⁻-coalg ⇒ C,γ
+--   prod₁ = π₁ , rel₁
   
-  prod₂ : R⁻-coalg ⇒ C,γ
-  prod₂ = π₂ , rel₂
+--   prod₂ : R⁻-coalg ⇒ C,γ
+--   prod₂ = π₂ , rel₂
 
-open bisimulation public
+-- open bisimulation public
 
-open Container
+-- open Container
 
-final-property : ∀ {ℓ} (S : Container {ℓ}) -> (sim : bisimulation S M-coalg) -> prod₁ sim ≡ prod₂  sim
-final-property S sim = final-coalg-property-2 {S = S} (R⁻-coalg sim) (M-final-coalg {S = S}) (prod₁ sim) (prod₂ sim)
+-- final-property : ∀ {ℓ} (S : Container {ℓ}) -> (sim : bisimulation S M-coalg) -> prod₁ sim ≡ prod₂  sim
+-- final-property S sim = final-coalg-property-2 {S = S} (R⁻-coalg sim) (M-final-coalg {S = S}) (prod₁ sim) (prod₂ sim)
 
-final-property-2 : ∀ {ℓ} (S : Container {ℓ}) -> (sim : bisimulation S M-coalg) -> π₁ sim ≡ π₂  sim
-final-property-2 S sim = λ i -> final-property S sim i .fst
+-- final-property-2 : ∀ {ℓ} (S : Container {ℓ}) -> (sim : bisimulation S M-coalg) -> π₁ sim ≡ π₂  sim
+-- final-property-2 S sim = λ i -> final-property S sim i .fst
 
-coinduction : ∀ {ℓ} (S : Container {ℓ}) -> (sim : bisimulation S M-coalg) -> ∀ (m m' : M S) -> (R sim) m m' -> m ≡ m' -- m ≡ π₁(m,m',r) ≡ π₂(m,m',r) ≡ m'
-coinduction S sim m m' r = λ i -> funExt⁻ (final-property-2 S sim) (m , (m' , r)) i
+-- coinduction : ∀ {ℓ} (S : Container {ℓ}) -> (sim : bisimulation S M-coalg) -> ∀ (m m' : M S) -> (R sim) m m' -> m ≡ m' -- m ≡ π₁(m,m',r) ≡ π₂(m,m',r) ≡ m'
+-- coinduction S sim m m' r = λ i -> funExt⁻ (final-property-2 S sim) (m , (m' , r)) i
 
-bisim-helper : ∀ {ℓ} {S : Container {ℓ}} -> bisimulation S M-coalg
-bisim-helper {S = S} = record { R = _≡_ ; αᵣ = {!!} ; rel₁ = {!!} ; rel₂ = {!!} }
+-- bisim-helper : ∀ {ℓ} {S : Container {ℓ}} -> bisimulation S M-coalg
+-- bisim-helper {S = S} = record { R = _≡_ ; αᵣ = {!!} ; rel₁ = {!!} ; rel₂ = {!!} }
 

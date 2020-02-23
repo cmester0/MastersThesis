@@ -40,13 +40,19 @@ L (x ,, pi) = Σ ((n : ℕ) → x n) λ x → (n : ℕ) → pi {n = n} (x (suc n
 shift-chain : ∀ {ℓ} -> Chain {ℓ} -> Chain {ℓ}
 shift-chain = λ X,π -> ((λ x → X X,π (suc x)) ,, λ {n} → π X,π {suc n})
 
+intro-helper : ∀ {ℓ} {X Y : Set ℓ} (p : X -> Set ℓ) (q : X -> Y -> Set ℓ) -> Σ Y (λ b → ∀ a -> q a b) -> (Σ X λ a -> p a) ≃ (Σ Y (λ b -> Σ X λ a -> q a b × p a))
+intro-helper p q y = (λ x → y .fst , x .fst , y .snd (x .fst) , x .snd) , record { equiv-proof = λ y₁ → (({!!} , {!!}) , {!!}) , λ y₂ i → {!!} }
+
+intro : ∀ {ℓ} {X Y : Set ℓ} (p : X -> Set ℓ) (q : X -> Y -> Set ℓ) -> (Σ X λ a -> p a) ≡ (Σ Y (λ b -> Σ X λ a -> q a b × p a))
+intro p q = λ i → {!!}
+
 postulate -- TODO
   combine : ∀ {ℓ} (X : ℕ -> Set ℓ) (p : ∀ {n} -> (X (suc n)) -> (X n) -> Set ℓ)  ->
     (Σ (X 0) λ x₀ → Σ ((n : ℕ) → X (suc n)) λ y → (p (y 0) x₀) × ((n : ℕ) → p (y (suc n)) (y n))) ≡
                    (Σ ((n : ℕ) → X n)       λ x → (p (x 1) (x 0)) × ((n : ℕ) → p (x (suc (suc n))) (x (suc n))))
 
-  intro : ∀ {ℓ} {X Y : Set ℓ} (p : X -> Set ℓ) (q : X -> Y -> Set ℓ) -> (Σ X λ a ->         p a) ≡
-                                                             (Σ Y (λ b -> Σ X λ a -> q a b × p a))
+  -- intro : ∀ {ℓ} {X Y : Set ℓ} (p : X -> Set ℓ) (q : X -> Y -> Set ℓ) -> (Σ X λ a ->         p a) ≡
+  --                                                            (Σ Y (λ b -> Σ X λ a -> q a b × p a))
                                                              
   combine2 : ∀ {ℓ} (X : ℕ -> Set ℓ) -> (p : ∀ {n} -> (X (suc n)) -> (X n) -> Set ℓ) -> (y : (n : ℕ) -> X n) ->
     p (y 1) (y 0) × ((n : ℕ) → p (y (suc (suc n))) (y (suc n))) ≡ ((n : ℕ) → p (y (suc n)) (y n))
@@ -123,7 +129,7 @@ shift {S = S} = λ i ->
       i i
       
 in-fun : ∀ {ℓ} {S : Container {ℓ}} -> P₀ {S = S} (M S) -> M S
-in-fun {S = S} = transp (λ i → shift {S = S} i) i0
+in-fun {S = S} = transport (shift {S = S})
 
 out-fun : ∀ {ℓ} {S : Container {ℓ}} -> M S -> P₀ {S = S} (M S)
-out-fun {S = S} = transp (λ i → shift {S = S} (~ i)) i0
+out-fun {S = S} = transport (sym (shift {S = S}))
