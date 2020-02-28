@@ -33,10 +33,6 @@ ret2 = delay-tau (delay-ret 2)
 ret3 : delay ℕ
 ret3 = delay-tau (delay-ret 2)
 
-{-# NON_TERMINATING #-}
-spin : ∀ {R} -> delay R
-spin {R} = delay-tau {R = R} spin
-
 delay-once : ∀ {R} -> R -> Delay R
 ValueD (delay-once r) = TauD (RetD r)
 

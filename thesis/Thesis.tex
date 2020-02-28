@@ -29,6 +29,7 @@
 \usepackage{todonotes} % \todo command
 \usepackage{proof} % \infer command
 \usepackage{tikz-cd}
+\usepackage{xfrac} % \sfrac - sideways fraction
 
 % Custom commands
 
@@ -40,6 +41,8 @@
 \newcommand*{\unit}{\type{\textbf{1}}}
 \newcommand*{\empt}{\type{\textbf{0}}}
 \newcommand*{\coalg}[2]{#1\texttt{-}#2}
+
+\newcommand*{\ssfrac}[2]{ {\LARGE \text{\sfrac{\ensuremath{#1}}{\ensuremath{#2}}}}}
 
 \begin{document}
 
@@ -278,6 +281,66 @@ We define our bisimulation coalgebra from the strong bisimulation relation \(\ma
   \infer[\mathtt{EqVis}]{\mathtt{Vis}~\term{e}~\term{k_1} \cong \mathtt{Tau}~\term{e}~\term{k_2}}{\type{A} : \universe{\mathcal{U}} & \term{e} : \type{E}~\type{A} & \term{k_1},\term{k_2} : \type{A} \rightarrow \mathtt{itree}~\type{E}~\type{R} & \term{t} \cong \term{u}}
 \end{equation}
 Now we just need to define \(\term{\alpha}_{\type{\overline{\mathcal{R}}}}\) \todo{define the \(\alpha_{\overline{R}}\) function}. Now we have a bisimulation relation, which is equivalent to equality, using what we showed in the previous section.
+
+\section{Examples of fixed points}
+We want to define spin, as being the fixed point \(\mathtt{spin}\ = \mathtt{later}~\mathtt{spin}\), so that is again a final coalgebra, but of a M-type (which is a final coalgebra)
+
+\begin{figure}[h]
+  \centering
+  \begin{tikzcd}[row sep=huge,column sep=huge]
+    \term{\texttt{spin}} \ar[d,"\term{\texttt{later}}"] \\
+    \term{\texttt{later}}~\term{\texttt{spin}}
+  \end{tikzcd}
+\end{figure}
+\noindent Since it is final, it also must be unique, meaning that there is just one program that spins forever, without returning a value, meaning every other program must return a value. If we just
+
+\section{Quotiented M-types}
+We can define a quotient of the polynomial functor \(P\) as a functor \(F\), such that the following diagram commutes
+
+\begin{figure}[h]
+  \centering
+  \begin{tikzcd}[row sep=huge,column sep=huge]
+    \term{P} \type{\alpha} \ar[r,"\term{P}\term{f}"] \ar[d,"\term{abs}_{\type{\alpha}}"'] & \term{P} \type{\beta} \ar[d,"\term{abs}_{\type{\beta}}"] \\
+    \term{F} \type{\alpha} \ar[r,"\term{F}\term{f}"] & \term{F} \type{\beta}
+  \end{tikzcd}
+\end{figure}
+\noindent for all \(f : \alpha \rightarrow \beta\) and \(\alpha,\beta\). This is a naturallity condition for \(abs\). As an example lets look at the quotient of the delay monad by the equality \(\forall \term{a} : \type{\mathtt{M}} , \term{\mathtt{later}}~\term{a} \equiv \term{a}\). We get the diagram
+
+\begin{figure}[h]
+  \centering
+  \begin{tikzcd}[row sep=huge,column sep=huge]
+    \type{\texttt{M}} \ar[r,"\term{\texttt{later}}"] \ar[d,"\term{\texttt{out}}"'] & \type{\texttt{M}} \ar[d,"\term{\texttt{out}}"] \\
+    \term{P} \type{\texttt{M}} \ar[r,"\term{P}~\term{\texttt{later}}"] \ar[d,"\term{abs}_{\type{\texttt{M}}}"'] & \term{P} \type{\texttt{M}} \ar[d,"\term{abs}_{\type{\texttt{M}}}"] \\
+    \term{F} \type{\texttt{M}} \ar[r,"\term{F}~\term{\texttt{later}}"] & \term{F} \type{\texttt{M}}
+  \end{tikzcd}
+\end{figure}
+\noindent Such that the (co?)limit for \(\term{F}~\type{\texttt{M}}\) is \(\unit + \type{R}\), meaning
+\begin{equation}
+  F~later \circ abs_M \circ out \equiv abs_M \circ out \circ later
+\end{equation}
+\begin{equation}
+  F~later \equiv later^{-1}
+\end{equation}
+\begin{align}
+  later &= in \circ inr \\
+  out \circ later &= inr \\
+        &= P~later \circ out \\
+  abs_{M} \circ out \circ later &= abs_{M} \circ inr \\
+        &= abs_M \circ P~later \circ out\\
+        &= F~later \circ abs_M \circ out\\
+\end{align}
+\\ \\
+Given the container of the final P-coalgebra for some container \(\container{S}\), we can construct the diagram:
+
+\begin{figure}[h]
+  \centering
+  \begin{tikzcd}[row sep=huge,column sep=huge]
+    (\type{\texttt{M}}, \term{P}~\type{\texttt{M}}) \ar[rr,"\texttt{Tau}"] \ar[dr,"\sim_x : \texttt{Tau}~x~\equiv~x"'] & & (\type{\texttt{M}}, \term{P}~\type{\texttt{M}}) \ar[dl,"\sim_y : \texttt{Tau}~y~\equiv~y"] \\
+    & (\ssfrac{\type{\texttt{M}}}{\sim}, \term{F}~\ssfrac{\type{\texttt{M}}}{\sim}) 
+  \end{tikzcd}
+\end{figure}
+\noindent Such that \(\sim_x \equiv \sim_y \circ \mathtt{Tau}\), where \(\ssfrac{\term{P}~\type{\texttt{M}}}{\sim} \equiv \term{F}~(\ssfrac{\type{\texttt{M}}}{\sim})\)
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 

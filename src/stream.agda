@@ -10,10 +10,14 @@ open import Cubical.Data.Prod
 open import Cubical.Foundations.Prelude
 open import Cubical.Foundations.Equiv
 
+open import Later
+open import Cubical.Data.List
+open import Cubical.Foundations.Univalence
+
 -- Stream example
 
 stream-S : ∀ A -> Container
-stream-S A = (A -,- (λ _ → Unit))
+stream-S A = (A , (λ _ → Unit))
 
 stream : ∀ (A : Set₀) -> Set₀
 stream A = M (stream-S A)
@@ -26,6 +30,17 @@ hd {A} S = out-fun S .fst
 
 tl : ∀ {A} -> stream A -> stream A
 tl {A} S = out-fun S .snd tt
+
+-- Stream2
+
+record S (A : Set) : Set where
+  inductive
+  constructor _,_
+  field
+    headS : A
+    tailS : ▹ (S A)
+
+open S
 
 {-# NON_TERMINATING #-}
 bisimR : ∀ (A : Set₀) -> (stream A) -> (stream A) -> Set
@@ -55,13 +70,37 @@ record Stream A : Set₀ where
 
 open Stream
 
+-- record Stream-to-S A (s1 : Stream A) (s2 : S A) (rel : Stream A -> ▹ S A -> Set) : Set₀ where
+--   coinductive
+--   field
+--     head≈ : head s1 ≡ headS s2
+--     tail≈ : rel (tail s1) (tailS s2)
+
+-- asdf : Stream ≡ S
+-- asdf = λ i A → ua {A = Stream A} {B = S A} ((λ x → head x , {!!}) , {!!}) i
+
+record Stream-to-stream {A} (x : stream A) (y : Stream A) : Set where
+  coinductive
+  field
+    head0 : hd x ≡ head y
+    tail0 : Stream-to-stream (tl x) (tail y)
+
+open Stream-to-stream
+
 stream-to-Stream : ∀ {A} -> stream A -> Stream A
 head (stream-to-Stream s) = hd s
 tail (stream-to-Stream s) = stream-to-Stream (tl s)
 
-{-# NON_TERMINATING #-}
-Stream-to-stream : ∀ {A} -> Stream A -> stream A
-Stream-to-stream {A} S = cons (head S) (Stream-to-stream {A} (tail S))
+asdd : ∀ A (x y) -> Stream-to-stream {A = A} x y → {p : stream ≡ Stream} -> PathP (λ i -> p i A) x y
+asdd = λ A x y p {q} i → (transp (λ i₁ → A -> q i₁ A -> q i₁ A) i0 cons) (p .head0 i) (asdd A (tl x) (tail y) (p .tail0) i)
 
-stream-equiv : ∀ {A} -> isEquiv (stream-to-Stream {A})
-stream-equiv = {!!}
+-- stream-to-Stream : ∀ {A} -> stream A -> Stream A
+-- head (stream-to-Stream s) = hd s
+-- tail (stream-to-Stream s) = stream-to-Stream (tl s)
+
+-- {-# NON_TERMINATING #-}
+-- Stream-to-stream : ∀ {A} -> Stream A -> stream A
+-- Stream-to-stream {A} S = cons (head S) (Stream-to-stream {A} (tail S))
+
+stream-equiv : ∀ {A} -> stream A ≃ Stream A -- ∀ {A} -> isEquiv (Stream-to-stream {A})
+stream-equiv = stream-to-Stream , record { equiv-proof = {!!} } -- record { equiv-proof = λ y → ({!!} , {!!}) , {!!} }

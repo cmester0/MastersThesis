@@ -2,29 +2,23 @@
 module M where
 
 open import Cubical.Foundations.Prelude
-open import Cubical.Foundations.Equiv
-open import Cubical.Foundations.Isomorphism
-open import Cubical.Foundations.Function
-open import Cubical.Foundations.Univalence
+open import Cubical.Foundations.Equiv using (_≃_)
+open import Cubical.Foundations.Function using (_∘_)
 
 open import Cubical.Data.Unit
 open import Cubical.Data.Prod
 open import Cubical.Data.Nat as ℕ using (ℕ ; suc ; _+_ )
 
--- Definitions
-record Container {ℓ : Level} : Set (ℓ-suc ℓ) where
-  constructor _-,-_
-  field
-    A : Set ℓ
-    B : A -> Set ℓ
+open import Cubical.Foundations.Transport
 
-open Container
+Container : ∀ {ℓ} -> Set (ℓ-suc ℓ)
+Container {ℓ} = Σ (Set ℓ) (λ A -> A -> Set ℓ)
 
-P₀ : ∀ {ℓ} -> ∀ {S : Container {ℓ}} -> Set ℓ -> Set ℓ
-P₀ {S = S} = λ X -> Σ (A S) λ x → (B S x) -> X
+P₀ : ∀ {ℓ} {S : Container {ℓ}} -> Set ℓ -> Set ℓ
+P₀ {S = S} X  = Σ (S .fst) λ x → (S .snd x) -> X
 
-P₁ : ∀ {ℓ} {S : Container {ℓ}} {X Y : Set ℓ} -> (f : X -> Y) -> P₀ {S = S} X -> P₀ {S = S} Y
-P₁ {S} f = λ { (a , g) -> a , f ∘ g }
+P₁ : ∀ {ℓ} {S : Container {ℓ}} {X Y} (f : X -> Y) -> P₀ {S = S} X -> P₀ {S = S} Y
+P₁ {S = S} f = λ { (a , g) ->  a , f ∘ g }
 
 record Chain {ℓ} : Set (ℓ-suc ℓ) where
   constructor _,,_
@@ -86,50 +80,62 @@ sequence-pre₁ : ∀ {ℓ} -> (S : Container {ℓ}) -> {n : ℕ} -> sequence-pr
 sequence-pre₁ {ℓ} S {0} = ! {ℓ}
 sequence-pre₁ S {suc n} = P₁ (sequence-pre₁ S {n})
 
-sequence : ∀ {ℓ} -> Container {ℓ} -> Chain {ℓ} -- {ℓ-max ℓ ℓ'}
+sequence : ∀ {ℓ} -> Container {ℓ} -> Chain {ℓ}
 X (sequence {ℓ} S) n = sequence-pre₀ {ℓ} S n
-π (sequence {ℓ} S) {n} = sequence-pre₁ {ℓ} S
+π (sequence {ℓ} S) {n} = sequence-pre₁ {ℓ} S {n}
 
-M : ∀ {ℓ} -> Container {ℓ} → Set ℓ -- Set (ℓ-max ℓ ℓ')
+M : ∀ {ℓ} -> Container {ℓ} → Set ℓ
 M = L ∘ sequence
 
 PX,Pπ : ∀ {ℓ} (S : Container {ℓ}) -> Chain
 PX,Pπ {ℓ} S =
-  (λ z → P₀ {S = S} (X (sequence S) z)) ,,
-  (λ x → P₁ {ℓ} (λ z → z) (π (sequence S) x)) -- TODO: Id func?
+  (λ n → P₀ {S = S} (X (sequence S) n)) ,,
+  (λ {n : ℕ} x → P₁ (λ z → z) (π (sequence S) {n = suc n} x ))
 
 postulate -- TODO
   swap-Σ-∀ : ∀ {ℓ} (X : ℕ -> Set ℓ) (A : Set ℓ) (B : A -> Set ℓ) (p : {n : ℕ} -> Σ A (λ a -> B a -> X (suc n)) -> Σ A (λ a -> B a -> X n) -> Set ℓ) ->
     (Σ (∀ (n : ℕ) -> Σ A (λ a -> B a -> X n)) (λ w -> (n : ℕ) -> p (w (suc n)) (w n))) ≡
     (Σ ((n : ℕ) → A) λ a → Σ ((n : ℕ) → B (a n) → X n) λ u → (n : ℕ) -> p (a (suc n) , u (suc n)) (a n , u n))  
 
-  todo-rules : ∀ {ℓ} (S : Container {ℓ}) -> (Σ ((n : ℕ) → A S) λ a → Σ ((n : ℕ) → B S (a n) → X (sequence S) n) λ u → (n : ℕ) -> P₁ {S = S} (π (sequence S)) (a (suc n) , u (suc n)) ≡ (a n , u n)) ≡ P₀ {S = S} (M S)
+  todo-rules : ∀ {ℓ} (S : Container {ℓ}) -> (Σ ((n : ℕ) → S .fst) λ a → Σ ((n : ℕ) → S .snd (a n) → X (sequence S) n) λ u → (n : ℕ) -> P₁ {S = S} (π (sequence S) {n = n}) (a (suc n) , u (suc n)) ≡ (a n , u n)) ≡ P₀ {S = S} (M S)
   -- equality of pairs, lemma 11, (Universal property of L)
 
 -- Lemma 13
 α-iso : ∀ {ℓ} {S : Container {ℓ}} -> L (PX,Pπ S) ≡ P₀ {S = S} (M S) -- L^P ≡ PL
 α-iso {S = S} = λ i ->
   compPath-filler
-  {x = L (PX,Pπ S)}
-  {y = (Σ ((n : ℕ) → A S) λ a → Σ ((n : ℕ) → B S (a n) → X (sequence S) n) λ u → (n : ℕ) -> P₁ (π (sequence S)) (a (suc n) , u (suc n)) ≡ (a n , u n))}
-  {z = P₀ {S = S} (M S)}
-  (swap-Σ-∀ (X (sequence S)) (A S) (B S) λ a b → P₁ (π (sequence S)) a ≡ b)
-  (todo-rules S)
-  i i
+    {x = L (PX,Pπ S)}
+    {y = (Σ ((n : ℕ) → S .fst) λ a → Σ ((n : ℕ) → S .snd (a n) → X (sequence S) n) λ u → (n : ℕ) -> P₁ (π (sequence S) {n}) (a (suc n) , u (suc n)) ≡ (a n , u n))}
+    {z = P₀ {S = S} (M S)}
+      (swap-Σ-∀ (X (sequence S)) (S .fst) (S .snd) λ {n} a b → (P₁ (π (sequence S) {n = n})) a ≡ b)
+      (todo-rules S)
+      i i
 
 -- P commutes with limits
-shift : ∀ {ℓ} {S : Container {ℓ}} -> P₀ {S = S} (M S) ≡ M S
+shift : ∀ {ℓ} {S : Container {ℓ}} -> P₀ (M S) ≡ M S
 shift {S = S} = λ i ->
   compPath-filler
-    {x = P₀ {S = S} (M S)}
+    {x = P₀ (M S)}
     {y = L (PX,Pπ S)}
     {z = M S}
       (sym α-iso)                   -- lemma 13
       (L-unique {X,π = sequence S}) -- lemma 12
       i i
       
-in-fun : ∀ {ℓ} {S : Container {ℓ}} -> P₀ {S = S} (M S) -> M S
+in-fun : ∀ {ℓ} {S : Container {ℓ}} -> P₀ (M S) -> M S
 in-fun {S = S} = transport (shift {S = S})
 
-out-fun : ∀ {ℓ} {S : Container {ℓ}} -> M S -> P₀ {S = S} (M S)
+out-fun : ∀ {ℓ} {S : Container {ℓ}} -> M S -> P₀ (M S)
 out-fun {S = S} = transport (sym (shift {S = S}))
+
+out-inverse-in : ∀ {ℓ} {S : Container {ℓ}} -> (out-fun ∘ in-fun {S = S}) ≡ (λ x -> x)
+out-inverse-in i a = transport⁻Transport shift a i
+
+out-inverse-in-x : ∀ {ℓ} {S : Container {ℓ}} -> ∀ x -> (out-fun ∘ in-fun {S = S}) x ≡ x
+out-inverse-in-x = funExt⁻ out-inverse-in
+
+in-inverse-out : ∀ {ℓ} {S : Container {ℓ}} -> (in-fun ∘ out-fun {S = S}) ≡ (λ (x : M S) -> x)
+in-inverse-out = λ i a → transportTransport⁻ shift a i
+
+in-inverse-out-x : ∀ {ℓ} {S : Container {ℓ}} -> ∀ x -> (in-fun ∘ out-fun {S = S}) x ≡ x
+in-inverse-out-x = funExt⁻ in-inverse-out
