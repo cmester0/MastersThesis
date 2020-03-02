@@ -21,7 +21,7 @@ delay-S R = (Unit ⊎ R) , λ { (inr _) -> ⊥ ; (inl tt) -> Unit }
 delay : (R : Set₀) -> Set₀
 delay R = M (delay-S R)
 
-delay-ret : {R : Set₀} -> R -> delay R
+delay-ret : {R : Set} -> R -> delay R
 delay-ret r = in-fun (inr r , λ ())
 
 delay-tau : {R : Set₀} -> delay R -> delay R

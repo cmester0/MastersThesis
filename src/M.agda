@@ -11,6 +11,10 @@ open import Cubical.Data.Nat as ℕ using (ℕ ; suc ; _+_ )
 
 open import Cubical.Foundations.Transport
 
+-------------------------------------
+-- Container and Container Functor --
+-------------------------------------
+
 Container : ∀ {ℓ} -> Set (ℓ-suc ℓ)
 Container {ℓ} = Σ (Set ℓ) (λ A -> A -> Set ℓ)
 
@@ -19,6 +23,10 @@ P₀ {S = S} X  = Σ (S .fst) λ x → (S .snd x) -> X
 
 P₁ : ∀ {ℓ} {S : Container {ℓ}} {X Y} (f : X -> Y) -> P₀ {S = S} X -> P₀ {S = S} Y
 P₁ {S = S} f = λ { (a , g) ->  a , f ∘ g }
+
+-----------------------
+-- Chains and Limits --
+-----------------------
 
 record Chain {ℓ} : Set (ℓ-suc ℓ) where
   constructor _,,_
@@ -33,6 +41,10 @@ L (x ,, pi) = Σ ((n : ℕ) → x n) λ x → (n : ℕ) → pi {n = n} (x (suc n
 
 shift-chain : ∀ {ℓ} -> Chain {ℓ} -> Chain {ℓ}
 shift-chain = λ X,π -> ((λ x → X X,π (suc x)) ,, λ {n} → π X,π {suc n})
+
+-----------------------
+-- Equivalence Rules --
+-----------------------
 
 intro-helper : ∀ {ℓ} {X Y : Set ℓ} (p : X -> Set ℓ) (q : X -> Y -> Set ℓ) -> Σ Y (λ b → ∀ a -> q a b) -> (Σ X λ a -> p a) ≃ (Σ Y (λ b -> Σ X λ a -> q a b × p a))
 intro-helper p q y = (λ x → y .fst , x .fst , y .snd (x .fst) , x .snd) , record { equiv-proof = λ y₁ → (({!!} , {!!}) , {!!}) , λ y₂ i → {!!} }
@@ -50,6 +62,10 @@ postulate -- TODO
                                                              
   combine2 : ∀ {ℓ} (X : ℕ -> Set ℓ) -> (p : ∀ {n} -> (X (suc n)) -> (X n) -> Set ℓ) -> (y : (n : ℕ) -> X n) ->
     p (y 1) (y 0) × ((n : ℕ) → p (y (suc (suc n))) (y (suc n))) ≡ ((n : ℕ) → p (y (suc n)) (y n))
+
+--------------------------------
+-- Limit of a Chain is Unique --
+--------------------------------
 
 -- Lemma 12
 L-unique : ∀ {ℓ} -> {X,π : Chain {ℓ}} -> L (shift-chain X,π) ≡ L X,π
@@ -71,6 +87,10 @@ L-unique {X,π = X,π} = λ i →
 
 ! : ∀ {ℓ} {A : Set ℓ} (x : A) -> Lift {ℓ-zero} {ℓ} Unit
 ! x = lift tt
+
+------------------------------------------------------
+-- Limit type of a Container , and Shift of a Limit --
+------------------------------------------------------
 
 sequence-pre₀ : ∀ {ℓ} -> Container {ℓ} -> ℕ -> Set ℓ -- (ℓ-max ℓ ℓ')
 sequence-pre₀ S 0 = Lift Unit
@@ -111,6 +131,10 @@ postulate -- TODO
       (todo-rules S)
       i i
 
+-----------------------------------------------------
+-- Shifting the limit of a chain is an equivalence --
+-----------------------------------------------------
+
 -- P commutes with limits
 shift : ∀ {ℓ} {S : Container {ℓ}} -> P₀ (M S) ≡ M S
 shift {S = S} = λ i ->
@@ -121,12 +145,16 @@ shift {S = S} = λ i ->
       (sym α-iso)                   -- lemma 13
       (L-unique {X,π = sequence S}) -- lemma 12
       i i
-      
+
+-- Transporting along shift
+
 in-fun : ∀ {ℓ} {S : Container {ℓ}} -> P₀ (M S) -> M S
 in-fun {S = S} = transport (shift {S = S})
 
 out-fun : ∀ {ℓ} {S : Container {ℓ}} -> M S -> P₀ (M S)
 out-fun {S = S} = transport (sym (shift {S = S}))
+
+-- in-fun and out-fun are inverse
 
 out-inverse-in : ∀ {ℓ} {S : Container {ℓ}} -> (out-fun ∘ in-fun {S = S}) ≡ (λ x -> x)
 out-inverse-in i a = transport⁻Transport shift a i
