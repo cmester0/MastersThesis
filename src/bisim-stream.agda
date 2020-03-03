@@ -48,6 +48,12 @@ tl≈ (stream≈-trans s t) = stream≈-trans (tl≈ s) (tl≈ t)
 stream≈-equality-relation : ∀ {A} -> equality-relation (stream≈ {A})
 stream≈-equality-relation = record { eq-refl = stream≈-refl ; eq-sym = stream≈-sym ; eq-trans = stream≈-trans }
 
+postulate
+  stream≈-anti-helper : ∀ {A} {x y : stream A} -> hd x ≡ hd y -> tl x ≡ tl y -> x ≡ y
+
+stream≈-anti : ∀ {A} {x y} -> stream≈ {A} x y -> stream≈ {A} y x -> x ≡ y
+stream≈-anti {x = x} {y = y} p q = {!!}
+
 stream≈-helper : ∀ {A} -> (x : Σ (stream A) (λ a → Σ (stream A) (stream≈ a))) -> (fst x) ≡ (fst (x .snd))
 stream≈-helper {A} = equality-relation-projection stream≈-equality-relation
 
@@ -61,11 +67,10 @@ rel₁ (stream-bisimulation) = funExt λ x → refl
 rel₂ (stream-bisimulation) = funExt λ x → λ i → out-fun (stream≈-helper x (~ i))
 
 stream-bisim : ∀ {A} -> ∀ {x y : stream A} -> stream≈ x y -> x ≡ y
-stream-bisim {A} {x} {y} = coinduction (A , (λ _ → Unit)) stream≈ stream-bisimulation x y
+stream-bisim {A} {x} {y} = coinduction stream≈ stream-bisimulation
   
 stream-misib : ∀ {A} {x y} -> x ≡ y -> stream≈ {A} x y
-hd≈ (stream-misib p) = λ i -> hd (p i)
-tl≈ (stream-misib p) = stream-misib (λ i -> tl (p i))
+stream-misib = coinduction⁻ stream≈ stream-bisimulation stream≈-refl
 
 eta-helper : ∀ {A} (x : stream A) -> ( out-fun x .fst , λ { tt -> out-fun x .snd tt } ) ≡ out-fun x
 eta-helper = λ x i → out-fun x .fst , λ tt → out-fun x .snd tt
@@ -105,3 +110,10 @@ bisim-helper-3 {A} x y = (bisim-helper (bisim-helper-2 x y))
 
 iso1 : {A : Type₀} → {x y : stream A} → (p : x ≡ y) → stream-bisim {A = A} (stream-misib {A = A} p) ≡ p -- equiv cons (hd (p i)) (tl (p i))
 iso1 p i j = bisim-helper-3 {x = stream-bisim (stream-misib p) j} {y = p j} (λ i₁ → hd {!!}) (λ i₁ → tl {!!}) {!!}
+
+iso2 : {A : Type₀} → {x y : stream A} → (p : stream≈ x y) → stream-misib (stream-bisim p) ≡ p -- equiv cons (hd (p i)) (tl (p i))
+hd≈ (iso2 p i) = λ j → transp (λ k → {!!}) j (hd≈ p i) -- hd≈ p
+tl≈ (iso2 p i) = {!!} -- iso2 (tl≈ p) i
+
+stream≈≡≡ : ∀ {A} -> stream≈ {A} ≡ _≡_
+stream≈≡≡ = coinduction-is-equality stream≈ stream-bisimulation stream≈-refl

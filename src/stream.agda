@@ -7,6 +7,7 @@ open import M
 open import Cubical.Data.Unit
 open import Cubical.Data.Sum
 open import Cubical.Data.Prod
+open import Cubical.Data.Nat
 open import Cubical.Foundations.Prelude
 open import Cubical.Foundations.Equiv
 

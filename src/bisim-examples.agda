@@ -91,3 +91,6 @@ delay-bisimulation : ∀ {R : Set} -> bisimulation (delay-S R) M-coalg (delay≈
 αᵣ (delay-bisimulation) = λ { (a₁ , a₂ , p ) → fst (out-fun a₁) , λ b → snd (out-fun a₁) b , snd (out-fun a₁) b , delay≈-refl }
 rel₁ (delay-bisimulation) = funExt λ x → refl
 rel₂ (delay-bisimulation {R = R}) = funExt λ x → λ i → out-fun (equality-relation-projection delay≈-equality-relation x (~ i))
+
+delay≈≡≡ : ∀ {A} -> delay≈ {A} ≡ _≡_
+delay≈≡≡ = coinduction-is-equality delay≈ delay-bisimulation delay≈-refl

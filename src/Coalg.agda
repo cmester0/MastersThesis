@@ -7,6 +7,9 @@ open import Cubical.Foundations.Function using ( _∘_ )
 
 open import Cubical.Data.Unit
 
+open import Cubical.Foundations.Univalence
+open import Cubical.Foundations.Isomorphism
+
 module Coalg where
 
 -------------------------------
@@ -88,6 +91,19 @@ record equality-relation {A : Set} (R : A -> A -> Set) : Set where
     eq-sym : ∀ {x y} -> R x y -> R y x
     eq-trans : ∀ {x y z} -> R x y -> R y z -> R x z
 
+open equality-relation
+
+record eq+anti {A : Set} (R : A -> A -> Set) : Set where
+  field
+    eq-rel : equality-relation R
+    eq-anti : ∀ {x y} -> R x y -> R y x -> x ≡ y
+
+-- equality-relation-projection-helper : ∀ {A R} (eq : equality-relation R) (x y : A) -> R x y -> x ≡ y
+-- equality-relation-projection-helper eq x y rel = λ i → {!!}
+
+-- equality-relation-projection : ∀ {A R} (eq : equality-relation R) -> (x : Σ A (λ a → Σ A (R a))) -> (fst x) ≡ (fst (x .snd))
+-- equality-relation-projection {A = A} {R = R} eq (x , y , p) = λ i → cong (λ a → {!!}) {!!} i
+
 postulate
   equality-relation-projection : ∀ {A R} (eq : equality-relation R) -> (x : Σ A (λ a → Σ A (R a))) -> (fst x) ≡ (fst (x .snd))
   equality-mono : ∀ {A R} (eq : equality-relation R) (f : A -> A) (x y : A) -> R x y → R (f x) (f y)
@@ -124,9 +140,6 @@ U-contr {ℓ} {C,γ = C,γ} x = transp (λ i -> (sym (contr-is-ext {A = U {C,γ 
 M-final-coalg : ∀ {ℓ} {S : Container {ℓ}} -> Final {S = S}
 M-final-coalg {ℓ} {S = S} = M-coalg , λ C,γ → transp (λ i → (sym (U-is-Unit {C,γ = C,γ})) i) i0 (lift tt) , λ y → U-contr {C,γ = C,γ} y .snd y
 
-final-coalg-property : ∀ {ℓ} {S : Container {ℓ}} -> (F1 F2 : Final {S = S}) -> F1 ≡ F2
-final-coalg-property  F1 F2 = λ i → {!!}
-
 final-coalg-property-2 : ∀ {ℓ} {S : Container {ℓ}} -> (C : Coalg₀ {S = S}) -> (F : Final {S = S}) -> ∀ (f g : C ⇒ F .fst) -> f ≡ g
 final-coalg-property-2 C F f g = λ i -> compPath-filler (sym (F .snd C .snd f))  (F .snd C .snd g) i i -- follows from contractability
 
@@ -141,5 +154,29 @@ final-property-2 S R sim = λ i -> final-property S R sim i .fst
 -------------------------------------------------------------
 
 -- coinduction proof by: m ≡ π₁(m,m',r) ≡ π₂(m,m',r) ≡ m' 
-coinduction : ∀ {ℓ} (S : Container {ℓ}) R -> (sim : bisimulation S M-coalg R) -> ∀ (m m' : M S) -> R m m' -> m ≡ m' 
-coinduction S R sim m m' r = λ i -> funExt⁻ (final-property-2 S R sim) (m , (m' , r)) i
+coinduction : ∀ {ℓ} {S : Container {ℓ}} R -> (sim : bisimulation S M-coalg R) -> ∀ {m m' : M S} -> R m m' -> m ≡ m' 
+coinduction {S = S} R sim {m} {m'} r = λ i -> funExt⁻ (final-property-2 S R sim) (m , (m' , r)) i
+
+coinduction⁻ : ∀ {ℓ} {S : Container {ℓ}} R -> (sim : bisimulation S M-coalg R) -> (∀ {x} -> R x x) ->  ∀ {m m' : M S} -> m ≡ m' -> R m m'
+coinduction⁻ {S = S} R sim k {m} {m'} r = transp (λ i -> R m (r i)) i0 k
+
+coinduction-iso1 : ∀ {ℓ} {S : Container {ℓ}} R -> (sim : bisimulation S M-coalg R) -> (R-refl : ∀ {x} -> R x x) ->
+                     ∀ {m} {m'} (p : m ≡ m') -> (coinduction R sim {m} {m'}) (coinduction⁻ R sim R-refl p) ≡ p
+coinduction-iso1 R sim R-refl p = {!!}
+
+coinduction-iso2 : ∀ {ℓ} {S : Container {ℓ}} R -> (sim : bisimulation S M-coalg R) -> (R-refl : ∀ {x} -> R x x) ->
+                     ∀ {m} {m'} (p : R m m') -> (coinduction⁻ R sim R-refl (coinduction R sim {m} {m'} p)) ≡ p
+coinduction-iso2 R sim R-refl p = {!!}
+
+coinduction-is-equality : ∀ {ℓ} {S : Container {ℓ}} R ->
+  (sim : bisimulation S M-coalg R) ->
+  (R-refl : ∀ {x} -> R x x) ->
+  R ≡ _≡_
+coinduction-is-equality R sim R-refl i m m' =
+  ua (isoToEquiv (
+    iso
+      (coinduction R sim {m} {m'})
+      (coinduction⁻ R sim R-refl)
+      (coinduction-iso1 R sim R-refl)
+      (coinduction-iso2 R sim R-refl)
+    )) i
