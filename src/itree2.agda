@@ -103,18 +103,6 @@ mutual
   data ITreeBisim {E : Set -> Set₁} {R : Set} : (_ _ : ITree E R) -> Set₁ where
     Eq : ∀ {x y} -> ITreeBisim-pre (ValueIT x) (ValueIT y) -> ITreeBisim x y
 
-as : ∀ {E} {R} {x} -> (ValueIT {E} {R} (record { ValueIT = x }) ≡ x)
-as = refl
-
-mutual
-  bisim-ITree-pre : ∀ {E R} (x y : ITree-IT E R) -> ITreeBisim-pre x y -> x ≡ y
-  bisim-ITree-pre x y (EqRet p) i = rret (p i)
-  bisim-ITree-pre x y (EqTau {t} {u} p) i = ttau (bisim-ITree t u p i)
-  bisim-ITree-pre x y (EqVis {e = e} p) i = vvis (_ , e , (p i))
-  
-  bisim-ITree : ∀ {E R} (x y : ITree E R) -> ITreeBisim x y -> x ≡ y
-  bisim-ITree x y (Eq p) i = {!!}
-
 Bind : ∀ {E R S} -> ITree-IT E R -> (R -> ITree-IT E S) -> ITree E S
 ValueIT (Bind (rret r) k) = k r
 -- Bind (rret r) k = record { ValueIT = k r }
@@ -145,12 +133,6 @@ data IO : Type₀ → Type₁ where
   Input : IO ℕ
   Output : (x : ℕ) -> IO Unit
 
--- Echo' : ITree IO ⊥
--- ValueIT Echo' = Bind' (Trigger Input) λ x → Bind' (Trigger (Output x)) λ _ → Tau Echo'
-
--- Echo : ITree IO ⊥ -> ITree IO ⊥
--- ValueIT (Echo e) = vvis ( _ , Input , λ x → Bind (ValueIT (record { ValueIT = rret x })) (λ x → vvis (_ , Output x , λ x → Bind (ValueIT record { ValueIT = rret x }) (λ _ → ttau (record { ValueIT = ValueIT e})))))
-
 Echo : ITree IO ⊥ -> ITree IO ⊥
 -- Echo e = record { ValueIT = vvis ( _ , Input , λ x → Bind (rret x ) (λ x → vvis (_ , Output x , λ x → Bind (rret x) (λ _ → ttau (record { ValueIT = ValueIT e}))))) }
 Echo e = record { ValueIT = vvis ( _ , Input , λ x → record { ValueIT = vvis (_ , Output x , λ _ → record { ValueIT = ttau (record { ValueIT = ValueIT e}) }) }) }
@@ -161,32 +143,5 @@ Echo' e = record { ValueIT = Bind' (Trigger Input) λ x → Bind' (Trigger (Outp
 Echo2 : ITree IO ⊥ -> ITree IO ⊥
 Echo2 e = record { ValueIT = vvis (_ , Input , λ x → record { ValueIT = vvis (_ , Output x , λ _ → record { ValueIT = ttau (record { ValueIT = ValueIT e })} )} )}
 
--- ttau (record { ValueIT = ValueIT e })
-
--- vvis (A , (e , (λ x → record { ValueIT = k x })))
-
--- ASD : ∀ {E R S} (k : R -> ITree-IT E S) -> k ≡ λ x -> Bind (rret x ) k
--- ASD = {!!}
-
-asddf : ∀ {E} {R S : Set} (k : R -> ITree-IT E S) (x : R) -> Bind (rret x ) k ≡ record { ValueIT = k x }
-asddf = λ k x → {!!}
-
 BindEquality : ∀ {E R S} e k -> Bind' {E = E} {R = R} {S = S} (Trigger e) k ≡ vvis (R , e , λ x -> Bind (rret x ) k)
 BindEquality = λ e k -> refl
-
-Echo-Bind-Equiv : Echo ≡ Echo2
-Echo-Bind-Equiv = λ i x → bisim-ITree (Echo x) (Echo2 x) (Eq (EqVis λ i₁ x₁ → record { ValueIT = vvis (Unit , (Output x₁ , λ x₂ → record { ValueIT = ttau (record { ValueIT = ValueIT x }) })) })) i
-
-Echo-Bind-Equiv' : Echo' ≡ Echo2
-Echo-Bind-Equiv' = λ i e → record { ValueIT = vvis (ℕ , Input , λ x → {!!}) }
-
--- data ITreeBisim {E : Set -> Set₁} {R : Set} : (_ _ : ITree E R) -> Set₁ where
---   EqRet : ∀ (r s : R) -> r ≡ s -> ITreeBisim {E} (Ret' r) (Ret' s)
---   EqTau : ∀ t u -> ITreeBisim t u -> ITreeBisim {E} {R} (Tau'' t) (Tau'' u)
---   EqVis : ∀ {A} e k1 k2 -> k1 ≡ k2 -> ITreeBisim (Vis'' {A = A} e k1) (Vis'' {A = A} e k2)
-
--- Echo : ITree IO ⊥
--- ValueIT Echo = Bind' (Trigger Input) λ x → Bind' (Trigger (Output x)) λ _ → Tau' Echo
-
--- Echo2 : ITree IO ⊥
--- ValueIT Echo2 = Vis (Input) λ x → Vis (Output x) λ _ → Tau' Echo2

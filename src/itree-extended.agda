@@ -79,20 +79,6 @@ vis {A = A} e = in-fun ∘ (vis' {A = A} e)
 help : ∀ {R : Set} -> isProp R -> isSet R
 help = isProp→isSet
 
--- TODO:
--- r-set-tree-set : ∀ {E} {R : Set} -> isSet R -> isSet (itree E R)
--- r-set-tree-set = {!!}
-
--- asdff : ∀ E R (k : Set) -> (itree-T E R -> k) -> itree E R -> k
--- asdff E R f = {!!}
-
--- isEmbedding?
--- injSuc : ∀ {E} {R} {r s : R} -> ret {E = E} r ≡ ret s → r ≡ s
--- injSuc {E} {R} p = (λ (f : itree E R → R) -> cong f p) (asdff E R R λ { (retT r) → r ; tauT -> {!!} ; (visT e) -> {!!} } )
-
--- Σ ((n : ℕ) → sequence-pre₀ (itree-S E R) n)
---     (λ x → (n : ℕ) → sequence-pre₁ (itree-S E R) (x (suc n)) ≡ x n)
-
 -- Bind operations
 {-# TERMINATING #-}
 bind-helper : ∀ {E : Set -> Set₁} {R S : Set} -> (R -> itree E S) -> P₀ {S = itree-S E R} (itree E R) -> itree E S

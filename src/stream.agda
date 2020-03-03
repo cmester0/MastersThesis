@@ -35,13 +35,6 @@ hd {A} S = out-fun S .fst
 tl : ∀ {A} -> stream A -> stream A
 tl {A} S = out-fun S .snd tt
 
-------------------------------------------------------------------------
--- Wrapping the stream definition to satisfy the termination checker? --
-------------------------------------------------------------------------
-
-scons : ∀ {A} -> A -> ∞ (stream A) -> ∞ (stream A)
-scons a b = ♯ cons a (♭ b)
-
 ---------------------------------------------
 -- Stream definitions using Later modality --
 ---------------------------------------------

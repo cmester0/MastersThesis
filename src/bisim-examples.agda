@@ -13,21 +13,39 @@ open import Cubical.Foundations.Univalence
 open import Cubical.Data.Nat
 open import Cubical.Data.Sum
 open import Cubical.Data.Empty
+open import Cubical.Data.Bool
 
 open import Cubical.Codata.Stream
--- open import Agda.Builtin.Coinduction
 open import Cubical.Foundations.Isomorphism
 open import Cubical.Foundations.Equiv
+open import Cubical.Foundations.Univalence
 
 open import Cubical.HITs.SetQuotients
+
+-------------------------------
+-- The identity bisimulation --
+-------------------------------
+
+Δ : ∀ {ℓ} {S : Container {ℓ}} -> bisimulation S M-coalg (_≡_)
+αᵣ (Δ {S = S}) = λ a → fst (M-coalg .snd (a .fst)) , (λ b → snd (M-coalg .snd (a .fst)) b , (snd (M-coalg .snd (a .fst)) b , refl))
+rel₁ (Δ {S = S}) = funExt λ x → refl
+rel₂ (Δ {S = S}) = funExt λ x → λ i → M-coalg .snd (x .snd .snd (~ i))
 
 ---------------------------------
 -- Quotienting the delay monad --
 ---------------------------------
 
-data delay≈ {R} : (delay R) -> (delay R) -> Set where
-  EqPNow : ∀ r s -> r ≡ s -> delay≈ (delay-ret r) (delay-ret s)
-  EqPLater : ∀ t u -> delay≈ t u -> delay≈ (delay-tau t) (delay-tau u)
+mutual
+  data delay≈ {R} : (delay R) -> (delay R) -> Set where
+    EqNow : ∀ {r} -> ∀ {b} -> delay≈ (in-fun (inr r , b)) (in-fun (inr r , b))
+    EqLater : ∀ {t} -> (∞delay≈ (in-fun (out-fun (t tt))) (in-fun (out-fun (t tt)))) -> delay≈ (in-fun (inl tt , t)) (in-fun (inl tt , t))
+
+  record ∞delay≈ {R} (x : delay R) (y : delay R) : Set where
+    coinductive
+    field
+      force : delay≈ x y
+
+open ∞delay≈
 
 data weak-delay≈ {R} : (delay R) -> (delay R) -> Set where
   EqNow : ∀ {r s} -> r ≡ s -> weak-delay≈ (delay-ret r) (delay-ret s)
@@ -35,42 +53,41 @@ data weak-delay≈ {R} : (delay R) -> (delay R) -> Set where
   EqLaterL : ∀ {t u} -> weak-delay≈ t u -> weak-delay≈ (delay-tau t) u
   EqLaterR : ∀ {t u} -> weak-delay≈ t u -> weak-delay≈ t (delay-tau u)
 
--- isEmbedding -- TODO!
+delay≈-in-out : ∀ {R} {x : delay R} -> delay≈ (in-fun (out-fun x)) (in-fun (out-fun x)) -> delay≈ x x
+delay≈-in-out {x = x} = λ p → transp (λ i → delay≈ (in-inverse-out-x x i) (in-inverse-out-x x i)) i0 p
 
-Qdelay : ∀ {R} -> delay R -> QM (weak-delay≈)
-Qdelay = [_]
+delay≈-in-out-L : ∀ {R} {x y : delay R} -> delay≈ (in-fun (out-fun x)) y -> delay≈ x y
+delay≈-in-out-L {x = x} {y = y} = λ p → transp (λ i → delay≈ (in-inverse-out-x x i) y) i0 p
 
--- constant step delayed and non Delayed programs are equal
-delay-once : Qdelay (delay-tau (delay-ret 2)) ≡ Qdelay (delay-ret 2)
-delay-once = λ i → eq/ (delay-tau (delay-ret 2)) (delay-ret 2) (EqLaterL (EqNow refl)) i
+delay≈-in-out-R : ∀ {R} {x y : delay R} -> delay≈ x (in-fun (out-fun y)) -> delay≈ x y
+delay≈-in-out-R {x = x} {y = y} = λ p → transp (λ i → delay≈ x (in-inverse-out-x y i)) i0 p
 
-Qdelay-Container : ∀ {R : Set} -> Container {ℓ-zero}
-Qdelay-Container {R} = delay R / weak-delay≈ , {!!} -- delay R / weak-delay≈ , λ { [ x ] -> case out-fun x of λ (x₁ , b) → {!!} }
+mutual
+  ∞delay≈-refl-helper : ∀ {R} (x₁ : Σ (delay-S R .fst) (λ x₂ → delay-S R .snd x₂ → M (delay-S R))) → ∞delay≈ (in-fun x₁) (in-fun x₁)
+  force (∞delay≈-refl-helper x) = delay≈-refl-helper x
 
-Qdelay-type : ∀ {R : Set} -> Set
-Qdelay-type {R = R} = M (Qdelay-Container {R = R})
+  delay≈-refl-helper : ∀ {R} (x₁ : Σ (delay-S R .fst) (λ x₂ → delay-S R .snd x₂ → M (delay-S R))) → delay≈ (in-fun x₁) (in-fun x₁)
+  delay≈-refl-helper (inr r , b) = EqNow
+  delay≈-refl-helper (inl tt , b) = EqLater (∞delay≈-refl-helper (out-fun (b tt)))
 
-asdff : ∀ {R : Set} -> R -> Qdelay-type {R = R}
-asdff {R} r = in-fun {S = Qdelay-Container {R = R}} ( [ delay-ret r ] , λ x → {!!})
+delay≈-refl : ∀ {R} {x} -> delay≈ {R} x x
+delay≈-refl {R = R} {x = x} = delay≈-in-out (case out-fun x return (λ x₁ → delay≈ (in-fun x₁) (in-fun x₁)) of delay≈-refl-helper)
 
--- asdf' : ∀ {R} -> bisimulation (delay-S R) M-coalg delay≈
--- αᵣ asdf' = {!!}
--- rel₁ (asdf' {R = R}) i ((a , c) , b , EqPNow r s p) = {!!}
--- rel₁ (asdf' {R = R}) i (a , b , EqPLater _ _ _) = {!!}
--- rel₂ asdf' = {!!}
+-- delay≈-trans : ∀ {R} {x y z} -> delay≈ {R} x y -> delay≈ {R} y z -> delay≈ {R} x z
+-- delay≈-trans {x = x} {y = y} {z = z} p q =
+--   delay≈-in-out-L (case out-fun x return (λ x₁ → delay≈ (in-fun x₁) z) of λ { (inr r , b) ->
+--   delay≈-in-out-R (case out-fun z return (λ z₁ → delay≈ (in-fun (inr r , b)) (in-fun z₁)) of λ { (inr s , b') →
+--     case p of λ { EqNow → {!!} }
+--   } ) } )
 
-data itree≈ {E} {R} : itree E R -> itree E R -> Set₁ where
-  EqRet : ∀ r s -> r ≡ s -> itree≈ (ret r) (ret s)
-  EqTau : ∀ t u -> itree≈ t u -> itree≈ (tau t) (tau u)
-  EqVis : ∀ {A} e k1 k2 -> k1 ≡ k2 -> itree≈ (vis {A = A} e k1) (vis {A = A} e k2)
+postulate
+  delay≈-trans : ∀ {R} {x y z} -> delay≈ {R} x y -> delay≈ {R} y z -> delay≈ {R} x z
+  delay≈-sym : ∀ {R} {x y} -> delay≈ {R} x y -> delay≈ {R} y x
+  
+delay≈-equality-relation : ∀ {R} -> equality-relation (delay≈ {R = R})
+delay≈-equality-relation = record { eq-refl = delay≈-refl ; eq-sym = delay≈-sym ; eq-trans = delay≈-trans }
 
-open itree≈
-
--- ((Unit ⊎ R) ⊎ Σ Set E) -,- (λ { (inl (inl _)) -> Lift Unit ; (inl (inr _)) -> ⊥₁ ; (inr (A , e)) -> Lift A } )
-itree-bisim : ∀ {E : Set₀ -> Set₁} {R : Set₀} -> bisimulation (itree-S E R) M-coalg itree≈
-αᵣ (itree-bisim {E} {R}) = {!!}
-rel₁ itree-bisim = λ i → λ a → {!!}
-rel₂ itree-bisim = {!!}
-
--- spin≡spin : ∀ {R} -> spin {R} ≡ spin
--- spin≡spin {R = R} = coinduction (delay-S R) delay-bisim spin spin (delay-tau≈ spin spin {!!})
+delay-bisimulation : ∀ {R : Set} -> bisimulation (delay-S R) M-coalg (delay≈ {R})
+αᵣ (delay-bisimulation) = λ { (a₁ , a₂ , p ) → fst (out-fun a₁) , λ b → snd (out-fun a₁) b , snd (out-fun a₁) b , delay≈-refl }
+rel₁ (delay-bisimulation) = funExt λ x → refl
+rel₂ (delay-bisimulation {R = R}) = funExt λ x → λ i → out-fun (equality-relation-projection delay≈-equality-relation x (~ i))

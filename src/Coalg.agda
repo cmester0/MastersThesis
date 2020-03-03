@@ -82,42 +82,16 @@ record bisimulation {ℓ} (S : Container {ℓ}) (C,γ : Coalg₀ {S = S}) (R : C
 
 open bisimulation public
 
-Δ : ∀ {ℓ} {S : Container {ℓ}} -> bisimulation S M-coalg (_≡_)
-αᵣ (Δ {S = S}) = λ i → fst (M-coalg .snd (i .fst)) , λ b → snd (M-coalg .snd (i .fst)) b , _ , refl
-rel₁ (Δ {S = S}) = funExt λ x → refl
-rel₂ (Δ {S = S}) = funExt λ x → λ i → M-coalg .snd (x .snd .snd (~ i))
+record equality-relation {A : Set} (R : A -> A -> Set) : Set where
+  field
+    eq-refl : ∀ {x} -> R x x
+    eq-sym : ∀ {x y} -> R x y -> R y x
+    eq-trans : ∀ {x y z} -> R x y -> R y z -> R x z
 
--- record Bisim (_∼_ : ∀ {i} → X i → X i → Set _): Set(lb ⊔ lc ⊔ lsuc la) where
---     field
---       α : Σ₂[ _∼_ ] →ⁱ F Σ₂[ _∼_ ]
---       π₁-Mor : IsMor (_ , α) 𝓧 Σ₂-proj₁
---       π₂-Mor : IsMor (_ , α) 𝓧 Σ₂-proj₂
-
---     𝓑 : Coalg C _
---     𝓑 = _ , α
-
---     π₁ : 𝓑 ⇒ 𝓧
---     π₁ = _ , π₁-Mor
-
---     π₂ : 𝓑 ⇒ 𝓧
---     π₂ = _ , π₂-Mor
-
--- -- Lemma 17 in Ahrens, Capriotti and Spadotti (arXiv:1504.02949v1 [cs.LO])
--- Δ : bisimulation (λ {i} → _≡_)
--- Δ = record { α = α ; π₁-Mor = π₁-Mor ; π₂-Mor = π₂-Mor }
---   where α : Σ₂[ _≡_ ] →ⁱ F Σ₂[ _≡_ ]
---         α i (x , ._ , refl) = proj₁ (γ _ x)
---                               , λ b → (proj₂ (γ _ x) b) , (_ , refl)
---         π₁-Mor : IsMor (_ , α) 𝓧 _
---         π₁-Mor = funextⁱ helper
---           where helper : (i : I) → (p : Σ₂[ _≡_ ] i) → _
---                 helper i (m , ._ , refl) = refl
---         π₂-Mor : IsMor (_ , α) 𝓧 _
---         π₂-Mor = funextⁱ helper
---           where helper : (i : I) → (p : Σ₂[ _≡_ ] i) → _
---                 helper i (m , ._ , refl) = refl
-
-
+postulate
+  equality-relation-projection : ∀ {A R} (eq : equality-relation R) -> (x : Σ A (λ a → Σ A (R a))) -> (fst x) ≡ (fst (x .snd))
+  equality-mono : ∀ {A R} (eq : equality-relation R) (f : A -> A) (x y : A) -> R x y → R (f x) (f y)
+  
 --------------------------------------------------------
 -- Properties of Bisimulations and (Final) Coalgebras --
 --------------------------------------------------------
@@ -169,12 +143,3 @@ final-property-2 S R sim = λ i -> final-property S R sim i .fst
 -- coinduction proof by: m ≡ π₁(m,m',r) ≡ π₂(m,m',r) ≡ m' 
 coinduction : ∀ {ℓ} (S : Container {ℓ}) R -> (sim : bisimulation S M-coalg R) -> ∀ (m m' : M S) -> R m m' -> m ≡ m' 
 coinduction S R sim m m' r = λ i -> funExt⁻ (final-property-2 S R sim) (m , (m' , r)) i
-
--- TODO ?
-equality-bisim : ∀ {ℓ} {S : Container {ℓ}} -> ∀ (k : Σ (M S) (λ a -> Σ (M S) (λ b -> a ≡ b)) -> S .fst) -> M-coalg {S = S} .snd ∘ fst ≡ P₁ fst ∘ (λ x → k x , λ _ → x)
-equality-bisim {ℓ} {S} k = λ i a → {!!}
-
-bisim-helper : ∀ {ℓ} {S : Container {ℓ}} -> bisimulation S M-coalg _≡_
-αᵣ (bisim-helper {S = S}) = λ x → x .snd .fst .fst 100 .fst , λ x₁ → x
-rel₁ (bisim-helper {S = S}) = equality-bisim (λ x -> x .snd .fst .fst 100 .fst)
-rel₂ (bisim-helper {S = S}) = {!!}

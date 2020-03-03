@@ -162,7 +162,7 @@ out-inverse-in i a = transport⁻Transport shift a i
 out-inverse-in-x : ∀ {ℓ} {S : Container {ℓ}} -> ∀ x -> (out-fun ∘ in-fun {S = S}) x ≡ x
 out-inverse-in-x = funExt⁻ out-inverse-in
 
-in-inverse-out : ∀ {ℓ} {S : Container {ℓ}} -> (in-fun ∘ out-fun {S = S}) ≡ (λ (x : M S) -> x)
+in-inverse-out : ∀ {ℓ} {S : Container {ℓ}} -> (in-fun ∘ out-fun {S = S}) ≡ (λ x -> x)
 in-inverse-out = λ i a → transportTransport⁻ shift a i
 
 in-inverse-out-x : ∀ {ℓ} {S : Container {ℓ}} -> ∀ x -> (in-fun ∘ out-fun {S = S}) x ≡ x
