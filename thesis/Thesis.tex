@@ -163,8 +163,6 @@ where \texttt{out} is an isomorphism (because of the finality of the coalgebra),
 \end{equation}
 
 \section{ITrees as \texttt{M}-types}
-
-\subsection{Delay Monad}
 We want the following rules for ITrees
 \begin{equation}
   \infer [\mathtt{I}_\mathtt{Ret}]{\mathtt{Ret}~\term{r} : \mathtt{itree}~\type{E}~\type{R}}{r : \type{R}}
@@ -176,6 +174,8 @@ Elimination rules
 \begin{equation}
   \infer[\mathtt{E}_\mathtt{Tau}]{\mathtt{Tau}~\term{t} : \mathtt{itree}~\type{E}~\type{R}}{\term{t} : \mathtt{itree}~\type{E}~\type{R}}.
 \end{equation}
+
+\subsection{Delay Monad}
 We start by looking at \texttt{itree}s without the \texttt{Vis} constructor, this type is also know as the delay monad \todo{check this statement}. We say this type is given by \(\container{S} = (\unit + \type{R},\lambda \{ \texttt{inl}~\_ \rightarrow \unit~;~\texttt{inr}~\_ \rightarrow \empt \})\) equal to \(\mathtt{M}\container{S}\), we then get the polynomial functor
 \begin{equation}
   P_{\container{S}}(\type{X}) = \sum_{\term{x} : \unit + \type{R}} \lambda \{ \texttt{inl}~\_ \rightarrow \unit ; \texttt{inr}~\_ \rightarrow \empt\}~\term{x} \rightarrow \type{X}
@@ -247,8 +247,8 @@ Giving us the diagram
   \caption{TODO: ???}
 \end{figure}
 
-\section{Coinduction priciple of M-types}
-We can now construct a bisimulation: forall coalgebras \(\coalg{\type{C}}{\term{\gamma}} : \mathtt{Coalg}_{\container{S}}\), if we have a relation \(\term{\mathcal{R}} : \type{C} \rightarrow \type{C} \rightarrow \universe{\mathcal{U}}\), and a type \(\type{\overline{\mathcal{R}}} = \sum_{\term{a} : \type{C}} \sum_{\term{b} : \type{C}} \term{\mathcal{R}}~\term{a}~\term{b}\), such that \(\type{\overline{\mathcal{R}}}\) and \(\term{\alpha}_{\type{\overline{\mathcal{R}}}} : \type{\overline{\mathcal{R}}} \rightarrow P(\type{\overline{\mathcal{R}}})\) makes a P-coalgebra \(\coalg{\type{\overline{\mathcal{R}}}}{\term{\alpha}_{\type{\overline{\mathcal{R}}}}} : \mathtt{Coalg}_{\container{S}}\), such that the following diagram commutes (where \(\Rightarrow\) are P-coalgebra morphisms).
+\section{Co-induction Principle for M-types}
+We can now construct a bisimulation: forall coalgebras \(\coalg{\type{C}}{\term{\gamma}} : \mathtt{Coalg}_{\container{S}}\), if we have a relation \(\term{\mathcal{R}} : \type{C} \rightarrow \type{C} \rightarrow \universe{\mathcal{U}}\), and a type \(\type{\overline{\mathcal{R}}} = \sum_{\term{a} : \type{C}} \sum_{\term{b} : \type{C}} \term{\mathcal{R}}~\term{a}~\term{b}\), such that \(\type{\overline{\mathcal{R}}}\) and \(\term{\alpha}_{\type{\overline{\mathcal{R}}}} : \type{\overline{\mathcal{R}}} \rightarrow P(\type{\overline{\mathcal{R}}})\) makes a \(P\)-coalgebra \(\coalg{\type{\overline{\mathcal{R}}}}{\term{\alpha}_{\type{\overline{\mathcal{R}}}}} : \mathtt{Coalg}_{\container{S}}\), such that the following diagram commutes (where \(\Rightarrow\) are \(P\)-coalgebra morphisms).
 
 \begin{figure}[h]
   \centering
@@ -256,7 +256,7 @@ We can now construct a bisimulation: forall coalgebras \(\coalg{\type{C}}{\term{
     \coalg{\type{C}}{\term{\gamma}} & \coalg{\type{\overline{\mathcal{R}}}}{\term{\alpha}_{\type{\overline{\mathcal{R}}}}} \ar[l,Rightarrow,"{\pi_1}^{\type{\overline{\mathcal{R}}}}"'] \ar[r,Rightarrow,"{\pi_2}^{\type{\overline{\mathcal{R}}}}"] & \coalg{\type{C}}{\term{\gamma}}
   \end{tikzcd}
 \end{figure}
-\noindent Furthermore for any bisimulation over a final P-coalgebra \(\coalg{\type{\mathtt{M}}}{\term{\mathtt{out}}}:\mathtt{Coalg}_{\container{S}}\) we have the following diagram,
+\noindent Furthermore for any bisimulation over a final \(P\)-coalgebra \(\coalg{\type{\mathtt{M}}}{\term{\mathtt{out}}}:\mathtt{Coalg}_{\container{S}}\) we have the following diagram,
 
 \begin{figure}[h]
   \centering
@@ -265,9 +265,22 @@ We can now construct a bisimulation: forall coalgebras \(\coalg{\type{C}}{\term{
   \end{tikzcd}
 \end{figure}
 \noindent where \(\pi_1^{\type{\overline{\mathcal{R}}}} = ~! = \pi_2^{\type{\overline{\mathcal{R}}}}\), which means given \(\term{r} : \term{\mathcal{R}}(\term{m},\term{m'})\) we get \(\term{m} = \pi_1^{\type{\overline{\mathcal{R}}}} (\term{m}, \term{m'}, \term{r}) = \pi_2^{\type{\overline{\mathcal{R}}}} (\term{m}, \term{m'}, \term{r}) = \term{m'}\).
-
-% \ar[d,"\texttt{out}"{name=out1}]
-% \ar[Rightarrow,from=alpha, to=out1, "(rel_1 ; \pi_1)"']
+\\ \\
+We want to define a co-induction principle from any bisimulation relation over a final coalgebra, that is if \(\term{R}\) gives a bisimulation, then it is true that
+\begin{equation}
+  \term{R} \equiv \term{\equiv}
+\end{equation}
+meaning we can use the relation \(\term{R}\), to show that two things of an \texttt{M}-type are equivalent. So we want to construct an isomorphism between \(\term{R}\) and the equivalence relation \(\equiv\), to do this we must construct functions
+\begin{align}
+  \term{p} &: \term{R} \rightarrow \term{\equiv} \\
+  \term{q} &: \term{\equiv} \rightarrow \term{R}
+\end{align}
+and relations
+\begin{align}
+  \term{\alpha} &: \term{p} \circ \term{q} \equiv \term{\mathtt{id}_{\equiv}} \\
+  \term{\beta} &: \term{q} \circ \term{p} \equiv \term{\mathtt{id}_{R}}
+\end{align}
+\todo[inline]{Complete the construction of equality from any bisimulation relation over an M-type}
 
 \subsection{Bisimulation of ITrees}
 We define our bisimulation coalgebra from the strong bisimulation relation \(\mathcal{R}\), defined by the following rules.
@@ -283,7 +296,7 @@ We define our bisimulation coalgebra from the strong bisimulation relation \(\ma
 Now we just need to define \(\term{\alpha}_{\type{\overline{\mathcal{R}}}}\) \todo{define the \(\alpha_{\overline{R}}\) function}. Now we have a bisimulation relation, which is equivalent to equality, using what we showed in the previous section.
 
 \section{Examples of fixed points}
-We want to define spin, as being the fixed point \(\mathtt{spin}\ = \mathtt{later}~\mathtt{spin}\), so that is again a final coalgebra, but of a M-type (which is a final coalgebra)
+We want to define spin, as being the fixed point \(\mathtt{spin} = \mathtt{later}~\mathtt{spin}\), so that is again a final coalgebra, but of a M-type (which is a final coalgebra)
 
 \begin{figure}[h]
   \centering
@@ -294,53 +307,12 @@ We want to define spin, as being the fixed point \(\mathtt{spin}\ = \mathtt{late
 \end{figure}
 \noindent Since it is final, it also must be unique, meaning that there is just one program that spins forever, without returning a value, meaning every other program must return a value. If we just
 
-\section{Quotiented M-types}
-We can define a quotient of the polynomial functor \(P\) as a functor \(F\), such that the following diagram commutes
+\section{Quotient M-type}
+Since we know that M-types preserves the H-level, we can use set-truncated quotients, to define quotient M-types, for examples we can define weak bisimulation of the delay monad as
+\[\]
 
-\begin{figure}[h]
-  \centering
-  \begin{tikzcd}[row sep=huge,column sep=huge]
-    \term{P} \type{\alpha} \ar[r,"\term{P}\term{f}"] \ar[d,"\term{abs}_{\type{\alpha}}"'] & \term{P} \type{\beta} \ar[d,"\term{abs}_{\type{\beta}}"] \\
-    \term{F} \type{\alpha} \ar[r,"\term{F}\term{f}"] & \term{F} \type{\beta}
-  \end{tikzcd}
-\end{figure}
-\noindent for all \(f : \alpha \rightarrow \beta\) and \(\alpha,\beta\). This is a naturallity condition for \(abs\). As an example lets look at the quotient of the delay monad by the equality \(\forall \term{a} : \type{\mathtt{M}} , \term{\mathtt{later}}~\term{a} \equiv \term{a}\). We get the diagram
-
-\begin{figure}[h]
-  \centering
-  \begin{tikzcd}[row sep=huge,column sep=huge]
-    \type{\texttt{M}} \ar[r,"\term{\texttt{later}}"] \ar[d,"\term{\texttt{out}}"'] & \type{\texttt{M}} \ar[d,"\term{\texttt{out}}"] \\
-    \term{P} \type{\texttt{M}} \ar[r,"\term{P}~\term{\texttt{later}}"] \ar[d,"\term{abs}_{\type{\texttt{M}}}"'] & \term{P} \type{\texttt{M}} \ar[d,"\term{abs}_{\type{\texttt{M}}}"] \\
-    \term{F} \type{\texttt{M}} \ar[r,"\term{F}~\term{\texttt{later}}"] & \term{F} \type{\texttt{M}}
-  \end{tikzcd}
-\end{figure}
-\noindent Such that the (co?)limit for \(\term{F}~\type{\texttt{M}}\) is \(\unit + \type{R}\), meaning
-\begin{equation}
-  F~later \circ abs_M \circ out \equiv abs_M \circ out \circ later
-\end{equation}
-\begin{equation}
-  F~later \equiv later^{-1}
-\end{equation}
-\begin{align}
-  later &= in \circ inr \\
-  out \circ later &= inr \\
-        &= P~later \circ out \\
-  abs_{M} \circ out \circ later &= abs_{M} \circ inr \\
-        &= abs_M \circ P~later \circ out\\
-        &= F~later \circ abs_M \circ out\\
-\end{align}
-\\ \\
-Given the container of the final P-coalgebra for some container \(\container{S}\), we can construct the diagram:
-
-\begin{figure}[h]
-  \centering
-  \begin{tikzcd}[row sep=huge,column sep=huge]
-    (\type{\texttt{M}}, \term{P}~\type{\texttt{M}}) \ar[rr,"\texttt{Tau}"] \ar[dr,"\sim_x : \texttt{Tau}~x~\equiv~x"'] & & (\type{\texttt{M}}, \term{P}~\type{\texttt{M}}) \ar[dl,"\sim_y : \texttt{Tau}~y~\equiv~y"] \\
-    & (\ssfrac{\type{\texttt{M}}}{\sim}, \term{F}~\ssfrac{\type{\texttt{M}}}{\sim}) 
-  \end{tikzcd}
-\end{figure}
-\noindent Such that \(\sim_x \equiv \sim_y \circ \mathtt{Tau}\), where \(\ssfrac{\term{P}~\type{\texttt{M}}}{\sim} \equiv \term{F}~(\ssfrac{\type{\texttt{M}}}{\sim})\)
-
+\section{Bisimulation}
+We want to define a bisimulation principle for M-types
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 

@@ -1,5 +1,4 @@
 {-# OPTIONS --cubical --guardedness --allow-unsolved-metas #-} --safe
-module M where
 
 open import Cubical.Foundations.Prelude
 open import Cubical.Foundations.Equiv using (_≃_)
@@ -10,6 +9,14 @@ open import Cubical.Data.Prod
 open import Cubical.Data.Nat as ℕ using (ℕ ; suc ; _+_ )
 
 open import Cubical.Foundations.Transport
+
+open import Cubical.Foundations.Univalence
+open import Cubical.Foundations.Isomorphism
+open import Cubical.Foundations.Function
+
+open import helper
+
+module M where
 
 -------------------------------------
 -- Container and Container Functor --
@@ -92,17 +99,17 @@ L-unique {X,π = X,π} = λ i →
 -- Limit type of a Container , and Shift of a Limit --
 ------------------------------------------------------
 
-sequence-pre₀ : ∀ {ℓ} -> Container {ℓ} -> ℕ -> Set ℓ -- (ℓ-max ℓ ℓ')
-sequence-pre₀ S 0 = Lift Unit
-sequence-pre₀ S (suc n) = P₀ {S = S} (sequence-pre₀ S n)
+W : ∀ {ℓ} -> Container {ℓ} -> ℕ -> Set ℓ -- (ℓ-max ℓ ℓ')
+W S 0 = Lift Unit
+W S (suc n) = P₀ {S = S} (W S n)
 
-sequence-pre₁ : ∀ {ℓ} -> (S : Container {ℓ}) -> {n : ℕ} -> sequence-pre₀ S (suc n) -> sequence-pre₀ S n
-sequence-pre₁ {ℓ} S {0} = ! {ℓ}
-sequence-pre₁ S {suc n} = P₁ (sequence-pre₁ S {n})
+πₙ : ∀ {ℓ} -> (S : Container {ℓ}) -> {n : ℕ} -> W S (suc n) -> W S n
+πₙ {ℓ} S {0} = ! {ℓ}
+πₙ S {suc n} = P₁ (πₙ S {n})
 
 sequence : ∀ {ℓ} -> Container {ℓ} -> Chain {ℓ}
-X (sequence {ℓ} S) n = sequence-pre₀ {ℓ} S n
-π (sequence {ℓ} S) {n} = sequence-pre₁ {ℓ} S {n}
+X (sequence {ℓ} S) n = W {ℓ} S n
+π (sequence {ℓ} S) {n} = πₙ {ℓ} S {n}
 
 M : ∀ {ℓ} -> Container {ℓ} → Set ℓ
 M = L ∘ sequence
@@ -156,14 +163,16 @@ out-fun {S = S} = transport (sym (shift {S = S}))
 
 -- in-fun and out-fun are inverse
 
-out-inverse-in : ∀ {ℓ} {S : Container {ℓ}} -> (out-fun ∘ in-fun {S = S}) ≡ (λ x -> x)
+out-inverse-in : ∀ {ℓ} {S : Container {ℓ}} -> (out-fun ∘ in-fun {S = S}) ≡ idfun (P₀ (M S))
 out-inverse-in i a = transport⁻Transport shift a i
-
-out-inverse-in-x : ∀ {ℓ} {S : Container {ℓ}} -> ∀ x -> (out-fun ∘ in-fun {S = S}) x ≡ x
-out-inverse-in-x = funExt⁻ out-inverse-in
 
 in-inverse-out : ∀ {ℓ} {S : Container {ℓ}} -> (in-fun ∘ out-fun {S = S}) ≡ (λ x -> x)
 in-inverse-out = λ i a → transportTransport⁻ shift a i
 
-in-inverse-out-x : ∀ {ℓ} {S : Container {ℓ}} -> ∀ x -> (in-fun ∘ out-fun {S = S}) x ≡ x
-in-inverse-out-x = funExt⁻ in-inverse-out
+-- constructor properties
+
+in-inj : ∀ {ℓ} {S : Container {ℓ}} {Z : Set ℓ} -> ∀ {f g : Z → P₀ (M S)} -> (in-fun ∘ f ≡ in-fun ∘ g) ≡ (f ≡ g)
+in-inj = ≡-rel-a-inj in-fun out-fun in-inverse-out out-inverse-in
+
+out-inj : ∀ {ℓ} {S : Container {ℓ}} {Z : Set ℓ} -> ∀ {f g : Z → M S} -> (out-fun ∘ f ≡ out-fun ∘ g) ≡ (f ≡ g)
+out-inj = ≡-rel-b-inj in-fun out-fun in-inverse-out out-inverse-in

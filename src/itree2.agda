@@ -10,6 +10,7 @@ open import Cubical.Data.Empty
 open import Cubical.Data.Bool
 open import Cubical.Foundations.Function
 open import Cubical.Foundations.Prelude
+open import Cubical.HITs.SetQuotients
 
 -- Delay
 mutual
@@ -30,29 +31,107 @@ TauD t = t
 TauD' : ∀ {R} -> Delay R -> Delay-IT R
 TauD' t = later t
 
+TauD'' : ∀ {R} -> Delay R -> Delay R
+ValueD (TauD'' t) = TauD' t
+
 RetD : ∀ {R} -> R -> Delay-IT R
 RetD r = now r
 
 RetD' : ∀ {R} -> R -> Delay R
 ValueD (RetD' r) = now r
 
-P1 : ∀ {R} (f : Delay R -> Delay R) -> Delay-IT R -> Delay-IT R
-P1 = λ f x → ValueD (f (record { ValueD = x }))
-
-record qpf {R} (F₀ : Set -> Set) (F₁ : ∀ (f : (Delay R) -> (Delay R)) -> F₀ (Delay R) -> F₀ (Delay R)) : Set₁ where
-  field
-    abs : Delay-IT R -> F₀ (Delay R)
-    repr : F₀ (Delay R) -> Delay-IT R
-    abs_repr : (x : F₀ (Delay R)) -> (abs ∘ repr) x ≡ x
-    abs_map : ∀ (f : Delay R -> Delay R) -> abs ∘ (P1 f) ≡ (F₁ f) ∘ abs
-
-open qpf
-
 spin' : ∀ {R} -> Delay R
 ValueD spin' = later spin'
 
+-- Delay weak bisimulation
+
+mutual
+  record ∞delay≈ {R} (x : Delay R) (y : Delay R) : Set where
+    coinductive
+    field
+      force : delay≈ (ValueD x) (ValueD y)
+
+  data delay≈ {R} : (Delay-IT R) -> (Delay-IT R) -> Set where
+    EqNow : ∀ {r s : R} -> r ≡ s -> delay≈ (now r) (now s)
+    EqLater : ∀ {t u} -> (∞delay≈ t u) -> delay≈ (later t) (later u)
+
+open ∞delay≈
+
+mutual
+  ∞delay≈-refl : ∀ {R} {x : Delay R} -> ∞delay≈ x x
+  force ∞delay≈-refl = delay≈-refl
+
+  delay≈-refl : ∀ {R} {x : Delay-IT R} -> delay≈ x x
+  delay≈-refl {x = now r} = EqNow refl
+  delay≈-refl {x = later t} = EqLater ∞delay≈-refl
+
+mutual
+  ∞delay-bisim : ∀ R a b -> ∞delay≈ {R} a b -> a ≡ b
+  ValueD (∞delay-bisim R a b p i) = delay-bisim R (ValueD a) (ValueD b) (force p) i
+
+  delay-bisim : ∀ R a b -> delay≈ {R} a b -> a ≡ b
+  delay-bisim R (now r) (now s) (EqNow p) = λ i → now (p i)
+  delay-bisim R (later t) (later u) (EqLater p) = λ i → later (∞delay-bisim R t u p i)
+
+mutual
+  data weak-delay≈ {R} : (Delay-IT R) -> (Delay-IT R) -> Set where
+    EqNow : ∀ {r s : R} -> r ≡ s -> weak-delay≈ (now r) (now s)
+    EqLater : ∀ {t u} -> (∞weak-delay≈ t u) -> weak-delay≈ (later t) (later u)
+    EqLaterL : ∀ {t u} -> (∞weak-delay≈ t record { ValueD = u }) -> weak-delay≈ (later t) u
+    EqLaterR : ∀ {t u} -> (∞weak-delay≈ record { ValueD = t} u) -> weak-delay≈ t (later u)
+
+  record ∞weak-delay≈ {R} (x : Delay R) (y : Delay R) : Set where
+    coinductive
+    field
+      force : weak-delay≈ (ValueD x) (ValueD y)
+
+open ∞weak-delay≈
+
+mutual
+  ∞weak-delay≈-refl : ∀ {R} {x : Delay R} -> ∞weak-delay≈ x x
+  force ∞weak-delay≈-refl = weak-delay≈-refl
+
+  weak-delay≈-refl : ∀ {R} {x : Delay-IT R} -> weak-delay≈ x x
+  weak-delay≈-refl {x = now r} = EqNow refl
+  weak-delay≈-refl {x = later t} = EqLater ∞weak-delay≈-refl
+
+-- weak
+mutual
+  ∞weak-delay-bisim : ∀ R a b -> ∞weak-delay≈ {R} a b -> a ≡ b
+  ValueD (∞weak-delay-bisim R a b p i) = weak-delay-bisim R (ValueD a) (ValueD b) (force p) i
+
+  postulate
+    helper0 : ∀ {R} t s p -> later t ≡ ValueD (∞weak-delay-bisim R t (record { ValueD = now s }) p i0)
+    helper1 : ∀ {R} r u p -> ValueD (∞weak-delay-bisim R (record { ValueD = now r }) u p i1) ≡ later u
+
+  weak-delay-bisim : ∀ R a b -> weak-delay≈ {R} a b -> a ≡ b
+  weak-delay-bisim R (now r) (now s) (EqNow p) = λ i → now (p i)
+  weak-delay-bisim R (later t) (now s) (EqLaterL p) = λ i → compPath-filler (helper0 t s p) (λ i -> ValueD (∞weak-delay-bisim R t (record { ValueD = now s }) p i)) i i
+  weak-delay-bisim R (now r) (later u) (EqLaterR p) = λ i → compPath-filler (λ i -> ValueD (∞weak-delay-bisim R (record { ValueD = now r }) u p i)) (helper1 r u p) i i
+  weak-delay-bisim R (later t) (later u) (EqLater p) = λ i → later (∞weak-delay-bisim R t u p i)
+
+-- Quotiented delay
+
+quotient-delay : ∀ {R} -> Delay-IT R -> Delay-IT R / (weak-delay≈ {R})
+quotient-delay (later t) = eq/ (later t) (ValueD t) (EqLaterL (record { force = weak-delay≈-refl })) i0
+quotient-delay (now r) = [ now r ] 
+
+-- weak-delay is equality
+
+-- ∀ t u -> ValueD t ≡ ValueD u -> u ≡ u
+
+tau-equiv : ∀ {R} (t : Delay R) -> later t ≡ ValueD t
+tau-equiv = {!!}
+
+-- delay-bisim R (later t) (later u) (EqLater p) = λ i → later ?
+
+-- delay examples
+
 spin : ∀ {R} -> Delay-IT R
 spin = ValueD spin'
+
+spin-is-delay-spin : ∀ {R} -> TauD {R} spin ≡ spin
+spin-is-delay-spin = {!!}
 
 -- Tree
 record Tree (E : Set₀ -> Set₁) (R : Set₀) : Set₁ where
