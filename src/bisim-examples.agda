@@ -26,10 +26,32 @@ open import Cubical.HITs.SetQuotients
 -- The identity bisimulation --
 -------------------------------
 
-Δ : ∀ {ℓ} {S : Container {ℓ}} -> bisimulation S M-coalg (_≡_)
-αᵣ (Δ {S = S}) = λ a → fst (M-coalg .snd (a .fst)) , (λ b → snd (M-coalg .snd (a .fst)) b , (snd (M-coalg .snd (a .fst)) b , refl))
-rel₁ (Δ {S = S}) = funExt λ x → refl
-rel₂ (Δ {S = S}) = funExt λ x → λ i → M-coalg .snd (x .snd .snd (~ i))
+-- fst (transp (λ i → U-is-Unit (~ i)) i0 (lift tt)) (x .snd .snd i0)  ≡ x .fst
+
+property-helper : ∀ {ℓ} (S : Container {ℓ}) (x : Σ (M S) (λ a → Σ (M S) (_≡_ a))) -> (x .fst) ≡ (x .snd .fst)
+property-helper S x i =
+  let y = unfold M-final-coalg M-coalg in
+  (U-contr {C,γ = M-coalg} y .snd y i .fst (x .snd .snd i))
+
+-- (property-helper2 S x)
+
+-- fst (transport (sym U-is-Unit) (lift tt)) (x₁ .fst) !=
+-- x₁ .fst of type
+
+-- (M-final-coalg {S = S} .snd M-coalg .snd (unfold M-final-coalg M-coalg) i .fst (x .snd .fst))
+
+-- Δ : ∀ {ℓ} {S : Container {ℓ}} -> bisimulation S M-coalg (_≡_)
+-- Δ {S = S} = property S _≡_ refl (λ x i → ) -- x .snd .snd (~ i)
+
+-- Δ : ∀ {ℓ} {S : Container {ℓ}} -> bisimulation S M-coalg (_≡_)
+-- Δ {S = S} = property S _≡_ refl (λ x i → x .snd .snd (~ i))
+
+-- Δ : ∀ {ℓ} {S : Container {ℓ}} -> bisimulation S M-coalg (_≡_)
+-- αᵣ (Δ {S = S}) = λ a → fst (M-coalg .snd (a .fst)) , (λ b → snd (M-coalg .snd (a .fst)) b , (snd (M-coalg .snd (a .fst)) b , refl))
+-- rel₁ (Δ {S = S}) = funExt λ x → refl
+-- rel₂ (Δ {S = S}) = funExt λ x → λ i → M-coalg .snd (x .snd .snd (~ i))
+
+-- M-final-coalg
 
 ---------------------------------
 -- Quotienting the delay monad --
@@ -54,13 +76,13 @@ data weak-delay≈ {R} : (delay R) -> (delay R) -> Set where
   EqLaterR : ∀ {t u} -> weak-delay≈ t u -> weak-delay≈ t (delay-tau u)
 
 delay≈-in-out : ∀ {R} {x : delay R} -> delay≈ (in-fun (out-fun x)) (in-fun (out-fun x)) -> delay≈ x x
-delay≈-in-out {x = x} = λ p → transp (λ i → delay≈ (in-inverse-out-x x i) (in-inverse-out-x x i)) i0 p
+delay≈-in-out {x = x} = λ p → transp (λ i → delay≈ (funExt⁻ in-inverse-out x i) (funExt⁻ in-inverse-out x i)) i0 p
 
 delay≈-in-out-L : ∀ {R} {x y : delay R} -> delay≈ (in-fun (out-fun x)) y -> delay≈ x y
-delay≈-in-out-L {x = x} {y = y} = λ p → transp (λ i → delay≈ (in-inverse-out-x x i) y) i0 p
+delay≈-in-out-L {x = x} {y = y} = λ p → transp (λ i → delay≈ (funExt⁻ in-inverse-out x i) y) i0 p
 
 delay≈-in-out-R : ∀ {R} {x y : delay R} -> delay≈ x (in-fun (out-fun y)) -> delay≈ x y
-delay≈-in-out-R {x = x} {y = y} = λ p → transp (λ i → delay≈ x (in-inverse-out-x y i)) i0 p
+delay≈-in-out-R {x = x} {y = y} = λ p → transp (λ i → delay≈ x (funExt⁻ in-inverse-out y i)) i0 p
 
 mutual
   ∞delay≈-refl-helper : ∀ {R} (x₁ : Σ (delay-S R .fst) (λ x₂ → delay-S R .snd x₂ → M (delay-S R))) → ∞delay≈ (in-fun x₁) (in-fun x₁)
@@ -87,10 +109,22 @@ postulate
 delay≈-equality-relation : ∀ {R} -> equality-relation (delay≈ {R = R})
 delay≈-equality-relation = record { eq-refl = delay≈-refl ; eq-sym = delay≈-sym ; eq-trans = delay≈-trans }
 
-delay-bisimulation : ∀ {R : Set} -> bisimulation (delay-S R) M-coalg (delay≈ {R})
-αᵣ (delay-bisimulation) = λ { (a₁ , a₂ , p ) → fst (out-fun a₁) , λ b → snd (out-fun a₁) b , snd (out-fun a₁) b , delay≈-refl }
-rel₁ (delay-bisimulation) = funExt λ x → refl
-rel₂ (delay-bisimulation {R = R}) = funExt λ x → λ i → out-fun (equality-relation-projection delay≈-equality-relation x (~ i))
+-- delay-bisimulation : ∀ {R : Set} -> bisimulation (delay-S R) M-coalg (delay≈ {R})
+-- αᵣ (delay-bisimulation) = λ { (a₁ , a₂ , p ) → fst (out-fun a₁) , λ b → snd (out-fun a₁) b , snd (out-fun a₁) b , delay≈-refl }
+-- rel₁ (delay-bisimulation) = funExt λ x → refl
+-- rel₂ (delay-bisimulation {R = R}) = funExt λ x → λ i → out-fun (equality-relation-projection delay≈-equality-relation x (~ i))
 
-delay≈≡≡ : ∀ {A} -> delay≈ {A} ≡ _≡_
-delay≈≡≡ = coinduction-is-equality delay≈ delay-bisimulation delay≈-refl
+-- delay-bisimulation : ∀ {R : Set} -> bisimulation (delay-S R) M-coalg (delay≈ {R})
+-- delay-bisimulation {R = R} =
+--   property (delay-S R) (delay≈ {R}) delay≈-refl
+--     (λ x i → M-final-coalg .snd ((Σ (delay R) (λ a → Σ (delay R) (delay≈ a))) ,
+--                            λ { (a , b) → fst (out-fun a) ,
+--                                           λ x → (snd (out-fun a) x) , ((snd (out-fun a) x) , delay≈-refl)}) .snd (property-2 delay≈ delay≈-refl) i .fst x)
+
+-- delay-bisimulation : ∀ {R : Set} -> bisimulation (delay-S R) M-coalg (delay≈ {R})
+-- αᵣ (delay-bisimulation) = λ { (a₁ , a₂ , p ) → fst (out-fun a₁) , λ b → snd (out-fun a₁) b , snd (out-fun a₁) b , delay≈-refl }
+-- rel₁ (delay-bisimulation) = funExt λ x → refl
+-- rel₂ (delay-bisimulation {R = R}) = funExt λ x → λ i → out-fun (equality-relation-projection delay≈-equality-relation x (~ i))
+
+-- delay≈≡≡ : ∀ {A} -> delay≈ {A} ≡ _≡_
+-- delay≈≡≡ = coinduction-is-equality delay≈ delay-bisimulation delay≈-refl

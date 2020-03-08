@@ -9,7 +9,6 @@ open import Cubical.Data.Prod
 open import Cubical.Data.Nat as ℕ using (ℕ ; suc ; _+_ )
 
 open import Cubical.Foundations.Transport
-
 open import Cubical.Foundations.Univalence
 open import Cubical.Foundations.Isomorphism
 open import Cubical.Foundations.Function
@@ -56,8 +55,8 @@ shift-chain = λ X,π -> ((λ x → X X,π (suc x)) ,, λ {n} → π X,π {suc n
 intro-helper : ∀ {ℓ} {X Y : Set ℓ} (p : X -> Set ℓ) (q : X -> Y -> Set ℓ) -> Σ Y (λ b → ∀ a -> q a b) -> (Σ X λ a -> p a) ≃ (Σ Y (λ b -> Σ X λ a -> q a b × p a))
 intro-helper p q y = (λ x → y .fst , x .fst , y .snd (x .fst) , x .snd) , record { equiv-proof = λ y₁ → (({!!} , {!!}) , {!!}) , λ y₂ i → {!!} }
 
-intro : ∀ {ℓ} {X Y : Set ℓ} (p : X -> Set ℓ) (q : X -> Y -> Set ℓ) -> (Σ X λ a -> p a) ≡ (Σ Y (λ b -> Σ X λ a -> q a b × p a))
-intro p q = λ i → {!!}
+M-intro : ∀ {ℓ} {X Y : Set ℓ} (p : X -> Set ℓ) (q : X -> Y -> Set ℓ) -> (Σ X λ a -> p a) ≡ (Σ Y (λ b -> Σ X λ a -> q a b × p a))
+M-intro p q = λ i → {!!}
 
 postulate -- TODO
   combine : ∀ {ℓ} (X : ℕ -> Set ℓ) (p : ∀ {n} -> (X (suc n)) -> (X n) -> Set ℓ)  ->
@@ -76,21 +75,10 @@ postulate -- TODO
 
 -- Lemma 12
 L-unique : ∀ {ℓ} -> {X,π : Chain {ℓ}} -> L (shift-chain X,π) ≡ L X,π
-L-unique {X,π = X,π} = λ i →
-  compPath-filler
-    {x = L (shift-chain X,π)}
-    {y = Σ (X X,π 0) λ x₀ → Σ ((n : ℕ) → X X,π (suc n)) λ y → (π X,π (y 0) ≡ x₀) × ((n : ℕ) → π X,π (y (suc n)) ≡ y n)} 
-    {z = L X,π}
-    (intro {X = ((n : ℕ) → X X,π (suc n))} {Y = (X X,π 0)} (λ y → (n : ℕ) → π X,π (y (suc n)) ≡ y n) λ y x₀ → π X,π (y 0) ≡ x₀)
-    (λ j ->
-      compPath-filler
-        {x = Σ (X X,π 0) λ x₀ → Σ ((n : ℕ) → X X,π (suc n)) λ y → (π X,π (y 0) ≡ x₀) × ((n : ℕ) → π X,π (y (suc n)) ≡ y n)}
-        {y = Σ ((n : ℕ) → X X,π n) λ x → (π X,π (x 1) ≡ x 0) × ((n : ℕ) → π X,π (x (suc (suc n))) ≡ x (suc n))} 
-        {z = L X,π}
-        (combine (X X,π) λ a b -> π X,π a ≡ b)
-        (λ i → Σ ((n : ℕ) → X X,π n) λ x → combine2 (X X,π) (λ a b → π X,π a ≡ b) x i)
-        j j)
-    i i
+L-unique {X,π = X,π} =  
+  (M-intro {X = ((n : ℕ) → X X,π (suc n))} {Y = (X X,π 0)} (λ y → (n : ℕ) → π X,π (y (suc n)) ≡ y n) λ y x₀ → π X,π (y 0) ≡ x₀)
+  □ ((combine (X X,π) λ a b -> π X,π a ≡ b) 
+  □ (λ i → Σ ((n : ℕ) → X X,π n) λ x → combine2 (X X,π) (λ a b → π X,π a ≡ b) x i))
 
 ! : ∀ {ℓ} {A : Set ℓ} (x : A) -> Lift {ℓ-zero} {ℓ} Unit
 ! x = lift tt
@@ -129,14 +117,9 @@ postulate -- TODO
 
 -- Lemma 13
 α-iso : ∀ {ℓ} {S : Container {ℓ}} -> L (PX,Pπ S) ≡ P₀ {S = S} (M S) -- L^P ≡ PL
-α-iso {S = S} = λ i ->
-  compPath-filler
-    {x = L (PX,Pπ S)}
-    {y = (Σ ((n : ℕ) → S .fst) λ a → Σ ((n : ℕ) → S .snd (a n) → X (sequence S) n) λ u → (n : ℕ) -> P₁ (π (sequence S) {n}) (a (suc n) , u (suc n)) ≡ (a n , u n))}
-    {z = P₀ {S = S} (M S)}
-      (swap-Σ-∀ (X (sequence S)) (S .fst) (S .snd) λ {n} a b → (P₁ (π (sequence S) {n = n})) a ≡ b)
-      (todo-rules S)
-      i i
+α-iso {S = S} = 
+  (swap-Σ-∀ (X (sequence S)) (S .fst) (S .snd) λ {n} a b → (P₁ (π (sequence S) {n = n})) a ≡ b) 
+  □ (todo-rules S)
 
 -----------------------------------------------------
 -- Shifting the limit of a chain is an equivalence --
@@ -144,14 +127,9 @@ postulate -- TODO
 
 -- P commutes with limits
 shift : ∀ {ℓ} {S : Container {ℓ}} -> P₀ (M S) ≡ M S
-shift {S = S} = λ i ->
-  compPath-filler
-    {x = P₀ (M S)}
-    {y = L (PX,Pπ S)}
-    {z = M S}
-      (sym α-iso)                   -- lemma 13
-      (L-unique {X,π = sequence S}) -- lemma 12
-      i i
+shift {S = S} = 
+  (sym α-iso) -- lemma 13
+  □ (L-unique {X,π = sequence S}) -- lemma 12
 
 -- Transporting along shift
 
@@ -166,7 +144,7 @@ out-fun {S = S} = transport (sym (shift {S = S}))
 out-inverse-in : ∀ {ℓ} {S : Container {ℓ}} -> (out-fun ∘ in-fun {S = S}) ≡ idfun (P₀ (M S))
 out-inverse-in i a = transport⁻Transport shift a i
 
-in-inverse-out : ∀ {ℓ} {S : Container {ℓ}} -> (in-fun ∘ out-fun {S = S}) ≡ (λ x -> x)
+in-inverse-out : ∀ {ℓ} {S : Container {ℓ}} -> (in-fun ∘ out-fun {S = S}) ≡ idfun (M S)
 in-inverse-out = λ i a → transportTransport⁻ shift a i
 
 -- constructor properties

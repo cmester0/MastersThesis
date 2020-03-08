@@ -10,10 +10,10 @@ open import Cubical.Data.Prod
 open import Cubical.Data.Nat as ℕ using (ℕ ; suc ; _+_ )
 
 open import Cubical.Foundations.Transport
-
 open import Cubical.Foundations.Univalence
 open import Cubical.Foundations.Isomorphism
 open import Cubical.Foundations.Function
+open import Cubical.Foundations.Equiv
 
 module helper where
 
@@ -46,15 +46,25 @@ identity-f-l {A = A} {k = k} p f = extent-l {a = k} {b = idfun A} f p
         j j)
       i i
 
+≡-rel-inj-iso-0 : ∀ {ℓ} {A B C : Set ℓ}
+  (a : A -> B)
+  (b : B -> A) ->
+  (left : a ∘ b ≡ idfun B) ->
+  (right : b ∘ a ≡ idfun A) ->
+  {f g : C -> A} ->
+  -------------------------------
+  ∀ p -> ≡-rel-a-monomorphism a b left right {f = f} {g = g} (extent-l a p) ≡ p
+≡-rel-inj-iso-0  a b left right p = {!!}
+
 postulate
-  ≡-rel-inj-iso-0 : ∀ {ℓ} {A B C : Set ℓ}
-    (a : A -> B)
-    (b : B -> A) ->
-    (left : a ∘ b ≡ idfun B) ->
-    (right : b ∘ a ≡ idfun A) ->
-    {f g : C -> A} ->
-    -------------------------------
-    ∀ p -> ≡-rel-a-monomorphism a b left right {f = f} {g = g} (extent-l a p) ≡ p
+  -- ≡-rel-inj-iso-0 : ∀ {ℓ} {A B C : Set ℓ}
+  --   (a : A -> B)
+  --   (b : B -> A) ->
+  --   (left : a ∘ b ≡ idfun B) ->
+  --   (right : b ∘ a ≡ idfun A) ->
+  --   {f g : C -> A} ->
+  --   -------------------------------
+  --   ∀ p -> ≡-rel-a-monomorphism a b left right {f = f} {g = g} (extent-l a p) ≡ p
 
   ≡-rel-inj-iso-1 : ∀ {ℓ} {A B C : Set ℓ}
     (a : A -> B)

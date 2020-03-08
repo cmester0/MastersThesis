@@ -66,8 +66,6 @@ stream-bisimulation : ∀ {A} -> bisimulation (stream-S A) M-coalg (stream≈)
 rel₁ (stream-bisimulation) = funExt λ x → refl
 rel₂ (stream-bisimulation) = funExt λ x → λ i → out-fun (stream≈-helper x (~ i))
 
-
-
 stream-bisim : ∀ {A} -> ∀ {x y : stream A} -> stream≈ x y -> x ≡ y
 stream-bisim {A} {x} {y} = coinduction stream≈ stream-bisimulation
   
@@ -89,7 +87,7 @@ eta {A} = λ x -> λ i ->
     {x = x}
     {y = in-fun (out-fun x)}
     {z = cons {A = A} (hd x) (tl x)}
-      (sym (in-inverse-out-x x))
+      (sym (funExt⁻ in-inverse-out x))
       (eta-helper-3 x)
       i i
 
