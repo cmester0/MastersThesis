@@ -51,7 +51,7 @@
 \pagestyle{empty} 
 \pagenumbering{roman} 
 \vspace*{\fill}\noindent{\rule{\linewidth}{1mm}\\[4ex]
-{\Huge\sf Higher Order Categorical Semantics}\\[2ex]
+{\Huge\sf M-types and Coinduction in HoTT and Cubical Type Theory}\\[2ex]
 {\huge\sf Lasse Letager Hansen, 201912345}\\[2ex]
 \noindent\rule{\linewidth}{1mm}\\[4ex]
 \noindent{\Large\sf Master's Thesis, Computer Science\\[1ex] 
@@ -315,6 +315,35 @@ Since we know that M-types preserves the H-level, we can use set-truncated quoti
 We want to define a bisimulation principle for M-types
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\chapter{Additions to the Cubical Agda Library}
+\section{Lemma 10}
+\texttt{M}-types are part of a final coalgebra, formally \(\forall\,\container{S}~\coalg{\type{C}}{\term{\gamma}}, (\coalg{\type{C}}{\term{\gamma}} \Rightarrow \coalg{\type{\mathtt{M}}}{\term{\mathtt{out}}}) \equiv \unit\)
+\begin{align}
+  U &\equiv \sum_{f : C \rightarrow \mathcal{L}} \mathtt{out} \circ f \equiv \mathtt{step}~f \\
+    &\equiv \sum_{f : C \rightarrow \mathcal{L}} \mathtt{in} \circ \mathtt{out} \circ f \equiv \mathtt{in} \circ \mathtt{step}~f\\
+    &\equiv \sum_{f : C \rightarrow \mathcal{L}} f \equiv \mathtt{in} \circ \mathtt{step}~f\\
+    &\equiv \sum_{f : C \rightarrow \mathcal{L}} f \equiv \Psi~f\\
+    &\equiv \sum_{c : Cone} e~c \equiv \Psi~(e~c)\\
+    &\equiv \sum_{c : Cone} e~c \equiv e~(\phi~c) \\
+    &\equiv \sum_{c : Cone} c \equiv \phi~c \\
+    &\equiv \sum_{(u,q) : Cone} (u , q) \equiv (\phi_0~u , \phi_1~u~q) \\
+    &\equiv \sum_{(u,q) : Cone} \sum_{p : u \equiv \phi_0~u} q \equiv_{\lambda i, Cone_1 (p~i)} \phi_1~u~q \\
+    &\equiv \sum_{(u,p) : \sum_{u : Cone_0} u \equiv \phi_0~u} \sum_{q : Cone_1~u} q \equiv_{\lambda i, Cone_1 (p~i)} \phi_1~u~q \\
+    &\equiv \sum_{q : Cone_1 u_0} q \equiv_{\lambda i, Cone_1 (funExt~p_0~i)} \phi_1~u_0~q \\
+    &\vdots \\
+    &\equiv \unit
+\end{align}
+%     \sum (\sum ((n : ℕ) \rightarrow C \rightarrow X (sequence S) n) (\lambda u \rightarrow u \equiv ϕ₀ {C,γ = C,γ} u))
+%       (\lambda { (u , p) \rightarrow \sum ((n : ℕ) \rightarrow π (sequence S) \circ u (suc n) \equiv u n) \lambda q \rightarrow (transport (\lambda j -> p j ? ?) q \equiv ϕ₁ u q)})
+%   \equiv⟨ {!!} ⟩
+%     {!!}
+%   \equiv⟨ {!!} ⟩
+%     \sum ((n : ℕ) \rightarrow C \rightarrow X (sequence S) n) (\lambda u \rightarrow \sum (u \equiv ϕ₀ {C,γ = C,γ} u) \lambda p \rightarrow \sum ((n : ℕ) \rightarrow π (sequence S) \circ u (suc n) \equiv u n) \lambda q \rightarrow (\lambda n \rightarrow transport (\lambda i \rightarrow (\lambda x \rightarrow π (sequence S) (p i (suc n) x)) \equiv p i n) (q n)) \equiv ϕ₁ u q)
+%   \equiv⟨ {!!} ⟩
+%     (\sum (Lift {ℓ-zero} {ℓ} Unit) (\lambda { (lift tt) \rightarrow Lift {ℓ-zero} {ℓ} Unit }))
+%   \equiv⟨ isoToPath (iso (\lambda x \rightarrow lift tt) (\lambda _ \rightarrow lift tt , lift tt) (\lambda b i \rightarrow lift tt) (\lambda a i \rightarrow lift tt , lift tt)) ⟩
+%     Lift Unit ∎
 
 \chapter{Conclusion}
 \label{ch:conclusion}

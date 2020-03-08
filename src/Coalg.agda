@@ -15,6 +15,7 @@ open import Cubical.Foundations.Equiv
 open import Cubical.Foundations.GroupoidLaws
 
 open import Cubical.Data.Nat
+open import Cubical.Data.Prod
 open import helper
 
 open import Cubical.Data.Sigma
@@ -94,19 +95,6 @@ record bisimulation {ℓ} (S : Container {ℓ}) (C,γ : Coalg₀ {S = S}) (R : C
 
 open bisimulation public
 
-record equality-relation {A : Set} (R : A -> A -> Set) : Set where
-  field
-    eq-refl : ∀ {x} -> R x x
-    eq-sym : ∀ {x y} -> R x y -> R y x
-    eq-trans : ∀ {x y z} -> R x y -> R y z -> R x z
-
-open equality-relation
-
-postulate
-  equality-relation-projection : ∀ {A R} (eq : equality-relation R) -> (x : Σ A (λ a → Σ A (R a))) -> (fst x) ≡ (fst (x .snd))
-  equality-mono : ∀ {A R} (eq : equality-relation R) (f : A -> A) (x y : A) -> R x y → R (f x) (f y)
-  equality-relation-projection-2 : ∀ {S R} (eq : equality-relation R) -> (x : Σ (M S) (λ a → Σ (M S) (R a))) -> (fst x) ≡ (fst (x .snd))
-
 --------------------------------------------------------
 -- Properties of Bisimulations and (Final) Coalgebras --
 --------------------------------------------------------
@@ -125,58 +113,56 @@ U-to-Unit _ = lift tt
 
 open Chain
 
+Cone₀ : ∀ {ℓ} {S : Container {ℓ}} {C,γ : Coalg₀ {S = S}} -> Set ℓ
+Cone₀ {S = S} {C , _} = (n : ℕ) → C → X (sequence S) n
+
+Cone₁ : ∀ {ℓ} {S : Container {ℓ}} {C,γ : Coalg₀ {S = S}} -> (f : Cone₀ {C,γ = C,γ}) -> Set ℓ
+Cone₁ {S = S} {C , _} f = (n : ℕ) → π (sequence S) ∘ (f (suc n)) ≡ f n
+
 Cone : ∀ {ℓ} {S : Container {ℓ}} (C,γ : Coalg₀ {S = S}) -> Set ℓ
-Cone {S = S} (C , θ) = Σ ((n : ℕ) → C → X (sequence S) n) λ f → (n : ℕ) → π (sequence S) ∘ (f (suc n)) ≡ f n
+Cone {S = S} C,γ = Σ (Cone₀ {C,γ = C,γ}) (Cone₁{C,γ = C,γ})
 
 projection : ∀ {ℓ} {S : Container {ℓ}} n -> M S -> X (sequence S) n
 projection n (x , q) = x n
 
 β : ∀ {ℓ} {S : Container {ℓ}} -> (n : ℕ) → ∀ x → π (sequence S) {n = n} (projection (suc n) x) ≡ projection n x
 β n (x , q) = q n
-             
-lemma10' : ∀ {ℓ} {S : Container {ℓ}} -> (Σ ((n : ℕ) → X (sequence S) n) λ u → (n : ℕ) → π (sequence S) (u (suc n)) ≡ u n) ≡ M S
-lemma10' = isoToPath (iso (λ { (u , q) → (λ n → u n) , λ n → q n} ) (λ f → (λ n → projection n f) , λ n → β n f) (λ { (u , q) → refl}) λ f → refl)
 
-unapΣ : ∀ {i j}{A : Set i}{B : A → Set j}
-          {a a' : A} {b : B a} {b' : B a'}
-        → (Σ (a ≡ a') λ q → PathP (λ i → B (q i)) b b')
-        → (a , b) ≡ (a' , b')
-unapΣ x = ΣPathP (x .fst , x .snd)
+lemma10 : ∀ {ℓ} {S : Container {ℓ}} (C,γ : Coalg₀ {S = S}) -> (C,γ .fst -> M S) ≡ Cone C,γ
+lemma10 {S = S} C,γ@(C , γ) =
+  isoToPath (iso (λ {f → (λ n z → projection n (f z)) , λ n i a → β n (f a) i})
+                 (λ {(u , q) z → (λ n → u n z) , (λ n i → q n i z)})
+                 (λ _ → refl)
+                  λ _ → refl)
 
-subst-naturality : ∀ {i i' j} {X : Set i} {Y : Set i'}
-                   {x x' : X} (P : Y → Set j)
-                   (f : X → Y) (p : x ≡ x') (u : P (f x))
-                 → subst (P ∘ f) p u ≡ subst P (λ i -> f (p i)) u
-subst-naturality _ _ _ _ = refl
+FunctionToProjection : ∀ {ℓ} {S : Container {ℓ}} (C,γ : Coalg₀) -> Cone C,γ -> C,γ .fst -> M S
+FunctionToProjection {S = S} C,γ c = transp (λ i → sym (lemma10 C,γ) i) i0 c
 
-    
-coherent : ∀ {i} {X Y : Set i} → X ≡ Y → Set i
-coherent {X = X} f = ∀ (x : X) → cong (to {f = f}) (iso₁ {f = f} x) ≡  iso₂ {f = f} (to {f = f} x)
-  where
-    to : ∀ {i} {X Y : Set i} {f : X ≡ Y} -> X → Y
-    to {f = f} = transport f
+step : ∀ {ℓ} {S : Container {ℓ}} {C,γ : Coalg₀ {S = S}} {Y : Set ℓ} (f : C,γ .fst -> Y) → C,γ .fst → P₀ Y
+step {C,γ = C,γ} {Y = Y} f = P₁ f  ∘ C,γ .snd
 
-    from : ∀ {i} {X Y : Set i}  {f : X ≡ Y} -> Y → X
-    from  {f = f} = transport⁻ f
+Ψ : ∀ {ℓ} {S : Container {ℓ}} {C,γ : Coalg₀ {S = S}} (f : C,γ .fst -> M S) -> C,γ .fst -> M S
+Ψ {C,γ = C,γ} f = in-fun ∘ step {C,γ = C,γ} f
 
-    iso₁ : ∀ {i} {X Y : Set i} {f : X ≡ Y} -> (x : X) → from {f = f} (to {f = f} x) ≡ x
-    iso₁ {f = f} = transport⁻Transport f
+ϕ₀ : ∀ {ℓ} {S : Container {ℓ}} {C,γ : Coalg₀ {S = S}} (u : (n : ℕ) → C,γ .fst → X (sequence S) n) -> (n : ℕ) -> C,γ .fst -> W S n
+ϕ₀ u 0 = λ x -> lift tt
+ϕ₀ {C,γ = C,γ} u (suc n) = step {C,γ = C,γ} (u n)
+           
+ϕ₁ : ∀ {ℓ} {S : Container {ℓ}} {C,γ : Coalg₀ {S = S}}
+           (u : (n : ℕ) → C,γ .fst → X (sequence S) n) ->
+           (g : (n : ℕ) → π (sequence S) ∘ u (suc n) ≡ u n) ->
+           (n : ℕ) → π (sequence S) ∘ (ϕ₀ {C,γ = C,γ} u (suc n)) ≡ ϕ₀ {C,γ = C,γ} u n
+ϕ₁ u g 0 i = !
+ϕ₁ {S = S} {C,γ = C,γ'} u g (suc n) = λ i a → step {C,γ = C,γ'} (λ x → g n i x) a
 
-    iso₂ : ∀ {i} {X Y : Set i} {f : X ≡ Y} -> (y : Y) → to {f = f} (from {f = f} y) ≡ y
-    iso₂ {f = f} = transportTransport⁻ f
+Φ : ∀ {ℓ} {S : Container {ℓ}} {C,γ : Coalg₀ {S = S}} -> Cone C,γ -> Cone C,γ
+Φ {S = S} {C,γ = C,γ} (u , g) = ϕ₀ {C,γ = C,γ} u , ϕ₁ {S = S} {C,γ = C,γ} u g
+      
+postulate
+  commutivity : ∀ {ℓ} {S : Container {ℓ}} {C,γ : Coalg₀ {S = S}} -> let e = FunctionToProjection C,γ in Ψ {C,γ = C,γ} ∘ e ≡ e ∘ Φ {C,γ = C,γ}
 
-
--- coherent isomorphisms
-_≅'_ : ∀ {i} → (X Y : Set i) → Set _
-X ≅' Y = Σ (X ≡ Y) coherent
-
-asdf : ∀ {ℓ} {X Y : Set ℓ} {f : X ≡ Y} -> coherent {X = X} {Y = Y} (isoToPath (iso (transport f) (transport⁻ f) (transportTransport⁻ f) (transport⁻Transport f)))
-asdf = λ x i → {!!}
-
-subst-hom : ∀ {i j} {X : Set i} (P : X → Set j) {x y z : X}
-          → (p : x ≡ y) (q : y ≡ z) (u : P x)
-          → subst P q (subst P p u) ≡ subst P (p □ q) u
-subst-hom P p q u = sym (substComposite-□ P p q u)
+postulate
+  e-inj : ∀ {ℓ} {S : Container {ℓ}} {C,γ : Coalg₀ {S = S}} x y -> (FunctionToProjection C,γ x ≡ FunctionToProjection C,γ y) ≡ (x ≡ y)
 
 Σ-ap-iso₁ : ∀ {i j} {X X' : Set i} {Y : X' → Set j}
           → (isom : X ≡ X')
@@ -210,85 +196,129 @@ subst-hom P p q u = sym (substComposite-□ P p q u)
                       (λ { (x , y) →  ΣPathP (refl , transportTransport⁻ (isom x) y)})
                       (λ { (x , y') → ΣPathP (refl , transport⁻Transport (isom x) y')}))
 
+Σ-split-iso : ∀ {ℓ} {A : Set ℓ} {B : A → Set ℓ} {a a' : A} {b : B a} {b' : B a'} → (Σ (a ≡ a') (λ q → PathP (λ i → B (q i)) b b')) ≡ ((a , b) ≡ (a' , b'))
+Σ-split-iso = ua Σ≡
+
 Σ-ap-iso : ∀ {i j} {X X' : Set i}
            {Y : X → Set j} {Y' : X' → Set j}
          → (isom : X ≡ X')
          → ((x : X) → Y x ≡ Y' (transport isom x))
          → Σ X Y ≡ Σ X' Y'
-Σ-ap-iso {X = X} {X'} {Y} {Y'} isom isom' = (Σ-ap-iso₂ isom') □ Σ-ap-iso₁ isom
+Σ-ap-iso {X = X} {X'} {Y} {Y'} isom isom' = 
+  (Σ-ap-iso₂ isom') □ Σ-ap-iso₁ isom
 
--- -- Σ ((n : ℕ) → C -> X (sequence S) n) λ u → (n : ℕ) → π (sequence S)  (u (suc n)) ≡ u n
--- -- Σ ((n : ℕ) → C → X (sequence S) n) λ f → (n : ℕ) → π (sequence S) ∘ (f (suc n)) ≡ f n
+Π-ap-iso : ∀ {i j} {X X' : Set i}
+             {Y : X → Set j}{Y' : X' → Set j}
+           → (isom : X ≡ X')
+           → ((x' : X') → Y (transport (sym isom) x') ≡ Y' x')
+           → ((x : X) → Y x)
+           ≡ ((x' : X') → Y' x')
+Π-ap-iso {X = X}{X'}{Y}{Y'} isom isom' = {!!}
 
-lemma10 : ∀ {ℓ} {S : Container {ℓ}} (C,γ : Coalg₀ {S = S}) -> (C,γ .fst -> M S) ≡ Cone C,γ
-lemma10 {S = S} C,γ@(C , γ) =
-  isoToPath (iso (λ {f → (λ n z → projection n (f z)) , λ n i a → β n (f a) i})
-                 (λ {(u , q) z → (λ n → u n z) , (λ n i → q n i z)})
-                 (λ _ → refl)
-                  λ _ → refl)
+×-left-unit : ∀ {i}{X : Set i} → (Σ (Lift {ℓ-zero} {i} Unit) (λ _ -> X)) ≡ X
+×-left-unit = isoToPath (iso (λ {(lift tt , x) → x}) (λ x → lift tt , x) (λ _ → refl) λ { (lift tt , a) → refl })
 
--- FunctionToProjection : ∀ {ℓ} {S : Container {ℓ}} (C,γ : Coalg₀) -> Cone C,γ -> C,γ .fst -> M S
--- FunctionToProjection {S = S} C,γ c = transp (λ i → sym (lemma10 C,γ) i) i0 c
+lemma11 : ∀ {ℓ} {S : Container {ℓ}} (ρ : (n : ℕ) -> X (sequence S) n -> X (sequence S) (suc n)) -> M S ≡ X (sequence S) 0
+lemma11 {ℓ} {S = S} ρ =
+    M S
+  ≡⟨ sym (Σ-ap-iso refl (λ x → Π-ap-iso refl λ n → sym {!!})) ⟩
+    Σ ((n : ℕ) → X (sequence S) n) (λ x → ∀ n → ρ n (x n) ≡ x (suc n))
+  ≡⟨ sym (Σ-ap-iso refl λ x → {!!}) ⟩
+    Σ ((n : ℕ) → X (sequence S) n) (λ x → Σ (Lift {ℓ-zero} {ℓ} Unit) λ _ -> ∀ n → ρ n (x n) ≡ x (suc n))
+  ≡⟨ {!!} ⟩
+    X (sequence S) 0 ∎
 
--- step : ∀ {ℓ} {S : Container {ℓ}} {C,γ : Coalg₀ {S = S}} {Y : Set ℓ} (f : C,γ .fst -> Y) → C,γ .fst → P₀ Y
--- step {C,γ = C,γ} {Y = Y} f = P₁ f  ∘ C,γ .snd
+-- lim-coalg-iso
+U-is-Unit : ∀ {ℓ} {S : Container {ℓ}} (C,γ : Coalg₀ {S = S}) -> (C,γ ⇒ M-coalg) ≡ Lift Unit
+U-is-Unit {ℓ = ℓ} {S = S} C,γ@(C , γ) =
+  let e = FunctionToProjection C,γ in
+  let 𝓛 = M S in
+    U {C,γ = C,γ}
+  ≡⟨ refl ⟩
+    Σ (C → 𝓛) (λ f → out-fun ∘ f ≡ step {C,γ = C,γ} f)
+  ≡⟨ (λ i → Σ (C → 𝓛) (λ f → in-inj {f = out-fun ∘ f} {g = step {C,γ = C,γ} f} (~ i))) ⟩ 
+    Σ (C → 𝓛) (λ f → in-fun ∘ out-fun ∘ f ≡ in-fun ∘ step {C,γ = C,γ} f)
+  ≡⟨ (λ i → Σ (C,γ .fst → M S) (λ f → identity-f-r {k = in-fun ∘ out-fun {S = S}} in-inverse-out f i ≡ in-fun ∘ step {C,γ = C,γ} f)) ⟩ 
+    Σ (C -> 𝓛) (λ f → f ≡ in-fun ∘ step {C,γ = C,γ} f)
+  ≡⟨ refl ⟩
+    Σ (C → 𝓛) (λ f → f ≡ Ψ {C,γ = C,γ} f) 
+  ≡⟨ sym (Σ-ap-iso (sym (lemma10 C,γ)) (λ _ → refl)) ⟩
+    Σ (Cone C,γ) (λ c → e c ≡ Ψ {C,γ = C,γ} (e c))
+  ≡⟨ (λ i → Σ (Cone C,γ) (λ c → e c ≡ funExt⁻ (commutivity {C,γ = C,γ}) c i)) ⟩
+    Σ (Cone C,γ) (λ c → e c ≡ e (Φ {C,γ = C,γ} c))
+  ≡⟨ (λ i → Σ (Cone C,γ) (λ c → e-inj {C,γ = C,γ} c (Φ {C,γ = C,γ} c) i)) ⟩
+    Σ (Cone C,γ) (λ c → c ≡ Φ {C,γ = C,γ} c)
+  ≡⟨ refl ⟩
+    Σ (Cone C,γ) (λ { (u , q) → (u , q) ≡ (ϕ₀ {C,γ = C,γ} u , ϕ₁ {C,γ = C,γ} u q)})
+  ≡⟨ (λ i → Σ (Cone C,γ) λ {(u , q) → sym (Σ-split-iso {a = u} {a' = ϕ₀ {C,γ = C,γ} u} {b = q} {b' = ϕ₁ {C,γ = C,γ} u q}) i}) ⟩ 
+    Σ (Cone C,γ) (λ { (u , q) → Σ (u ≡ ϕ₀ {C,γ = C,γ} u) λ p → PathP (λ i → Cone₁ {C,γ = C,γ} (p i)) q (ϕ₁ {C,γ = C,γ} u q) })
+  ≡⟨ isoToPath (iso (λ {((u , p) , q , r) → (u , q) , p , r}) (λ {((u , q) , p , r) → (u , p) , (q , r)}) (λ _ → refl) λ _ → refl) ⟩
+    Σ (Σ (Cone₀ {C,γ = C,γ}) (λ u → u ≡ ϕ₀ {C,γ = C,γ} u))
+      (λ { (u , p) → Σ (Cone₁ {C,γ = C,γ} u) λ q → PathP (λ i → Cone₁ {C,γ = C,γ} (p i)) q (ϕ₁ u q)})
+  ≡⟨ sym (λ i → Σ-ap-iso (sym (contr-⊤-iso Fix₀-contr)) (λ _ → refl) i) □ ×-left-unit ⟩ -- (sym (Σ-ap-iso (sym {!!}) (λ _ → {!!})) □ {!!})
+    Σ (Cone₁ {C,γ = C,γ} u0) (λ q → PathP (λ i → Cone₁ {C,γ = C,γ} (funExt p0 i)) q (ϕ₁ {C,γ = C,γ} u0 q))
+  ≡⟨ {!!} ⟩ -- Σ-ap-iso (isoToPath (iso (λ x → lift tt) iso-helper {!!} {!!})) {!!}
+    (Σ (Lift {ℓ-zero} {ℓ} Unit) (λ { (lift tt) → Lift {ℓ-zero} {ℓ} Unit }))
+  ≡⟨ isoToPath (iso (λ x → lift tt) (λ _ → lift tt , lift tt) (λ b i → lift tt) (λ a i → lift tt , lift tt)) ⟩
+    Lift Unit ∎
+  --   (Σ (Lift {ℓ-zero} {ℓ} Unit) (λ { (lift tt) → Lift {ℓ-zero} {ℓ} Unit }))
+  -- ≡⟨ isoToPath (iso (λ x → lift tt) (λ _ → lift tt , lift tt) (λ b i → lift tt) (λ a i → lift tt , lift tt)) ⟩
+    -- Lift Unit ∎
+      where
+        u0 : Cone₀ {C,γ = C,γ}
+        u0 = λ { 0 _ → lift tt ; (suc n) -> step {C,γ = C,γ} (u0 n) }
 
--- Ψ : ∀ {ℓ} {S : Container {ℓ}} {C,γ : Coalg₀ {S = S}} (f : C,γ .fst -> M S) -> C,γ .fst -> M S
--- Ψ {C,γ = C,γ} f = in-fun ∘ step {C,γ = C,γ} f
+        -- π (sequence S) ∘ (f (suc n)) ≡ f n
 
--- ϕ₀ : ∀ {ℓ} {S : Container {ℓ}} {C,γ : Coalg₀ {S = S}} (u : (n : ℕ) → C,γ .fst → X (sequence S) n) -> (n : ℕ) -> C,γ .fst -> W S n
--- ϕ₀ u 0 = λ x -> lift tt
--- ϕ₀ {C,γ = C,γ} u (suc n) = step {C,γ = C,γ} (u n)
-           
--- ϕ₁ : ∀ {ℓ} {S : Container {ℓ}} {C,γ : Coalg₀ {S = S}}
---            (u : (n : ℕ) → C,γ .fst → X (sequence S) n) ->
---            (g : (n : ℕ) → π (sequence S) ∘ u (suc n) ≡ u n) ->
---            (n : ℕ) → π (sequence S) ∘ (ϕ₀ {C,γ = C,γ} u (suc n)) ≡ ϕ₀ {C,γ = C,γ} u n
--- ϕ₁ u g 0 i = !
--- ϕ₁ {S = S} {C,γ = C,γ'} u g (suc n) = λ i a → step {C,γ = C,γ'} (λ x → g n i x) a
+        p0 : ∀ n → u0 n ≡ ϕ₀ {C,γ = C,γ} u0 n
+        p0 zero = refl
+        p0 (suc n) = refl
 
--- Φ : ∀ {ℓ} {S : Container {ℓ}} {C,γ : Coalg₀ {S = S}} -> Cone C,γ -> Cone C,γ
--- Φ {S = S} {C,γ = C,γ} (u , g) = ϕ₀ {C,γ = C,γ} u , ϕ₁ {S = S} {C,γ = C,γ} u g
-      
--- postulate
---   commutivity : ∀ {ℓ} {S : Container {ℓ}} {C,γ : Coalg₀ {S = S}} -> let e = FunctionToProjection C,γ in Ψ {C,γ = C,γ} ∘ e ≡ e ∘ Φ {C,γ = C,γ}
+        iso-helper : ∀ (x : Lift Unit) -> (Cone₁ {C,γ = C,γ} u0)
+        iso-helper x 0 i a = lift tt
+        iso-helper x (suc n) = {!!}
 
--- postulate
---   e-inj : ∀ {ℓ} {S : Container {ℓ}} {C,γ : Coalg₀ {S = S}} x y -> (FunctionToProjection C,γ x ≡ FunctionToProjection C,γ y) ≡ (x ≡ y)
 
--- U-is-Unit : ∀ {ℓ} {S : Container {ℓ}} (C,γ : Coalg₀ {S = S}) -> (C,γ ⇒ M-coalg) ≡ Lift Unit
--- U-is-Unit {ℓ = ℓ} {S = S} C,γ@(C , γ) =
---   let e = FunctionToProjection C,γ in
---   let 𝓛 = M S in
---     U {C,γ = C,γ}
---   ≡⟨ refl ⟩
---     Σ (C → 𝓛) (λ f → out-fun ∘ f ≡ step {C,γ = C,γ} f)
---   ≡⟨ (λ i → Σ (C → 𝓛) (λ f → in-inj {f = out-fun ∘ f} {g = step {C,γ = C,γ} f} (~ i))) ⟩ 
---     Σ (C → 𝓛) (λ f → in-fun ∘ out-fun ∘ f ≡ in-fun ∘ step {C,γ = C,γ} f)
---   ≡⟨ (λ i → Σ (C,γ .fst → M S) (λ f → identity-f-r {k = in-fun ∘ out-fun {S = S}} in-inverse-out f i ≡ in-fun ∘ step {C,γ = C,γ} f)) ⟩ 
---     Σ (C -> 𝓛) (λ f → f ≡ in-fun ∘ step {C,γ = C,γ} f)
---   ≡⟨ refl ⟩
---     Σ (C → 𝓛) (λ f → f ≡ Ψ {C,γ = C,γ} f)
---   ≡⟨ {!!} ⟩
---     Σ (Cone C,γ) (λ c → e c ≡ Ψ {C,γ = C,γ} (e c))
---   ≡⟨ (λ i → Σ (Cone C,γ) (λ c → e c ≡ funExt⁻ (commutivity {C,γ = C,γ}) c i)) ⟩
---     Σ (Cone C,γ) (λ c → e c ≡ e (Φ {C,γ = C,γ} c))
---   ≡⟨ (λ i → Σ (Cone C,γ) (λ c → e-inj {C,γ = C,γ} c (Φ {C,γ = C,γ} c) i)) ⟩
---     Σ (Cone C,γ) (λ c → c ≡ Φ {C,γ = C,γ} c)
---   ≡⟨ {!!} ⟩
---     Σ (Cone C,γ) (λ { (u , q) → Σ (u ≡ ϕ₀ {C,γ = C,γ} u) λ p → (λ n → transport (λ i → (λ x → π (sequence S) (p i (suc n) x)) ≡ p i n) (q n)) ≡ ϕ₁ {C,γ = C,γ} u q })
---   ≡⟨ {!!} ⟩
+        contr-⊤-iso : ∀ {i}{X : Set i} → isContr X → X ≡ Lift Unit
+        contr-⊤-iso x-is-contr = ua (Contr→Equiv x-is-contr ((lift tt) , (λ y i → lift tt)))
+
+
+        Fix₀ : Set ℓ
+        Fix₀ = Σ (Cone₀ {C,γ = C,γ}) λ u → u ≡ ϕ₀ u
+
+        Fix₀-center : Fix₀
+        Fix₀-center = u0 , funExt p0
+        
+        Fix₀-contr : isContr Fix₀
+        Fix₀-contr = Fix₀-center , isContr→isProp {!!} {!!}
+          -- (iso-level (sym≅ Fix₀-iso) Z→X₀-contr) _
+
+
+        Fix₁ : Fix₀ → Set {!!}
+        Fix₁ (u , p) = Σ (Cone₁ u) λ q → subst Cone₁ p q ≡ ϕ₁ u q
+
+        Fix₁-iso : Fix₁ Fix₀-center ≡ Lift Unit
+        
+        
 --     Σ ((n : ℕ) → C → X (sequence S) n) (λ u → Σ (u ≡ ϕ₀ {C,γ = C,γ} u) λ p → Σ ((n : ℕ) → π (sequence S) ∘ u (suc n) ≡ u n) λ q → (λ n → transport (λ i → (λ x → π (sequence S) (p i (suc n) x)) ≡ p i n) (q n)) ≡ ϕ₁ u q)
---   ≡⟨ {!!} ⟩
---     (Σ (Lift {ℓ-zero} {ℓ} Unit) (λ { (lift tt) → Lift {ℓ-zero} {ℓ} Unit }))
---   ≡⟨ {!!} ⟩
---     Lift Unit ∎
 
--- -- contr-is-ext : ∀ {ℓ} {A B : Set ℓ} -> A ≡ B -> isContr A ≡ isContr B
--- -- contr-is-ext p = λ i -> isContr (p i)
-  
--- -- U-contr : ∀ {ℓ} {S : Container {ℓ}} {C,γ : Coalg₀ {S = S}} -> ∀ (x : U {C,γ = C,γ}) -> isContr (U {C,γ = C,γ})
--- -- U-contr {ℓ} {C,γ = C,γ} x = transp (λ i -> (sym (contr-is-ext {A = U {C,γ = C,γ}} U-is-Unit)) i) i0 (lift tt , λ { (lift tt) -> refl })
+      -- Cone₀ : Set _
+      -- Cone₀ = (n : ℕ) → Z →ⁱ Xⁱ n
+
+      -- Cone₁ : Cone₀ → Set _
+      -- Cone₁ u = (n : ℕ) → πⁱ n ∘ⁱ u (suc n) ≡ u n
+
+
+-- Σ-split-iso : ∀ {ℓ} {A : Set ℓ} {B : A → Set ℓ} → (Σ (a ≡ a') (λ q → PathP (λ i → B (q i)) b b')) ≡ ((a , b) ≡ (a' , b'))
+-- Σ-split-iso = ua Σ≡
+-- a = u , a' = ϕ₀ {C,γ = C,γ} u , b = q , b' = ϕ₁ {C,γ = C,γ} u q
+
+            
+contr-is-ext : ∀ {ℓ} {A B : Set ℓ} -> A ≡ B -> isContr A ≡ isContr B
+contr-is-ext p = λ i -> isContr (p i)
+
+U-contr : ∀ {ℓ} {S : Container {ℓ}} {C,γ : Coalg₀ {S = S}} -> ∀ (x : U {C,γ = C,γ}) -> isContr (U {C,γ = C,γ})
+U-contr {ℓ} {C,γ = C,γ} x = transp (λ i -> (sym (contr-is-ext {A = U {C,γ = C,γ}} (U-is-Unit C,γ))) i) i0 (lift tt , λ { (lift tt) -> refl })
 
 -- -- ----------------------------------------------------
 -- -- -- Finality properties for bisimulation relations --
