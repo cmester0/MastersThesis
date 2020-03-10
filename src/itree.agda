@@ -27,6 +27,66 @@ delay-ret r = in-fun (inr r , λ ())
 delay-tau : {R : Set₀} -> delay R -> delay R
 delay-tau S = in-fun (inl tt , λ x → S)
 
+-- remove-tau : ∀ {R} -> delay R -> delay R
+-- remove-tau {R} x = case out-fun x return (λ x₁ → delay R) of λ { (inr r , b) → x ; (inl tt , b) -> b tt }
+
+repeat : ∀ {ℓ} {A : Set ℓ} (x : A -> A) (n : ℕ) -> A -> A
+repeat x 0 a = a
+repeat x (suc n) a = repeat x n (x a)
+
+open Chain
+
+-- lliifftt : ∀ {ℓ} -> (S : Container {ℓ}) -> (n : ℕ) -> (W (Ms S) (suc n) -> W (Ms S) (suc n)) -> W (Ms S) n -> W (Ms S) n
+-- lliifftt S n f x = πₙ S (f ? .fst )
+
+-- MW : ∀ {ℓ} -> (S : Container {ℓ}) -> (n : ℕ) -> (f : W S n -> W S n) -> Set ℓ
+-- MW {ℓ = ℓ} S 0 f = Lift {ℓ-zero} {ℓ} Unit -> Lift {ℓ-zero} {ℓ} Unit
+-- MW S (suc n) f = {!!}
+
+-- Mπₙ : ∀ {ℓ} -> (S : Container {ℓ}) -> {n : ℕ} (f : W S n -> W S n) -> MW S (suc n) f -> MW S n
+-- Mπₙ {ℓ} S {0} = λ _ _ → lift tt
+-- Mπₙ S {suc n} = P₁ (Mπₙ S {n})
+
+-- Msequence : ∀ {ℓ} -> Container {ℓ} -> Chain {ℓ}
+-- X (Msequence {ℓ} S) n = MW {ℓ} S n
+-- π (Msequence {ℓ} S) {n} = Mπₙ {ℓ} S {n}
+
+-- MM : ∀ {ℓ} -> Container {ℓ} → Set ℓ
+-- MM = L ∘ Msequence
+
+-- as : ∀ {R} -> MM (delay-S R)
+-- as = {!!}
+
+-- W : ∀ {ℓ} -> Container {ℓ} -> ℕ -> Set ℓ -- (ℓ-max ℓ ℓ')
+-- W S 0 = Lift Unit
+-- W S (suc n) = P₀ {S = S} (W S n)
+
+-- πₙ : ∀ {ℓ} -> (S : Container {ℓ}) -> {n : ℕ} -> W S (suc n) -> W S n
+-- πₙ {ℓ} S {0} = ! {ℓ}
+-- πₙ S {suc n} = P₁ (πₙ S {n})
+
+-- sequence : ∀ {ℓ} -> Container {ℓ} -> Chain {ℓ}
+-- X (sequence {ℓ} S) n = W {ℓ} S n
+-- π (sequence {ℓ} S) {n} = πₙ {ℓ} S {n}
+
+-- M : ∀ {ℓ} -> Container {ℓ} → Set ℓ
+-- M = L ∘ sequence
+
+-- repeat-chain : ∀ {A : Set} -> M-Chain {ℓ = ℓ-zero} (delay-S A)
+-- MX (repeat-chain) 0 x = lift tt
+-- MX (repeat-chain) (suc n) x = inl tt , λ x₁ → (λ { (inr _) → ⊥ ; (inl tt) → Unit }) (fst x)
+-- Mπ (repeat-chain) {0} f x = π (f (x))
+
+-- fixpoint = λ {R} (f : delay R -> delay R) -> L ((λ x → {!!}) ,, {!!})
+
+-- L : ∀ {ℓ} -> Chain {ℓ} → Set ℓ
+-- L (x ,, pi) = Σ ((n : ℕ) → x n) λ x → (n : ℕ) → pi {n = n} (x (suc n)) ≡ x n
+
+-- fixpoint : ∀ {R} -> (f : (delay R -> delay R) -> delay R -> delay R) -> (x : delay R) -> delay R
+-- fixpoint f x = f (fixpoint f) x
+
+-- spin = fixpoint delay-tau
+
 -- Bottom element raised
 data ⊥₁ : Set₁ where
 

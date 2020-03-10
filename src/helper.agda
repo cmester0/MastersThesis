@@ -8,12 +8,14 @@ open import Cubical.Foundations.Function using (_∘_)
 open import Cubical.Data.Unit
 open import Cubical.Data.Prod
 open import Cubical.Data.Nat as ℕ using (ℕ ; suc ; _+_ )
+open import Cubical.Data.Sigma
 
 open import Cubical.Foundations.Transport
 open import Cubical.Foundations.Univalence
 open import Cubical.Foundations.Isomorphism
 open import Cubical.Foundations.Function
 open import Cubical.Foundations.Equiv
+
 
 module helper where
 
@@ -46,25 +48,15 @@ identity-f-l {A = A} {k = k} p f = extent-l {a = k} {b = idfun A} f p
         j j)
       i i
 
-≡-rel-inj-iso-0 : ∀ {ℓ} {A B C : Set ℓ}
-  (a : A -> B)
-  (b : B -> A) ->
-  (left : a ∘ b ≡ idfun B) ->
-  (right : b ∘ a ≡ idfun A) ->
-  {f g : C -> A} ->
-  -------------------------------
-  ∀ p -> ≡-rel-a-monomorphism a b left right {f = f} {g = g} (extent-l a p) ≡ p
-≡-rel-inj-iso-0  a b left right p = {!!}
-
 postulate
-  -- ≡-rel-inj-iso-0 : ∀ {ℓ} {A B C : Set ℓ}
-  --   (a : A -> B)
-  --   (b : B -> A) ->
-  --   (left : a ∘ b ≡ idfun B) ->
-  --   (right : b ∘ a ≡ idfun A) ->
-  --   {f g : C -> A} ->
-  --   -------------------------------
-  --   ∀ p -> ≡-rel-a-monomorphism a b left right {f = f} {g = g} (extent-l a p) ≡ p
+  ≡-rel-inj-iso-0 : ∀ {ℓ} {A B C : Set ℓ}
+    (a : A -> B)
+    (b : B -> A) ->
+    (left : a ∘ b ≡ idfun B) ->
+    (right : b ∘ a ≡ idfun A) ->
+    {f g : C -> A} ->
+    -------------------------------
+    ∀ p -> ≡-rel-a-monomorphism a b left right {f = f} {g = g} (extent-l a p) ≡ p
 
   ≡-rel-inj-iso-1 : ∀ {ℓ} {A B C : Set ℓ}
     (a : A -> B)
@@ -80,6 +72,68 @@ postulate
 
 ≡-rel-b-inj : ∀ {ℓ} {A B C : Set ℓ} (a : A -> B) (b : B -> A) -> a ∘ b ≡ idfun B -> b ∘ a ≡ idfun A -> ∀ {f g : C -> B} -> (b ∘ f ≡ b ∘ g) ≡ (f ≡ g)
 ≡-rel-b-inj a b left right = ua (isoToEquiv (iso (≡-rel-a-monomorphism b a right left) (extent-l b) (≡-rel-inj-iso-0 b a right left) (≡-rel-inj-iso-1 b a right left)))
+
+------------------
+-- Σ properties --
+------------------
+
+Σ-ap-iso₁ : ∀ {i j} {X X' : Set i} {Y : X' → Set j}
+          → (isom : X ≡ X')
+          → Σ X (Y ∘ transport isom) ≡ Σ X' Y
+Σ-ap-iso₁ {i} {j }{X} {X'} {Y} isom =
+  let
+    f : X → X'
+    f = transport {A = X} {B = X'} isom
+
+    g : X' → X
+    g = transport⁻ {A = X} {B = X'} isom
+               
+    K : ∀ a → f (g a) ≡ a
+    K a = transportTransport⁻ {A = X} {B = X'} isom a
+               
+    H : ∀ b → g (f b) ≡ b
+    H b = transport⁻Transport {A = X} {B = X'} isom b  
+  in
+    isoToPath (iso (λ {(x , y) → f x , y})
+                   (λ {(x , y) → g x , subst Y (sym (K x)) y})
+                   (λ {(x , y) → ΣPathP (K x , {!!} )}) -- (subst-hom {!!} (sym (K x)) (K x) {!!}) □ (λ j → (λ p → subst Y p y) (rCancel (K x) j))
+                   (λ {(x , y) → ΣPathP (H x , {!!})}))
+               
+Σ-ap-iso₂ : ∀ {i j} {X : Set i}
+          → {Y : X → Set j}{Y' : X → Set j}
+          → ((x : X) → Y x ≡ Y' x)
+          → Σ X Y ≡ Σ X Y'
+Σ-ap-iso₂ {X = X} {Y} {Y'} isom =
+  isoToPath (iso (λ { (x , y) → x , transport (isom x) y})
+                      (λ { (x , y') → x , transport (sym (isom x)) y'})
+                      (λ { (x , y) →  ΣPathP (refl , transportTransport⁻ (isom x) y)})
+                      (λ { (x , y') → ΣPathP (refl , transport⁻Transport (isom x) y')}))
+
+Σ-split-iso : ∀ {ℓ} {A : Set ℓ} {B : A → Set ℓ} {a a' : A} {b : B a} {b' : B a'} → (Σ (a ≡ a') (λ q → PathP (λ i → B (q i)) b b')) ≡ ((a , b) ≡ (a' , b'))
+Σ-split-iso = ua Σ≡
+
+Σ-ap-iso : ∀ {i j} {X X' : Set i}
+           {Y : X → Set j} {Y' : X' → Set j}
+         → (isom : X ≡ X')
+         → ((x : X) → Y x ≡ Y' (transport isom x))
+         → Σ X Y ≡ Σ X' Y'
+Σ-ap-iso {X = X} {X'} {Y} {Y'} isom isom' = 
+  (Σ-ap-iso₂ isom') □ Σ-ap-iso₁ isom
+
+-- Π-ap-iso₁ : ∀ {i j : Level}  -- causes error??
+--              → {X X' : Set i} {Y : X' → Set j}
+--              → (isom : X ≡ X')
+--              → {!!} -- ((x : X) -> (Y ∘ transport isom) x) ≡ ((x' : X') -> Y x')
+-- Π-ap-iso₁ isom = {!!}
+
+Π-ap-iso : ∀ {i j} {X X' : Set i}
+             {Y : X → Set j}{Y' : X' → Set j}
+           → (isom : X ≡ X')
+           → ((x' : X') → Y (transport (sym isom) x') ≡ Y' x')
+           → ((x : X) → Y x)
+           ≡ ((x' : X') → Y' x')
+Π-ap-iso {X = X}{X'}{Y}{Y'} isom isom' = {!!}
+  -- {!!} □ {!!}
 
 
 

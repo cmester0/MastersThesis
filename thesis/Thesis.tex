@@ -314,6 +314,43 @@ Since we know that M-types preserves the H-level, we can use set-truncated quoti
 \section{Bisimulation}
 We want to define a bisimulation principle for M-types
 
+\section{Closure properties of M-types}
+\subsection{Closure under products}
+The product of two M-types is again an M-type
+
+\begin{figure}[h]
+  \centering
+  \begin{tikzcd}[row sep=huge,column sep=huge]
+    \unit \ar[r] & P_{\container{S_0}}~\unit \ar[r] & \dots \ar[r] & P_{\container{S_0}}^n~\unit \ar[r] & \dots \\
+    \unit \times \unit \ar[u] \ar[d] \ar[r] & P_{\container{S_0}}~\unit \times P_{\container{S_1}}~\unit \ar[u] \ar[d] \ar[r] & \dots \ar[r] & P_{\container{S_0}}^n~\unit \times P_{\container{S_1}}^n~\unit \ar[u] \ar[d] \ar[r] & \dots \\
+    \unit \ar[r] & P_{\container{S_1}}~\unit \ar[r] & \dots \ar[r] & P_{\container{S_1}}^n~\unit \ar[r] & \dots
+  \end{tikzcd}
+\end{figure}
+
+\begin{figure}[h]
+  \centering
+  \begin{tikzcd}[row sep=huge,column sep=huge]
+    \unit \ar[r] & P_{\container{S_0} \times \container{S_1}}~\unit \ar[r] & \dots \ar[r] & P_{\container{S_0} \times \container{S_1}}^n~\unit \ar[r] & \dots \\
+  \end{tikzcd}
+\end{figure}
+
+\begin{figure}[h]
+  \centering
+  \begin{tikzcd}[row sep=huge,column sep=huge]
+    & A \times B & \\
+    Stream A \times Stream B \ar[ur,"hd \times hd"'] \ar[rr,"zip"] \ar[d,"tl \times tl"] & & Stream (A \times B) \ar[ul,"hd"] \ar[d,"tl"] \\
+    Stream A \times Stream B \ar[rr,"zip"] & & Stream (A \times B)
+  \end{tikzcd}
+\end{figure}
+\noindent From this we get the computation rules
+\begin{equation}
+  hd \times hd \equiv hd \circ zip
+\end{equation}
+\begin{equation}
+  zip \circ tl \times tl \equiv tl \circ zip
+\end{equation}
+
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \chapter{Additions to the Cubical Agda Library}

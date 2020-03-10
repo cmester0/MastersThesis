@@ -1,4 +1,4 @@
-{-# OPTIONS --cubical --guardedness --allow-unsolved-metas #-} --safe
+{-# OPTIONS --cubical --guardedness #-} --safe
 
 open import Cubical.Foundations.Prelude
 open import Cubical.Foundations.Equiv using (_≃_)
@@ -131,6 +131,14 @@ shift {S = S} =
   (sym α-iso) -- lemma 13
   □ (L-unique {X,π = sequence S}) -- lemma 12
 
+-- delay
+
+record ∞M {ℓ} (S : Container {ℓ}) : Set ℓ where
+  field
+    force : M S
+
+open ∞M public
+
 -- Transporting along shift
 
 in-fun : ∀ {ℓ} {S : Container {ℓ}} -> P₀ (M S) -> M S
@@ -138,6 +146,14 @@ in-fun {S = S} = transport (shift {S = S})
 
 out-fun : ∀ {ℓ} {S : Container {ℓ}} -> M S -> P₀ (M S)
 out-fun {S = S} = transport (sym (shift {S = S}))
+
+-- in and out 2
+
+in-fun-2 : ∀ {ℓ} {S : Container {ℓ}} -> P₀ (M S) -> ∞M S
+force (in-fun-2 x) = in-fun x
+
+out-fun-2 : ∀ {ℓ} {S : Container {ℓ}} -> ∞M S -> P₀ (M S)
+out-fun-2 x = out-fun (force x)
 
 -- in-fun and out-fun are inverse
 
