@@ -1,5 +1,4 @@
-
-{-# OPTIONS --cubical --guardedness --allow-unsolved-metas #-} --safe
+{-# OPTIONS --cubical --guardedness #-} --safe
 
 open import Cubical.Foundations.Prelude
 open import Cubical.Foundations.Equiv using (_≃_)
@@ -16,7 +15,6 @@ open import Cubical.Foundations.Isomorphism
 open import Cubical.Foundations.Function
 open import Cubical.Foundations.Equiv
 
-
 module helper where
 
 identity-x : ∀ {ℓ} {A B : Set ℓ} (k : A -> A) -> k ≡ idfun A -> ∀ (x : A) -> k x ≡ x
@@ -27,14 +25,14 @@ extent-r : ∀ {ℓ} {A B C : Set ℓ} {a b : A -> B} (f : C -> A) -> a ≡ b ->
 extent-r = λ f x i → x i ∘ f
 
 identity-f-r : ∀ {ℓ} {A B : Set ℓ} {k : A -> A} -> k ≡ idfun A -> ∀ (f : B -> A) -> k ∘ f ≡ f
-identity-f-r {A = A} {k = k} p f = extent-r {a = k} {b = idfun A} f p 
+identity-f-r {A = A} {k = k} p f = extent-r {a = k} {b = idfun A} f p
 
 -- Left
 extent-l : ∀ {ℓ} {A B C : Set ℓ} {a b : A -> B} (f : B -> C) -> a ≡ b -> f ∘ a ≡ f ∘ b
 extent-l = λ f x i → f ∘ x i
 
 identity-f-l : ∀ {ℓ} {A B : Set ℓ} {k : A -> A} -> k ≡ idfun A -> ∀ (f : A -> B) -> f ∘ k ≡ f
-identity-f-l {A = A} {k = k} p f = extent-l {a = k} {b = idfun A} f p 
+identity-f-l {A = A} {k = k} p f = extent-l {a = k} {b = idfun A} f p
 
 -- General
 
@@ -77,28 +75,11 @@ postulate
 -- Σ properties --
 ------------------
 
-Σ-ap-iso₁ : ∀ {i j} {X X' : Set i} {Y : X' → Set j}
-          → (isom : X ≡ X')
-          → Σ X (Y ∘ transport isom) ≡ Σ X' Y
-Σ-ap-iso₁ {i} {j }{X} {X'} {Y} isom =
-  let
-    f : X → X'
-    f = transport {A = X} {B = X'} isom
+postulate -- TODO
+  Σ-ap-iso₁ : ∀ {i j} {X X' : Set i} {Y : X' → Set j}
+            → (isom : X ≡ X')
+            → Σ X (Y ∘ transport isom) ≡ Σ X' Y
 
-    g : X' → X
-    g = transport⁻ {A = X} {B = X'} isom
-               
-    K : ∀ a → f (g a) ≡ a
-    K a = transportTransport⁻ {A = X} {B = X'} isom a
-               
-    H : ∀ b → g (f b) ≡ b
-    H b = transport⁻Transport {A = X} {B = X'} isom b  
-  in
-    isoToPath (iso (λ {(x , y) → f x , y})
-                   (λ {(x , y) → g x , subst Y (sym (K x)) y})
-                   (λ {(x , y) → ΣPathP (K x , {!!} )}) -- (subst-hom {!!} (sym (K x)) (K x) {!!}) □ (λ j → (λ p → subst Y p y) (rCancel (K x) j))
-                   (λ {(x , y) → ΣPathP (H x , {!!})}))
-               
 Σ-ap-iso₂ : ∀ {i j} {X : Set i}
           → {Y : X → Set j}{Y' : X → Set j}
           → ((x : X) → Y x ≡ Y' x)
@@ -117,23 +98,17 @@ postulate
          → (isom : X ≡ X')
          → ((x : X) → Y x ≡ Y' (transport isom x))
          → Σ X Y ≡ Σ X' Y'
-Σ-ap-iso {X = X} {X'} {Y} {Y'} isom isom' = 
+Σ-ap-iso {X = X} {X'} {Y} {Y'} isom isom' =
   (Σ-ap-iso₂ isom') □ Σ-ap-iso₁ isom
 
--- Π-ap-iso₁ : ∀ {i j : Level}  -- causes error??
---              → {X X' : Set i} {Y : X' → Set j}
---              → (isom : X ≡ X')
---              → {!!} -- ((x : X) -> (Y ∘ transport isom) x) ≡ ((x' : X') -> Y x')
--- Π-ap-iso₁ isom = {!!}
+------------------
+-- Π properties --
+------------------
 
-Π-ap-iso : ∀ {i j} {X X' : Set i}
-             {Y : X → Set j}{Y' : X' → Set j}
-           → (isom : X ≡ X')
-           → ((x' : X') → Y (transport (sym isom) x') ≡ Y' x')
-           → ((x : X) → Y x)
-           ≡ ((x' : X') → Y' x')
-Π-ap-iso {X = X}{X'}{Y}{Y'} isom isom' = {!!}
-  -- {!!} □ {!!}
-
-
-
+postulate
+  Π-ap-iso : ∀ {i j} {X X' : Set i}
+               {Y : X → Set j}{Y' : X' → Set j}
+             → (isom : X ≡ X')
+             → ((x' : X') → Y (transport (sym isom) x') ≡ Y' x')
+             → ((x : X) → Y x)
+             ≡ ((x' : X') → Y' x')

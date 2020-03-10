@@ -9,6 +9,7 @@ open import Cubical.Data.Prod
 open import Cubical.Data.Nat as ℕ using (ℕ ; suc ; _+_ )
 
 open import Cubical.Foundations.Transport
+
 open import Cubical.Foundations.Univalence
 open import Cubical.Foundations.Isomorphism
 open import Cubical.Foundations.Function
@@ -52,20 +53,13 @@ shift-chain = λ X,π -> ((λ x → X X,π (suc x)) ,, λ {n} → π X,π {suc n
 -- Equivalence Rules --
 -----------------------
 
-intro-helper : ∀ {ℓ} {X Y : Set ℓ} (p : X -> Set ℓ) (q : X -> Y -> Set ℓ) -> Σ Y (λ b → ∀ a -> q a b) -> (Σ X λ a -> p a) ≃ (Σ Y (λ b -> Σ X λ a -> q a b × p a))
-intro-helper p q y = (λ x → y .fst , x .fst , y .snd (x .fst) , x .snd) , record { equiv-proof = λ y₁ → (({!!} , {!!}) , {!!}) , λ y₂ i → {!!} }
-
-M-intro : ∀ {ℓ} {X Y : Set ℓ} (p : X -> Set ℓ) (q : X -> Y -> Set ℓ) -> (Σ X λ a -> p a) ≡ (Σ Y (λ b -> Σ X λ a -> q a b × p a))
-M-intro p q = λ i → {!!}
-
 postulate -- TODO
   combine : ∀ {ℓ} (X : ℕ -> Set ℓ) (p : ∀ {n} -> (X (suc n)) -> (X n) -> Set ℓ)  ->
     (Σ (X 0) λ x₀ → Σ ((n : ℕ) → X (suc n)) λ y → (p (y 0) x₀) × ((n : ℕ) → p (y (suc n)) (y n))) ≡
                    (Σ ((n : ℕ) → X n)       λ x → (p (x 1) (x 0)) × ((n : ℕ) → p (x (suc (suc n))) (x (suc n))))
 
-  -- intro : ∀ {ℓ} {X Y : Set ℓ} (p : X -> Set ℓ) (q : X -> Y -> Set ℓ) -> (Σ X λ a ->         p a) ≡
-  --                                                            (Σ Y (λ b -> Σ X λ a -> q a b × p a))
-                                                             
+  M-intro : ∀ {ℓ} {X Y : Set ℓ} (p : X -> Set ℓ) (q : X -> Y -> Set ℓ) -> (Σ X λ a -> p a) ≡ (Σ Y (λ b -> Σ X λ a -> q a b × p a))
+
   combine2 : ∀ {ℓ} (X : ℕ -> Set ℓ) -> (p : ∀ {n} -> (X (suc n)) -> (X n) -> Set ℓ) -> (y : (n : ℕ) -> X n) ->
     p (y 1) (y 0) × ((n : ℕ) → p (y (suc (suc n))) (y (suc n))) ≡ ((n : ℕ) → p (y (suc n)) (y n))
 
@@ -75,10 +69,10 @@ postulate -- TODO
 
 -- Lemma 12
 L-unique : ∀ {ℓ} -> {X,π : Chain {ℓ}} -> L (shift-chain X,π) ≡ L X,π
-L-unique {X,π = X,π} =  
+L-unique {X,π = X,π} =
   (M-intro {X = ((n : ℕ) → X X,π (suc n))} {Y = (X X,π 0)} (λ y → (n : ℕ) → π X,π (y (suc n)) ≡ y n) λ y x₀ → π X,π (y 0) ≡ x₀)
-  □ ((combine (X X,π) λ a b -> π X,π a ≡ b) 
-  □ (λ i → Σ ((n : ℕ) → X X,π n) λ x → combine2 (X X,π) (λ a b → π X,π a ≡ b) x i))
+  □ ((combine (X X,π) λ a b -> π X,π a ≡ b)
+      □ (λ i → Σ ((n : ℕ) → X X,π n) λ x → combine2 (X X,π) (λ a b → π X,π a ≡ b) x i))
 
 ! : ∀ {ℓ} {A : Set ℓ} (x : A) -> Lift {ℓ-zero} {ℓ} Unit
 ! x = lift tt
@@ -110,7 +104,7 @@ PX,Pπ {ℓ} S =
 postulate -- TODO
   swap-Σ-∀ : ∀ {ℓ} (X : ℕ -> Set ℓ) (A : Set ℓ) (B : A -> Set ℓ) (p : {n : ℕ} -> Σ A (λ a -> B a -> X (suc n)) -> Σ A (λ a -> B a -> X n) -> Set ℓ) ->
     (Σ (∀ (n : ℕ) -> Σ A (λ a -> B a -> X n)) (λ w -> (n : ℕ) -> p (w (suc n)) (w n))) ≡
-    (Σ ((n : ℕ) → A) λ a → Σ ((n : ℕ) → B (a n) → X n) λ u → (n : ℕ) -> p (a (suc n) , u (suc n)) (a n , u n))  
+    (Σ ((n : ℕ) → A) λ a → Σ ((n : ℕ) → B (a n) → X n) λ u → (n : ℕ) -> p (a (suc n) , u (suc n)) (a n , u n))
 
   todo-rules : ∀ {ℓ} (S : Container {ℓ}) -> (Σ ((n : ℕ) → S .fst) λ a → Σ ((n : ℕ) → S .snd (a n) → X (sequence S) n) λ u → (n : ℕ) -> P₁ {S = S} (π (sequence S) {n = n}) (a (suc n) , u (suc n)) ≡ (a n , u n)) ≡ P₀ {S = S} (M S)
   -- equality of pairs, lemma 11, (Universal property of L)
@@ -118,7 +112,7 @@ postulate -- TODO
 -- Lemma 13
 α-iso : ∀ {ℓ} {S : Container {ℓ}} -> L (PX,Pπ S) ≡ P₀ {S = S} (M S) -- L^P ≡ PL
 α-iso {S = S} = 
-  (swap-Σ-∀ (X (sequence S)) (S .fst) (S .snd) λ {n} a b → (P₁ (π (sequence S) {n = n})) a ≡ b) 
+  (swap-Σ-∀ (X (sequence S)) (S .fst) (S .snd) λ {n} a b → (P₁ (π (sequence S) {n = n})) a ≡ b)
   □ (todo-rules S)
 
 -----------------------------------------------------
@@ -128,16 +122,7 @@ postulate -- TODO
 -- P commutes with limits
 shift : ∀ {ℓ} {S : Container {ℓ}} -> P₀ (M S) ≡ M S
 shift {S = S} = 
-  (sym α-iso) -- lemma 13
-  □ (L-unique {X,π = sequence S}) -- lemma 12
-
--- delay
-
-record ∞M {ℓ} (S : Container {ℓ}) : Set ℓ where
-  field
-    force : M S
-
-open ∞M public
+  (sym α-iso) □ (L-unique {X,π = sequence S}) -- lemma 13 & lemma 12
 
 -- Transporting along shift
 
@@ -146,14 +131,6 @@ in-fun {S = S} = transport (shift {S = S})
 
 out-fun : ∀ {ℓ} {S : Container {ℓ}} -> M S -> P₀ (M S)
 out-fun {S = S} = transport (sym (shift {S = S}))
-
--- in and out 2
-
-in-fun-2 : ∀ {ℓ} {S : Container {ℓ}} -> P₀ (M S) -> ∞M S
-force (in-fun-2 x) = in-fun x
-
-out-fun-2 : ∀ {ℓ} {S : Container {ℓ}} -> ∞M S -> P₀ (M S)
-out-fun-2 x = out-fun (force x)
 
 -- in-fun and out-fun are inverse
 
