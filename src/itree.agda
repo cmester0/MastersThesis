@@ -30,6 +30,9 @@ delay-tau S = in-fun (inl tt , λ x → S)
 -- Bottom element raised
 data ⊥₁ : Set₁ where
 
+spin : ∀ {R} -> M (delay R , λ x → Unit)
+spin {R} = {!!}
+
 -- TREES
 tree-S : (E : Set₀ -> Set₁) (R : Set₀) -> Container {ℓ-suc ℓ-zero}
 tree-S E R = (R ⊎ Σ Set (λ A -> E A)) , (λ { (inl _) -> ⊥₁ ; (inr (A , e)) -> Lift A } )

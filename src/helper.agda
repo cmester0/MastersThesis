@@ -71,6 +71,13 @@ postulate
 ≡-rel-b-inj : ∀ {ℓ} {A B C : Set ℓ} (a : A -> B) (b : B -> A) -> a ∘ b ≡ idfun B -> b ∘ a ≡ idfun A -> ∀ {f g : C -> B} -> (b ∘ f ≡ b ∘ g) ≡ (f ≡ g)
 ≡-rel-b-inj a b left right = ua (isoToEquiv (iso (≡-rel-a-monomorphism b a right left) (extent-l b) (≡-rel-inj-iso-0 b a right left) (≡-rel-inj-iso-1 b a right left)))
 
+-------------------------
+-- Unit / × properties --
+-------------------------
+
+diagonal-unit : Unit ≡ Unit × Unit
+diagonal-unit = isoToPath (iso (λ _ → tt , tt) (λ _ → tt) (λ {(tt , tt) i → tt , tt}) λ a i → tt)
+
 ------------------
 -- Σ properties --
 ------------------
@@ -81,7 +88,7 @@ postulate -- TODO
             → Σ X (Y ∘ transport isom) ≡ Σ X' Y
 
 Σ-ap-iso₂ : ∀ {i j} {X : Set i}
-          → {Y : X → Set j}{Y' : X → Set j}
+          → {Y Y' : X → Set j}
           → ((x : X) → Y x ≡ Y' x)
           → Σ X Y ≡ Σ X Y'
 Σ-ap-iso₂ {X = X} {Y} {Y'} isom =

@@ -206,32 +206,31 @@ U-is-Unit : ∀ {ℓ} {S : Container {ℓ}} (C,γ : Coalg₀ {S = S}) -> (C,γ �
 U-is-Unit {ℓ = ℓ} {S = S} C,γ@(C , γ) =
   let e = FunctionToProjection C,γ in
   let 𝓛 = M S in
-    U {C,γ = C,γ}
-  ≡⟨ refl ⟩
-    Σ (C → 𝓛) (λ f → out-fun ∘ f ≡ step {C,γ = C,γ} f)
-  ≡⟨ (λ i → Σ (C → 𝓛) (λ f → in-inj {f = out-fun ∘ f} {g = step {C,γ = C,γ} f} (~ i))) ⟩
-    Σ (C → 𝓛) (λ f → in-fun ∘ out-fun ∘ f ≡ in-fun ∘ step {C,γ = C,γ} f)
-  ≡⟨ (λ i → Σ (C,γ .fst → M S) (λ f → identity-f-r {k = in-fun ∘ out-fun {S = S}} in-inverse-out f i ≡ in-fun ∘ step {C,γ = C,γ} f)) ⟩
-    Σ (C -> 𝓛) (λ f → f ≡ in-fun ∘ step {C,γ = C,γ} f)
-  ≡⟨ refl ⟩
-    Σ (C → 𝓛) (λ f → f ≡ Ψ {C,γ = C,γ} f)
-  ≡⟨ sym (Σ-ap-iso (sym (lemma10 C,γ)) (λ _ → refl)) ⟩
-    Σ (Cone C,γ) (λ c → e c ≡ Ψ {C,γ = C,γ} (e c))
-  ≡⟨ (λ i → Σ (Cone C,γ) (λ c → e c ≡ funExt⁻ (commutivity {C,γ = C,γ}) c i)) ⟩
-    Σ (Cone C,γ) (λ c → e c ≡ e (Φ {C,γ = C,γ} c))
-  ≡⟨ (λ i → Σ (Cone C,γ) (λ c → e-inj {C,γ = C,γ} c (Φ {C,γ = C,γ} c) i)) ⟩
-    Σ (Cone C,γ) (λ c → c ≡ Φ {C,γ = C,γ} c)
-  ≡⟨ refl ⟩
-    Σ (Cone C,γ) (λ { (u , q) → (u , q) ≡ (ϕ₀ {C,γ = C,γ} u , ϕ₁ {C,γ = C,γ} u q)})
-  ≡⟨ (λ i → Σ (Cone C,γ) λ {(u , q) → sym (Σ-split-iso {a = u} {a' = ϕ₀ {C,γ = C,γ} u} {b = q} {b' = ϕ₁ {C,γ = C,γ} u q}) i}) ⟩
-    Σ (Cone C,γ) (λ { (u , q) → Σ (u ≡ ϕ₀ {C,γ = C,γ} u) λ p → PathP (λ i → Cone₁ {C,γ = C,γ} (p i)) q (ϕ₁ {C,γ = C,γ} u q) })
-  ≡⟨ isoToPath (iso (λ {((u , p) , q , r) → (u , q) , p , r}) (λ {((u , q) , p , r) → (u , p) , (q , r)}) (λ _ → refl) λ _ → refl) ⟩
-    Σ (Σ (Cone₀ {C,γ = C,γ}) (λ u → u ≡ ϕ₀ {C,γ = C,γ} u))
-      (λ { (u , p) → Σ (Cone₁ {C,γ = C,γ} u) λ q → PathP (λ i → Cone₁ {C,γ = C,γ} (p i)) q (ϕ₁ u q)})
-  ≡⟨ sym (Σ-ap-iso missing-0 missing-2) ⟩
-    Σ (Lift {ℓ-zero} {ℓ} Unit) (λ { (lift tt) → Lift {ℓ-zero} {ℓ} Unit })
-  ≡⟨ isoToPath (iso (λ x → lift tt) (λ _ → lift tt , lift tt) (λ b i → lift tt) (λ a i → lift tt , lift tt)) ⟩
-    Lift {ℓ-zero} {ℓ} Unit ∎
+  U {C,γ = C,γ}
+    ≡⟨ refl ⟩
+  Σ (C → 𝓛) (λ f → out-fun ∘ f ≡ step {C,γ = C,γ} f)
+    ≡⟨ (λ i → Σ (C → 𝓛) (λ f → in-inj {f = out-fun ∘ f} {g = step {C,γ = C,γ} f} (~ i))) ⟩
+  Σ (C → 𝓛) (λ f → in-fun ∘ out-fun ∘ f ≡ in-fun ∘ step {C,γ = C,γ} f)
+    ≡⟨ (λ i → Σ (C,γ .fst → M S) (λ f → identity-f-r {k = in-fun ∘ out-fun {S = S}} in-inverse-out f i ≡ in-fun ∘ step {C,γ = C,γ} f)) ⟩
+  Σ (C -> 𝓛) (λ f → f ≡ in-fun ∘ step {C,γ = C,γ} f)
+    ≡⟨ refl ⟩
+  Σ (C → 𝓛) (λ f → f ≡ Ψ {C,γ = C,γ} f)
+    ≡⟨ sym (Σ-ap-iso (sym (lemma10 C,γ)) (λ _ → refl)) ⟩
+  Σ (Cone C,γ) (λ c → e c ≡ Ψ {C,γ = C,γ} (e c))
+    ≡⟨ (λ i → Σ (Cone C,γ) (λ c → e c ≡ funExt⁻ (commutivity {C,γ = C,γ}) c i)) ⟩
+  Σ (Cone C,γ) (λ c → e c ≡ e (Φ {C,γ = C,γ} c))
+    ≡⟨ (λ i → Σ (Cone C,γ) (λ c → e-inj {C,γ = C,γ} c (Φ {C,γ = C,γ} c) i)) ⟩
+  Σ (Cone C,γ) (λ c → c ≡ Φ {C,γ = C,γ} c)
+    ≡⟨ refl ⟩
+  Σ (Cone C,γ) (λ { (u , q) → (u , q) ≡ (ϕ₀ {C,γ = C,γ} u , ϕ₁ {C,γ = C,γ} u q)})
+    ≡⟨ (λ i → Σ (Cone C,γ) λ {(u , q) → sym (Σ-split-iso {a = u} {a' = ϕ₀ {C,γ = C,γ} u} {b = q} {b' = ϕ₁ {C,γ = C,γ} u q}) i}) ⟩
+  Σ (Cone C,γ) (λ { (u , q) → Σ (u ≡ ϕ₀ {C,γ = C,γ} u) λ p → PathP (λ i → Cone₁ {C,γ = C,γ} (p i)) q (ϕ₁ {C,γ = C,γ} u q) })
+    ≡⟨ isoToPath (iso (λ {((u , p) , q , r) → (u , q) , p , r}) (λ {((u , q) , p , r) → (u , p) , (q , r)}) (λ _ → refl) λ _ → refl) ⟩
+  Σ (Σ (Cone₀ {C,γ = C,γ}) (λ u → u ≡ ϕ₀ {C,γ = C,γ} u)) (λ { (u , p) → Σ (Cone₁ {C,γ = C,γ} u) λ q → PathP (λ i → Cone₁ {C,γ = C,γ} (p i)) q (ϕ₁ u q)})
+    ≡⟨ sym (Σ-ap-iso missing-0 missing-2) ⟩
+  Σ (Lift {ℓ-zero} {ℓ} Unit) (λ { (lift tt) → Lift {ℓ-zero} {ℓ} Unit })
+    ≡⟨ isoToPath (iso (λ x → lift tt) (λ _ → lift tt , lift tt) (λ b i → lift tt) (λ a i → lift tt , lift tt)) ⟩
+  Lift {ℓ-zero} {ℓ} Unit ∎
 
 contr-is-ext : ∀ {ℓ} {A B : Set ℓ} -> A ≡ B -> isContr A ≡ isContr B
 contr-is-ext p = λ i -> isContr (p i)

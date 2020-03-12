@@ -19,7 +19,6 @@
 
 \renewcommand*\sfdefault{lmss}
 \renewcommand*\ttdefault{txtt}
-% \newcommand{\todo}[1]{{\color[rgb]{.5,0,0}\textbf{$\blacktriangleright$#1$\blacktriangleleft$}}}
 
 % Custom packages added:
 
@@ -255,6 +254,7 @@ We can now construct a bisimulation: forall coalgebras \(\coalg{\type{C}}{\term{
   \begin{tikzcd}[row sep=huge,column sep=huge]
     \coalg{\type{C}}{\term{\gamma}} & \coalg{\type{\overline{\mathcal{R}}}}{\term{\alpha}_{\type{\overline{\mathcal{R}}}}} \ar[l,Rightarrow,"{\pi_1}^{\type{\overline{\mathcal{R}}}}"'] \ar[r,Rightarrow,"{\pi_2}^{\type{\overline{\mathcal{R}}}}"] & \coalg{\type{C}}{\term{\gamma}}
   \end{tikzcd}
+  \caption{TODO}
 \end{figure}
 \noindent Furthermore for any bisimulation over a final \(P\)-coalgebra \(\coalg{\type{\mathtt{M}}}{\term{\mathtt{out}}}:\mathtt{Coalg}_{\container{S}}\) we have the following diagram,
 
@@ -263,6 +263,7 @@ We can now construct a bisimulation: forall coalgebras \(\coalg{\type{C}}{\term{
   \begin{tikzcd}[row sep=huge,column sep=huge]
     \coalg{\type{\texttt{M}}}{\term{\texttt{out}}} & \coalg{\type{\overline{\mathcal{R}}}}{\term{\alpha}_{\type{\overline{\mathcal{R}}}}} \ar[l,Rightarrow,"{\pi_1}^{\type{\overline{\mathcal{R}}}}"'] \ar[r,Rightarrow,"{\pi_2}^{\type{\overline{\mathcal{R}}}}"] & \coalg{\type{\texttt{M}}}{\term{\texttt{out}}}
   \end{tikzcd}
+  \caption{TODO}
 \end{figure}
 \noindent where \(\pi_1^{\type{\overline{\mathcal{R}}}} = ~! = \pi_2^{\type{\overline{\mathcal{R}}}}\), which means given \(\term{r} : \term{\mathcal{R}}(\term{m},\term{m'})\) we get \(\term{m} = \pi_1^{\type{\overline{\mathcal{R}}}} (\term{m}, \term{m'}, \term{r}) = \pi_2^{\type{\overline{\mathcal{R}}}} (\term{m}, \term{m'}, \term{r}) = \term{m'}\).
 \\ \\
@@ -304,6 +305,7 @@ We want to define spin, as being the fixed point \(\mathtt{spin} = \mathtt{later
     \term{\texttt{spin}} \ar[d,"\term{\texttt{later}}"] \\
     \term{\texttt{later}}~\term{\texttt{spin}}
   \end{tikzcd}
+  \caption{TODO}
 \end{figure}
 \noindent Since it is final, it also must be unique, meaning that there is just one program that spins forever, without returning a value, meaning every other program must return a value. If we just
 
@@ -315,6 +317,54 @@ Since we know that M-types preserves the H-level, we can use set-truncated quoti
 We want to define a bisimulation principle for M-types
 
 \section{Closure properties of M-types}
+We define the product of two containers
+\begin{equation}
+  \container{(A,B)} \times \container{(C,D)} \equiv \container{( A \times C , \lambda (a , c), B a \times D c)},
+\end{equation}
+we can lift this rule, through the following diagram, used to define M-types
+
+\begin{figure}[h]
+  \centering
+  \begin{tikzcd}[row sep=huge,column sep=huge]
+    A & A \times C \ar[l,"\pi_1"'] \ar[r,"\pi_2"] & C \\
+    P (M_{(A , B)}) \ar[u,"fst"] & P(M_{(A \times C , B \times D)}) \ar[u,"fst"] & P (M_{(C , D)}) \ar[u,"fst"'] \\
+    M_{(A , B)} \ar[u,"out"] \ar[d,"\pi_!"] & M_{(A \times C , B \times D)} \ar[u,"out"] \ar[d,"\pi_!"] & M_{(C , D)} \ar[u,"out"] \ar[d,"\pi_!"] \\
+    {P_{\container{(A,B)}}}^n~\unit \ar[d,"\pi_n"] & {P_{\container{(A,B)} \times \container{(C,D)}}}^n~\unit \ar[l] \ar[r] \ar[d,"\pi_n"] & {P_{\container{(C,D)}}}^n~\unit \ar[d,"\pi_n"] \\
+    \vdots \ar[d,"\pi_1"] & \vdots \ar[d,"\pi_1"] & \vdots \ar[d,"\pi_1"] \\
+    P_{\container{(A,B)}}~\unit \ar[d,"\pi_0"] & P_{\container{(A,B)} \times \container{(C,D)}}~\unit \ar[l] \ar[r] \ar[d,"\pi_0"] & P_{\container{(C,D)}}~\unit \ar[d,"\pi_0"] \\
+    \unit & \unit \ar[l] \ar[r] & \unit
+  \end{tikzcd}
+  \caption{TODO}
+\end{figure}
+\noindent We now prove that
+\begin{equation}
+  {P_{\container{(A,B)}}}^n~\unit \times {P_{\container{(C,D)}}}^n~\unit \equiv {P_{\container{(A,B)} \times \container{(C,D)}}}^n~\unit,
+\end{equation}
+by induction on \(n\). For \(n = 0\), we have \(\unit \times \unit \equiv \unit\). For \(n = m + 1\), we may assume
+\begin{equation}
+{P_{\container{(A,B)}}}^m~\unit \times {P_{\container{(C,D)}}}^m~\unit \equiv {P_{\container{(A,B)} \times \container{(C,D)}}}^m~\unit,
+\end{equation}
+and show 
+\begin{align}
+  &~ {P_{\container{(A,B)}}}^{m+1}~\unit \times {P_{\container{(C,D)}}}^{m+1}~\unit \\
+   \equiv&~ P_{\container{(A,B)}} ({P_{\container{(A,B)}}}^m~\unit) \times P_{\container{(C,D)}} ({P_{\container{(C,D)}}}^m~\unit) \\
+   \equiv&~ \sum_{\term{a} : \type{A}} \type{B}~\term{a} \rightarrow {P_{\container{(A,B)}}}^m~\unit \times \sum_{\term{c} : \type{C}} \type{D}~\term{c} \rightarrow {P_{\container{(C,D)}}}^m~\unit \\
+  \equiv&~ \sum_{\term{a} , \term{c} : \type{A} \times \type{C}} (\type{B}~\term{a} \rightarrow {P_{\container{(A,B)}}}^m~\unit) \times (\type{D}~\term{c} \rightarrow {P_{\container{(C,D)}}}^m~\unit) \\
+  \equiv&~ \sum_{\term{a} , \term{c} : \type{A} \times \type{C}} \type{B}~\term{a} \times \type{D}~\term{c} \rightarrow {P_{\container{(A,B)}}}^m~\unit \times {P_{\container{(C,D)}}}^m~\unit \\
+  \equiv&~ \sum_{\term{a} , \term{c} : \type{A} \times \type{C}} \type{B}~\term{a} \times \type{D}~\term{c} \rightarrow {P_{\container{(A,B)} \times \container{(C,D)}}}^m~\unit \\
+  \equiv&~ P_{\container{(A,B)} \times \container{(C,D)}} ({P_{\container{(A,B)} \times \container{(C,D)}}}^m~\unit) \\
+  \equiv&~ {P_{\container{(A,B)} \times \container{(C,D)}}}^{m+1}~\unit
+\end{align}
+taking the limit we get
+\begin{equation}
+  M_{\container{(A,B)}} \times M_{\container{(C,D)}} \equiv M_{\container{(A,B)} \times \container{(C,D)}}
+\end{equation}
+as an example hereof lets look at the definition for streams, where we actually get
+\begin{equation}
+  stream~A \times stream~B \equiv stream~(A \times B)
+\end{equation}
+as expected, transporting along this gives us the definition for zip.
+
 \subsection{Closure under products}
 The product of two M-types is again an M-type
 
@@ -325,6 +375,7 @@ The product of two M-types is again an M-type
     \unit \times \unit \ar[u] \ar[d] \ar[r] & P_{\container{S_0}}~\unit \times P_{\container{S_1}}~\unit \ar[u] \ar[d] \ar[r] & \dots \ar[r] & P_{\container{S_0}}^n~\unit \times P_{\container{S_1}}^n~\unit \ar[u] \ar[d] \ar[r] & \dots \\
     \unit \ar[r] & P_{\container{S_1}}~\unit \ar[r] & \dots \ar[r] & P_{\container{S_1}}^n~\unit \ar[r] & \dots
   \end{tikzcd}
+  \caption{TODO}
 \end{figure}
 
 \begin{figure}[h]
@@ -332,6 +383,7 @@ The product of two M-types is again an M-type
   \begin{tikzcd}[row sep=huge,column sep=huge]
     \unit \ar[r] & P_{\container{S_0} \times \container{S_1}}~\unit \ar[r] & \dots \ar[r] & P_{\container{S_0} \times \container{S_1}}^n~\unit \ar[r] & \dots \\
   \end{tikzcd}
+  \caption{TODO}
 \end{figure}
 
 \begin{figure}[h]
@@ -341,6 +393,7 @@ The product of two M-types is again an M-type
     Stream A \times Stream B \ar[ur,"hd \times hd"'] \ar[rr,"zip"] \ar[d,"tl \times tl"] & & Stream (A \times B) \ar[ul,"hd"] \ar[d,"tl"] \\
     Stream A \times Stream B \ar[rr,"zip"] & & Stream (A \times B)
   \end{tikzcd}
+  \caption{TODO}
 \end{figure}
 \noindent From this we get the computation rules
 \begin{equation}
@@ -371,16 +424,15 @@ The product of two M-types is again an M-type
     &\vdots \\
     &\equiv \unit
 \end{align}
-%     \sum (\sum ((n : ℕ) \rightarrow C \rightarrow X (sequence S) n) (\lambda u \rightarrow u \equiv ϕ₀ {C,γ = C,γ} u))
-%       (\lambda { (u , p) \rightarrow \sum ((n : ℕ) \rightarrow π (sequence S) \circ u (suc n) \equiv u n) \lambda q \rightarrow (transport (\lambda j -> p j ? ?) q \equiv ϕ₁ u q)})
-%   \equiv⟨ {!!} ⟩
-%     {!!}
-%   \equiv⟨ {!!} ⟩
-%     \sum ((n : ℕ) \rightarrow C \rightarrow X (sequence S) n) (\lambda u \rightarrow \sum (u \equiv ϕ₀ {C,γ = C,γ} u) \lambda p \rightarrow \sum ((n : ℕ) \rightarrow π (sequence S) \circ u (suc n) \equiv u n) \lambda q \rightarrow (\lambda n \rightarrow transport (\lambda i \rightarrow (\lambda x \rightarrow π (sequence S) (p i (suc n) x)) \equiv p i n) (q n)) \equiv ϕ₁ u q)
-%   \equiv⟨ {!!} ⟩
-%     (\sum (Lift {ℓ-zero} {ℓ} Unit) (\lambda { (lift tt) \rightarrow Lift {ℓ-zero} {ℓ} Unit }))
-%   \equiv⟨ isoToPath (iso (\lambda x \rightarrow lift tt) (\lambda _ \rightarrow lift tt , lift tt) (\lambda b i \rightarrow lift tt) (\lambda a i \rightarrow lift tt , lift tt)) ⟩
-%     Lift Unit ∎
+
+\section{Missing postulates}
+\subsubsection{Combine}
+For all \(\term{X} : \type{\mathbb{N}} \rightarrow \universe{U}\) and \(p : \prod_{n : \type{\mathbb{N}}} \term{X}~(n + 1) \rightarrow \term{X}~n \rightarrow \universe{U}\)
+\begin{align}
+  &~\sum_{\term{x_0} : \type{X_0}} \sum_{\term{y} : \prod_{\term{n} : \type{\mathbb{N}}} \type{X_{n+1}}} (\term{p}~\type{y_0}~\type{x_0}) \times \left(\prod_{\term{n} : \type{\mathbb{N}}} \term{p}~\type{y_{n + 1}}~\type{y_n}\right) \\
+  \equiv&~\sum_{\term{x_0} : \type{X_0}} \sum_{\term{y} : \prod_{\term{n} : \type{\mathbb{N}}} \type{X_{n+1}}} (\term{p}~\type{y_0}~\type{x_0}) \times \left(\prod_{\term{n} : \type{\mathbb{N}}} \term{p}~\type{y_{n + 1}}~\type{y_n}\right) \\
+  \equiv&~\sum_{\term{x} : \prod_{\term{n} : \type{\mathbb{N}}} \rightarrow \type{X_n}} (\term{p}~\type{x_1}~\type{x_0}) \times \left(\prod_{\term{n} : \type{\mathbb{N}}} → \term{p}~\type{x_{n+2}}~\type{x_{n+1}}\right)
+\end{align}
 
 \chapter{Conclusion}
 \label{ch:conclusion}
