@@ -167,23 +167,6 @@ postulate
 ×-left-unit : ∀ {i} {X : Set i} → (Σ (Lift {ℓ-zero} {i} Unit) (λ _ -> X)) ≡ X
 ×-left-unit = isoToPath (iso (λ {(lift tt , x) → x}) (λ x → lift tt , x) (λ _ → refl) λ { (lift tt , a) → refl })
 
-postulate
-  lemma11-helper-0 : ∀ {ℓ} {S : Container {ℓ}} (ρ : (n : ℕ) -> X (sequence S) n -> X (sequence S) (suc n)) x n -> (π (sequence S) (transport (λ _ → (n₁ : ℕ) → X (sequence S) n₁) x (suc n)) ≡ transport (λ _ → (n₁ : ℕ) → X (sequence S) n₁) x n) ≡ (ρ (transport (sym (λ _ → ℕ)) n) (x (transport (sym (λ _ → ℕ)) n)) ≡ x (suc (transport (sym (λ _ → ℕ)) n)))
-
-  lemma11-helper-1 : ∀ {ℓ} {S : Container {ℓ}} (ρ : (n : ℕ) -> X (sequence S) n -> X (sequence S) (suc n)) x -> Σ (Lift {ℓ-zero} {ℓ} Unit) (λ _ → (n : ℕ) → ρ n (x n) ≡ x (suc n)) ≡ ((n : ℕ) → ρ n (transport (λ _ → (n₁ : ℕ) → X (sequence S) n₁) x n) ≡ transport (λ _ → (n₁ : ℕ) → X (sequence S) n₁) x (suc n))
-
-  lemma11-helper-2 : ∀ {ℓ} {S : Container {ℓ}} (ρ : (n : ℕ) -> X (sequence S) n -> X (sequence S) (suc n)) -> Σ ((n : ℕ) → X (sequence S) n) (λ x → Σ (Lift {ℓ-zero} {ℓ} Unit) (λ _ → (n : ℕ) → ρ n (x n) ≡ x (suc n))) ≡ X (sequence S) 0
-
-lemma11 : ∀ {ℓ} {S : Container {ℓ}} (ρ : (n : ℕ) -> X (sequence S) n -> X (sequence S) (suc n)) -> M S ≡ X (sequence S) 0
-lemma11 {ℓ} {S = S} ρ =
-    M S
-  ≡⟨ sym (Σ-ap-iso refl (λ x → Π-ap-iso refl λ n → sym (lemma11-helper-0 ρ x n))) ⟩
-    Σ ((n : ℕ) → X (sequence S) n) (λ x → ∀ n → ρ n (x n) ≡ x (suc n))
-  ≡⟨ sym (Σ-ap-iso refl λ x → lemma11-helper-1 ρ x) ⟩
-    Σ ((n : ℕ) → X (sequence S) n) (λ x → Σ (Lift {ℓ-zero} {ℓ} Unit) λ _ -> ∀ n → ρ n (x n) ≡ x (suc n))
-  ≡⟨ lemma11-helper-2 ρ ⟩
-    X (sequence S) 0 ∎
-
 u0 : ∀ {ℓ} {S : Container {ℓ}} {C,γ : Coalg₀ {S = S}} -> Cone₀ {C,γ = C,γ}
 u0 {C,γ = C,γ} = λ { 0 _ → lift tt ; (suc n) -> step {C,γ = C,γ} (u0 {C,γ = C,γ} n) }
 
