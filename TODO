@@ -1,0 +1,14 @@
+Coalg/Properties.agda:126:postulate
+Coalg/Properties.agda:129:postulate
+Coalg/Properties.agda:143:postulate
+Coalg/Properties.agda:149:postulate
+Coalg/Properties.agda:221:postulate
+M/Base.agda:102:postulate
+M/Base.agda:119:postulate
+M/Base.agda:123:postulate
+M/Properties.agda:28:postulate -- TODO: Slow computations..
+M/Properties.agda:32:postulate -- TODO: Slow computations..
+M/Properties.agda:38:postulate -- TODO: Slow computations..
+M/Properties.agda:86:-- postulate
+M/Properties.agda:117:-- postulate
+M/Properties.agda:151:-- postulate

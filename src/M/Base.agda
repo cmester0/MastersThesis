@@ -17,64 +17,22 @@ open import Cubical.Foundations.Function
 open import Cubical.Data.Sum
 
 open import helper
+open import Container
+
+open import Coalg.Base
 
 module M.Base where
-
--------------------------------------
--- Container and Container Functor --
--------------------------------------
-
-Container : ∀ {ℓ} -> Set (ℓ-suc ℓ)
-Container {ℓ} = Σ (Set ℓ) (λ A -> A -> Set ℓ)
-
-P₀ : ∀ {ℓ} {S : Container {ℓ}} -> Set ℓ -> Set ℓ
-P₀ {S = S} X  = Σ (S .fst) λ x → (S .snd x) -> X
-
-P₁ : ∀ {ℓ} {S : Container {ℓ}} {X Y} (f : X -> Y) -> P₀ {S = S} X -> P₀ {S = S} Y
-P₁ {S = S} f = λ { (a , g) ->  a , f ∘ g }
-
------------------------
--- Chains and Limits --
------------------------
-
-record Chain {ℓ} : Set (ℓ-suc ℓ) where
-  constructor _,,_
-  field
-    X : ℕ -> Set ℓ
-    π : {n : ℕ} -> X (suc n) -> X n
-
-open Chain
-
-L : ∀ {ℓ} -> Chain {ℓ} → Set ℓ
-L (x ,, pi) = Σ ((n : ℕ) → x n) λ x → (n : ℕ) → pi {n = n} (x (suc n)) ≡ x n
-
-shift-chain : ∀ {ℓ} -> Chain {ℓ} -> Chain {ℓ}
-shift-chain = λ X,π -> ((λ x → X X,π (suc x)) ,, λ {n} → π X,π {suc n})
-
-! : ∀ {ℓ} {A : Set ℓ} (x : A) -> Lift {ℓ-zero} {ℓ} Unit
-! x = lift tt
-
-------------------------------------------------------
--- Limit type of a Container , and Shift of a Limit --
-------------------------------------------------------
-
-W : ∀ {ℓ} -> Container {ℓ} -> ℕ -> Set ℓ -- (ℓ-max ℓ ℓ')
-W S 0 = Lift Unit
-W S (suc n) = P₀ {S = S} (W S n)
-
-πₙ : ∀ {ℓ} -> (S : Container {ℓ}) -> {n : ℕ} -> W S (suc n) -> W S n
-πₙ {ℓ} S {0} = ! {ℓ}
-πₙ S {suc n} = P₁ (πₙ S {n})
-
-sequence : ∀ {ℓ} -> Container {ℓ} -> Chain {ℓ}
-X (sequence {ℓ} S) n = W {ℓ} S n
-π (sequence {ℓ} S) {n} = πₙ {ℓ} S {n}
 
 -----------------------
 -- Equivalence Rules --
 -----------------------
 
-M-combine-helper : ∀ {ℓ} (X : ℕ -> Set ℓ) -> X 0 -> ((n : ℕ) -> X (suc n)) -> (n : ℕ) -> X n
+M-combine-helper :
+  ∀ {ℓ} (X : ℕ -> Set ℓ)
+  -> X 0
+  -> ((n : ℕ) -> X (suc n))
+  ---------------------
+  -> (n : ℕ) -> X n
 M-combine-helper X a b 0 = a
 M-combine-helper X a b (suc n) = b n
 
@@ -115,39 +73,18 @@ PX,Pπ {ℓ} S =
   (λ n → P₀ {S = S} (X (sequence S) n)) ,,
   (λ {n : ℕ} x → P₁ (λ z → z) (π (sequence S) {n = suc n} x ))
 
-swap-Σ-∀ : ∀ {ℓ} (X : ℕ -> Set ℓ) (A : Set ℓ) (B : A -> Set ℓ) (p : {n : ℕ} -> Σ A (λ a -> B a -> X (suc n)) -> Σ A (λ a -> B a -> X n) -> Set ℓ)
+swap-Σ-∀ :
+  ∀ {ℓ} (X : ℕ -> Set ℓ)
+    -> (A : Set ℓ)
+    -> (B : A -> Set ℓ)
+    -> (p : {n : ℕ} -> Σ A (λ a -> B a -> X (suc n)) -> Σ A (λ a -> B a -> X n) -> Set ℓ)
     -> (Σ (∀ (n : ℕ) -> Σ A (λ a -> B a -> X n)) (λ w -> (n : ℕ) -> p (w (suc n)) (w n)))
+    -----------------------
     ≡ (Σ ((n : ℕ) → A) λ a → Σ ((n : ℕ) → B (a n) → X n) λ u → (n : ℕ) -> p (a (suc n) , u (suc n)) (a n , u n))
 swap-Σ-∀ X A B p = isoToPath (iso (λ {(x , y) → (λ n → x n .fst) , (λ n → x n .snd) , y})
                                    (λ {(x , (y , z)) → (λ n → (x n) , y n) , z})
                                    (λ b → refl)
                                    (λ a → refl))
-
--------------------------------
--- Definition of a Coalgebra --
--------------------------------
-
-Coalg₀ : ∀ {ℓ} {S : Container {ℓ}} -> Set (ℓ-suc ℓ)
-Coalg₀ {ℓ} {S = S} = Σ (Set ℓ) λ C → C → P₀ {S = S} C
-
-Coalg₁ : ∀ {ℓ} {S : Container {ℓ}} -> Coalg₀ {S = S} -> Coalg₀ {S = S} -> Set ℓ
-Coalg₁ {S = S} (C , γ) (D , δ) = Σ (C → D) λ f → δ ∘ f ≡ (P₁ f) ∘ γ
-
--- Coalgebra morphism notation
-_⇒_ = Coalg₁
-
----------------------------
--- Definition of a Cones --
----------------------------
-
-Cone₀ : ∀ {ℓ} {S : Container {ℓ}} {C,γ : Coalg₀ {S = S}} -> Set ℓ
-Cone₀ {S = S} {C , _} = (n : ℕ) → C → X (sequence S) n
-
-Cone₁ : ∀ {ℓ} {S : Container {ℓ}} {C,γ : Coalg₀ {S = S}} -> (f : Cone₀ {C,γ = C,γ}) -> Set ℓ
-Cone₁ {S = S} {C , _} f = (n : ℕ) → π (sequence S) ∘ (f (suc n)) ≡ f n
-
-Cone : ∀ {ℓ} {S : Container {ℓ}} (C,γ : Coalg₀ {S = S}) -> Set ℓ
-Cone {S = S} C,γ = Σ (Cone₀ {C,γ = C,γ}) (Cone₁{C,γ = C,γ})
 
 projection : ∀ {ℓ} {S : Container {ℓ}} n -> M S -> X (sequence S) n
 projection n (x , q) = x n
