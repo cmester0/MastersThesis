@@ -85,6 +85,22 @@ postulate
 transport-iso : ∀ {ℓ} {X Y : Set ℓ} {A : X → Y} {B C D} {x : X} → transport (isoToPath (iso A B C D)) x ≡ A x
 transport-iso {A = A} {x = x} = transportRefl (A x)
 
+transport-cong : ∀ (A B C : Set) (k : A) (y : B) (P : B ≡ C) → transport (cong (λ a → Σ A λ x → a) P) (k , y) ≡ (k , transport P y)
+transport-cong A B C k y P =
+  transport (cong (λ a → Σ A λ x → a) P) (k , y)
+    ≡⟨ refl ⟩
+  transport (λ i → Σ A λ x → P i) (k , y)
+    ≡⟨ {!!} ⟩
+  (k , transport P y) ∎
+
+postulate
+  zip-equality-helper-2 :
+    ∀ {A B} (x : stream A × stream B) →
+    ∀ n →
+    ((hd (proj₁ x) , hd (proj₂ x)) , (λ a → stream-zip-x n (tl (proj₁ x) , tl (proj₂ x)))) ≡
+    (((proj₁ x) .fst (suc n) .fst , (proj₂ x) .fst (suc n) .fst) , transport (λ i → Unit × Unit → P-equality n i)
+      (λ y → ((proj₁ x) .fst (suc n) .snd (proj₁ x) , (proj₂ x) .fst (suc n) .snd (proj₂ x))))
+
 zip-equality-helper : ∀ {A B} (x : stream A × stream B) → (lifting stream-zip-x stream-zip-π x) ≡ (transport (M-product-equality (stream-S A) (stream-S B)) x)
 zip-equality-helper {A} {B} (a , b) =
   lifting stream-zip-x stream-zip-π (a , b)
@@ -96,9 +112,15 @@ zip-equality-helper {A} {B} (a , b) =
   (λ {0 → refl ; (suc n) → λ i → (hd a , hd b) , λ _ → stream-zip-π n (tl a , tl b) i})
     ≡⟨ transport Σ-split-iso (funExt (λ {0 → refl ; (suc n) →
        (((hd a , hd b) , λ x → stream-zip-x n (tl a , tl b))
-         ≡⟨ {!!} ⟩
-       ((a .fst (suc n) .fst , b .fst (suc n) .fst) , λ {(tt , tt) → transport (P-equality n) (a .fst (suc n) .snd tt , b .fst (suc n) .snd tt)})
-         ≡⟨ {!!} ⟩
+         ≡⟨ zip-equality-helper-2 (a , b) n ⟩
+       ((a .fst (suc n) .fst , b .fst (suc n) .fst) , transport (λ i → Unit × Unit → P-equality n i) (λ x → (a .fst (suc n) .snd (proj₁ x) , b .fst (suc n) .snd (proj₂ x))))
+         ≡⟨ sym (transport-cong (A × B) (Unit × Unit → P-equality n i0) (Unit × Unit → P-equality n i1) (a .fst (suc n) .fst , b .fst (suc n) .fst) (λ x → a .fst (suc n) .snd (proj₁ x) , b .fst (suc n) .snd (proj₂ x)) λ i → Unit × Unit → P-equality n i ) ⟩
+       transport (cong (λ y → Σ (A × B) λ x → y) (λ i → Unit × Unit → P-equality n i))
+         ((a .fst (suc n) .fst , b .fst (suc n) .fst) , (λ x → a .fst (suc n) .snd (proj₁ x) , b .fst (suc n) .snd (proj₂ x)))
+         ≡⟨ refl ⟩
+       transport (cong (λ y → Σ (A × B) λ x → Unit × Unit → y) (P-equality n))
+         ((a .fst (suc n) .fst , b .fst (suc n) .fst) , (λ x → a .fst (suc n) .snd (proj₁ x) , b .fst (suc n) .snd (proj₂ x)))
+         ≡⟨ cong (λ a₁ → transport (cong (λ y → Σ (A × B) λ x → Unit × Unit → y) (P-equality n)) ((a .fst (suc n) .fst , b .fst (suc n) .fst) , a₁)) (λ {i (tt , tt) → a .fst (suc n) .snd tt , b .fst (suc n) .snd tt}) ⟩
        transport (cong (λ y → Σ (A × B) λ x → Unit × Unit → y) (P-equality n))
          ((a .fst (suc n) .fst , b .fst (suc n) .fst) , (Σ-prod-fun₁ n (a .fst (suc n) .fst , b .fst (suc n) .fst)) (a .fst (suc n) .snd , b .fst (suc n) .snd))
          ≡⟨ cong (λ a₁ → transport (cong (λ y → Σ (A × B) λ x → Unit × Unit → y) (P-equality n)) ((a .fst (suc n) .fst , b .fst (suc n) .fst) , a₁)) (sym (transportRefl (Σ-prod-fun₁ n (a .fst (suc n) .fst , b .fst (suc n) .fst) (a .fst (suc n) .snd , b .fst (suc n) .snd)))) ⟩
@@ -173,9 +195,6 @@ zip-equality {A} {B} i (a , b) =
   transport (stream-pair A B) (a , b)
     ≡⟨ refl ⟩
   zip (a , b) ∎) i
-
-
-
 
 -- ------------------------------
 -- -- Equality of stream types --
