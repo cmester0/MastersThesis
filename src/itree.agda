@@ -12,6 +12,8 @@ open import Cubical.Data.Bool
 open import Cubical.Foundations.Function
 open import Cubical.Foundations.Prelude
 
+open import Container
+
 module itree where
 
 -- itrees (and buildup examples)
@@ -29,9 +31,6 @@ delay-tau S = in-fun (inl tt , λ x → S)
 
 -- Bottom element raised
 data ⊥₁ : Set₁ where
-
-spin : ∀ {R} -> M (delay R , λ x → Unit)
-spin {R} = {!!}
 
 -- TREES
 tree-S : (E : Set₀ -> Set₁) (R : Set₀) -> Container {ℓ-suc ℓ-zero}

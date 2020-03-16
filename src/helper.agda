@@ -91,11 +91,11 @@ postulate -- TODO
           → {Y Y' : X → Set j}
           → ((x : X) → Y x ≡ Y' x)
           → Σ X Y ≡ Σ X Y'
-Σ-ap-iso₂ {X = X} {Y} {Y'} isom =
+Σ-ap-iso₂ {X = X} {Y} {Y'} isom = 
   isoToPath (iso (λ { (x , y) → x , transport (isom x) y})
-                      (λ { (x , y') → x , transport (sym (isom x)) y'})
-                      (λ { (x , y) →  ΣPathP (refl , transportTransport⁻ (isom x) y)})
-                      (λ { (x , y') → ΣPathP (refl , transport⁻Transport (isom x) y')}))
+                 (λ { (x , y') → x , transport (sym (isom x)) y'})
+                 (λ { (x , y) →  ΣPathP (refl , transportTransport⁻ (isom x) y)})
+                 (λ { (x , y') → ΣPathP (refl , transport⁻Transport (isom x) y')}))
 
 Σ-split-iso : ∀ {ℓ} {A : Set ℓ} {B : A → Set ℓ} {a a' : A} {b : B a} {b' : B a'} → (Σ (a ≡ a') (λ q → PathP (λ i → B (q i)) b b')) ≡ ((a , b) ≡ (a' , b'))
 Σ-split-iso = ua Σ≡

@@ -120,18 +120,33 @@ postulate
   lemma11 : ∀ {ℓ} {S : Container {ℓ}} -> M S ≡ X (sequence S) 0
   lemma11' : ∀ {ℓ} {S : Container {ℓ}} → S .fst ≡ Σ (ℕ → S .fst) (λ a → (n : ℕ) → a (suc n) ≡ a n)
 
+helper-todo :
+    ∀ {ℓ} (S : Container {ℓ}) ->
+    (b : Σ (ℕ → S .fst) (λ v → (n₁ : ℕ) → v (suc n₁) ≡ v n₁))
+    (n : ℕ) → (b .fst 0) ≡ (b .fst n)
+helper-todo S b 0 = refl
+helper-todo S b (suc n) i = compPath-filler (helper-todo S b n) (sym (b .snd n)) i1 i
+
+postulate -- something wtih lemma 11
+  reduced-todo' :
+    ∀ {ℓ} (S : Container {ℓ}) ->
+      (S .fst) ≡ (Σ (ℕ → S .fst) (λ a → (n : ℕ) → a (suc n) ≡ a n))
+-- reduced-todo' S = isoToPath (iso (λ x → (λ x₁ → x) , λ n i → x) (λ x → x .fst 0) (λ {(a , b) → {!!}}) λ a → refl)
+
 postulate
   reduced-todo :
     ∀ {ℓ} (S : Container {ℓ}) ->
-    Σ (Σ (ℕ → S .fst) λ a → (n : ℕ) → a (suc n) ≡ a n) (λ {(a , q) → Σ ((n : ℕ) → (b : S .snd (a n)) → X (sequence S) n) λ u → (n : ℕ) → PathP (λ x → S .snd (q n x) → X (sequence S) n) (π (sequence S) ∘ u (suc n)) (u n)})
-      ≡
-    Σ (S .fst) (λ a → Σ ((n : ℕ) → S .snd a → X (sequence S) n) λ u → (n : ℕ) → π (sequence S) ∘ (u (suc n)) ≡ u n)
+    forall x ->
+    let (A , B) = S in
+       Σ ((n : ℕ) → B x → X (sequence (A , B)) n) (λ u → (n : ℕ) → (λ x₁ → π (sequence (A , B)) (u (suc n) x₁)) ≡ u n)
+    ≡ Σ ((n : ℕ) → B (transport (reduced-todo' (A , B)) x .fst n) → X (sequence (A , B)) n)
+    (λ u → (n : ℕ) → PathP (λ x₁ → B (transport (reduced-todo' (A , B)) x .snd n x₁) → X (sequence (A , B)) n) (λ x₁ → π (sequence (A , B)) (u (suc n) x₁)) (u n))
 
 -- Lemma 13
 α-iso : ∀ {ℓ} {S : Container {ℓ}} -> L (PX,Pπ S) ≡ P₀ {S = S} (M S) -- L^P ≡ PL
 α-iso {S = S@(A , B)} =
   L (PX,Pπ S)
-    ≡⟨ (swap-Σ-∀ (X (sequence S)) (S .fst) (S .snd) λ {n} a b → (P₁ (π (sequence S) {n = n})) a ≡ b) ⟩
+    ≡⟨ (swap-Σ-∀ (X (sequence S)) A B λ {n} a b → (P₁ (π (sequence S) {n = n})) a ≡ b) ⟩
   Σ ((n : ℕ) → A) (λ a → Σ ((n : ℕ) → B (a n) → X (sequence S) n) λ u → (n : ℕ) → P₁ {S = S} (π (sequence S) {n = n}) (a (suc n) , u (suc n)) ≡ (a n , u n))
     ≡⟨ Σ-ap-iso₂ (λ a → Σ-ap-iso₂ λ u → refl) ⟩
   Σ ((n : ℕ) → A) (λ a → Σ ((n : ℕ) → B (a n) → X (sequence S) n) λ u → (n : ℕ) → (a (suc n) , π (sequence S) {n = n} ∘ (u (suc n))) ≡ (a n , u n))
@@ -140,9 +155,9 @@ postulate
                                          (λ {(a , b) → refl})
                                          (λ {(a , b) → refl}))) ⟩
   Σ ((n : ℕ) → A) (λ a → Σ ((n : ℕ) → a (suc n) ≡ a n) λ p → Σ ((n : ℕ) → B (a n) → X (sequence S) n) λ u → (n : ℕ) → PathP (λ x → B (p n x) → X (sequence S) n) (π (sequence S) ∘ u (suc n)) (u n))
-    ≡⟨ isoToPath (iso (λ {(a , b , c , d) → (a , b) , (c , d)}) (λ {((a , b) , (c , d)) → a , (b , (c , d))}) (λ b → refl) λ a → refl) ⟩
-  Σ (Σ (ℕ → A) λ a → (n : ℕ) → a (suc n) ≡ a n) (λ {(a , q) → Σ ((n : ℕ) → (b : B (a n)) → X (sequence S) n) λ u → (n : ℕ) → PathP (λ x → B (q n x) → X (sequence S) n) (π (sequence S) ∘ u (suc n)) (u n)})
-    ≡⟨ reduced-todo S ⟩
+  ≡⟨ isoToPath (iso (λ x → ((x .fst) , (x .snd .fst)) , ((x .snd .snd .fst) , (x .snd .snd .snd))) (λ x → x .fst .fst , x .fst .snd , x .snd .fst , x .snd .snd) (λ b → refl) λ a → refl) ⟩    
+  (Σ (Σ ((n : ℕ) → A) (λ a → (n : ℕ) → a (suc n) ≡ a n)) λ a → Σ ((n : ℕ) → B (a .fst n) → X (sequence S) n) λ u → (n : ℕ) → PathP (λ x → B (a .snd n x) → X (sequence S) n) (π (sequence S) ∘ u (suc n)) (u n))
+  ≡⟨ sym (Σ-ap-iso (reduced-todo' S) (reduced-todo S)) ⟩
   Σ A (λ a → Σ ((n : ℕ) → B a → X (sequence S) n) λ u → (n : ℕ) → π (sequence S) ∘ (u (suc n)) ≡ u n)
     ≡⟨ Σ-ap-iso₂ (λ a → sym (lemma10 (B a , (λ x → a , λ x₁ → x₁)))) ⟩ -- x₁ or x , are they equal ?
   Σ A (λ a → B a → M S)
@@ -153,10 +168,15 @@ postulate
 -- Shifting the limit of a chain is an equivalence --
 -----------------------------------------------------
 
+postulate
+  α-iso' : ∀ {ℓ} {S : Container {ℓ}} -> L (PX,Pπ S) ≡ P₀ {S = S} (M S) -- L^P ≡ PL
+  L-unique' : ∀ {ℓ} -> {S : Container {ℓ}} -> L (shift-chain (sequence S)) ≡ L (sequence S)
+  
 -- P commutes with limits
-shift : ∀ {ℓ} {S : Container {ℓ}} -> P₀ (M S) ≡ M S
+-- postulate -- TODO: Slow computations..
+shift : ∀ {ℓ} {S : Container {ℓ}} -> P₀ {S = S} (M S) ≡ M S
 shift {S = S} = 
-  (sym α-iso) □ (L-unique {S = S}) -- lemma 13 & lemma 12
+  (sym α-iso') □ (L-unique' {S = S}) -- lemma 13 & lemma 12
 
 -- Transporting along shift
 
@@ -165,3 +185,10 @@ in-fun {S = S} = transport (shift {S = S})
 
 out-fun : ∀ {ℓ} {S : Container {ℓ}} -> M S -> P₀ (M S)
 out-fun {S = S} = transport (sym (shift {S = S}))
+
+----------------------------------------
+-- Property of functions into M-types --
+----------------------------------------
+
+lifting : ∀ {ℓ} {A : Set ℓ} {S : Container {ℓ}} → (x : (n : ℕ) -> A → X (sequence S) n) → ((n : ℕ) → (a : A) →  π (sequence S) (x (suc n) a) ≡ x n a) → A → M S
+lifting x p a = (λ n → x n a) , λ n i → p n a i

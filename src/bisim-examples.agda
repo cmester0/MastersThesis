@@ -21,6 +21,8 @@ open import Cubical.Foundations.Univalence
 
 open import Cubical.HITs.SetQuotients
 
+open import Container
+
 module bisim-examples where
 
 -------------------------------
