@@ -420,6 +420,7 @@ We can then define \(\function{zip}_{lift}\) as
 \begin{equation}
   \function{zip}_{lift}~(x , y) := \function{lift_M}~\function{zip}_X~\function{zip}~(x,y)
 \end{equation}
+\paragraph{Equality of Zip Definitions}~\\
 We would expect that the two definitions for zip are equal
 \begin{align}
   \texttt{transport}_{?}~a &\equiv \function{zip}_{lift}~a \\
@@ -448,6 +449,19 @@ successor case
   &\equiv ((\function{hd}~x, \function{hd}~y),(\lambda\,\_,\function{zip}_X~m~(\function{tl}~x,\function{tl}~y))) , (\lambda\,i, (\function{hd}~x, \function{hd}~y),(\lambda\,\_,\function{zip}_\pi~m~(\function{tl}~x,\function{tl}~y)~i)) \\
 \end{align}
 \subsection{Examples of fixed points}
+Let us try to define the zero stream, we do this by lifting the functions
+\begin{equation}
+  \function{const_X}~(n : \type{\mathbb{N}})~(c : \type{\mathbb{N}})  := \begin{cases} \unit & n = 0 \\ (c , \lambda\,\_, \function{const_X}~m~c) & n = m + 1 \end{cases}
+\end{equation}
+\begin{equation}
+  \function{const_\pi}~(n : \type{\mathbb{N}})~(c : \type{\mathbb{N}}) := \begin{cases} \mathtt{refl} & n = 0 \\ \lambda\,i,(c , \lambda\,\_, \function{const_\pi}~m~c~i) & n = m + 1 \end{cases}
+\end{equation}
+to get the definition of zero stream, we do
+\begin{equation}
+  \mathtt{zeros} := \function{lift_M}~\function{const_X}~\function{const_\pi}~0
+\end{equation}
+We want to show that we get 
+\\ \\
 We want to define spin, as being the fixed point \(\mathtt{spin} = \mathtt{later}~\mathtt{spin}\), so that is again a final coalgebra, but of a M-type (which is a final coalgebra)
 
 \begin{figure}[h]

@@ -71,3 +71,10 @@ X (sequence {ℓ} S) n = W {ℓ} S n
 π (sequence {ℓ} S) {n} = πₙ {ℓ} S {n}
 
 open Chain public
+
+-----------------------------------
+-- M-type is limit of a sequence --
+-----------------------------------
+
+M : ∀ {ℓ} -> Container {ℓ} → Set ℓ
+M = L ∘ sequence

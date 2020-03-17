@@ -109,11 +109,11 @@ postulate -- TODO
   (Σ-ap-iso₂ isom') □ Σ-ap-iso₁ isom
 
 ------------------
--- Π properties --
+-- ∏ properties --
 ------------------
 
 postulate
-  Π-ap-iso : ∀ {i j} {X X' : Set i}
+  ∏-ap-iso : ∀ {i j} {X X' : Set i}
                {Y : X → Set j}{Y' : X' → Set j}
              → (isom : X ≡ X')
              → ((x' : X') → Y (transport (sym isom) x') ≡ Y' x')
