@@ -50,6 +50,8 @@ identity-f-l {A = A} {k = k} p f = extent-l {a = k} {b = idfun A} f p
       i i
 
 postulate
+  -- TODO: look into isInjectiveTransport 
+
   ≡-rel-inj-iso-0 : ∀ {ℓ} {A B C : Set ℓ}
     (a : A -> B)
     (b : B -> A) ->
@@ -88,7 +90,7 @@ diagonal-unit = isoToPath (iso (λ _ → tt , tt) (λ _ → tt) (λ {(tt , tt) i
 Σ-split-iso : ∀ {ℓ} {A : Set ℓ} {B : A → Set ℓ} {a a' : A} {b : B a} {b' : B a'} → (Σ (a ≡ a') (λ q → PathP (λ i → B (q i)) b b')) ≡ ((a , b) ≡ (a' , b'))
 Σ-split-iso = ua Σ≡
 
-subst-hom : ∀ {i j}{X : Set i}(P : X → Set j){x y z : X}
+subst-hom : ∀ {i j} {X : Set i}(P : X → Set j){x y z : X}
           → (p : x ≡ y)(q : y ≡ z)(u : P x)
           → subst P q (subst P p u) ≡ subst P (p □ q) u
 subst-hom {X = X} P {x = x} {y = y} {z = z} p q u = sym (substComposite-□ P p q u)
@@ -103,11 +105,8 @@ subst-hom {X = X} P {x = x} {y = y} {z = z} p q u = sym (substComposite-□ P p 
                  (λ { (x , y) →  ΣPathP (refl , transportTransport⁻ (isom x) y)})
                  (λ { (x , y') → ΣPathP (refl , transport⁻Transport (isom x) y')}))
 
-postulate
-  transport-compose : ∀ {ℓ} {A B C : Set ℓ} (p : A ≡ B) (q : B ≡ C) (x : A) → transport q (transport p x) ≡ transport (p □ q) x
-
-transport-sym : ∀ {ℓ} {X Y : Set ℓ} {f : X → Y} {g : Y → X} → (a : (∀ b → f (g b) ≡ b)) → ∀ b → (sym (a b) □ (a b)) ≡ λ _ → b
-transport-sym a b =
+sym-refl : ∀ {ℓ} {X Y : Set ℓ} {f : X → Y} {g : Y → X} → (a : (∀ b → f (g b) ≡ b)) → ∀ b → (sym (a b) □ (a b)) ≡ λ _ → b
+sym-refl a b =
   (sym (a b) □ (a b))
     ≡⟨ □≡∙ (sym (a b)) (a b) ⟩
   sym (a b) ∙ (a b)
@@ -117,9 +116,6 @@ transport-sym a b =
   (refl ∙ sym (a b)) ∙ (a b)
     ≡⟨ compPathr-cancel (a b) refl ⟩
   refl ∎
-
-postulate
-  cong-compose : ∀ {ℓ} {X Y : Set ℓ} {f : X → Y} {g : Y → X} → (a : (∀ b → f (g b) ≡ b)) (k : Y → Set ℓ) → ∀ b → cong k (sym (a b)) □ cong k (a b) ≡ cong k (sym (a b) □ (a b))
 
 Σ-ap-iso₁ : ∀ {i} {X X' : Set i} {Y : X' → Set i}
           → (isom : X ≡ X')
@@ -132,32 +128,43 @@ postulate
     isoToPath (iso (λ x → f (x .fst) , (x .snd))
                    (λ x → (g (x .fst)) , subst Y (sym (K (x .fst))) (x .snd))
                    (λ {(x , y) →
-                     let ttemp : (sym (K x) □ K x) ≡ λ _ → x
-                         ttemp = transport-sym {f = f} {g = g} K x
-                     in
-                     let temp' : transport (λ i₁ → Y (K x i₁)) (transport (λ i₁ → Y (sym (K x) i₁)) y) ≡ y
-                         temp' =
-                           transport (λ i₁ → Y (K x i₁)) (transport (λ i₁ → Y (sym (K x) i₁)) y)
-                             ≡⟨ transport-compose (cong Y (sym (K x))) (cong Y (K x)) y ⟩
-                           transport (cong Y (sym (K x)) □ cong Y (K x)) y
-                             ≡⟨ (cong (λ a → transport a y) (cong-compose {f = f} {g = g} K Y x)) ⟩
-                           transport (cong Y ((sym (K x) □ K x))) y
-                             ≡⟨ (cong (λ a → transport (cong Y a) y) (ttemp)) ⟩ -- transport-sym  (K x)
-                           transport (cong Y (refl)) y
-                             ≡⟨ transportRefl y ⟩
-                           y ∎
-                     in
-                     let temp''' : PathP (λ i₁ → cong Y (K x) i₁) (subst Y (sym (K x)) y) y
-                         temp''' = transport (sym (PathP≡Path (λ i₁ → cong Y (K x) i₁) (transport (λ i₁ → Y (transportTransport⁻ isom x (~ i₁))) y) y)) temp' -- Y (K x i0)
-                     in
-                     let temp : (f (g x) , subst Y (sym (K x)) y) ≡ (x , y)
-                         temp = ΣPathP {B = Y}
-                                       {x = f (g x) , subst Y (sym (K x)) y}
-                                       {y = x , y}
-                                       (transportTransport⁻ isom x ,
-                                       temp''')
-                     in temp }) 
-                   (λ {(x , y) → ΣPathP ((H x) , {!!})}))
+                     ΣPathP
+                       {B = Y}
+                       {x = f (g x) , subst Y (sym (K x)) y}
+                       {y = x , y}
+                         (K x ,
+                         transport (sym (PathP≡Path (λ j → cong Y (K x) j) (subst Y (sym (K x)) y) y))
+                         (subst Y (K x) (subst Y (sym (K x)) y)
+                           ≡⟨ sym (substComposite-□ Y (sym (K x)) (K x) y) ⟩
+                         subst Y ((sym (K x)) □ (K x)) y
+                           ≡⟨ (cong (λ a → subst Y a y) (sym-refl {f = f} {g = g} K x)) ⟩
+                         subst Y refl y
+                           ≡⟨ substRefl {B = Y} y ⟩
+                         y ∎))})
+                   (λ {(x , y) →
+                     ΣPathP
+                       {B = Y ∘ transport isom}
+                       {x = g (f x) , subst Y (sym (K (f x))) y}
+                       {y = x , y}
+                       (H x ,
+                       transport (sym (PathP≡Path (λ j → Y (f (H x j))) (subst Y (sym (K (f x))) y) y))
+                       (subst Y (cong f (H x)) (subst Y (sym (K (f x))) y)
+                         ≡⟨ sym (substComposite-□ Y (sym (K (f x))) (λ j → f (H x j)) y) ⟩
+                       subst Y (sym (K (f x)) □ (cong f (H x))) y
+                         ≡⟨ cong (λ a → subst Y (sym (K (f x)) □ a) y) (lem x) ⟩
+                       subst Y (sym (K (f x)) □ K (f x)) y
+                         ≡⟨ cong (λ a → subst Y a y) (sym-refl {f = f} {g = g} K (f x)) ⟩
+                       subst Y (refl) y
+                         ≡⟨ substRefl {B = Y} y ⟩
+                       y ∎))}))
+    where
+      postulate
+        lem :  -- Vogt lemma
+          let f = transport isom in
+          let g = transport⁻ isom in
+          let K = transportTransport⁻ isom in
+          let H = transport⁻Transport isom in
+            ∀ x → (cong f (H x)) ≡ K (f x)
 
 Σ-ap-iso : ∀ {i} {X X' : Set i}
            {Y : X → Set i} {Y' : X' → Set i}
