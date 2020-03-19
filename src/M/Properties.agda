@@ -38,3 +38,5 @@ in-inj = ≡-rel-a-inj in-fun out-fun in-inverse-out out-inverse-in
 
 out-inj : ∀ {ℓ} {S : Container {ℓ}} {Z : Set ℓ} -> ∀ {f g : Z → M S} -> (out-fun ∘ f ≡ out-fun ∘ g) ≡ (f ≡ g)
 out-inj = ≡-rel-b-inj in-fun out-fun in-inverse-out out-inverse-in
+
+-- isInjectiveTransport

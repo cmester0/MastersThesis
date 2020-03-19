@@ -27,44 +27,97 @@ module M.Base where
 -- Limit of a Chain is Unique --
 --------------------------------
 
-M-combine-helper :
-  ∀ {ℓ} (X : ℕ -> Set ℓ)
-  -> X 0
-  -> ((n : ℕ) -> X (suc n))
-  ---------------------
-  -> (n : ℕ) -> X n
-M-combine-helper X a b 0 = a
-M-combine-helper X a b (suc n) = b n
+M-combine : ∀ {ℓ} {S : Container {ℓ}} (b : (n : ℕ) → W S (suc n)) (n : ℕ) → W S n
+M-combine b 0 = lift tt
+M-combine b (suc n) = b n
 
-M-combine-helper-lemma : ∀ {ℓ} (X : ℕ -> Set ℓ) (x : (n : ℕ) -> X n) (n : ℕ) -> (M-combine-helper X (x 0) (λ (n : ℕ) -> x (suc n)) n) ≡ x n
-M-combine-helper-lemma X x 0 = refl
-M-combine-helper-lemma X x (suc n) = refl
+M-combine-helper-lemma : ∀ {ℓ} {S : Container {ℓ}} (x : (n : ℕ) -> W S n) (n : ℕ) -> ((M-combine {S = S} λ n₁ → x (suc n₁)) n) ≡ x n
+M-combine-helper-lemma {ℓ} x 0 i = x 0
+M-combine-helper-lemma {ℓ} x (suc n) i = x (suc n)
+
+L-unique-1-2 : ∀ {ℓ} -> {S : Container {ℓ}}
+  -> L (shift-chain (sequence S))
+  ≡ Σ ((n : ℕ) → W S n) (λ x → (πₙ S (x 1) ≡ x 0) × ((n : ℕ) → π (sequence S) (x (suc (suc n))) ≡ x (suc n)))
+L-unique-1-2 {S = S} =
+  (isoToPath (iso (λ x → M-combine {S = S} (x .fst) , (refl , x .snd))
+                  (λ x → (λ n → x .fst (suc n)) , proj₂ (x .snd))
+                  (λ {(a , (b , c)) → λ i → (\ n -> M-combine-helper-lemma a n i) , refl , c})
+                  (λ a → refl)))
+
+-- πₙ S (m (suc n)) ≡ m n
+
+L-unique-helper : ∀ {ℓ} {S : Container {ℓ}} (m : (n₁ : ℕ) → W S n₁) (b : (n : ℕ) → P₁ (πₙ S) (m (suc (suc n))) ≡ m (suc n)) (n : ℕ) → πₙ S (m (suc n)) ≡ m n
+L-unique-helper m b = λ { 0 → refl ; (suc n) → b n }
+
+L-unique-helper-0 : ∀ {ℓ} {S : Container {ℓ}} (m : (n₁ : ℕ) → W S n₁) (b : (n : ℕ) → πₙ S (m (suc n)) ≡ m n) -> (n : ℕ) → πₙ S (m (suc n)) ≡ m n
+L-unique-helper-0 m b 0 = b 0
+L-unique-helper-0 m b (suc n) = b (suc n)
+
+-- (iso fun inv rightInv leftInv) (iso fun₁ inv₁ rightInv₁ leftInv₁) = iso (fun₁ ∘ fun) (inv ∘ inv₁)
+--         (λ b → cong fun₁ (rightInv (inv₁ b)) ∙ (rightInv₁ b))
+--         (λ a → cong inv (leftInv₁ (fun a) ) ∙ leftInv a )
 
 -- Lemma 12
 L-unique : ∀ {ℓ} -> {S : Container {ℓ}} -> L (shift-chain (sequence S)) ≡ L (sequence S)
 L-unique {ℓ} {S = S} =
-  L (shift-chain (sequence S))
-    ≡⟨ (isoToPath (iso (λ {(x , y) → π (sequence S) (x 0) , x , refl , y})
-                       (λ x → x .snd .fst , proj₂ (x .snd .snd))
-                       (λ {(x , y , z , w)  → λ i → x , y , refl , w })
-                       (λ a → refl))) ⟩
-  Σ (X (sequence S) 0) (λ x₀ → Σ ((n : ℕ) → X (sequence S) (suc n)) λ y → (π (sequence S) (y 0) ≡ x₀) × ((n : ℕ) → π (sequence S) (y (suc n)) ≡ y n))
-    ≡⟨ (isoToPath (iso (λ {(a , (b , c)) -> M-combine-helper (X (sequence S)) a b , c})
-                       (λ {(a , b) -> a 0 , (λ n → a (suc n)) , b})
-                       (λ {(a , (b , c)) -> λ i → (λ n → M-combine-helper-lemma (X (sequence S)) a n i) , b , c})
-                       (λ {(a , (b , c)) -> λ i → a , (b , c)}))) ⟩
-  Σ ((n : ℕ) → X (sequence S) n) (λ x → (π (sequence S) (x 1) ≡ x 0) × ((n : ℕ) → π (sequence S) (x (suc (suc n))) ≡ x (suc n)))
-    ≡⟨ (λ i -> Σ {ℓ} {ℓ} ((n : ℕ) → X (sequence S) n) λ x →
-       isoToPath
-           {A = (π (sequence S) (x 1) ≡ x 0) × ((n : ℕ) → π (sequence S) (x (suc (suc n))) ≡ x (suc n))}
-           {B = (n : ℕ) → π (sequence S) (x (suc n)) ≡ x n}
-         (iso (λ { (a , b) 0 → a ; (a , b) (suc n) → b n }) (λ x → x 0 , (λ n → x (suc n))) (λ { b i 0 → b 0 ; b i (suc n) → b (suc n) }) (λ { (a , b) i → a , b })) i) ⟩
-  L (sequence S) ∎
+  (let isom : ∀ x → ((πₙ S (x 1) ≡ x 0) × ((n : ℕ) → πₙ S (x (suc (suc n))) ≡ x (suc n))) ≡ ((n : ℕ) → πₙ S (x (suc n)) ≡ x n)
+       isom = λ x → isoToPath
+                  (iso (λ { (a , b) 0 → a ; (a , b) (suc n) → b n })
+                       (λ x → x 0 , (λ n → x (suc n)))
+                       (λ { b i 0 → b 0 ; b i (suc n) → b (suc n) })
+                       (λ { (a , b) i → a , b }))
+  in
+      isoToPath (
+        compIso
+          (iso (λ x → M-combine {S = S} (x .fst) , refl , x .snd)
+               (λ x → (λ n → x .fst (suc n)) , proj₂ (x .snd))
+               (λ { (a , b , c) → λ i → (λ n → M-combine-helper-lemma a n i) , refl , c })
+               (λ a → refl))
+          (iso (λ { (x , y) → x , transport (isom x) y})
+                 (λ { (x , y') → x , transport (sym (isom x)) y'})
+                 (λ { (x , y) →  ΣPathP (refl , transportTransport⁻ (isom x) y)})
+                 (λ { (x , y') → ΣPathP (refl , transport⁻Transport (isom x) y')}))))
+
+
+  -- L (shift-chain (sequence S))
+  --   ≡⟨ (isoToPath (iso (λ {(x , y) → πₙ S (x 0) , (x , (refl , y))})
+  --                      (λ x → x .snd .fst , proj₂ (x .snd .snd))
+  --                      (λ {(x , y , z , w)  → λ i → x , y , refl , w })
+  --                      (λ a → refl))) ⟩
+  -- Σ (W S 0) (λ x₀ → Σ ((n : ℕ) → W S (suc n)) λ y → (πₙ S (y 0) ≡ x₀) × ((n : ℕ) → πₙ S (y (suc n)) ≡ y n))
+  --   ≡⟨ (isoToPath (iso (λ {(lift tt , (b , c)) -> M-combine {S = S} b , c})
+  --                      (λ {(a , b) -> a 0 , (λ n → a (suc n)) , b})
+  --                      (λ { (a , b , c) → \ i -> (\ n -> M-combine-helper-lemma a n i) , b , c })
+  --                      (λ {(a , (b , c)) -> refl}))) ⟩
+  -- Σ ((n : ℕ) → W S n) (λ x → (πₙ S (x 1) ≡ x 0) × ((n : ℕ) → π (sequence S) (x (suc (suc n))) ≡ x (suc n)))
+  --   ≡⟨ (λ i -> Σ {ℓ} {ℓ} ((n : ℕ) → W S n) λ x →
+  --      isoToPath
+  --          {A = (πₙ S (x 1) ≡ x 0) × ((n : ℕ) → πₙ S (x (suc (suc n))) ≡ x (suc n))}
+  --          {B = (n : ℕ) → πₙ S (x (suc n)) ≡ x n}
+  --        (iso (λ { (a , b) 0 → a ; (a , b) (suc n) → b n }) (λ x → x 0 , (λ n → x (suc n))) (λ { b i 0 → b 0 ; b i (suc n) → b (suc n) }) (λ { (a , b) i → a , b })) i) ⟩
+  -- L (sequence S) ∎
 
 PX,Pπ : ∀ {ℓ} (S : Container {ℓ}) -> Chain
 PX,Pπ {ℓ} S =
   (λ n → P₀ {S = S} (X (sequence S) n)) ,,
   (λ {n : ℕ} x → P₁ (λ z → z) (π (sequence S) {n = suc n} x ))
+
+--------------
+-- Lemma 10 --
+--------------
+
+projection : ∀ {ℓ} {S : Container {ℓ}} n -> M S -> X (sequence S) n
+projection n (x , q) = x n
+
+β : ∀ {ℓ} {S : Container {ℓ}} -> (n : ℕ) → ∀ x → π (sequence S) {n = n} (projection (suc n) x) ≡ projection n x
+β n (x , q) = q n
+
+lemma10 : ∀ {ℓ} {S : Container {ℓ}} (C,γ : Coalg₀ {S = S}) -> (C,γ .fst -> M S) ≡ Cone C,γ
+lemma10 {S = S} C,γ@(C , γ) =
+  isoToPath (iso (λ {f → (λ n z → projection n (f z)) , λ n i a → β n (f a) i})
+                 (λ {(u , q) z → (λ n → u n z) , (λ n i → q n i z)})
+                 (λ _ → refl)
+                  λ _ → refl)
 
 ------------------------------------
 -- Shifting M-type is an equality --
@@ -82,19 +135,6 @@ swap-Σ-∀ X A B p = isoToPath (iso (λ {(x , y) → (λ n → x n .fst) , (λ 
                                    (λ {(x , (y , z)) → (λ n → (x n) , y n) , z})
                                    (λ b → refl)
                                    (λ a → refl))
-
-projection : ∀ {ℓ} {S : Container {ℓ}} n -> M S -> X (sequence S) n
-projection n (x , q) = x n
-
-β : ∀ {ℓ} {S : Container {ℓ}} -> (n : ℕ) → ∀ x → π (sequence S) {n = n} (projection (suc n) x) ≡ projection n x
-β n (x , q) = q n
-
-lemma10 : ∀ {ℓ} {S : Container {ℓ}} (C,γ : Coalg₀ {S = S}) -> (C,γ .fst -> M S) ≡ Cone C,γ
-lemma10 {S = S} C,γ@(C , γ) =
-  isoToPath (iso (λ {f → (λ n z → projection n (f z)) , λ n i a → β n (f a) i})
-                 (λ {(u , q) z → (λ n → u n z) , (λ n i → q n i z)})
-                 (λ _ → refl)
-                  λ _ → refl)
 
 contr-⊤-iso : ∀ {i}{X : Set i} → isContr X → X ≡ Lift Unit
 contr-⊤-iso hX = isoToPath (iso (λ _ → lift tt)
@@ -131,37 +171,7 @@ lemma11-helper {ℓ} {S = S} χ =
 
 postulate
   lemma11 : ∀ {ℓ} {S : Container {ℓ}} -> M S ≡ X (sequence S) 0
-
-helper-todo :
-    ∀ {ℓ} (S : Container {ℓ}) ->
-    (b : Σ (ℕ → S .fst) (λ v → (n₁ : ℕ) → v (suc n₁) ≡ v n₁))
-    (n : ℕ) → (b .fst 0) ≡ (b .fst n)
-helper-todo S b 0 = refl
-helper-todo S b (suc n) i = compPath-filler (helper-todo S b n) (sym (b .snd n)) i1 i
-
--- postulate -- something wtih lemma 11
-reduced-todo' :
-  ∀ {ℓ} (S : Container {ℓ}) ->
-    (S .fst) ≡ (Σ (ℕ → S .fst) (λ a → (n : ℕ) → a (suc n) ≡ a n))
-reduced-todo' S =
-  let temp = lemma11 {S = S} {!!} in
-    {!!}
-  -- isoToPath (iso (λ x → (λ x₁ → x) , λ n → refl)
-  --                (λ x → x .fst 0)
-  --                (λ x → {!!})
-  --                (λ a → refl))
-
--- λ i → (λ _ → x .fst {!!}) , λ n i₁ → x .snd {!!} i₁
-
-postulate
-  reduced-todo :
-    ∀ {ℓ} (S : Container {ℓ}) ->
-    forall x ->
-    let (A , B) = S in
-       Σ ((n : ℕ) → B x → X (sequence (A , B)) n) (λ u → (n : ℕ) → (λ x₁ → π (sequence (A , B)) (u (suc n) x₁)) ≡ u n)
-    ≡ Σ ((n : ℕ) → B (transport (reduced-todo' (A , B)) x .fst n) → X (sequence (A , B)) n)
-    (λ u → (n : ℕ) → PathP (λ x₁ → B (transport (reduced-todo' (A , B)) x .snd n x₁) → X (sequence (A , B)) n) (λ x₁ → π (sequence (A , B)) (u (suc n) x₁)) (u n))
-
+  
 α-iso-step-1-4 : ∀ {ℓ} {S : Container {ℓ}}
     -> let (A , B) = S in
     L (PX,Pπ S)
@@ -177,13 +187,40 @@ postulate
     (λ b → refl)
     (λ a → refl))
 
+helper-todo :
+    ∀ {ℓ} (A : Set ℓ) ->
+    (b : Σ (ℕ → A) (λ v → (n₁ : ℕ) → v (suc n₁) ≡ v n₁))
+    (n : ℕ) → (b .fst n) ≡ (b .fst 0)
+helper-todo S b 0 = refl
+helper-todo S b (suc n) = (b .snd n) □ (helper-todo S b n)
+
+postulate -- something with lemma 11
+  helper-todo-2 :
+    ∀ {ℓ} (A : Set ℓ)
+    → (b : Σ (ℕ → A) (λ v → (n₁ : ℕ) → v (suc n₁) ≡ v n₁))
+    → ((λ n → b .fst 0) , (λ n i → b .fst 0)) ≡ b
+-- helper-todo-2 A b = transport Σ-split-iso (funExt (λ x → sym (helper-todo A b x)) , λ {i 0 → {!!}})
+
+  helper-todo-3 :
+    ∀ {ℓ} (A : Set ℓ) (B : A → Set ℓ) ->
+    ∀ x
+    → Σ ((n : ℕ) → B (x .fst n) → X (sequence (A , B)) n) (λ u → (n : ℕ) → PathP (λ x₁ → B (x .snd n x₁) → X (sequence (A , B)) n) ((λ {a} → π (sequence (A , B))) ∘ u (suc n)) (u n))
+    ≡ Σ ((n : ℕ) → B (transport (isoToPath (iso (λ x₁ → x₁ .fst 0) (λ x₁ → (λ n₁ → x₁) , (λ n₁ i → x₁)) (λ b _ → b) (λ x₁ → helper-todo-2 A x₁))) x)
+    → X (sequence (A , B)) n) (λ u → (n : ℕ) → (λ {a} → π (sequence (A , B))) ∘ u (suc n) ≡ u n)
+
 postulate
   α-iso-step-5 : ∀ {ℓ} {S : Container {ℓ}}
     -> let (A , B) = S in
     (Σ (Σ ((n : ℕ) → A) (λ a → (n : ℕ) → a (suc n) ≡ a n)) λ a → Σ ((n : ℕ) → B (a .fst n) → X (sequence S) n) λ u → (n : ℕ) → PathP (λ x → B (a .snd n x) → X (sequence S) n) (π (sequence S) ∘ u (suc n)) (u n))
     ≡ Σ A (λ a → Σ ((n : ℕ) → B a → X (sequence S) n) λ u → (n : ℕ) → π (sequence S) ∘ (u (suc n)) ≡ u n)
--- α-iso-step-5 {S = S} =  
---   sym (Σ-ap-iso (reduced-todo' S) (reduced-todo S))
+-- α-iso-step-5 {S = S@(A , B)} =
+--   let temp : Σ (ℕ → A) (λ v → (n₁ : ℕ) → v (suc n₁) ≡ v n₁) ≡ A
+--       temp = isoToPath (iso (λ x → x .fst 0)
+--                             (λ x → (λ n → x) , λ n i → x)
+--                             (λ b → refl)
+--                             (λ x → helper-todo-2 A x ))
+--   in 
+--     Σ-ap-iso temp (helper-todo-3 A B)
 
 postulate
   α-iso-step-6 : ∀ {ℓ} {S : Container {ℓ}}
@@ -202,7 +239,7 @@ postulate
 -- Lemma 13
 α-iso : ∀ {ℓ} {S : Container {ℓ}} -> L (PX,Pπ S) ≡ P₀ {S = S} (M S) -- L^P ≡ PL
 α-iso {S = S@(A , B)} =
-  α-iso-step-1-4 □ (α-iso-step-5 □ α-iso-step-6)
+  α-iso-step-1-4 □ temp-post --  (α-iso-step-5 □ α-iso-step-6)
   -- (α-iso-step-4 □
   -- (α-iso-step-5 □
   -- α-iso-step-6))))
@@ -234,8 +271,49 @@ postulate
 -- P commutes with limits
 -- postulate -- TODO: Slow computations..
 shift : ∀ {ℓ} {S : Container {ℓ}} -> P₀ {S = S} (M S) ≡ M S
-shift {S = S} = 
-  (sym α-iso) □ (L-unique' {S = S}) -- lemma 13 & lemma 12
+shift {S = S@(A , B)} =
+  ((let isom : ∀ a → (B a -> M S) ≡ Cone (B a , (λ x → a , λ x₁ → x₁))
+        isom = (λ a → (lemma10 (B a , (λ x → a , λ x₁ → x₁))))
+    in
+      isoToPath (iso (λ { (x , y) → x , transport (isom x) y})
+                     (λ { (x , y') → x , transport (sym (isom x)) y'})
+                     (λ { (x , y) →  ΣPathP (refl , transportTransport⁻ (isom x) y)})
+                     (λ { (x , y') → ΣPathP (refl , transport⁻Transport (isom x) y')}))) □
+   (let temp : Σ (ℕ → A) (λ v → (n₁ : ℕ) → v (suc n₁) ≡ v n₁) ≡ A
+        temp = isoToPath (iso (λ x → x .fst 0)
+                            (λ x → (λ n → x) , λ n i → x)
+                            (λ b → refl)
+                            (λ x → helper-todo-2 A x ))
+   in sym (Σ-ap-iso temp (helper-todo-3 A B)))) □ 
+  (isoToPath (
+        compIso
+          (iso
+            (λ a →
+              (λ n → (a .fst .fst n) , (a .snd .fst n)) ,
+              (λ n i → a .fst .snd n i , a .snd .snd n i))
+            (λ a →
+              ((λ n → a .fst n .fst) , (λ n i → a .snd n i .fst)) ,
+              ((λ n → a .fst n .snd) , (λ n x₁ → a .snd n x₁ .snd)))
+            (λ a → refl)
+            (λ b → refl))
+        (compIso
+          (iso (λ x → M-combine {S = S} (x .fst) , refl , x .snd)
+               (λ x → (λ n → x .fst (suc n)) , proj₂ (x .snd))
+               (λ { (a , b , c) → λ i → (λ n → M-combine-helper-lemma a n i) , refl , c })
+               (λ a → refl))
+          (let isom : ∀ x → ((πₙ S (x 1) ≡ x 0) × ((n : ℕ) → πₙ S (x (suc (suc n))) ≡ x (suc n))) ≡ ((n : ℕ) → πₙ S (x (suc n)) ≡ x n)
+               isom = λ x → isoToPath
+                  (iso (λ { (a , b) 0 → a ; (a , b) (suc n) → b n })
+                       (λ x → x 0 , (λ n → x (suc n)))
+                       (λ { b i 0 → b 0 ; b i (suc n) → b (suc n) })
+                       (λ { (a , b) i → a , b }))
+          in
+          iso (λ { (x , y) → x , transport (isom x) y})
+                 (λ { (x , y') → x , transport (sym (isom x)) y'})
+                 (λ { (x , y) →  ΣPathP (refl , transportTransport⁻ (isom x) y)})
+                 (λ { (x , y') → ΣPathP (refl , transport⁻Transport (isom x) y')})))))
+
+  -- (sym α-iso) □ (L-unique {S = S}) -- lemma 13 & lemma 12
 
 -- Transporting along shift
 
