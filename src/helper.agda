@@ -18,6 +18,9 @@ open import Cubical.Foundations.Equiv
 open import Cubical.Foundations.GroupoidLaws
 open import Cubical.Foundations.Path
 
+open import Cubical.Foundations.Embedding
+open import Cubical.Foundations.FunExtEquiv
+
 module helper where
 
 identity-x : ∀ {ℓ} {A B : Set ℓ} (k : A -> A) -> k ≡ idfun A -> ∀ (x : A) -> k x ≡ x
@@ -49,32 +52,50 @@ identity-f-l {A = A} {k = k} p f = extent-l {a = k} {b = idfun A} f p
         j j)
       i i
 
-postulate
-  -- TODO: look into isInjectiveTransport 
 
-  ≡-rel-inj-iso-0 : ∀ {ℓ} {A B C : Set ℓ}
-    (a : A -> B)
-    (b : B -> A) ->
-    (left : a ∘ b ≡ idfun B) ->
-    (right : b ∘ a ≡ idfun A) ->
-    {f g : C -> A} ->
-    -------------------------------
-    ∀ p -> ≡-rel-a-monomorphism a b left right {f = f} {g = g} (extent-l a p) ≡ p
+transport-iso : ∀ {ℓ} {X Y : Set ℓ} (a : X → Y) (b : Y → X) (c : ∀ x → a (b x) ≡ x) (d : ∀ y → b (a y) ≡ y) → transport (isoToPath (iso a b c d)) ≡ a
+transport-iso a b c d = funExt (λ x → transportRefl (a x))
 
-  ≡-rel-inj-iso-1 : ∀ {ℓ} {A B C : Set ℓ}
-    (a : A -> B)
-    (b : B -> A) ->
-    (left : a ∘ b ≡ idfun B) ->
-    (right : b ∘ a ≡ idfun A) ->
-    {f g : C -> A} ->
-    -------------------------------
-    ∀ p -> extent-l a (≡-rel-a-monomorphism a b left right {f = f} {g = g} p) ≡ p
+open import Cubical.Foundations.Equiv.Properties
+
+≡-to-embedding : ∀ {ℓ} {A B C : Set ℓ}
+  (a : A -> B)
+  (b : B -> A) ->
+  (left : a ∘ b ≡ idfun B) ->
+  (right : b ∘ a ≡ idfun A) ->
+  -------------------------------
+  isEmbedding a
+≡-to-embedding {A = A} {B} {C} a b left right =
+  transport
+    (cong (λ a₁ → isEmbedding a₁)
+     (transport-iso a b (funExt⁻ left) (funExt⁻ right)))
+    (isEquiv→isEmbedding
+     (equivIsEquiv
+      (pathToEquiv
+       (isoToPath (iso a b (funExt⁻ left) (funExt⁻ right))))))
+  
+≡-rel-a-inj' : ∀ {ℓ} {A B C : Set ℓ} (a : A -> B) (e : isEmbedding a) → ∀ {f g : C -> A} -> ∀ x → ((a (f x) ≡ a (g x)) ≡ (f x ≡ g x))
+≡-rel-a-inj' a e {f = f} {g} x = sym (ua (cong a , e (f x) (g x)))
 
 ≡-rel-a-inj : ∀ {ℓ} {A B C : Set ℓ} (a : A -> B) (b : B -> A) -> a ∘ b ≡ idfun B -> b ∘ a ≡ idfun A -> ∀ {f g : C -> A} -> (a ∘ f ≡ a ∘ g) ≡ (f ≡ g)
-≡-rel-a-inj a b left right = ua (isoToEquiv (iso (≡-rel-a-monomorphism a b left right) (extent-l a) (≡-rel-inj-iso-0 a b left right) (≡-rel-inj-iso-1 a b left right)))
+≡-rel-a-inj {A = A} {B} {C} a b left right {f = f} {g} =
+  a ∘ f ≡ a ∘ g
+    ≡⟨ sym funExtPath ⟩
+  (∀ x → a (f x) ≡ a (g x))
+    ≡⟨ (λ i → ∀ x → ≡-rel-a-inj' {A = A} {B} {C} a (≡-to-embedding {A = A} {B} {C} a b left right) {f = f} {g = g} x i) ⟩
+  (∀ x → f x ≡ g x)
+    ≡⟨ funExtPath ⟩
+  f ≡ g ∎
 
 ≡-rel-b-inj : ∀ {ℓ} {A B C : Set ℓ} (a : A -> B) (b : B -> A) -> a ∘ b ≡ idfun B -> b ∘ a ≡ idfun A -> ∀ {f g : C -> B} -> (b ∘ f ≡ b ∘ g) ≡ (f ≡ g)
-≡-rel-b-inj a b left right = ua (isoToEquiv (iso (≡-rel-a-monomorphism b a right left) (extent-l b) (≡-rel-inj-iso-0 b a right left) (≡-rel-inj-iso-1 b a right left)))
+≡-rel-b-inj {A = A} {B} {C} a b left right {f = f} {g} =
+  b ∘ f ≡ b ∘ g
+    ≡⟨ sym funExtPath ⟩
+  (∀ x → b (f x) ≡ b (g x))
+    ≡⟨ (λ i → ∀ x → ≡-rel-a-inj' {A = B} {A} {C} b (≡-to-embedding {A = B} {A} {C} b a right left) {f = f} {g = g} x i) ⟩
+  (∀ x → f x ≡ g x)
+    ≡⟨ funExtPath ⟩
+  f ≡ g ∎
 
 -------------------------
 -- Unit / × properties --

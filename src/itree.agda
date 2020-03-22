@@ -1,8 +1,5 @@
 {-# OPTIONS --cubical --guardedness #-} --safe
 
-open import M
-open import Coalg
-
 open import Cubical.Data.Unit
 open import Cubical.Data.Prod
 open import Cubical.Data.Nat as ℕ using (ℕ ; suc ; _+_ )
@@ -11,14 +8,26 @@ open import Cubical.Data.Empty
 open import Cubical.Data.Bool
 open import Cubical.Foundations.Function
 open import Cubical.Foundations.Prelude
+open import Cubical.Foundations.Isomorphism
+open import Cubical.Foundations.Univalence
+open import Cubical.Foundations.Equiv
 
 open import Container
+open import M
+open import Coalg
+open import helper
+
+open import Cubical.Foundations.Transport
 
 module itree where
 
+delay-helper : ∀ (R : Set) → (Unit ⊎ R) → Set
+delay-helper R (inr _) = ⊥
+delay-helper R (inl tt) = Unit
+
 -- itrees (and buildup examples)
 delay-S : (R : Set₀) -> Container
-delay-S R = (Unit ⊎ R) , λ { (inr _) -> ⊥ ; (inl tt) -> Unit }
+delay-S R = (Unit ⊎ R) , delay-helper R
 
 delay : (R : Set₀) -> Set₀
 delay R = M (delay-S R)
@@ -28,6 +37,41 @@ delay-ret r = in-fun (inr r , λ ())
 
 delay-tau : {R : Set₀} -> delay R -> delay R
 delay-tau S = in-fun (inl tt , λ x → S)
+
+delay-constructor-inj : ∀ {R} a b c d → (in-fun {S = delay-S R} (a , b) ≡ in-fun (c , d)) ≡ Σ (a ≡ c) (λ q → PathP (λ i → delay-S R .snd (q i) → M (delay-S R)) b d)
+delay-constructor-inj {R} a b c d =
+  in-fun {S = delay-S R} (a , b) ≡ in-fun (c , d)
+    ≡⟨ in-inj-x ⟩
+  (a , b) ≡ (c , d)
+    ≡⟨ sym Σ-split-iso ⟩
+  Σ (a ≡ c)
+    (λ q → PathP (λ i → delay-S R .snd (q i) → M (delay-S R)) b d) ∎ -- (Σ (a ≡ c) (λ q → PathP (λ i → B (q i)) b d)) = a , b = a' , b'
+
+postulate
+  inr-inj : ∀ {R : Set} (a b : R) → (inr {A = Unit} a ≡ inr b) ≡ (a ≡ b) -- should follow from inr being an embedding!
+  -- empty-fun-is-unit : ∀ {A B : Set} (a b : A) -> (_≡_ {A = Σ (Unit ⊎ A) λ x → delay-helper A x} (inr a , λ ()) (inr b , λ ())) ≡ (inr {A = Unit} a ≡ inr b)
+  -- proof should be: isoToPath (iso (λ x i → x i .fst) (λ x → cong (λ a₁ → a₁ , λ ()) x) (λ b₁ → refl) λ a₁ → refl)
+-- Error message:
+-- (λ { (inr _) → ⊥ ; (inl tt) → Unit }) a₁ should be empty, but
+-- that's not obvious to me
+-- when checking that the expression λ () has type
+-- (λ { (inr _) → ⊥ ; (inl tt) → Unit }) a₁ →
+-- M ((Unit ⊎ R) , (λ { (inr _) → ⊥ ; (inl tt) → Unit }))
+
+-- TODO: Combine the two proofs for delay-ret and delay-tau, since they are part of the same property for in-fun, splitting this property makes the proof harder!
+delay-ret-inj : ∀ R (a b : R) → (delay-ret a ≡ delay-ret b) ≡ (a ≡ b)
+delay-ret-inj R a b = 
+  delay-ret a ≡ delay-ret b
+    ≡⟨ refl ⟩
+  in-fun (inr a , λ ()) ≡ in-fun (inr b , λ ())
+    ≡⟨ in-inj-x ⟩
+  (inr a , λ ()) ≡ (inr b , λ ())
+    ≡⟨ sym Σ-split-iso ⟩ 
+  Σ (inr a ≡ inr b) (λ r → PathP (λ i → delay-helper R (r i) → M ((Unit ⊎ R) , delay-helper R)) (λ ()) (λ ()))
+    ≡⟨ {!!} ⟩ --empty-fun-is-unit {A = R} {C = Unit} a b
+  inr a ≡ inr b
+    ≡⟨ inr-inj a b ⟩
+  a ≡ b ∎
 
 -- Bottom element raised
 data ⊥₁ : Set₁ where

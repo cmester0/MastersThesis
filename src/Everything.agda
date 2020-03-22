@@ -9,3 +9,4 @@ open import Container public
 open import itree public
 open import stream public
 open import bisim-examples public
+open import bisim-stream public

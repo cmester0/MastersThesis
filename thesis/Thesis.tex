@@ -32,20 +32,22 @@
 
 % Custom commands
 
+\newcommand*{\figref}[1]{Figure~\ref{#1}}
+
 \newcommand*{\set}[1]{\left\{#1\right\}}
 \newcommand*{\term}[1]{\textcolor{blue!80!black}{#1}}
 \newcommand*{\type}[1]{\textcolor{magenta!90!black}{#1}}
 \newcommand*{\dependenttype}[1]{\textcolor{magenta!70!black}{#1}}
 \newcommand*{\container}[1]{\textcolor{red}{#1}}
-\newcommand*{\containerpair}[2]{\textcolor{red}{(}#1\textcolor{red}{,}#2\textcolor{red}{)}}
+\newcommand*{\containerpair}[2]{\textcolor{red}{(}#1\,\textcolor{red}{,}\,#2\textcolor{red}{)}}
 \newcommand*{\universe}[1]{\textcolor{orange!80!black}{#1}}
 \newcommand*{\unit}{\type{\textbf{1}}}
 \newcommand*{\empt}{\type{\textbf{0}}}
 \newcommand*{\coalg}[2]{#1\texttt{-}#2}
 
-\newcommand*{\function}[1]{\textcolor{blue!60!black}{\mathtt{#1}}}
-\newcommand*{\typeformer}[1]{\mathtt{#1}}
-\newcommand*{\functor}[1]{\textbf{\mathtt{#1}}}
+\newcommand*{\function}[1]{\textcolor{blue!60!black}{\ensuremath{\mathtt{#1}}}}
+\newcommand*{\typeformer}[1]{\ensuremath{\mathtt{#1}}}
+\newcommand*{\functor}[1]{\ensuremath{\mathbf{\mathtt{#1}}}}
 
 \newcommand*{\ssfrac}[2]{ {\LARGE \text{\sfrac{\ensuremath{#1}}{\ensuremath{#2}}}}}
 
@@ -147,7 +149,7 @@ we denote a coalgera of \(\type{C}\) and \(\term{\gamma}\) as \(\coalg{\type{C}}
 \end{equation}
 that is \(\prod_{(\coalg{\type{C}}{\term{\gamma}} : \mathtt{Coalg}_{\container{S}})} \mathtt{isContr}(\coalg{\type{C}}{\term{\gamma}} \Rightarrow \coalg{\typeformer{M}_{\container{S}}}{\function{out}})\). We denote this construction of the M-type as \(\typeformer{M}_{\containerpair{\type{A}}{\type{B}}}\) or \(\typeformer{M}_{\container{S}}\) or just \(\typeformer{M}\) when the Container is clear from the context.
 \\ \\
-If we continue our example for streams this will give us the \(\mathtt{M}\)-type, we can see that \(\functor{P}_{\container{S}}(\typeformer{M}}) = \type{A} \times \typeformer{M}}\), meaning we have the following diagram,
+If we continue our example for streams this will give us the \(\mathtt{M}\)-type, we can see that \(\functor{P}_{\container{S}}(\typeformer{M}) = \type{A} \times \typeformer{M}\), meaning we have the following diagram,
 \begin{figure}[h]
   \centering
   \begin{tikzcd}[row sep=large,column sep=large]
@@ -156,7 +158,7 @@ If we continue our example for streams this will give us the \(\mathtt{M}\)-type
   \end{tikzcd}
   \caption{M-types of streams}
 \end{figure}
-where \function{out} is an isomorphism (because of the finality of the coalgebra), with inverse \(\function{in} : \functor{P}_{\container{S}}(\typeformer{M}) \rightarrow \typeformer{M}}\). We now have a semantic for the rules we would expect for streams, if we let \(\function{cons} = \function{in}\) and \(\typeformer{stream}~\type{A} = \typeformer{M}_{\containerpair{\type{A}}{\lambda\,\_,\unit}}\),
+where \(\function{out}\) is an isomorphism (because of the finality of the coalgebra), with inverse \(\function{in} : \functor{P}_{\container{S}}(\typeformer{M}) \rightarrow \typeformer{M}\). We now have a semantic for the rules we would expect for streams, if we let \(\function{cons} = \function{in}\) and \(\typeformer{stream}~\type{A} = \typeformer{M}_{\containerpair{\type{A}}{\lambda\,\_,\unit}}\),
 \begin{equation}
   \infer[\mathtt{E}_{\function{hd}}]{\function{hd}~\term{s} : \type{A}}{\type{A} : \universe{\mathcal{U}} & \term{s} : \typeformer{stream}~\type{A}}
 \end{equation}
@@ -170,18 +172,18 @@ where \function{out} is an isomorphism (because of the finality of the coalgebra
 \section{ITrees as \texttt{M}-types}
 We want the following rules for ITrees
 \begin{equation}
-  \infer [\mathtt{I}_\function{Ret}]{\function{Ret}~\term{r} : \typeformer{itree}~\typeformer{E}~\type{R}}{r : \type{R}}
+  \infer[\mathtt{I}_{\function{Ret}}]{\function{Ret}~\term{r} : \typeformer{itree}~\typeformer{E}~\type{R}}{r : \type{R}}
 \end{equation}
 \begin{equation}
-  \infer[\mathtt{I}_\function{Vis}]{\function{Vis}~\term{a}~\term{f} : \typeformer{itree}~\typeformer{E}~\type{R}}{\type{A} : \universe{\mathcal{U}} & \term{a} : \typeformer{E}~\type{A} & \term{f} : \type{A} \rightarrow \typeformer{itree}~\typeformer{E}~\type{R}}.
+  \infer[\mathtt{I}_{\function{Vis}}]{\function{Vis}~\term{a}~\term{f} : \typeformer{itree}~\typeformer{E}~\type{R}}{\type{A} : \universe{\mathcal{U}} & \term{a} : \typeformer{E}~\type{A} & \term{f} : \type{A} \rightarrow \typeformer{itree}~\typeformer{E}~\type{R}}.
 \end{equation}
 Elimination rules
 \begin{equation}
-  \infer[\mathtt{E}_\function{Tau}]{\function{Tau}~\term{t} : \typeformer{itree}~\typeformer{E}~\type{R}}{\term{t} : \typeformer{itree}~\typeformer{E}~\type{R}}.
+  \infer[\mathtt{E}_{\function{Tau}}]{\function{Tau}~\term{t} : \typeformer{itree}~\typeformer{E}~\type{R}}{\term{t} : \typeformer{itree}~\typeformer{E}~\type{R}}.
 \end{equation}
 
 \subsection{Delay Monad}
-We start by looking at itrees without the \function{Vis} constructor, this type is also know as the delay monad\todo{check this statement}. We construct this type by letting \(\container{S} = (\unit + \type{R},\lambda \{ \texttt{inl}~\_ \rightarrow \unit~;~\texttt{inr}~\_ \rightarrow \empt \})\), we then get the polynomial functor
+We start by looking at itrees without the \(\function{Vis}\) constructor, this type is also know as the delay monad\todo{check this statement}. We construct this type by letting \(\container{S} = (\unit + \type{R},\lambda \{ \texttt{inl}~\_ \rightarrow \unit~;~\texttt{inr}~\_ \rightarrow \empt \})\), we then get the polynomial functor
 \begin{equation}
   \functor{P}_{\container{S}}(\type{X}) = \sum_{\term{x} : \unit + \type{R}} \lambda \{ \texttt{inl}~\_ \rightarrow \unit ; \texttt{inr}~\_ \rightarrow \empt\}~\term{x} \rightarrow \type{X},
 \end{equation}
@@ -222,7 +224,7 @@ and further
 \begin{equation}
   \functor{P}_{\container{S}}(\type{X}) = \type{R} + \sum_{\type{A} : \universe{\mathcal{U}}} \typeformer{E}~\type{A} \times (\type{A} \rightarrow \type{X}).
 \end{equation}
-We get the following diagram for the \functor{P}-coalgebra.
+We get the following diagram for the \(\functor{P}\)-coalgebra.
 
 \begin{figure}[h]
   \centering
@@ -232,7 +234,7 @@ We get the following diagram for the \functor{P}-coalgebra.
   \end{tikzcd}
   \caption{TODO}
 \end{figure}
-\noindent Again we can define \function{Ret} and \function{Vis} using the \function{in} function.
+\noindent Again we can define \(\function{Ret}\) and \(\function{Vis}\) using the \(\function{in}\) function.
 
 \subsection{ITrees}
 Now we should have all the knowledge needed to make ITrees using \texttt{M}-types. We define ITrees by the container
@@ -255,23 +257,23 @@ Giving us the diagram
 \end{figure}
 
 \section{Co-induction Principle for M-types}
-We can now construct a bisimulation: forall coalgebras \(\coalg{\type{C}}{\term{\gamma}} : \typeformer{Coalg}_{\container{S}}\), if we have a relation \(\typeformer{\mathcal{R}} : \type{C} \rightarrow \type{C} \rightarrow \universe{\mathcal{U}}\), and a type \(\type{\overline{\mathcal{R}}} = \sum_{\term{a} : \type{C}} \sum_{\term{b} : \type{C}} \typeformer{\mathcal{R}}~\term{a}~\term{b}\), such that \(\type{\overline{\mathcal{R}}}\) and \(\term{\alpha}_{\type{\overline{\mathcal{R}}}} : \type{\overline{\mathcal{R}}} \rightarrow \functor{P}(\type{\overline{\mathcal{R}}})\) forms a \(\functor{P}\)-coalgebra \(\coalg{\type{\overline{\mathcal{R}}}}{\term{\alpha}_{\type{\overline{\mathcal{R}}}}} : \mathtt{Coalg}_{\container{S}}\), making the following diagram commute (where \(\Longrightarrow\) are \(\functor{P}\)-coalgebra morphisms).
-
+We can now construct a bisimulation: forall coalgebras \(\coalg{\type{C}}{\term{\gamma}} : \typeformer{Coalg}_{\container{S}}\), if we have a relation \(\typeformer{\mathcal{R}} : \type{C} \rightarrow \type{C} \rightarrow \universe{\mathcal{U}}\), and a type \(\type{\overline{\mathcal{R}}} = \sum_{\term{a} : \type{C}} \sum_{\term{b} : \type{C}} \typeformer{\mathcal{R}}~\term{a}~\term{b}\), such that \(\type{\overline{\mathcal{R}}}\) and \(\term{\alpha}_{\type{\overline{\mathcal{R}}}} : \type{\overline{\mathcal{R}}} \rightarrow \functor{P}(\type{\overline{\mathcal{R}}})\) forms a \(\functor{P}\)-coalgebra \(\coalg{\type{\overline{\mathcal{R}}}}{\term{\alpha}_{\type{\overline{\mathcal{R}}}}} : \mathtt{Coalg}_{\container{S}}\), making the diagram in \figref{fig:coalgebra-coinduction-definition} commute (where \(\Longrightarrow\) are \(\functor{P}\)-coalgebra morphisms).
 \begin{figure}[h]
   \centering
   \begin{tikzcd}[row sep=huge,column sep=huge]
     \coalg{\type{C}}{\term{\gamma}} & \coalg{\type{\overline{\mathcal{R}}}}{\term{\alpha}_{\type{\overline{\mathcal{R}}}}} \ar[l,Rightarrow,"{\pi_1}^{\type{\overline{\mathcal{R}}}}"'] \ar[r,Rightarrow,"{\pi_2}^{\type{\overline{\mathcal{R}}}}"] & \coalg{\type{C}}{\term{\gamma}}
   \end{tikzcd}
-  \caption{TODO}
+  \caption{Bisimulation for a coalgebra}
+  \label{fig:coalgebra-coinduction-definition}
 \end{figure}
-\noindent Furthermore for any bisimulation over a final \(\functor{P}\)-coalgebra \(\coalg{\typeformer{M}}{\term{\mathtt{out}}}:\mathtt{Coalg}_{\container{S}}\) we have the following diagram,
-
+\noindent Furthermore for any bisimulation over a final \(\functor{P}\)-coalgebra \(\coalg{\typeformer{M}}{\term{\mathtt{out}}}:\mathtt{Coalg}_{\container{S}}\) we get the diagram in \figref{fig:final-coalgebra-coinduction},
 \begin{figure}[h]
   \centering
   \begin{tikzcd}[row sep=huge,column sep=huge]
     \coalg{\typeformer{M}}{\function{out}} & \coalg{\type{\overline{\mathcal{R}}}}{\term{\alpha}_{\type{\overline{\mathcal{R}}}}} \ar[l,Rightarrow,"{\pi_1}^{\type{\overline{\mathcal{R}}}}"'] \ar[r,Rightarrow,"{\pi_2}^{\type{\overline{\mathcal{R}}}}"] & \coalg{\typeformer{M}}{\function{out}}
   \end{tikzcd}
-  \caption{TODO}
+  \caption{Bisimulation principle for final coalgebra}
+  \label{fig:final-coalgebra-coinduction}
 \end{figure}
 \noindent where \(\pi_1^{\type{\overline{\mathcal{R}}}} = ~! = \pi_2^{\type{\overline{\mathcal{R}}}}\), which means given \(\term{r} : \term{\mathcal{R}}(\term{m},\term{m'})\) we get \(\term{m} = \pi_1^{\type{\overline{\mathcal{R}}}} (\term{m}, \term{m'}, \term{r}) = \pi_2^{\type{\overline{\mathcal{R}}}} (\term{m}, \term{m'}, \term{r}) = \term{m'}\).
 \\ \\
@@ -309,118 +311,107 @@ We define our bisimulation coalgebra from the strong bisimulation relation \(\ma
 \end{equation}
 Now we just need to define \(\term{\alpha}_{\type{\overline{\mathcal{R}}}}\) \todo{define the \(\alpha_{\overline{R}}\) function}. Now we have a bisimulation relation, which is equivalent to equality, using what we showed in the previous section.
 
+\section{Stream Formalization using M-types}
+When taking the head of a stream, we get
+\begin{align}
+  \function{hd}~(\function{cons}~x~xs) &\equiv \pi_1~\function{out}~(\function{cons}~x~xs) \\
+                                       &\equiv \pi_1~\function{out}~(\function{in}~(x , \lambda\,\_,xs)) \\
+                                       &\equiv \pi_1~(x , \lambda\,\_,xs) \\
+                                       &\equiv x
+\end{align}
+
+
 \section{Quotient M-type}
 Since we know that M-types preserves the H-level, we can use set-truncated quotients, to define quotient M-types, for examples we can define weak bisimulation of the delay monad as
-\[\]
+\todo[inline]{Quotients of the delay monad}
 
 \section{Closure properties of M-types}
 We define the product of two containers
 \begin{equation}
-  \container{(A,B)} \times \container{(C,D)} \equiv \container{( A \times C , \lambda (a , c), B a \times D c)},
+  \containerpair{\type{A}}{\type{B}} \times \containerpair{\type{C}}{\type{D}} \equiv \containerpair{\type{A} \times \type{C}}{\lambda\,(\term{a} , \term{c}), \typeformer{B}~\term{a} \times \typeformer{D}~\term{c}},
 \end{equation}
-we can lift this rule, through the following diagram, used to define M-types
-
+we can lift this rule, through the diagram in \figref{fig:container-products}, used to define M-types.
 \begin{figure}[h]
   \centering
   \begin{tikzcd}[row sep=huge,column sep=huge]
-    A & A \times C \ar[l,"\pi_1"'] \ar[r,"\pi_2"] & C \\
-    \functor{P} (M_{(A , B)}) \ar[u,"fst"] & \functor{P}(M_{(A \times C , B \times D)}) \ar[u,"fst"] & \functor{P} (M_{(C , D)}) \ar[u,"fst"'] \\
-    M_{(A , B)} \ar[u,"out"] \ar[d,"\pi_!"] & M_{(A \times C , B \times D)} \ar[u,"out"] \ar[d,"\pi_!"] & M_{(C , D)} \ar[u,"out"] \ar[d,"\pi_!"] \\
-    {\functor{P}_{\container{(A,B)}}}^n~\unit \ar[d,"\pi_n"] & {\functor{P}_{\container{(A,B)} \times \container{(C,D)}}}^n~\unit \ar[l] \ar[r] \ar[d,"\pi_n"] & {\functor{P}_{\container{(C,D)}}}^n~\unit \ar[d,"\pi_n"] \\
-    \vdots \ar[d,"\pi_1"] & \vdots \ar[d,"\pi_1"] & \vdots \ar[d,"\pi_1"] \\
-    \functor{P}_{\container{(A,B)}}~\unit \ar[d,"\pi_0"] & \functor{P}_{\container{(A,B)} \times \container{(C,D)}}~\unit \ar[l] \ar[r] \ar[d,"\pi_0"] & \functor{P}_{\container{(C,D)}}~\unit \ar[d,"\pi_0"] \\
-    \unit & \unit \ar[l] \ar[r] & \unit
+    \type{A} & \type{A} \times \type{C} \ar[l,"\pi_1"'] \ar[r,"\pi_2"] & \type{C} \\
+    \functor{P} (\typeformer{M}_{\containerpair{\type{A}}{\type{B}}}) \ar[u,"\pi_1"'] & \functor{P}(\typeformer{M}_{\containerpair{\type{A}}{\type{B}} \times \containerpair{\type{C}}{\type{D}}}) \ar[u,"\pi_1"'] & \functor{P} (\typeformer{M}_{\containerpair{\type{C}}{\type{D}}}) \ar[u,"\pi_1"'] \\
+    \typeformer{M}_{\containerpair{\type{A}}{\type{B}}} \ar[u,"\function{out}"'] \ar[d,"\pi_{(!)}"] & \typeformer{M}_{\containerpair{\type{A}}{\type{B}} \times \containerpair{\type{C}}{\type{D}}} \ar[u,"\function{out}"'] \ar[d,"\pi_{(!)}"] & \typeformer{M}_{\containerpair{\type{C}}{\type{D}}} \ar[u,"\function{out}"'] \ar[d,"\pi_{(!)}"] \\
+    {\functor{P}_{\containerpair{\type{A}}{\type{B}}}}^n~\unit \ar[d,"\pi_{(n)}"] & {\functor{P}_{\containerpair{\type{A}}{\type{B}} \times \containerpair{\type{C}}{\type{D}}}}^n~\unit \ar[l] \ar[r] \ar[d,"\pi_{(n)}"] & {\functor{P}_{\containerpair{\type{C}}{\type{D}}}}^n~\unit \ar[d,"\pi_{(n)}"] \\
+    \vdots \ar[d,"\pi_{(1)}"] & \vdots \ar[d,"\pi_{(1)}"] & \vdots \ar[d,"\pi_{(1)}"] \\
+    \functor{P}_{\containerpair{\type{A}}{\type{B}}}~\unit \ar[d,"\pi_{(0)}"] & \functor{P}_{\containerpair{\type{A}}{\type{B}} \times \containerpair{\type{C}}{\type{D}}}~\unit \ar[l] \ar[r] \ar[d,"\pi_{(0)}"] & \functor{P}_{\containerpair{\type{C}}{\type{D}}}~\unit \ar[d,"\pi_{(0)}"] \\
+    \unit & \unit \ar[l,"\texttt{refl}"] \ar[r,"\texttt{refl}"'] & \unit
   \end{tikzcd}
   \caption{TODO}
+  \label{fig:container-products}
 \end{figure}
-\noindent We now prove that
+We now prove that
 \begin{equation}
-  {\functor{P}_{\container{(A,B)}}}^n~\unit \times {\functor{P}_{\container{(C,D)}}}^n~\unit \equiv {\functor{P}_{\container{(A,B)} \times \container{(C,D)}}}^n~\unit,
+  {\functor{P}_{\containerpair{\type{A}}{\type{B}}}}^n~\unit \times {\functor{P}_{\containerpair{\type{C}}{\type{D}}}}^n~\unit \equiv {\functor{P}_{\containerpair{\type{A}}{\type{B}} \times \containerpair{\type{C}}{\type{D}}}}^n~\unit,
 \end{equation}
 by induction on \(n\). For \(n = 0\), we have \(\unit \times \unit \equiv \unit\). For \(n = m + 1\), we may assume
 \begin{equation}
-{\functor{P}_{\container{(A,B)}}}^m~\unit \times {\functor{P}_{\container{(C,D)}}}^m~\unit \equiv {\functor{P}_{\container{(A,B)} \times \container{(C,D)}}}^m~\unit,
+{\functor{P}_{\containerpair{\type{A}}{\type{B}}}}^m~\unit \times {\functor{P}_{\containerpair{\type{C}}{\type{D}}}}^m~\unit \equiv {\functor{P}_{\containerpair{\type{A}}{\type{B}} \times \containerpair{\type{C}}{\type{D}}}}^m~\unit,
 \end{equation}
 and show 
 \begin{align}
-  &~ {\functor{P}_{\container{(A,B)}}}^{m+1}~\unit \times {\functor{P}_{\container{(C,D)}}}^{m+1}~\unit \\
-   \equiv&~ \functor{P}_{\container{(A,B)}} ({\functor{P}_{\container{(A,B)}}}^m~\unit) \times \functor{P}_{\container{(C,D)}} ({\functor{P}_{\container{(C,D)}}}^m~\unit) \\
-   \equiv&~ \sum_{\term{a} : \type{A}} \type{B}~\term{a} \rightarrow {\functor{P}_{\container{(A,B)}}}^m~\unit \times \sum_{\term{c} : \type{C}} \type{D}~\term{c} \rightarrow {\functor{P}_{\container{(C,D)}}}^m~\unit \\
-  \equiv&~ \sum_{\term{a} , \term{c} : \type{A} \times \type{C}} (\type{B}~\term{a} \rightarrow {\functor{P}_{\container{(A,B)}}}^m~\unit) \times (\type{D}~\term{c} \rightarrow {\functor{P}_{\container{(C,D)}}}^m~\unit) \\
-  \equiv&~ \sum_{\term{a} , \term{c} : \type{A} \times \type{C}} \type{B}~\term{a} \times \type{D}~\term{c} \rightarrow {\functor{P}_{\container{(A,B)}}}^m~\unit \times {\functor{P}_{\container{(C,D)}}}^m~\unit \\
-  \equiv&~ \sum_{\term{a} , \term{c} : \type{A} \times \type{C}} \type{B}~\term{a} \times \type{D}~\term{c} \rightarrow {\functor{P}_{\container{(A,B)} \times \container{(C,D)}}}^m~\unit \\
-  \equiv&~ \functor{P}_{\container{(A,B)} \times \container{(C,D)}} ({\functor{P}_{\container{(A,B)} \times \container{(C,D)}}}^m~\unit) \\
-  \equiv&~ {\functor{P}_{\container{(A,B)} \times \container{(C,D)}}}^{m+1}~\unit
+  &~ {\functor{P}_{\containerpair{\type{A}}{\type{B}}}}^{m+1}~\unit \times {\functor{P}_{\containerpair{\type{C}}{\type{D}}}}^{m+1}~\unit \\
+   \equiv&~ \functor{P}_{\containerpair{\type{A}}{\type{B}}} ({\functor{P}_{\containerpair{\type{A}}{\type{B}}}}^m~\unit) \times \functor{P}_{\containerpair{\type{C}}{\type{D}}} ({\functor{P}_{\containerpair{\type{C}}{\type{D}}}}^m~\unit) \\
+   \equiv&~ \sum_{\term{a} : \type{A}} \type{B}~\term{a} \rightarrow {\functor{P}_{\containerpair{\type{A}}{\type{B}}}}^m~\unit \times \sum_{\term{c} : \type{C}} \type{D}~\term{c} \rightarrow {\functor{P}_{\containerpair{\type{C}}{\type{D}}}}^m~\unit \\
+  \equiv&~ \sum_{\term{a} , \term{c} : \type{A} \times \type{C}} (\type{B}~\term{a} \rightarrow {\functor{P}_{\containerpair{\type{A}}{\type{B}}}}^m~\unit) \times (\type{D}~\term{c} \rightarrow {\functor{P}_{\containerpair{\type{C}}{\type{D}}}}^m~\unit) \\
+  \equiv&~ \sum_{\term{a} , \term{c} : \type{A} \times \type{C}} \type{B}~\term{a} \times \type{D}~\term{c} \rightarrow {\functor{P}_{\containerpair{\type{A}}{\type{B}}}}^m~\unit \times {\functor{P}_{\containerpair{\type{C}}{\type{D}}}}^m~\unit \\
+  \equiv&~ \sum_{\term{a} , \term{c} : \type{A} \times \type{C}} \type{B}~\term{a} \times \type{D}~\term{c} \rightarrow {\functor{P}_{\containerpair{\type{A}}{\type{B}} \times \containerpair{\type{C}}{\type{D}}}}^m~\unit \\
+  \equiv&~ \functor{P}_{\containerpair{\type{A}}{\type{B}} \times \containerpair{\type{C}}{\type{D}}} ({\functor{P}_{\containerpair{\type{A}}{\type{B}} \times \containerpair{\type{C}}{\type{D}}}}^m~\unit) \\
+  \equiv&~ {\functor{P}_{\containerpair{\type{A}}{\type{B}} \times \containerpair{\type{C}}{\type{D}}}}^{m+1}~\unit
 \end{align}
 taking the limit we get
 \begin{equation}
-  M_{\container{(A,B)}} \times M_{\container{(C,D)}} \equiv M_{\container{(A,B)} \times \container{(C,D)}}
+  \typeformer{M}_{\containerpair{\type{A}}{\type{B}}} \times \typeformer{M}_{\containerpair{\type{C}}{\type{D}}} \equiv \typeformer{M}_{\containerpair{\type{A}}{\type{B}} \times \containerpair{\type{C}}{\type{D}}}
 \end{equation}
-as an example hereof lets look at the definition for streams, where we actually get
+as an example hereof lets look at streams, where we actually get
 \begin{equation}
-  \typeformer{stream}~A \times \typeformer{stream}~B \equiv M_{\container{(A,\lambda~\_,\unit)} \times \container{(B,\lambda~\_,\unit)}} \equiv \typeformer{stream}~(A \times B)
+  \typeformer{stream}~\type{A} \times \typeformer{stream}~\type{B} \equiv \typeformer{M}_{\containerpair{\type{A}}{\lambda~\_,\unit}} \times \typeformer{M}_{\containerpair{\type{B}}{\lambda~\_,\unit}} \equiv \typeformer{M}_{\containerpair{\type{A}}{\lambda~\_,\unit} \times \containerpair{\type{B}}{\lambda~\_,\unit}} \equiv \typeformer{stream}~(\type{A} \times \type{B}) \label{eq:zip-equality}
 \end{equation}
-as expected, transporting along this gives us the definition for zip. More precisely we define zip as:
-\\ \\
-We start by defining the equality,
-\begin{equation}
-  \begin{aligned}
-    &~W~(A , B)~(n+1) \times W~(C , D)~(n+1) \\
-    \equiv&~\left(\sum_{(a : A)} B~a \rightarrow W~(A , B)~n\right) \times \left(\sum_{(c : C)} D~c \rightarrow W~(C , D)~n\right) \\
-    \equiv&~ \sum_{((a , c) : A \times C)} (B~a \rightarrow W~(A , B)~n) \times (D~c \rightarrow W~(C , D)~n) \label{zip-helper}
-  \end{aligned}
-\end{equation}
-by the two functions
-\begin{align}
-  f &: ((a , c) , (b , d)) \rightarrow ((a , b) , (c , d)) \\
-  g &: ((a , b) , (c , d)) \rightarrow ((a , c) , (b , d))
-\end{align}
-such that \(f \circ g \equiv id\) and \(g \circ f \equiv id\) by \texttt{refl}. 
-\begin{equation}
-  zip = \mathtt{transport}_{\eqref{zip-helper}~\square~(\sum_{(a , c) : \mathtt{refl}} ?~\square \mathtt{cong}~(\lambda x, Ba \times D c \rightarrow x) (\eqref{?})}
-\end{equation}
-transporting over an equality \(A \equiv B\), given by \(f : A \rightarrow B\) and \(g : B \rightarrow A\), is the same as applying the function \(f\). The definition of zip therefore reduce do
-\begin{equation}
-  zip = f \circ (\mathtt{transport}_{\sum_{(a , c) : \mathtt{refl}} ?~\square \mathtt{cong}~(\lambda x, Ba \times D c \rightarrow x) (\eqref{?})})
-\end{equation}
+as expected, transporting along equality \eqref{eq:zip-equality} gives us the definition for \function{zip}.
 
-\subsection{Closure under products}
-The product of two M-types is again an M-type
-
+\subsection{Zip Function}
+We want the diagram in \figref{fig:zip-computation-rules} to commute,
 \begin{figure}[h]
   \centering
   \begin{tikzcd}[row sep=huge,column sep=huge]
     & A \times B & \\
-    Stream A \times Stream B \ar[ur,"hd \times hd"'] \ar[rr,"zip"] \ar[d,"tl \times tl"] & & Stream (A \times B) \ar[ul,"hd"] \ar[d,"tl"] \\
-    Stream A \times Stream B \ar[rr,"zip"] & & Stream (A \times B)
+    \typeformer{stream}~\type{A} \times \typeformer{stream}~\type{B} \ar[ur,"\function{hd} \times \function{hd}"'] \ar[rr,"\function{zip}"] \ar[d,"\function{tl} \times \function{tl}"] & & \typeformer{stream}~(\type{A} \times \type{B}) \ar[ul,"\function{hd}"] \ar[d,"\function{tl}"] \\
+    \typeformer{stream}~\type{A} \times \typeformer{stream}~\type{B} \ar[rr,"\function{zip}"] & & \typeformer{stream}~(\type{A} \times \type{B})
   \end{tikzcd}
   \caption{TODO}
+  \label{fig:zip-computation-rules}
 \end{figure}
-\noindent From this we get the computation rules
+meaning we get the computation rules
 \begin{equation}
-  hd \times hd \equiv hd \circ zip
+  (\function{hd} \times \function{hd}) \equiv \function{hd} \circ \function{zip}
 \end{equation}
 \begin{equation}
-  zip \circ tl \times tl \equiv tl \circ zip
+  \function{zip} \circ (\function{tl} \times \function{tl}) \equiv \function{tl} \circ \function{zip}
 \end{equation}
-another way to define the zip function is more directly, using the following lifting property of M-types
+we can define the zip function as we did in the end of the last section. Another way to define the zip function is more directly, using the following lifting property of M-types
 \begin{equation}
-  \begin{aligned}
+\begin{aligned}
   &\function{lift_M}~\left(x : \prod_{n : \mathbb{N}} (\type{A} \rightarrow {\functor{P}_{\container{S}}}^n~\unit)\right)~\left(u : \prod_{n : \mathbb{N}} (\type{A} \rightarrow \pi_n (x_{n+1} a) \equiv x_n a)\right) (a : \type{A}) : \function{M}~\container{S} := \\
   &\qquad\qquad (\lambda\,n, x~n~a) , (\lambda\,n~i, p~n~a~i).
-  \end{aligned}
+\end{aligned} \label{eq:M-lift}
 \end{equation}
-We can then define \(\function{zip}_{lift}\) as
+To use this definition, we first define some helper functions
 \begin{equation}
   \function{zip}_{X}~n~(x , y) = \begin{cases} \unit & \mathtt{if}~n = 0 \\ (\function{hd}~x , \function{hd}~y) , (\lambda\,\_, \function{zip}_{X}~m~(\function{tl}~x,\function{tl}~y)) , & \mathtt{if}~n = m + 1 \end{cases}
 \end{equation}
 \begin{equation}
-  \function{zip}_{\pi}~n~(x , y) = \begin{cases} \function{refl} & \mathtt{if}~n = 0 \\ \lambda\,i,(\function{hd}~x , \function{hd}~y) , (\lambda\,\_, \function{zip}_{\pi}~m~(\function{tl}~x,\function{tl}~y)~i) , & \mathtt{if}~n = m + 1 \end{cases}
+  \function{zip}_{\pi}~n~(x , y) = \begin{cases} \function{refl} & \mathtt{if}~n = 0 \\ \lambda\,i,(\function{hd}~x , \function{hd}~y) , (\lambda\,\_, \function{zip}_{\pi}~m~(\function{tl}~x,\function{tl}~y)~i) , & \mathtt{if}~n = m + 1 \end{cases},
 \end{equation}
+we can then define
 \begin{equation}
-  \function{zip}_{lift}~(x , y) := \function{lift_M}~\function{zip}_X~\function{zip}~(x,y)
+  \function{zip}_{lift}~(x , y) := \function{lift_M}~\function{zip}_X~\function{zip}~(x,y).
 \end{equation}
-\paragraph{Equality of Zip Definitions}~\\
+\subsubsection{Equality of Zip Definitions}
 We would expect that the two definitions for zip are equal
 \begin{align}
   \texttt{transport}_{?}~a &\equiv \function{zip}_{lift}~a \\
@@ -429,7 +420,7 @@ We would expect that the two definitions for zip are equal
 \end{align}
 zero case \(X\)
 \begin{equation}
-  \(\function{zip}_X~0~(x,y) \equiv \unit\)
+  \function{zip}_X~0~(x,y) \equiv \unit
 \end{equation}
 Sucessor case \(X\)
 \begin{align} 
@@ -446,9 +437,12 @@ Zero case \(\pi\): \((\lambda\,i, \function{zip}_\pi~0~(x,y)~i \equiv refl)\).
 successor case
 \begin{align}
   &\equiv (\function{zip}_X~(m+1)~(x,y)) , (\lambda\,i, \function{zip}_\pi~(m+1)~(x,y)~i) \\
-  &\equiv ((\function{hd}~x, \function{hd}~y),(\lambda\,\_,\function{zip}_X~m~(\function{tl}~x,\function{tl}~y))) , (\lambda\,i, (\function{hd}~x, \function{hd}~y),(\lambda\,\_,\function{zip}_\pi~m~(\function{tl}~x,\function{tl}~y)~i)) \\
+  &\equiv ((\function{hd}~x, \function{hd}~y),(\lambda\,\_,\function{zip}_X~m~(\function{tl}~x,\function{tl}~y))) , (\lambda\,i, (\function{hd}~x, \function{hd}~y),(\lambda\,\_,\function{zip}_\pi~m~(\function{tl}~x,\function{tl}~y)~i))
 \end{align}
-\subsection{Examples of fixed points}
+\todo[inline]{Complete this proof}
+
+\subsection{Examples of Fixed Points}
+\subsubsection{Zeros}
 Let us try to define the zero stream, we do this by lifting the functions
 \begin{equation}
   \function{const_X}~(n : \type{\mathbb{N}})~(c : \type{\mathbb{N}})  := \begin{cases} \unit & n = 0 \\ (c , \lambda\,\_, \function{const_X}~m~c) & n = m + 1 \end{cases}
@@ -456,12 +450,17 @@ Let us try to define the zero stream, we do this by lifting the functions
 \begin{equation}
   \function{const_\pi}~(n : \type{\mathbb{N}})~(c : \type{\mathbb{N}}) := \begin{cases} \mathtt{refl} & n = 0 \\ \lambda\,i,(c , \lambda\,\_, \function{const_\pi}~m~c~i) & n = m + 1 \end{cases}
 \end{equation}
-to get the definition of zero stream, we do
+to get the definition of zero stream
 \begin{equation}
-  \mathtt{zeros} := \function{lift_M}~\function{const_X}~\function{const_\pi}~0
+  \mathtt{zeros} := \function{lift_M}~\function{const_X}~\function{const_\pi}~0.
 \end{equation}
-We want to show that we get 
-\\ \\
+We want to show that we get the expected properties, such as
+\begin{align}
+  \function{hd}~\mathtt{zeros} &\equiv 0 \\
+  \function{tl}~\mathtt{zeros} &\equiv \mathtt{zeros}
+\end{align}
+
+\subsubsection{Spin}
 We want to define spin, as being the fixed point \(\mathtt{spin} = \mathtt{later}~\mathtt{spin}\), so that is again a final coalgebra, but of a M-type (which is a final coalgebra)
 
 \begin{figure}[h]
@@ -511,8 +510,6 @@ For all \(\term{X} : \type{\mathbb{N}} \rightarrow \universe{U}\) and \(p : \pro
   \equiv&~\sum_{\term{x_0} : \type{X_0}} \sum_{\term{y} : \prod_{\term{n} : \type{\mathbb{N}}} \type{X_{n+1}}} (\term{p}~\type{y_0}~\type{x_0}) \times \left(\prod_{\term{n} : \type{\mathbb{N}}} \term{p}~\type{y_{n + 1}}~\type{y_n}\right) \\
   \equiv&~\sum_{\term{x} : \prod_{\term{n} : \type{\mathbb{N}}} \rightarrow \type{X_n}} (\term{p}~\type{x_1}~\type{x_0}) \times \left(\prod_{\term{n} : \type{\mathbb{N}}} → \term{p}~\type{x_{n+2}}~\type{x_{n+1}}\right)
 \end{align}
-
-
 
 \chapter{Conclusion}
 \label{ch:conclusion}

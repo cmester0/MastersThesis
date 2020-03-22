@@ -12,6 +12,7 @@ open import Cubical.Foundations.Prelude
 open import Cubical.Foundations.Equiv
 open import Cubical.Foundations.Univalence
 open import Cubical.Foundations.Isomorphism
+open import Cubical.Foundations.Function using ( _∘_ )
 
 open import Cubical.Codata.Stream
 
@@ -41,9 +42,39 @@ hd {A} S = out-fun S .fst
 tl : ∀ {A} -> stream A -> stream A
 tl {A} S = out-fun S .snd tt
 
--- --------------------------
--- -- Stream using M-types --
--- --------------------------
+stream-equality-2 : ∀ {A} {s t : stream A} → (s ≡ t) ≡ (cons (hd s) (tl s) ≡ cons (hd t) (tl t))
+stream-equality-2 = sym in-out-id
+
+stream-equality-1 : ∀ {A} {a c : A} {b d : stream A} → (cons a b ≡ cons c d) ≡ (a ≡ c) × (b ≡ d)
+stream-equality-1 {a = a} {c} {b} {d} =
+  (cons a b ≡ cons c d)
+    ≡⟨ in-inj-x ⟩
+  ((a , (λ { tt → b })) ≡ (c , (λ { tt → d })))
+    ≡⟨ sym Σ-split-iso ⟩
+  (Σ (a ≡ c) (λ _ → (λ { tt → b }) ≡ λ { tt → d }))
+     ≡⟨ isoToPath (iso (λ {(x , y) → x , funExt⁻ y tt}) (λ {(x , y) → x , funExt (λ { tt → y})}) (λ b₁ → refl) λ a₁ → refl) ⟩
+  (Σ (a ≡ c) (λ _ → b ≡ d)) 
+     ≡⟨ sym A×B≡A×ΣB ⟩ 
+  ((a ≡ c) × (b ≡ d)) ∎
+
+stream-equality : ∀ A (s t : stream A) → (s ≡ t) ≡ (hd s ≡ hd t) × (tl s ≡ tl t)
+stream-equality A s t = stream-equality-2 □ stream-equality-1
+
+hd-is-hd : ∀ A (x : A) (xs : stream A) → hd (cons x xs) ≡ x
+hd-is-hd A x xs =
+  hd (cons x xs)
+    ≡⟨ refl ⟩
+  hd (in-fun (x , λ { tt → xs }))
+    ≡⟨ refl ⟩
+  out-fun (in-fun (x , λ { tt → xs })) .fst
+    ≡⟨ (λ i → out-inverse-in {S = stream-S A} i (x , λ { tt → xs }) .fst) ⟩
+  (x , λ { tt → xs }) .fst
+    ≡⟨ refl ⟩
+  x ∎
+
+--------------------------
+-- Stream using M-types --
+--------------------------
 
 stream-pair-M : ∀ A B → stream A × stream B ≡ M (Container-product (stream-S A) (stream-S B))
 stream-pair-M A B = M-product-equality (stream-S A) (stream-S B)
@@ -87,8 +118,8 @@ cons-2-inv : ∀ {A} -> stream A → (ℕ → A)
 cons-2-inv x 0 = hd x
 cons-2-inv x (suc n) = cons-2-inv (tl x) n
 
--- cons-2-equality : ∀ {A} -> (ℕ → A) ≡ stream A
--- cons-2-equality = isoToPath (iso cons-2 cons-2-inv (λ b → {!!}) (λ a → {!!}))
+cons-2-equality : ∀ {A} -> (ℕ → A) ≡ stream A
+cons-2-equality {A = A} = isoToPath (iso cons-2 cons-2-inv (λ b → let temp = stream-equality A (cons-2 (cons-2-inv b)) b in transport (sym temp) ({!!} , {!!})) (λ a → {!!})) -- transport (stream-equality ? ? ?) {!!}
 
 zip-2 : ∀ {A B} → stream A × stream B → stream (A × B)
 zip-2 (x , y) = cons-2 λ n → cons-2-inv x n , cons-2-inv y n
@@ -96,22 +127,32 @@ zip-2 (x , y) = cons-2 λ n → cons-2-inv x n , cons-2-inv y n
 zeros : stream ℕ
 zeros = cons-2 λ _ → 0
 
-hd-of-cons-2 : ∀ {A} (f : ℕ → A) → hd (cons-2 f) ≡ f 0
-hd-of-cons-2 {A} f =
-  hd (cons-2 f)
+postulate
+  sym-□ : ∀ {ℓ} {X Y Z : Set ℓ} {a : X ≡ Y} {b : Y ≡ Z} → sym (a □ b) ≡ (sym b □ sym a)
+  transport-compose : ∀ {ℓ} {X Y Z : Set ℓ} (a : X ≡ Y) (b : Y ≡ Z) x → transport (a □ b) x ≡ transport b (transport a x)
+
+out-of-cons-2 : ∀ {A} (f : ℕ → A) → out-fun (cons-2 f) ≡ (f 0 , λ { tt → cons-2 (λ n → f (suc n)) } )
+out-of-cons-2 {A} f =
+  out-fun (cons-2 f)
     ≡⟨ refl ⟩
-  hd (lift-to-M (lifting-cons-x 0) (lifting-cons-π 0) f)
+  out-fun (lift-to-M (lifting-cons-x 0) (lifting-cons-π 0) f)
     ≡⟨ refl ⟩
-  hd ((λ n → (lifting-cons-x 0) n f) , λ n i → (lifting-cons-π 0) n f i)
+  out-fun ((λ n → (lifting-cons-x 0) n f) , λ n i → (lifting-cons-π 0) n f i)
     ≡⟨ refl ⟩
-  out-fun ((λ n → (lifting-cons-x 0) n f) , λ n i → (lifting-cons-π 0) n f i) .fst
-    ≡⟨ refl ⟩
-  ((λ n → (lifting-cons-x 0) n f) {!!} .fst
-  , λ _ → ((λ n → (lifting-cons-x {A} 0) n f) , (λ n i → (lifting-cons-π {A} 0) n f i))) .fst
+  transport (sym (shift {S = stream-S A})) ((λ n → (lifting-cons-x 0) n f) , λ n i → (lifting-cons-π 0) n f i)
     ≡⟨ {!!} ⟩
-  (lifting-cons-x 0) (suc {!!}) f .fst
+  transport (sym ((sym α-iso) □ (L-unique {S = stream-S A}))) ((λ n → (lifting-cons-x 0) n f) , λ n i → (lifting-cons-π 0) n f i)
+    ≡⟨ {!!} ⟩
+  transport (sym (L-unique {S = stream-S A}) □ α-iso) ((λ n → (lifting-cons-x 0) n f) , λ n i → (lifting-cons-π 0) n f i)
+    ≡⟨ transport-compose (sym (L-unique {S = stream-S A})) (α-iso) ((λ n → (lifting-cons-x 0) n f) , λ n i → (lifting-cons-π 0) n f i) ⟩
+  transport (α-iso) (transport (sym (L-unique {S = stream-S A})) ((λ n → (lifting-cons-x 0) n f) , λ n i → (lifting-cons-π 0) n f i))
+    ≡⟨ {!!} ⟩
+  let isom = {!!} in
+  transport (α-iso) (((λ x → (λ n → x .fst (suc n)) , proj₂ (x .snd)) ∘ (λ { (x , y') → x , transport (sym (isom x)) y'})) ((λ n → (lifting-cons-x 0) n f) , λ n i → (lifting-cons-π 0) n f i))
+    ≡⟨ {!!} ⟩
+  (lifting-cons-x 0 (suc {!!}) f .fst , λ { tt → cons-2 (λ n → f (suc n)) })
     ≡⟨ refl ⟩
-  f 0 ∎
+  (f 0 , (λ { tt → cons-2 (λ n → f (suc n)) })) ∎
 
 -- transport (sym ((sym
 --     (  (isoToPath (iso (λ {(x , y) → (λ n → x n .fst) , (λ n → x n .snd) , y})
