@@ -15,6 +15,8 @@ open import Cubical.Foundations.Univalence
 open import Cubical.Foundations.Isomorphism
 open import Cubical.Foundations.Function
 open import Cubical.Foundations.GroupoidLaws
+open import Cubical.Foundations.Path
+open import Cubical.Foundations.FunExtEquiv
 
 open import Cubical.Data.Sum
 
@@ -28,14 +30,24 @@ module M.Base where
 -- Limit of a Chain is Unique --
 --------------------------------
 
+open Iso
+
+L-unique-iso : ∀ {ℓ} -> {S : Container {ℓ}} -> Iso (L (shift-chain (sequence S))) (L (sequence S))
+fst (fun L-unique-iso (a , b)) 0 = lift tt
+fst (fun L-unique-iso (a , b)) (suc n) = a n
+snd (fun L-unique-iso (a , b)) 0 = refl {x = lift tt}
+snd (fun L-unique-iso (a , b)) (suc n) = b n
+fst (inv L-unique-iso x) = x .fst ∘ suc
+snd (inv L-unique-iso x) = x .snd ∘ suc
+fst (rightInv L-unique-iso (b , c) i) 0 = lift tt
+fst (rightInv L-unique-iso (b , c) i) (suc n) = refl i
+snd (rightInv L-unique-iso (b , c) i) 0 = refl
+snd (rightInv L-unique-iso (b , c) i) (suc n) = c (suc n)
+leftInv L-unique-iso = (λ a → ΣPathP (refl , refl))
+
 -- Lemma 12
 L-unique : ∀ {ℓ} -> {S : Container {ℓ}} -> L (shift-chain (sequence S)) ≡ L (sequence S)
-L-unique {ℓ} {S = S} =
-  isoToPath (
-    iso (λ x → (λ {0 → lift tt ; (suc n) -> x .fst n}) , (λ { 0 → refl {x = lift tt} ; (suc n) → x .snd n }))
-        (λ x → x .fst ∘ suc , x .snd ∘ suc)
-        (λ {(b , c) → ΣPathP (funExt (λ { 0 → refl ; (suc n) → refl }) , λ {i 0 → refl ; i (suc n) → c (suc n)})})
-        (λ a → ΣPathP (refl , refl)))
+L-unique {ℓ} {S = S} = isoToPath (L-unique-iso)
 
 PX,Pπ : ∀ {ℓ} (S : Container {ℓ}) -> Chain
 PX,Pπ {ℓ} S =
@@ -127,262 +139,44 @@ postulate
     (λ b → refl)
     (λ a → refl))
 
-helper-todo :
-    ∀ {ℓ} (A : Set ℓ) ->
-    (b : Σ (ℕ → A) (λ v → (n₁ : ℕ) → v (suc n₁) ≡ v n₁))
-    (n : ℕ) → (b .fst n) ≡ (b .fst 0)
-helper-todo A b 0 = refl
-helper-todo A b (suc n) = (b .snd n) □ (helper-todo A b n)
-
 postulate
-  close-loop : ∀ {ℓ} {A : Set ℓ} {x y : A} {a : x ≡ y} →
-    transport (λ i → a i  ≡ a i1) a ≡ refl {x = y}
-
--- helper-todo-2-helper-helper :  ∀ {ℓ} (A : Set ℓ)
---   → (b : Σ (ℕ → A) (λ v → (n₁ : ℕ) → v (suc n₁) ≡ v n₁))
---   -> (n : ℕ)
---   -> (transport (λ i → ((b .snd (suc n)) □ (b .snd n)) i
---                     ≡ (b .snd n) i)
---                 (snd b (suc n)))
---   ≡ (transport (λ i → (b .snd n) i
---                      ≡ refl {x = b .fst n} i)
---                 (snd b n))
--- helper-todo-2-helper-helper = {!!}
-
-postulate
-  helper-todo-2-helper : ∀ {ℓ} (A : Set ℓ)
-    → (b : Σ (ℕ → A) (λ v → (n₁ : ℕ) → v (suc n₁) ≡ v n₁))
-    -------------------------
-    → ∀ (n : ℕ)
-    → transport (λ i → (n₁ : ℕ) →
-              funExt (helper-todo A b) i (suc n₁) ≡
-              funExt (helper-todo A b) i n₁) (snd b) n
-    ≡ refl
--- helper-todo-2-helper A b ℕ.zero =
---   transport (λ i → (n₁ : ℕ) → funExt (helper-todo A b) i (suc n₁) ≡ funExt (helper-todo A b) i n₁) (snd b) ℕ.zero
---     ≡⟨ refl ⟩
---   transport (λ i → funExt (helper-todo A b) i (suc 0) ≡ funExt (helper-todo A b) i 0) (snd b 0)
---     ≡⟨ refl ⟩
---   transport (λ i → helper-todo A b (suc 0) i  ≡ helper-todo A b 0 i) (snd b 0)
---     ≡⟨ refl ⟩
---   transport (λ i → ((b .snd 0) □ (helper-todo A b 0)) i  ≡ (helper-todo A b 0) i) (snd b 0)
---     ≡⟨ refl ⟩
---   transport (λ i → (b .snd 0 □ refl) i  ≡ refl i) (snd b 0)
---     ≡⟨ cong (λ a → transport (λ i → a i ≡ refl {x = b .fst 0} i) (snd b 0)) (□≡∙ (b .snd 0) refl) ⟩
---   transport (λ i → (b .snd 0 ∙ refl {x = b .fst 0}) i  ≡ refl {x = b .fst 0} i) (snd b 0)
---     ≡⟨ cong (λ a → transport (λ i → a i ≡ refl {x = b .fst 0} i) (snd b 0)) (sym (rUnit (b .snd 0))) ⟩
---   transport (λ i → (b .snd 0) i  ≡ refl {x = b .fst 0} i) (snd b 0)
---     ≡⟨ refl ⟩
---   transport (λ i → b .snd 0 i  ≡ b .snd 0 i1) (snd b 0)
---     ≡⟨ close-loop ⟩
---   (λ _ → b .snd 0 i1)
---     ≡⟨ refl ⟩
---   (λ _ → b .fst 0)
---     ≡⟨ refl ⟩
---   refl ∎
-
--- helper-todo-2-helper A b (suc n) =
---   let temp : ∀ {ℓ} {X : Set ℓ} {Y : Set ℓ} {Z : Set ℓ} {W : Set ℓ}
---            → ∀ (a : (X ≡ Y) ≡ (Z ≡ W)) c b x
---            → transport (λ i → (a □ b) i ≡ (c □ b) i) x
---            ≡ transport (λ i → b i ≡ b i) (transport (λ i → a i ≡ c i) x)
---       temp = {!!}
---   in
---   let temp' : ∀ (nn : ℕ)
---             (vv : (ℕ → A))
---             (pp : (n : ℕ) → vv (suc n) ≡ vv n)
---             (aa : vv (suc (suc nn)) ≡ vv nn)
---             (cc : vv (suc nn) ≡ vv nn)
---             (bb : vv nn ≡ vv 0)
---             (x : ((pp (suc nn) □ cc) □ bb) i0 ≡ (cc □ bb) i0)
---            -> transport (λ i → (aa □ bb) i ≡ (cc □ bb) i) x
---            ≡ transport (λ i → bb i ≡ bb i) (transport (λ i → aa i ≡ cc i) x)
---       temp' nn vv pp aa cc bb x = {!!}
---   in
---   let temp'' : {!!}
---       temp'' = (b .snd (suc n))
---   in
---   transport (λ i → (n₁ : ℕ) → funExt (helper-todo A b) i (suc n₁)
---                               ≡ funExt (helper-todo A b) i n₁)
---             (b .snd) (suc n)
---     ≡⟨ refl ⟩
---   transport (λ i → funExt (helper-todo A b) i (suc (suc n))
---                  ≡ funExt (helper-todo A b) i (suc n))
---             (b .snd (suc n))
---     ≡⟨ refl ⟩
---   transport (λ i → helper-todo A b (suc (suc n)) i
---                  ≡ helper-todo A b (suc n) i)
---             (b .snd (suc n))
---     ≡⟨ refl ⟩
---   transport (λ i → ((b .snd (suc n)) □ (helper-todo A b (suc n))) i
---                  ≡ (helper-todo A b (suc n)) i)
---             (b .snd (suc n))
---     ≡⟨ refl ⟩
---   transport (λ i → ((b .snd (suc n)) □ ((b .snd n) □ helper-todo A b n)) i
---                  ≡ ((b .snd n) □ helper-todo A b n) i)
---             (b .snd (suc n))
---     ≡⟨ cong (λ a → transport (λ i → ((b .snd (suc n)) □ a) i ≡ (b .snd n □ helper-todo A b n) i) (snd b (suc n))) (□≡∙ (b .snd n) (helper-todo A b n)) ⟩
---   transport (λ i → ((b .snd (suc n)) □ ((b .snd n) ∙ helper-todo A b n)) i
---                  ≡ ((b .snd n) □ helper-todo A b n) i)
---             (b .snd (suc n))
---     ≡⟨ cong (λ a → transport (λ i → a i ≡ (b .snd n □ helper-todo A b n) i) (snd b (suc n))) (□≡∙ (b .snd (suc n)) (b .snd n ∙ helper-todo A b n)) ⟩
---   transport (λ i → ((b .snd (suc n)) ∙ (b .snd n) ∙ helper-todo A b n) i
---                  ≡ ((b .snd n) □ helper-todo A b n) i)
---             (b .snd (suc n))
---     ≡⟨ cong (λ a → transport (λ i → a i ≡ (b .snd n □ helper-todo A b n) i) (snd b (suc n))) (assoc (b .snd (suc n)) (b .snd n) (helper-todo A b n)) ⟩
---   transport (λ i → (((b .snd (suc n)) ∙ (b .snd n)) ∙ helper-todo A b n) i
---                  ≡ ((b .snd n) □ helper-todo A b n) i)
---             (b .snd (suc n))
---     ≡⟨ cong (λ a → transport (λ i → (a ∙ helper-todo A b n) i ≡ (b .snd n □ helper-todo A b n) i) (snd b (suc n))) (sym (□≡∙ (b .snd (suc n)) (b .snd n))) ⟩
---   transport (λ i → (((b .snd (suc n)) □ (b .snd n)) ∙ helper-todo A b n) i
---                  ≡ ((b .snd n) □ helper-todo A b n) i)
---             (b .snd (suc n))
---     ≡⟨ cong (λ a → transport (λ i → a i ≡ (b .snd n □ helper-todo A b n) i) (snd b (suc n))) (sym (□≡∙ (b .snd (suc n) □ b .snd n) (helper-todo A b n))) ⟩
---   transport (λ i → (((b .snd (suc n)) □ (b .snd n)) □ helper-todo A b n) i
---                  ≡ ((b .snd n) □ helper-todo A b n) i)
---             (b .snd (suc n))
---     ≡⟨ temp' n (b .fst) (b .snd) (b .snd (suc n) □ b .snd n) (b .snd n) (helper-todo A b n) (snd b (suc n)) ⟩
---   transport (\ i -> helper-todo A b n i ≡ helper-todo A b n i)
---     (transport (λ i → ((b .snd (suc n)) □ (b .snd n)) i
---                     ≡ (b .snd n) i)
---                (b .snd (suc n)))
---     ≡⟨ cong (transport (λ i → helper-todo A b n i ≡ helper-todo A b n i)) {!!} ⟩
---   transport (λ i → helper-todo A b n i ≡ helper-todo A b n i)
---     (transport (λ i → (b .snd n) i
---                     ≡ refl {x = b .fst n} i)
---                (b .snd n))
---             ≡⟨ {!!} ⟩
---   transport (λ i → ((b .snd n) □ helper-todo A b n) i
---                  ≡ (helper-todo A b n) i) (b .snd n)
---     ≡⟨ helper-todo-2-helper A b n ⟩
---   refl ∎
-
-helper-todo-2 :
-  ∀ {ℓ} (A : Set ℓ)
-  → (b : Σ (ℕ → A) (λ v → (n₁ : ℕ) → v (suc n₁) ≡ v n₁))
-  → ((λ _ → b .fst 0) , (λ _ → refl)) ≡ b
-helper-todo-2 A b = sym (sigmaPath→pathSigma b ((λ _ → b .fst 0) , (λ _ → refl)) (funExt (helper-todo A b) , funExt (helper-todo-2-helper A b)))
-
--- λ {0 →
---   transport (λ i → (n₁ : ℕ) → funExt (helper-todo A b) i (suc n₁) ≡ funExt (helper-todo A b) i n₁) (snd b) 0
---     ≡⟨ refl ⟩
---   transport (λ i → funExt (helper-todo A b) i (suc 0) ≡ funExt (helper-todo A b) i 0) (snd b 0)
---     ≡⟨ refl ⟩
---   transport (λ i → helper-todo A b (suc 0) i  ≡ helper-todo A b 0 i) (snd b 0)
---     ≡⟨ refl ⟩
---   transport (λ i → ((b .snd 0) □ (helper-todo A b 0)) i  ≡ (helper-todo A b 0) i) (snd b 0)
---     ≡⟨ refl ⟩
---   transport (λ i → (b .snd 0 □ refl) i  ≡ refl i) (snd b 0)
---     ≡⟨ cong (λ a → transport (λ i → a i ≡ refl {x = b .fst 0} i) (snd b 0)) (□≡∙ (b .snd 0) refl) ⟩
---   transport (λ i → (b .snd 0 ∙ refl {x = b .fst 0}) i  ≡ refl {x = b .fst 0} i) (snd b 0)
---     ≡⟨ cong (λ a → transport (λ i → a i ≡ refl {x = b .fst 0} i) (snd b 0)) (sym (rUnit (b .snd 0))) ⟩
---   transport (λ i → (b .snd 0) i  ≡ refl {x = b .fst 0} i) (snd b 0)
---     ≡⟨ refl ⟩
---   transport (λ i → b .snd 0 i  ≡ b .snd 0 i1) (snd b 0)
---     ≡⟨ close-loop ⟩
---   (λ _ → b .snd 0 i1)
---     ≡⟨ refl ⟩
---   (λ _ → b .fst 0)
---     ≡⟨ refl ⟩
---   refl ∎}
-
-  --   ≡⟨ (cong (λ a → transport (λ i → a i ≡ (b .fst 0)) (snd b 0)) {!!}) ⟩
-  -- transport (λ i → (b .snd 0) i  ≡ (b .fst 0)) (snd b 0)
-
-
-  -- transport (λ i → (n₁ : ℕ) → funExt (helper-todo A b) i (suc n₁) ≡ funExt (helper-todo A b) i n₁) (snd b) n
-  --   ≡⟨ refl ⟩
-  -- transport (λ i → funExt (helper-todo A b) i (suc n) ≡ funExt (helper-todo A b) i n) (snd b n)
-  --   ≡⟨ refl ⟩
-  -- transport (λ i → helper-todo A b (suc n) i  ≡ helper-todo A b n i) (snd b n)
-  --   ≡⟨ refl ⟩
-  -- transport (λ i → ((b .snd n) □ (helper-todo A b n)) i  ≡ (helper-todo A b n) i) (snd b n)
-  --   ≡⟨ cong (λ a → transport (λ i → a i ≡ helper-todo A b n i) (snd b n)) (□≡∙ (b .snd n) (helper-todo A b n)) ⟩
-  -- transport (λ i → ((b .snd n) ∙ (helper-todo A b n)) i  ≡ (helper-todo A b n) i) (snd b n)
-  --   ≡⟨ cong (λ a → transport (λ i → (b .snd n ∙ helper-todo A b n) i ≡ a i) (snd b n)) (lUnit (helper-todo A b n)) ⟩
-  -- transport (λ i → ((b .snd n) ∙ (helper-todo A b n)) i  ≡ (refl ∙ helper-todo A b n) i) (snd b n)
-  --   ≡⟨ refl ⟩
-  -- transp (λ i → ((b .snd n) ∙ (helper-todo A b n)) i  ≡ (refl ∙ helper-todo A b n) i) i0 (snd b n)
-  --   ≡⟨ {!!} ⟩
-  -- (refl ∙ helper-todo A b n)
-  --   ≡⟨ {!!} ⟩
-  -- refl ∎))
-
-  --   ≡⟨ refl ⟩
-  -- transp (λ i → helper-todo A b (suc n) i  ≡ helper-todo A b n i) i0 (snd b n)
-  --   ≡⟨ refl ⟩
-  -- transp (λ i → ((b .snd n) □ (helper-todo A b n)) i  ≡ helper-todo A b n i) i0 (snd b n)
-
-
-  -- (λ _ → helper-todo A b (suc n) i1)
-  --   ≡⟨ refl ⟩
-  -- (λ _ → helper-todo A b n i1)
-  --   ≡⟨ refl ⟩
-  -- (λ _ → helper-todo A b 1 i1)
-  --   ≡⟨ refl ⟩
-  -- (λ _ → snd b 0 i1)
-  --   ≡⟨ refl ⟩
-  -- (λ _ → b .fst 0)
-  --   ≡⟨ refl ⟩
-
-
--- transport (λ i → helper-todo A b (suc x) i  ≡ helper-todo A b x i) (snd b x)
-
--- {!!} ≡⟨ {!!} ⟩ {!!} ∎
-
-  -- (λ n → b .fst 0) , (λ n → refl)
-  --   ≡⟨ (λ i → (λ n → helper-todo A b n (~ i)) , λ n → {!!}) ⟩
-  -- (λ n → b .fst n) , (λ n i → b .snd n i)
-  --   ≡⟨ refl ⟩
-  -- b .fst , b .snd
-  --   ≡⟨ refl ⟩
-  -- b ∎
-
-  -- let temp : isContr (ℕ → A)
-  --     temp = {!!}
-  -- in
-  -- transport Σ-split-iso (funExt (λ {0 → sym (helper-todo A b 0) ; (suc n) → sym (helper-todo A b (suc n))})
-  -- , λ {i 0 → {!!} ; i (suc n) i₁ → {!!}})
-
--- transport Σ-split-iso (funExt (λ x → sym (helper-todo A b x)) , {!!})
-
-
-postulate -- something with lemma 11
-  -- helper-todo-2 :
-  --   ∀ {ℓ} (A : Set ℓ)
-  --   → (b : Σ (ℕ → A) (λ v → (n₁ : ℕ) → v (suc n₁) ≡ v n₁))
-  --   → ((λ n → b .fst 0) , (λ n i → b .fst 0)) ≡ b
--- helper-todo-2 A b = transport Σ-split-iso (funExt (λ x → sym (helper-todo A b x)) , λ {i 0 → {!!}})
-
-  helper-todo-3 :
-    ∀ {ℓ} (A : Set ℓ) (B : A → Set ℓ) ->
-    ∀ x
-    → Σ ((n : ℕ) → B (x .fst n) → X (sequence (A , B)) n) (λ u → (n : ℕ) → PathP (λ x₁ → B (x .snd n x₁) → X (sequence (A , B)) n) ((λ {a} → π (sequence (A , B))) ∘ u (suc n)) (u n))
-    ≡ Σ ((n : ℕ) → B (transport (isoToPath (iso (λ x₁ → x₁ .fst 0) (λ x₁ → (λ n₁ → x₁) , (λ n₁ i → x₁)) (λ b _ → b) (λ x₁ → helper-todo-2 A x₁))) x)
-    → X (sequence (A , B)) n) (λ u → (n : ℕ) → (λ {a} → π (sequence (A , B))) ∘ u (suc n) ≡ u n)
+  sym-α-iso-step-5-Iso : ∀ {ℓ} {S : Container {ℓ}}
+    -> let (A , B) = S in
+    Iso
+      (Σ A (λ a → Σ ((n : ℕ) → B a → X (sequence S) n) λ u → (n : ℕ) → π (sequence S) ∘ (u (suc n)) ≡ u n))
+      (Σ (Σ ((n : ℕ) → A) (λ a → (n : ℕ) → a (suc n) ≡ a n)) λ a →
+        Σ ((n : ℕ) → B (a .fst n) → X (sequence S) n) λ u →
+          (n : ℕ) → PathP (λ x → B (a .snd n x) → X (sequence S) n) (π (sequence S) ∘ u (suc n)) (u n))
 
 α-iso-step-5 : ∀ {ℓ} {S : Container {ℓ}}
+  -> let (A , B) = S in
+  (Σ (Σ ((n : ℕ) → A) (λ a → (n : ℕ) → a (suc n) ≡ a n)) λ a →
+     Σ ((n : ℕ) → B (a .fst n) → X (sequence S) n) λ u →
+       (n : ℕ) → PathP (λ x → B (a .snd n x) → X (sequence S) n) (π (sequence S) ∘ u (suc n)) (u n))
+  ≡ Σ A (λ a → Σ ((n : ℕ) → B a → X (sequence S) n) λ u → (n : ℕ) → π (sequence S) ∘ (u (suc n)) ≡ u n)
+α-iso-step-5 = isoToPath (iso (inv sym-α-iso-step-5-Iso) (fun sym-α-iso-step-5-Iso) (leftInv sym-α-iso-step-5-Iso) (rightInv sym-α-iso-step-5-Iso))
+
+
+sym-α-iso-step-6 : ∀ {ℓ} {S : Container {ℓ}}
     -> let (A , B) = S in
-    (Σ (Σ ((n : ℕ) → A) (λ a → (n : ℕ) → a (suc n) ≡ a n)) λ a → Σ ((n : ℕ) → B (a .fst n) → X (sequence S) n) λ u → (n : ℕ) → PathP (λ x → B (a .snd n x) → X (sequence S) n) (π (sequence S) ∘ u (suc n)) (u n))
-    ≡ Σ A (λ a → Σ ((n : ℕ) → B a → X (sequence S) n) λ u → (n : ℕ) → π (sequence S) ∘ (u (suc n)) ≡ u n)
-α-iso-step-5 {S = S@(A , B)} =
-  let temp : Σ (ℕ → A) (λ v → (n₁ : ℕ) → v (suc n₁) ≡ v n₁) ≡ A
-      temp = isoToPath (iso (λ x → x .fst 0)
-                            (λ x → (λ n → x) , λ n i → x)
-                            (λ b → refl)
-                            (λ x → helper-todo-2 A x ))
-  in
-    Σ-ap-iso temp (helper-todo-3 A B)
+    Iso
+      (Σ A (λ a → B a → M S))
+      (Σ A (λ a → Σ ((n : ℕ) → B a → X (sequence S) n) λ u → (n : ℕ) → π (sequence S) ∘ (u (suc n)) ≡ u n))
+fst (fun (sym-α-iso-step-6 {S = S@(A , B)}) (x , y')) = x
+snd (fun (sym-α-iso-step-6 {S = S@(A , B)}) (x , y')) = transport (sym ((λ (a : A) → sym (lemma10 (B a , (λ x → a , (λ x₁ → x₁))))) x)) y'
+
+fst (inv (sym-α-iso-step-6 {S = S@(A , B)}) (x , y)) = x
+snd (inv (sym-α-iso-step-6 {S = S@(A , B)}) (x , y)) = transport ((λ (a : A) → sym (lemma10 (B a , (λ x → a , (λ x₁ → x₁))))) x) y
+
+rightInv (sym-α-iso-step-6 {S = S@(A , B)}) (x , y') = ΣPathP (refl {x = x} , transport⁻Transport ((λ (a : A) → sym (lemma10 (B a , (λ x → a , (λ x₁ → x₁))))) x) y')
+
+leftInv (sym-α-iso-step-6 {S = S@(A , B)}) (x , y) = ΣPathP (refl {x = x} , transportTransport⁻ ((λ (a : A) → sym (lemma10 (B a , (λ x → a , (λ x₁ → x₁))))) x) y)
 
 α-iso-step-6 : ∀ {ℓ} {S : Container {ℓ}}
     -> let (A , B) = S in
     Σ A (λ a → Σ ((n : ℕ) → B a → X (sequence S) n) λ u → (n : ℕ) → π (sequence S) ∘ (u (suc n)) ≡ u n)
     ≡ Σ A (λ a → B a → M S)
 α-iso-step-6 {S = S@(A , B)} = Σ-ap-iso₂ (λ a i → lemma10 (B a , (λ x → a , (λ x₁ → x₁))) (~ i))
-
--- TODO: Slow computations..
-postulate
-  α-iso' : ∀ {ℓ} {S : Container {ℓ}} -> L (PX,Pπ S) ≡ P₀ {S = S} (M S) -- L^P ≡ PL
 
 -- Lemma 13
 α-iso : ∀ {ℓ} {S : Container {ℓ}} -> L (PX,Pπ S) ≡ P₀ {S = S} (M S) -- L^P ≡ PL
@@ -392,9 +186,24 @@ postulate
 -----------------------------------------------------
 -- Shifting the limit of a chain is an equivalence --
 -----------------------------------------------------
-  
+
+comp-α-iso-step-1-4-Iso-Sym-L-unique-iso : ∀ {ℓ} {S : Container {ℓ}} -> let (A , B) = S in Iso (Σ (Σ ((n : ℕ) → A) (λ a → (n : ℕ) → a (suc n) ≡ a n)) λ a → Σ ((n : ℕ) → B (a .fst n) → X (sequence S) n) λ u → (n : ℕ) → PathP (λ x → B (a .snd n x) → X (sequence S) n) (π (sequence S) ∘ u (suc n)) (u n))  (L (sequence S))
+fst (fun comp-α-iso-step-1-4-Iso-Sym-L-unique-iso (a , b)) 0 = lift tt
+fst (fun comp-α-iso-step-1-4-Iso-Sym-L-unique-iso (a , b)) (suc n) = (a .fst n) , (b .fst n)
+snd (fun comp-α-iso-step-1-4-Iso-Sym-L-unique-iso (a , b)) 0 = refl {x = lift tt}
+snd (fun comp-α-iso-step-1-4-Iso-Sym-L-unique-iso (a , b)) (suc n) i = a .snd n i , b .snd n i
+fst (fst (inv comp-α-iso-step-1-4-Iso-Sym-L-unique-iso x)) n = (x .fst) (suc n) .fst
+snd (fst (inv comp-α-iso-step-1-4-Iso-Sym-L-unique-iso x)) n i = (x .snd) (suc n) i .fst
+fst (snd (inv comp-α-iso-step-1-4-Iso-Sym-L-unique-iso x)) n = (x .fst) (suc n) .snd
+snd (snd (inv comp-α-iso-step-1-4-Iso-Sym-L-unique-iso x)) n i = (x .snd) (suc n) i .snd
+fst (rightInv comp-α-iso-step-1-4-Iso-Sym-L-unique-iso (b , c) i) 0 = lift tt
+fst (rightInv comp-α-iso-step-1-4-Iso-Sym-L-unique-iso (b , c) i) (suc n) = refl i
+snd (rightInv comp-α-iso-step-1-4-Iso-Sym-L-unique-iso (b , c) i) 0 = refl
+snd (rightInv comp-α-iso-step-1-4-Iso-Sym-L-unique-iso (b , c) i) (suc n) = c (suc n)
+leftInv comp-α-iso-step-1-4-Iso-Sym-L-unique-iso a = ΣPathP (refl , refl)
+
 shift : ∀ {ℓ} {S : Container {ℓ}} -> P₀ {S = S} (M S) ≡ M S
-shift {S = S@(A , B)} = (sym α-iso') □ (L-unique {S = S}) -- lemma 13 & lemma 12
+shift {S = S@(A , B)} = isoToPath (compIso (sym-α-iso-step-6) (compIso (sym-α-iso-step-5-Iso {S = S}) (comp-α-iso-step-1-4-Iso-Sym-L-unique-iso {S = S}))) -- lemma 13 & lemma 12
 
 -- Transporting along shift
 

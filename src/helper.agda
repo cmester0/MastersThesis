@@ -23,6 +23,11 @@ open import Cubical.Foundations.FunExtEquiv
 
 module helper where
 
+refl-fun : ∀ {ℓ} {A : Set ℓ} (x : A) → x ≡ x
+refl-fun x = refl {x = x}
+
+-- 
+
 identity-x : ∀ {ℓ} {A B : Set ℓ} (k : A -> A) -> k ≡ idfun A -> ∀ (x : A) -> k x ≡ x
 identity-x {A = A} k = funExt⁻
 
@@ -101,8 +106,8 @@ open import Cubical.Foundations.Equiv.Properties
 -- Unit / × properties --
 -------------------------
 
-diagonal-unit : Unit ≡ Unit × Unit
-diagonal-unit = isoToPath (iso (λ _ → tt , tt) (λ _ → tt) (λ {(tt , tt) i → tt , tt}) λ a i → tt)
+diagonal-unit : ∀ {ℓ} → Lift {ℓ-zero} {ℓ} Unit ≡ Lift {ℓ-zero} {ℓ} Unit × Lift {ℓ-zero} {ℓ} Unit
+diagonal-unit = isoToPath (iso (λ x → (lift tt) , (lift tt)) (λ x → lift tt) (λ {(lift tt , lift tt) i → (lift tt) , (lift tt)}) λ {(lift tt) i → lift tt})
 
 ------------------
 -- Σ properties --
@@ -110,6 +115,9 @@ diagonal-unit = isoToPath (iso (λ _ → tt , tt) (λ _ → tt) (λ {(tt , tt) i
 
 Σ-split-iso : ∀ {ℓ} {A : Set ℓ} {B : A → Set ℓ} {a a' : A} {b : B a} {b' : B a'} → (Σ (a ≡ a') (λ q → PathP (λ i → B (q i)) b b')) ≡ ((a , b) ≡ (a' , b'))
 Σ-split-iso = ua Σ≡
+
+Σ-split-iso' : ∀ {ℓ} {A B : Set ℓ} {a a' : A} {b' b : B} → (Σ (a ≡ a') (λ q → b ≡ b')) ≡ ((a , b) ≡ (a' , b'))
+Σ-split-iso' = ua Σ≡
 
 subst-hom : ∀ {i j} {X : Set i}(P : X → Set j){x y z : X}
           → (p : x ≡ y)(q : y ≡ z)(u : P x)
