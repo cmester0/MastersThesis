@@ -47,6 +47,10 @@ inr-inj : ∀ {ℓ} {M : Set ℓ} {R : Set ℓ} (a b : R) → (inr {A = M} {B = 
 inr-inj a b =
   (sym (ua (SumPath.Cover≃Path (inr a) (inr b)))) □ isoToPath (iso (inl ∘ lower) (λ {(inl x) → lift x ; (inr ())}) (λ {(inl x) → refl ; (inr ())}) refl-fun)
 
+inr-inj-unit : ∀ {R : Set} (a b : R) → (inr {A = Unit} {B = R} a ≡ inr b) ≡ (a ≡ b)
+inr-inj-unit a b =
+  (sym (ua (SumPath.Cover≃Path (inr a) (inr b)))) □ isoToPath (iso lower lift refl-fun refl-fun)
+
 inr-inj' : ∀ {ℓ} {M : Set ℓ} {R : Set ℓ} (a : R) → isContr (a ≡ a) → (p : inr {A = M} {B = R} a ≡ inr a) → ∀ i → p i ≡ inr a
 inr-inj' a x p i =
   p i
@@ -55,11 +59,46 @@ inr-inj' a x p i =
     ≡⟨ cong inr {!!} ⟩
   inr a ∎
 
-pair-contracitve : ∀ (R : Set) → ∀ (a b : Unit ⊎ R) → (p : a ≡ b) → isContr (SumPath.Cover {A = Unit} {B = R} a b)
-pair-contracitve R (inl tt) (inl tt) p = lift refl , λ y i → lift refl
-pair-contracitve R (inl tt) (inr s) p = {!!}
-pair-contracitve R (inr r) (inl tt) p = {!!}
-pair-contracitve R (inr r) (inr s) p = lift (case transport (inr-inj r s) p return (λ _ → r ≡ s) of (λ {(inl x) → x ; (inr ())})) , λ y i → lift {!!}
+helper-missing-5 : ∀ {R : Set} (a b : R) → (p : inr {A = Unit} a ≡ inr b)
+  → cong (inr {A = Unit}) (transport (inr-inj-unit a b) p)
+  ≡ cong (inr {A = Unit}) (transport (inr-inj-unit a b) (cong (inr {A = Unit}) (transport (inr-inj-unit a b) p)))
+helper-missing-5 = {!!}
+
+helper-missing-4 : ∀ {R : Set} (a b : R) → isEmbedding (λ (p : inr {A = Unit} a ≡ inr b) → cong (inr {A = Unit}) (transport (inr-inj-unit a b) p))
+helper-missing-4 a b w x = record { equiv-proof = λ y → ({!!} , {!!}) , {!!} }
+
+helper-missing : ∀ {R : Set} (a b : R) → (p : inr {A = Unit} a ≡ inr b) → p ≡ cong inr (transport (inr-inj-unit a b) p)
+helper-missing a b p = helper-missing-4 a b p (cong inr (transport (inr-inj-unit a b) p)) .equiv-proof (helper-missing-5 a b p) .fst .fst
+
+-- transport (sym (helper-missing-2 a b p (transport (inr-inj-unit a b) p))) refl
+
+-- TODO: Combine the two proofs for delay-ret and delay-tau, since they are part of the same property for in-fun, splitting this property makes the proof harder!
+delay-ret-inj : ∀ R (a b : R) → (delay-ret a ≡ delay-ret b) ≡ (a ≡ b)
+delay-ret-inj R a b = 
+  delay-ret a ≡ delay-ret b
+    ≡⟨ refl ⟩
+  in-fun (inr a , λ ()) ≡ in-fun (inr b , λ ())
+    ≡⟨ in-inj-x ⟩
+  (inr a , λ ()) ≡ (inr b , λ ())
+    ≡⟨ sym Σ-split ⟩
+  (Σ (inr a ≡ inr b) λ y → PathP (λ x → delay-helper R (y x) → M ((Unit ⊎ R) , delay-helper R)) _ _)
+    ≡⟨ Σ-ap (inr-inj-unit a b) (λ y → cong (λ k → PathP (λ x → delay-helper R ((k y) x) → M ((Unit ⊎ R) , delay-helper R)) _ _) (funExt (helper-missing {R = R} a b))) ⟩  
+  (Σ ((a ≡ b)) λ y → PathP (λ x → delay-helper R (transport (sym (inr-inj-unit a b)) y x) → M ((Unit ⊎ R) , delay-helper R)) _ _)
+    ≡⟨ refl ⟩
+  (Σ ((a ≡ b)) λ y → PathP (λ x → delay-helper R (inr (y x)) → M ((Unit ⊎ R) , delay-helper R)) _ _)
+    ≡⟨ {!!} ⟩
+  (Σ ((a ≡ b)) λ y → Lift Unit)
+    ≡⟨ {!!} ⟩
+  (a ≡ b) ∎
+
+-- (λ i → transp (λ j → inr-inj-unit a b j) i y)
+-- Σ-ap (inr-inj-unit a b) (λ y → cong (λ k → PathP (λ x → delay-helper R (k x) → M ((Unit ⊎ R) , delay-helper R)) _ _) (transp {!!} {!!} y))
+
+-- pair-contracitve : ∀ (R : Set) → ∀ (a b : Unit ⊎ R) → (p : a ≡ b) → isContr (SumPath.Cover {A = Unit} {B = R} a b)
+-- pair-contracitve R (inl tt) (inl tt) p = lift refl , λ y i → lift refl
+-- pair-contracitve R (inl tt) (inr s) p = {!!}
+-- pair-contracitve R (inr r) (inl tt) p = {!!}
+-- pair-contracitve R (inr r) (inr s) p = lift (case transport (inr-inj r s) p return (λ _ → r ≡ s) of (λ {(inl x) → x ; (inr ())})) , λ y i → lift {!!}
 
 -- isContr→isContr-≡ : ∀ {A} → isContr A → isContr (A ≡ A)
 -- isContr→isContr-≡ {A} x = (λ i → A) , λ y i → {!!}

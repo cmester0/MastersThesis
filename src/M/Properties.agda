@@ -29,11 +29,13 @@ open import Container
 
 -- in-fun and out-fun are inverse
 
-out-inverse-in : ∀ {ℓ} {S : Container {ℓ}} -> (out-fun {S = S} ∘ in-fun {S = S}) ≡ idfun (P₀ (M S))
-out-inverse-in {S = S} i a = transport⁻Transport {A = P₀ {S = S} (M S)} {B = M S} (shift {S = S}) a i
+open Iso
 
 in-inverse-out : ∀ {ℓ} {S : Container {ℓ}} -> (in-fun ∘ out-fun {S = S}) ≡ idfun (M S)
-in-inverse-out {S = S} i a = transportTransport⁻ {A = P₀ (M S)} {B = M S} (shift {S = S}) a i
+in-inverse-out {S = S} i a = rightInv {A = P₀ (M S)} {B = M S} (shift-iso {S = S}) a i
+
+out-inverse-in : ∀ {ℓ} {S : Container {ℓ}} -> (out-fun {S = S} ∘ in-fun {S = S}) ≡ idfun (P₀ (M S))
+out-inverse-in {S = S} i a = leftInv {A = P₀ {S = S} (M S)} {B = M S} (shift-iso {S = S}) a i
 
 in-out-id : ∀ {ℓ} {S : Container {ℓ}} -> ∀ {x y} → (in-fun (out-fun {S = S} x) ≡ in-fun (out-fun {S = S} y)) ≡ (x ≡ y)
 in-out-id {x = x} {y} =
@@ -44,39 +46,21 @@ in-out-id {x = x} {y} =
 -- Embeddings
 
 in-embedding : ∀ {ℓ} {S : Container {ℓ}} → isEmbedding {A = P₀ (M S)} {B = M S} (in-fun {S = S})
-in-embedding = isEquiv→isEmbedding (equivIsEquiv (pathToEquiv shift))
+in-embedding = isEquiv→isEmbedding (equivIsEquiv (isoToEquiv shift-iso))
 
 out-embedding : ∀ {ℓ} {S : Container {ℓ}} → isEmbedding (out-fun {S = S})
-out-embedding = isEquiv→isEmbedding (equivIsEquiv (pathToEquiv (sym shift)))
+out-embedding = isEquiv→isEmbedding (equivIsEquiv (isoToEquiv (sym-iso shift-iso)))
 
 -- constructor properties
 
 in-inj : ∀ {ℓ} {S : Container {ℓ}} {Z : Set ℓ} -> ∀ {f g : Z → P₀ (M S)} -> (in-fun ∘ f ≡ in-fun ∘ g) ≡ (f ≡ g)
-in-inj = ≡-rel-a-inj in-fun out-fun in-inverse-out out-inverse-in
-
-in-inj-x : ∀ {ℓ} {S : Container {ℓ}} -> ∀ {x y : P₀ (M S)} -> (in-fun x ≡ in-fun y) ≡ (x ≡ y)
-in-inj-x {ℓ} {S = S} {x = x} {y} =
-  let tempx = λ {(lift tt) → x}
-      tempy = λ {(lift tt) → y} in
-  in-fun x ≡ in-fun y
-      ≡⟨ isoToPath (iso (λ x₁ t → x₁)
-                        (λ x₁ → x₁ (lift tt))
-                        (λ b → refl)
-                        (λ a → refl)) ⟩
-  (∀ (t : Lift Unit) -> ((in-fun ∘ tempx) t ≡ (in-fun ∘ tempy) t))
-    ≡⟨ funExtPath ⟩
-  (in-fun ∘ tempx) ≡ (in-fun ∘ tempy)
-    ≡⟨ in-inj ⟩
-  tempx ≡ tempy
-    ≡⟨ sym (funExtPath) ⟩  
-  (∀ (t : Lift Unit) -> tempx t ≡ tempy t)
-    ≡⟨ isoToPath (iso (λ x₁ → x₁ (lift tt))
-                      (λ x₁ t → x₁)
-                      (λ b → refl)
-                      (λ a → refl)) ⟩
-  x ≡ y ∎
+in-inj = ≡-rel-a-inj shift-iso
 
 out-inj : ∀ {ℓ} {S : Container {ℓ}} {Z : Set ℓ} -> ∀ {f g : Z → M S} -> (out-fun ∘ f ≡ out-fun ∘ g) ≡ (f ≡ g)
-out-inj = ≡-rel-b-inj in-fun out-fun in-inverse-out out-inverse-in
+out-inj = ≡-rel-b-inj (iso in-fun out-fun (funExt⁻ in-inverse-out) (funExt⁻ out-inverse-in))
 
--- isInjectiveTransport
+in-inj-x : ∀ {ℓ} {S : Container {ℓ}} -> ∀ {x y : P₀ (M S)} -> (in-fun x ≡ in-fun y) ≡ (x ≡ y)
+in-inj-x {ℓ} {S = S} {x = x} {y} = ≡-rel-a-inj-x shift-iso
+
+out-inj-x : ∀ {ℓ} {S : Container {ℓ}} -> ∀ {x y : M S} -> (out-fun x ≡ out-fun y) ≡ (x ≡ y)
+out-inj-x {ℓ} {S = S} {x = x} {y} = ≡-rel-b-inj-x shift-iso

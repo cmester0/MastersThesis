@@ -22,7 +22,6 @@
 
 % Custom packages added:
 
-
 \usepackage{fullpage}
 \setlength\marginparwidth{0.7in}
 
@@ -122,25 +121,25 @@ and for a function \(\term{f} : \type{X} \rightarrow \type{Y}\) as
 \begin{equation}
   \begin{aligned}
     \functor{P}\term{f} &: \functor{P}\type{X} \rightarrow \functor{P}\type{Y} \\
-    \functor{P}\term{f}(\term{a},\term{g}) &= (a, \term{f} \circ \term{g})
+    \functor{P}\term{f}(\term{a},\term{g}) &= (a, \term{f} \circ \term{g}).
   \end{aligned}
 \end{equation}
 As an example lets look at type for streams over the type \(\type{A}\), defined by the container \(\container{S} = (\type{A},\lambda\,\_, \unit)\), applying the polynomial functor we get
 \begin{equation}
-  \functor{P}_{\container{S}}(\type{X}) = \sum_{\term{a} : \type{A}} \unit \rightarrow \type{X}
+  \functor{P}_{\container{S}}(\type{X}) = \sum_{\term{a} : \type{A}} \unit \rightarrow \type{X},
 \end{equation}
-since we are working in a Category with exponentials we get \(\unit \rightarrow \type{X} \equiv \type{X}^{\unit} \equiv \type{X}\), furthermore \(\unit\) and \(\type{X}\) does not depend on \(\type{A}\) here, so this will be equivalent to the definition
+since we are working in a Category with exponentials, we get \(\unit \rightarrow \type{X} \equiv \type{X}^{\unit} \equiv \type{X}\). Furthermore \(\unit\) and \(\type{X}\) does not depend on \(\type{A}\), so this will be equivalent to the definition
 \begin{equation}
-  \functor{P}_{\container{S}}(\type{X}) = \type{A} \times \type{X}
+  \functor{P}_{\container{S}}(\type{X}) = \type{A} \times \type{X}.
 \end{equation}
 Now we define the coalgebra for this functor with type
 \begin{equation}
-  \typeformer{Coalg}_{\container{S}} = \sum_{\type{C} : \universe{\mathcal{U}}} \type{C} \rightarrow \functor{P}\type{C}
+  \typeformer{Coalg}_{\container{S}} = \sum_{\type{C} : \universe{\mathcal{U}}} \type{C} \rightarrow \functor{P}\type{C}.
 \end{equation}
-we denote a coalgera of \(\type{C}\) and \(\term{\gamma}\) as \(\coalg{\type{C}}{\term{\gamma}}\). The coalgebra morphisms are defined as
+We denote a coalgera of \(\type{C}\) and \(\term{\gamma}\) as \(\coalg{\type{C}}{\term{\gamma}}\). The coalgebra morphisms are defined as
 \begin{equation}
   \begin{aligned}
-    \_\function{\Rightarrow}\_ &: \typeformer{Coalg}_{\container{S}} \rightarrow \typeformer{Coalg}_{\container{S}} \\
+    \cdot~\function{\Rightarrow}~\cdot &: \typeformer{Coalg}_{\container{S}} \rightarrow \typeformer{Coalg}_{\container{S}} \\
     \coalg{\type{C}}{\term{\gamma}}~\function{\Rightarrow}~\coalg{\type{D}}{\term{\delta}} &= \sum_{\term{f} : \type{C} \rightarrow \type{D}} \term{\delta} \circ \term{f} = \functor{P} \term{f} \circ \term{\gamma}
   \end{aligned}
 \end{equation}
@@ -180,8 +179,8 @@ we can lift this rule, through the diagram in \figref{fig:container-products}, u
   \centering
   \begin{tikzcd}[row sep=huge,column sep=huge]
     \type{A} & \type{A} \times \type{C} \ar[l,"\pi_1"'] \ar[r,"\pi_2"] & \type{C} \\
-    \functor{P} (\typeformer{M}_{\containerpair{\type{A}}{\type{B}}}) \ar[u,"\pi_1"'] & \functor{P}(\typeformer{M}_{\containerpair{\type{A}}{\type{B}} \times \containerpair{\type{C}}{\type{D}}}) \ar[u,"\pi_1"'] & \functor{P} (\typeformer{M}_{\containerpair{\type{C}}{\type{D}}}) \ar[u,"\pi_1"'] \\
-    \typeformer{M}_{\containerpair{\type{A}}{\type{B}}} \ar[u,"\function{out}"'] \ar[d,"\pi_{(!)}"] & \typeformer{M}_{\containerpair{\type{A}}{\type{B}} \times \containerpair{\type{C}}{\type{D}}} \ar[u,"\function{out}"'] \ar[d,"\pi_{(!)}"] & \typeformer{M}_{\containerpair{\type{C}}{\type{D}}} \ar[u,"\function{out}"'] \ar[d,"\pi_{(!)}"] \\
+    \functor{P} (\typeformer{M}_{\containerpair{\type{A}}{\type{B}}}) \ar[u,"\pi_1"'] & \functor{P}(\typeformer{M}_{\containerpair{\type{A}}{\type{B}} \times \containerpair{\type{C}}{\type{D}}}) \ar[l] \ar[r] \ar[u,"\pi_1"'] & \functor{P} (\typeformer{M}_{\containerpair{\type{C}}{\type{D}}}) \ar[u,"\pi_1"'] \\
+    \typeformer{M}_{\containerpair{\type{A}}{\type{B}}} \ar[u,"\function{out}"'] \ar[d,"\pi_{(!)}"] & \typeformer{M}_{\containerpair{\type{A}}{\type{B}} \times \containerpair{\type{C}}{\type{D}}} \ar[l] \ar[r] \ar[u,"\function{out}"'] \ar[d,"\pi_{(!)}"] & \typeformer{M}_{\containerpair{\type{C}}{\type{D}}} \ar[u,"\function{out}"'] \ar[d,"\pi_{(!)}"] \\
     {\functor{P}_{\containerpair{\type{A}}{\type{B}}}}^n~\unit \ar[d,"\pi_{(n)}"] & {\functor{P}_{\containerpair{\type{A}}{\type{B}} \times \containerpair{\type{C}}{\type{D}}}}^n~\unit \ar[l] \ar[r] \ar[d,"\pi_{(n)}"] & {\functor{P}_{\containerpair{\type{C}}{\type{D}}}}^n~\unit \ar[d,"\pi_{(n)}"] \\
     \vdots \ar[d,"\pi_{(1)}"] & \vdots \ar[d,"\pi_{(1)}"] & \vdots \ar[d,"\pi_{(1)}"] \\
     \functor{P}_{\containerpair{\type{A}}{\type{B}}}~\unit \ar[d,"\pi_{(0)}"] & \functor{P}_{\containerpair{\type{A}}{\type{B}} \times \containerpair{\type{C}}{\type{D}}}~\unit \ar[l] \ar[r] \ar[d,"\pi_{(0)}"] & \functor{P}_{\containerpair{\type{C}}{\type{D}}}~\unit \ar[d,"\pi_{(0)}"] \\
