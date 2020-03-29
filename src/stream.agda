@@ -46,13 +46,13 @@ tl {A} S = out-fun S .snd (lift tt)
 
 open isEquiv
 
-hd-isEmbedding : ∀ {A} → isEmbedding (hd {A = A})
-fst (fst (equiv-proof (hd-isEmbedding {A} w z) y)) =
-  {!!}
-     ≡⟨ {!!} ⟩ 
-  {!!} ∎
-snd (fst (equiv-proof (hd-isEmbedding {A} w z) y)) = {!!}
-snd (equiv-proof (hd-isEmbedding {A} w z) y) = {!!} 
+-- hd-isEmbedding : ∀ {A} → isEmbedding (hd {A = A})
+-- fst (fst (equiv-proof (hd-isEmbedding {A} w z) y)) =
+--   {!!}
+--      ≡⟨ {!!} ⟩
+--   {!!} ∎
+-- snd (fst (equiv-proof (hd-isEmbedding {A} w z) y)) = {!!}
+-- snd (equiv-proof (hd-isEmbedding {A} w z) y) = {!!}
 
 --------------------
 -- Cons-injective --
@@ -63,14 +63,14 @@ cons-inj x xs y ys =
   cons x xs ≡ cons y ys
      ≡⟨ in-inj-x ⟩
   (x , λ {(lift tt) → xs}) ≡ (y , λ {(lift tt) → ys})
-     ≡⟨ sym Σ-split-iso ⟩
+     ≡⟨ sym Σ-split ⟩
   (x ≡ y) ×Σ ((λ { (lift tt) → xs }) ≡ (λ { (lift tt) → ys }))
      ≡⟨ cong (λ a → (x ≡ y) ×Σ a) (isoToPath (iso (λ a → funExt⁻ a (lift tt))
                                                     (λ a → cong (λ b → λ {(lift tt) → b}) a)
                                                     (λ b → refl)
-                                                    (λ a → refl))) ⟩ 
+                                                    (λ a → refl))) ⟩
   (x ≡ y) ×Σ (xs ≡ ys)
-     ≡⟨ sym A×B≡A×ΣB ⟩ 
+     ≡⟨ sym A×B≡A×ΣB ⟩
   (x ≡ y) × (xs ≡ ys) ∎
 
 -- -------------------------------
@@ -88,8 +88,8 @@ cons-inj x xs y ys =
 --     ≡⟨ sym Σ-split-iso ⟩
 --   (Σ (a ≡ c) (λ _ → (λ { (lift tt) → b }) ≡ λ { (lift tt) → d }))
 --      ≡⟨ isoToPath (iso (λ {(x , y) → x , funExt⁻ y (lift tt)}) (λ {(x , y) → x , funExt (λ { (lift tt) → y})}) (λ b₁ → refl) λ a₁ → refl) ⟩
---   (Σ (a ≡ c) (λ _ → b ≡ d)) 
---      ≡⟨ sym A×B≡A×ΣB ⟩ 
+--   (Σ (a ≡ c) (λ _ → b ≡ d))
+--      ≡⟨ sym A×B≡A×ΣB ⟩
 --   ((a ≡ c) × (b ≡ d)) ∎
 
 -- stream-expand : ∀ {ℓ} (A : Set ℓ) (s t : stream A) → (s ≡ t) ≡ (hd s ≡ hd t) × (tl s ≡ tl t)
@@ -131,7 +131,7 @@ cons-inj x xs y ys =
 --     ≡⟨ refl ⟩
 --   (A × B , λ x → Lift Unit × Lift Unit )
 --     ≡⟨ (λ i → (A × B) , λ _ → sym diagonal-unit i) ⟩
---   (A × B , λ x → Lift Unit ) 
+--   (A × B , λ x → Lift Unit )
 --     ≡⟨ refl ⟩
 --   stream-S (A × B) ∎
 
@@ -216,7 +216,7 @@ cons-inj x xs y ys =
 
 -- helper : ∀ {ℓ} {A : Set ℓ} → (b : Stream A) → ((n : ℕ) → nth n (stream-to-Stream (Stream-to-stream b)) ≡ nth n b)
 -- helper b 0 = head-to-hd (Stream-to-stream b) □ hd-to-head b
--- helper b (suc n) = 
+-- helper b (suc n) =
 --   nth (suc n) (stream-to-Stream (Stream-to-stream b))
 --     ≡⟨ refl ⟩
 --   nth n (tail (stream-to-Stream (Stream-to-stream b)))
@@ -254,7 +254,7 @@ cons-inj x xs y ys =
 --                ((λ n → cong (Stream-to-stream-func-π n) (stream-to-Stream-unfold a) i))) ⟩
 --   (λ n → Stream-to-stream-func-x n (record { head = hd a ; tail = stream-to-Stream (tl a) })) ,
 --   (λ n → Stream-to-stream-func-π n (record { head = hd a ; tail = stream-to-Stream (tl a) }))
---     ≡⟨ ΣPathP (stream-equality-iso-2₁ a , stream-equality-iso-2₂ a) ⟩ 
+--     ≡⟨ ΣPathP (stream-equality-iso-2₁ a , stream-equality-iso-2₂ a) ⟩
 --   (a .fst , a .snd)
 --     ≡⟨ refl ⟩
 --   a ∎

@@ -45,7 +45,7 @@ record qpf {ℓ} {S : Container {ℓ}} (F₀ : {S : Container {ℓ}} -> Set ℓ 
 
   QpfM : Set ℓ
   QpfM = (L ∘ sequenceF) (Ms S)
-  
+
   QMs : Container
   QMs = QpfM , λ x → F₀ {S = Ms S} QpfM
 

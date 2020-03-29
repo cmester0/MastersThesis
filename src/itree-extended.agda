@@ -65,7 +65,7 @@ tau' : {E : Set₀ -> Set₁} -> {R : Set₀} -> itree E R -> P₀ {S = itree-S 
 tau' t = tauT , λ x → t
 
 vis' : ∀ {E} {R}  -> ∀ {A : Set} -> E A -> (A -> itree E R) -> P₀ {S = itree-S E R} (itree E R)
-vis' {A = A} e k = visT e , λ { (lift x) -> k x } 
+vis' {A = A} e k = visT e , λ { (lift x) -> k x }
 
 ret : ∀ {E} {R}  -> R -> itree E R
 ret = in-fun ∘ ret'

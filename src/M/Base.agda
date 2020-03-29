@@ -1,21 +1,20 @@
 {-# OPTIONS --cubical --guardedness #-} --safe
 
-open import Cubical.Foundations.Prelude
-open import Cubical.Foundations.Function using (idfun ; _∘_)
-
 open import Cubical.Data.Unit
 open import Cubical.Data.Prod
 open import Cubical.Data.Nat as ℕ using (ℕ ; suc ; _+_ )
 open import Cubical.Data.Sigma
 
+open import Cubical.Foundations.Prelude
+open import Cubical.Foundations.Function using (idfun ; _∘_)
 open import Cubical.Foundations.Transport
-
 open import Cubical.Foundations.Univalence
 open import Cubical.Foundations.Isomorphism
 open import Cubical.Foundations.Function
 open import Cubical.Foundations.GroupoidLaws
 open import Cubical.Foundations.Path
 open import Cubical.Foundations.FunExtEquiv
+open import Cubical.Foundations.Equiv
 
 open import Cubical.Data.Sum
 
@@ -25,27 +24,48 @@ open import Container
 open import Coalg.Base
 
 module M.Base where
+
 --------------------------------
 -- Limit of a Chain is Unique --
 --------------------------------
 
 open Iso
 
+postulate
+  lemma11-Iso : ∀ {ℓ} {S : Container {ℓ}} (X : ℕ → Set ℓ) (l : (n : ℕ) → X n → X (suc n)) → Iso (Σ ((n : ℕ) → X n) (λ x → (n : ℕ) → x (suc n) ≡ l n (x n))) (X 0)
+  lemma11 : ∀ {ℓ} {S : Container {ℓ}} (X : ℕ → Set ℓ) (l : (n : ℕ) → X n → X (suc n)) → Σ ((n : ℕ) → X n) (λ x → (n : ℕ) → x (suc n) ≡ l n (x n)) ≡ X 0
+  lemma11-2 : ∀ {ℓ} {S : Container {ℓ}} a p n → a n ≡ transport (lemma11 {S = S} (λ _ → S .fst) (λ _ x₂ → x₂)) (a , p) 
+  lemma11-2-Iso : ∀ {ℓ} {S : Container {ℓ}} a p n → a n ≡ fun (lemma11-Iso {S = S} (λ _ → S .fst) (λ _ x₂ → x₂)) (a , p)
+  
+-- -- helper
+-- eight-nine :
+--   ∀ {ℓ} -> {S : Container {ℓ}} →
+--   let (A , B) = S in
+--   Σ ((n : ℕ) → A) (λ a → Σ ((n : ℕ) → a (suc n) ≡ a n) λ p → Σ ((n : ℕ) → B (a n) → X (sequence S) n) λ u → (n : ℕ) → transport (λ i → B (p n i) → X (sequence S) n) (π (sequence S) ∘ u (suc n)) ≡ u n)
+--   ≡
+--   Σ A λ a → Σ ((n : ℕ) → B a → X (sequence S) n) λ u → (n : ℕ) → π (sequence S) ∘ u (suc n) ≡ u n
+-- eight-nine {S = S@(A , B)} =
+--   Σ ((n : ℕ) → A) (λ a → Σ ((n : ℕ) → a (suc n) ≡ a n) λ p → Σ ((n : ℕ) → B (a n) → X (sequence S) n) λ u → (n : ℕ) → transport (λ i → B (p n i) → X (sequence S) n) (π (sequence S) ∘ u (suc n)) ≡ u n)
+--     ≡⟨ isoToPath (iso (λ {(a , (b , (c , d))) → (a , b) , (c , d)}) (λ {((a , b) , (c , d)) → a , (b , (c , d))}) refl-fun refl-fun) ⟩
+--   Σ (Σ ((n : ℕ) → A) (λ a → (n : ℕ) → a (suc n) ≡ a n)) (λ ap →
+--     Σ ((n : ℕ) → B (ap .fst n) → X (sequence S) n) λ u → (n : ℕ) → transport (λ i → B (ap .snd n i) → X (sequence S) n) (π (sequence S) ∘ u (suc n)) ≡ u n)
+--     ≡⟨ Σ-ap (lemma11 {S = S} (λ _ → A) λ _ x → x) (λ {(a , p) → {!!}}) ⟩
+--   (Σ A (λ a → Σ ((n : ℕ) → B a → X (sequence S) n) λ u → (n : ℕ) → π (sequence S) ∘ u (suc n) ≡ u n)) ∎
+
+-- isoToPath (iso (λ {(x , y) → (λ n x₁ → x n (subst B (lemma11-2 a p n) x₁)) , λ n i a₁ → {!!}})
+--                                                                                   (λ {(x , y) → (λ n x₁ → x n (subst B (sym (lemma11-2 a p n)) x₁)) , {!!}})
+--                                                                                   {!!}
+--                                                                                   {!!})
+
 -- Lemma 12
 L-unique-iso : ∀ {ℓ} -> {S : Container {ℓ}} -> Iso (L (shift-chain (sequence S))) (L (sequence S))
-fst (fun L-unique-iso (a , b)) n with n
-... | 0 = lift tt
-... | (suc m) = a m
-snd (fun L-unique-iso (a , b)) n with n
-... | 0 = refl {x = lift tt}
-... | (suc m) = b m
-fst (inv L-unique-iso x) = x .fst ∘ suc
-snd (inv L-unique-iso x) = x .snd ∘ suc
-fst (rightInv L-unique-iso (b , c) i) 0 = lift tt
-fst (rightInv L-unique-iso (b , c) i) (suc n) = b (suc n)
-snd (rightInv L-unique-iso (b , c) i) 0 = refl
-snd (rightInv L-unique-iso (b , c) i) (suc n) = c (suc n)
-leftInv L-unique-iso a = ΣPathP (refl , refl)
+fun L-unique-iso (a , b) = (λ {0 → lift tt ; (suc n) → a n }) , λ { 0 → refl {x = lift tt} ; (suc n) → b n }
+inv L-unique-iso x = x .fst ∘ suc , x .snd ∘ suc
+fst (rightInv L-unique-iso (a , b) i) 0 = lift tt
+fst (rightInv L-unique-iso (a , b) i) (suc n) = a (suc n)
+snd (rightInv L-unique-iso (a , b) i) 0 = refl
+snd (rightInv L-unique-iso (a , b) i) (suc n) = b (suc n)
+leftInv L-unique-iso x = ΣPathP (refl , refl)
 
 PX,Pπ : ∀ {ℓ} (S : Container {ℓ}) -> Chain
 PX,Pπ {ℓ} S =
@@ -63,10 +83,8 @@ projection n (x , q) = x n
 β n (x , q) = q n
 
 lemma10-Iso : ∀ {ℓ} {S : Container {ℓ}} {C,γ : Coalg₀ {S = S}} -> Iso (C,γ .fst -> M S) (Cone C,γ)
-fst (fun (lemma10-Iso) f) n z = projection n (f z)
-snd (fun (lemma10-Iso) f) n i a = β n (f a) i
-fst (inv (lemma10-Iso) (u , q) z) n = u n z
-snd (inv (lemma10-Iso) (u , q) z) n i = q n i z
+fun (lemma10-Iso) f = (λ n z → projection n (f z)) , λ n i a → β n (f a) i
+inv (lemma10-Iso) (u , q) z = (λ n → u n z) , λ n i → q n i z
 rightInv (lemma10-Iso) = refl-fun
 leftInv (lemma10-Iso) = refl-fun
 
@@ -153,8 +171,8 @@ lemma11-helper :
   → M S ≡ X (sequence S) 0
 lemma11-helper = isoToPath ∘ lemma11-helper-Iso
 
-postulate
-  lemma11 : ∀ {ℓ} {S : Container {ℓ}} -> M S ≡ X (sequence S) 0
+-- postulate
+--   lemma11 : ∀ {ℓ} {S : Container {ℓ}} -> M S ≡ X (sequence S) 0
 
 α-iso-step-1-4-Iso : ∀ {ℓ} {S : Container {ℓ}}
     -> let (A , B) = S in
@@ -173,33 +191,82 @@ leftInv (α-iso-step-1-4-Iso {S = S@(A , B)}) = refl-fun
           PathP (λ x → B (a .snd n x) → X (sequence S) n) (π (sequence S) ∘ u (suc n)) (u n))
 α-iso-step-1-4 {S = S@(A , B)} = isoToPath α-iso-step-1-4-Iso
 
-postulate
-  sym-α-iso-step-5-Iso : ∀ {ℓ} {S : Container {ℓ}}
+α-iso-step-5'-Iso : ∀ {ℓ} {S : Container {ℓ}}
+  -> let (A , B) = S in
+  Iso
+    (Σ (Σ ((n : ℕ) → A) (λ a → (n : ℕ) → a (suc n) ≡ a n)) λ a →
+      Σ ((n : ℕ) → B (a .fst n) → X (sequence S) n) λ u →
+        (n : ℕ) → transport (λ x → B (a .snd n x) → X (sequence S) n) (π (sequence S) ∘ u (suc n)) ≡ (u n))
+    (Σ A (λ a → Σ ((n : ℕ) → B a → X (sequence S) n) λ u → (n : ℕ) → π (sequence S) ∘ (u (suc n)) ≡ u n))
+α-iso-step-5'-Iso {S = S@(A , B)} =
+  (Σ (Σ ((n : ℕ) → A) (λ a → (n : ℕ) → a (suc n) ≡ a n)) λ a →
+     Σ ((n : ℕ) → B (a .fst n) → W S n) λ u →
+       (n : ℕ) → transport (λ x → B (a .snd n x) → W S n) (πₙ S ∘ u (suc n)) ≡ (u n))
+    Iso⟨ Σ-ap-iso ((lemma11-Iso {S = S} (λ _ → A) λ _ x → x)) (λ {(a , p) →
+       Σ-ap-iso (pathToIso (lemma11-temp (a , p))) (λ x → pathToIso (cong (λ k → (n : ℕ) → k n) (funExt (lemma11-temp-2 (a , p) x))))}) ⟩
+  (Σ A λ a → Σ ((n : ℕ) → B a → W S n) λ u →
+     (n : ℕ) → transport (λ x → B a → W S n) (πₙ S ∘ u (suc n)) ≡ (u n))
+    Iso⟨ Σ-ap-iso₂ (λ a → Σ-ap-iso₂ λ u → pathToIso (cong (λ k → (n : ℕ) → k n ≡ u n) (funExt λ n → transportRefl (πₙ S ∘ u (suc n))))) ⟩
+  Σ A (λ a → Σ ((n : ℕ) → B a → W S n) λ u →
+     (n : ℕ) → πₙ S ∘ u (suc n) ≡ u n) ∎Iso
+    where
+      lemma11-temp :
+          (a : Σ ((n : ℕ) → A) (λ x → (n : ℕ) → x (suc n) ≡ x n)) →
+          ((n : ℕ) → B (a .fst n) → W (A , B) n) ≡
+          ((n : ℕ) → B (fun (lemma11-Iso {S = S} (λ _ → A) (λ _ x → x)) a) → W (A , B) n)
+      lemma11-temp a =
+        (cong (λ k → (n : ℕ) → B (k n) → W S n) (funExt (lemma11-2-Iso (a .fst) (a .snd))))
+
+      postulate
+        lemma11-temp-2 :
+          (a : Σ ((n : ℕ) → A) (λ x → (n : ℕ) → x (suc n) ≡ x n)) →
+          (x : (n : ℕ) → B (a .fst n) → W (A , B) n) →
+          (n : ℕ) → 
+          (transport (λ x₁ → B (a .snd n x₁) → W (A , B) n)
+                               (λ x₁ → πₙ (A , B) (x (suc n) x₁))
+                     ≡ x n)
+          ≡
+          (transport (λ x₁ → B (fun (lemma11-Iso {S = S} (λ _ → A) (λ _ x₂ → x₂)) a) → W (A , B) n)
+                               (λ x₁ → πₙ (A , B) (transport (lemma11-temp a) x (suc n) x₁))
+                     ≡ transport (lemma11-temp a) x n)
+
+sym-α-iso-step-5-Iso : ∀ {ℓ} {S : Container {ℓ}}
     -> let (A , B) = S in
     Iso
       (Σ A (λ a → Σ ((n : ℕ) → B a → X (sequence S) n) λ u → (n : ℕ) → π (sequence S) ∘ (u (suc n)) ≡ u n))
       (Σ (Σ ((n : ℕ) → A) (λ a → (n : ℕ) → a (suc n) ≡ a n)) λ a →
         Σ ((n : ℕ) → B (a .fst n) → X (sequence S) n) λ u →
           (n : ℕ) → PathP (λ x → B (a .snd n x) → X (sequence S) n) (π (sequence S) ∘ u (suc n)) (u n))
-
-α-iso-step-5 : ∀ {ℓ} {S : Container {ℓ}}
-  -> let (A , B) = S in
+sym-α-iso-step-5-Iso {S = S@(A , B)} =
+  Σ A (λ a → Σ ((n : ℕ) → B a → X (sequence S) n) λ u → (n : ℕ) → π (sequence S) ∘ u (suc n) ≡ u n)
+    Iso⟨ sym-iso α-iso-step-5'-Iso ⟩
   (Σ (Σ ((n : ℕ) → A) (λ a → (n : ℕ) → a (suc n) ≡ a n)) λ a →
      Σ ((n : ℕ) → B (a .fst n) → X (sequence S) n) λ u →
-       (n : ℕ) → PathP (λ x → B (a .snd n x) → X (sequence S) n) (π (sequence S) ∘ u (suc n)) (u n))
-  ≡ Σ A (λ a → Σ ((n : ℕ) → B a → X (sequence S) n) λ u → (n : ℕ) → π (sequence S) ∘ (u (suc n)) ≡ u n)
-α-iso-step-5 = isoToPath (sym-iso sym-α-iso-step-5-Iso)
+       (n : ℕ) → transport (λ x → B (a .snd n x) → X (sequence S) n) (π (sequence S) ∘ u (suc n)) ≡ (u n))
+    Iso⟨ iso (λ {((x , y) , (z , w)) → (x , y) , (z , λ n → transport⁻ (PathP≡Path (λ x → B (y n x) → X (sequence S) n) (πₙ S ∘ z (suc n)) (z n)) (w n))})
+             (λ {((x , y) , (z , w)) → (x , y) , (z , λ n → transport (PathP≡Path (λ x → B (y n x) → X (sequence S) n) (πₙ S ∘ z (suc n)) (z n)) (w n))})
+             (λ {((x , y) , (z , w)) → λ i → (x , y) , (z , (λ n → transport⁻Transport (PathP≡Path (λ x → B (y n x) → X (sequence S) n) (πₙ S ∘ z (suc n)) (z n)) (w n) i))})
+             (λ {((x , y) , (z , w)) → λ i → (x , y) , (z , (λ n → transportTransport⁻ (PathP≡Path (λ x → B (y n x) → X (sequence S) n) (πₙ S ∘ z (suc n)) (z n)) (w n) i))}) ⟩
+  (Σ (Σ ((n : ℕ) → A) (λ a → (n : ℕ) → a (suc n) ≡ a n)) (λ a →
+     Σ ((n : ℕ) → B (a .fst n) → X (sequence S) n) λ u →
+       (n : ℕ) → PathP (λ x → B (a .snd n x) → X (sequence S) n) (π (sequence S) ∘ u (suc n)) (u n))) ∎Iso
+
+α-iso-step-5 : ∀ {ℓ} {S : Container {ℓ}}
+    -> let (A , B) = S in
+    (Σ (Σ ((n : ℕ) → A) (λ a → (n : ℕ) → a (suc n) ≡ a n)) λ a →
+      Σ ((n : ℕ) → B (a .fst n) → X (sequence S) n) λ u →
+        (n : ℕ) → PathP (λ x → B (a .snd n x) → X (sequence S) n) (π (sequence S) ∘ u (suc n)) (u n))
+    ≡ Σ A (λ a → Σ ((n : ℕ) → B a → X (sequence S) n) λ u → (n : ℕ) → π (sequence S) ∘ (u (suc n)) ≡ u n)
+α-iso-step-5 {S = S@(A , B)} = isoToPath (sym-iso sym-α-iso-step-5-Iso)
 
 sym-α-iso-step-6 : ∀ {ℓ} {S : Container {ℓ}}
     -> let (A , B) = S in
     Iso (Σ A (λ a → B a → M S))
         (Σ A (λ a → Σ ((n : ℕ) → B a → X (sequence S) n) λ u → (n : ℕ) → π (sequence S) ∘ (u (suc n)) ≡ u n))
-fst (fun (sym-α-iso-step-6 {S = S@(A , B)}) (x , y')) = x
-snd (fun (sym-α-iso-step-6 {S = S@(A , B)}) (x , y')) = transport (sym ((λ (a : A) → sym (lemma10 (B a , (λ x → a , (λ x₁ → x₁))))) x)) y'
-fst (inv (sym-α-iso-step-6 {S = S@(A , B)}) (x , y)) = x
-snd (inv (sym-α-iso-step-6 {S = S@(A , B)}) (x , y)) = transport ((λ (a : A) → sym (lemma10 (B a , (λ x → a , (λ x₁ → x₁))))) x) y
-rightInv (sym-α-iso-step-6 {S = S@(A , B)}) (x , y') = ΣPathP (refl {x = x} , transport⁻Transport ((λ (a : A) → sym (lemma10 (B a , (λ x → a , (λ x₁ → x₁))))) x) y')
-leftInv (sym-α-iso-step-6 {S = S@(A , B)}) (x , y) = ΣPathP (refl {x = x} , transportTransport⁻ ((λ (a : A) → sym (lemma10 (B a , (λ x → a , (λ x₁ → x₁))))) x) y)
+fun (sym-α-iso-step-6 {S = S@(A , B)}) (x , y') = x , transport (lemma10 (B x , λ _ → x , (λ x₁ → x₁))) y'
+inv (sym-α-iso-step-6 {S = S@(A , B)}) (x , y) = x , transport (sym (lemma10 (B x , λ _ → x , (λ x₁ → x₁)))) y
+rightInv (sym-α-iso-step-6 {S = S@(A , B)}) (x , y') = ΣPathP (refl {x = x} , transport⁻Transport (sym (lemma10 (B x , λ _ → x , (λ x₁ → x₁)))) y')
+leftInv (sym-α-iso-step-6 {S = S@(A , B)}) (x , y) = ΣPathP (refl {x = x} , transportTransport⁻ (sym (lemma10 (B x , λ _ → x , (λ x₁ → x₁)))) y)
 
 α-iso-step-6 : ∀ {ℓ} {S : Container {ℓ}}
     -> let (A , B) = S in
@@ -217,25 +284,16 @@ leftInv (sym-α-iso-step-6 {S = S@(A , B)}) (x , y) = ΣPathP (refl {x = x} , tr
 -----------------------------------------------------
 
 comp-α-iso-step-1-4-Iso-Sym-L-unique-iso : ∀ {ℓ} {S : Container {ℓ}} -> let (A , B) = S in Iso (Σ (Σ ((n : ℕ) → A) (λ a → (n : ℕ) → a (suc n) ≡ a n)) λ a → Σ ((n : ℕ) → B (a .fst n) → X (sequence S) n) λ u → (n : ℕ) → PathP (λ x → B (a .snd n x) → X (sequence S) n) (π (sequence S) ∘ u (suc n)) (u n))  (L (sequence S))
-fst (fun comp-α-iso-step-1-4-Iso-Sym-L-unique-iso (a , b)) n with n
-... | 0 = lift tt
-... | (suc m) = (a .fst m) , (b .fst m)
-snd (fun comp-α-iso-step-1-4-Iso-Sym-L-unique-iso (a , b)) n with n
-... | 0 = refl {x = lift tt}
-... | (suc m) = λ i → a .snd m i , b .snd m i
-fst (fst (inv comp-α-iso-step-1-4-Iso-Sym-L-unique-iso x)) n = (x .fst) (suc n) .fst
-snd (fst (inv comp-α-iso-step-1-4-Iso-Sym-L-unique-iso x)) n i = (x .snd) (suc n) i .fst
-fst (snd (inv comp-α-iso-step-1-4-Iso-Sym-L-unique-iso x)) n = (x .fst) (suc n) .snd
-snd (snd (inv comp-α-iso-step-1-4-Iso-Sym-L-unique-iso x)) n i = (x .snd) (suc n) i .snd
+fun comp-α-iso-step-1-4-Iso-Sym-L-unique-iso (a , b) = (λ { 0 → lift tt ; (suc n) → (a .fst n) , (b .fst n)}) , λ { 0 → refl {x = lift tt} ; (suc m) i → a .snd m i , b .snd m i }
+inv comp-α-iso-step-1-4-Iso-Sym-L-unique-iso x = ((λ n → (x .fst) (suc n) .fst) , λ n i → (x .snd) (suc n) i .fst) , (λ n → (x .fst) (suc n) .snd) , λ n i → (x .snd) (suc n) i .snd
 fst (rightInv comp-α-iso-step-1-4-Iso-Sym-L-unique-iso (b , c) i) 0 = lift tt
 fst (rightInv comp-α-iso-step-1-4-Iso-Sym-L-unique-iso (b , c) i) (suc n) = refl i
 snd (rightInv comp-α-iso-step-1-4-Iso-Sym-L-unique-iso (b , c) i) 0 = refl
 snd (rightInv comp-α-iso-step-1-4-Iso-Sym-L-unique-iso (b , c) i) (suc n) = c (suc n)
 leftInv comp-α-iso-step-1-4-Iso-Sym-L-unique-iso a = ΣPathP (refl , refl)
 
-abstract
-  shift-iso : ∀ {ℓ} {S : Container {ℓ}} -> Iso (P₀ {S = S} (M S)) (M S)
-  shift-iso {S = S@(A , B)} = (compIso (sym-α-iso-step-6) (compIso (sym-α-iso-step-5-Iso {S = S}) (comp-α-iso-step-1-4-Iso-Sym-L-unique-iso {S = S})))
+shift-iso : ∀ {ℓ} {S : Container {ℓ}} -> Iso (P₀ {S = S} (M S)) (M S)
+shift-iso {S = S@(A , B)} = (compIso (sym-α-iso-step-6) (compIso (sym-α-iso-step-5-Iso {S = S}) (comp-α-iso-step-1-4-Iso-Sym-L-unique-iso {S = S})))
 
 shift : ∀ {ℓ} {S : Container {ℓ}} -> P₀ {S = S} (M S) ≡ M S
 shift {S = S@(A , B)} = isoToPath shift-iso -- lemma 13 & lemma 12

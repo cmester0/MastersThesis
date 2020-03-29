@@ -45,6 +45,8 @@
 \newcommand*{\empt}{\type{\textbf{0}}}
 \newcommand*{\coalg}[2]{#1\texttt{-}#2}
 
+\newcommand*{\constant}[1]{\textcolor{orange!60!black}{\ensuremath{\mathtt{#1}}}}
+
 \newcommand*{\function}[1]{\textcolor{blue!60!black}{\ensuremath{\mathtt{#1}}}}
 \newcommand*{\typeformer}[1]{\ensuremath{\mathtt{#1}}}
 \newcommand*{\functor}[1]{\ensuremath{\mathbf{\mathtt{#1}}}}
@@ -276,6 +278,54 @@ Since we know that M-types preserves the H-level, we can use set-truncated quoti
 \item QIITs have been formalized in agda using private types. Can this also be done in cubical agda (ie without cheating).
 \item   Show that this is the final (quotiented) coalgebra. Does this generalize to QM-types, and what are those constructively ??
 \end{itemize}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\chapter{Contractive}
+We want to show that
+\begin{align}
+  &\sum_{(a : A)} \sum_{(u : \prod_{(n : \mathbb{N})} B~a \rightarrow X_n)} \prod_{(n : \mathbb{N})} \pi_{(n)} \circ (u_{n + 1}) \equiv u_n \\
+  \equiv& \sum_{(a : \sum_{(a : (n : \mathbb{N}) \rightarrow A)} \prod_{(n : \mathbb{N})} a_{n+1} \equiv a_n))} \sum_{(u : (n : \mathbb{N}) \rightarrow B~(\pi_1~a)_n \rightarrow X_n)} \prod_{(n : \mathbb{N})} \pi_{(n)} \circ u_{n+1} \equiv_{(\lambda\,x, B~((\pi_2~a)_n~x)) \rightarrow X_n)} u_n
+\end{align}
+we have the two functions
+\begin{equation}
+  \function{fun}~(x , y) := ((\lambda\,n, x) , (\lambda\,n~i, x)) , y
+\end{equation}
+and its inverse (we use the notation \(y_{(!n)} = y_{n} \cdot y_{n-1} \cdot ~\dots~ \cdot y_1 \cdot y_0\))
+\begin{equation}
+  \function{inv}~((x , y) , (z , w)) := x_0 , ((\lambda\,n~a , z~n~(\mathtt{subst}~B~y_{(!n)}~a)) , (\lambda\,n~i~a, w~n~i~(\mathtt{subst}~B~?~a)))
+\end{equation}
+
+\begin{figure}[h]
+  \centering
+  \begin{tikzcd}[row sep=huge,column sep=huge]
+    x , (z , w) \ar[r,"\function{fun}"] \ar[d,"\texttt{refl}"] & (\lambda\,n, x , \lambda\,n~i, x) , (z , w) \ar[d,"\function{inv}"] \\
+    x , (z , w) & x , ((\lambda\,n~a, z~n~(\texttt{transport}~y_?~a)) , (\lambda\,n~i~a,w~n~i~(\texttt{transport}~?~a))) \ar[l,"refl"]
+  \end{tikzcd}
+  \caption{Left inverse}
+  \label{fig:contractive}
+\end{figure}
+
+so we want
+\begin{align}
+  &~\function{invhelper0}~((\lambda\,n, (x , y) , \lambda\,n~i, (x , y)) , (z , w)) \\
+  \equiv&~\lambda n, \begin{cases} \constant{tt} & n = 0 \\  \end{cases} \\
+  \equiv&~z
+\end{align}
+\begin{equation}
+  \function{invhelper1}~((\lambda\,n, (x , y) , \lambda\,n~i, (x , y)) , (z , w)) \equiv w
+\end{equation}
+
+\begin{figure}[h]
+  \centering
+  \begin{tikzcd}[row sep=huge,column sep=huge]
+    (x , y) , (z , w) \ar[r,"\function{inv}"] \ar[d,"\texttt{refl}"] & x_0 , (\texttt{subst}~B~?~z , \texttt{subst}~B~?~w) \ar[d,"\function{fun}"] \\
+    (x , y) , (z , w) & ((\lambda\,n,~x_0) , (\lambda\,n~i,~x_0)) , (\texttt{subst}~B~?~z , \texttt{subst}~B~?~w) \ar[l,"refl"]
+  \end{tikzcd}
+  \caption{Right inverse}
+  \label{fig:contractive}
+\end{figure}
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 

@@ -11,7 +11,7 @@ open import Cubical.Data.Bool
 open import Cubical.Foundations.Function
 open import Cubical.Foundations.Prelude
 open import Cubical.HITs.SetQuotients
- 
+
 -- Delay
 mutual
   data Delay-IT (R : Set) : Set where
@@ -114,7 +114,7 @@ mutual
 
 quotient-delay : ∀ {R} -> Delay-IT R -> Delay-IT R / (weak-delay≈ {R})
 quotient-delay (later t) = eq/ (later t) (ValueD t) (EqLaterL (record { force = weak-delay≈-refl })) i0
-quotient-delay (now r) = [ now r ] 
+quotient-delay (now r) = [ now r ]
 
 -- weak-delay is equality
 

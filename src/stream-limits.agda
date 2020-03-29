@@ -48,7 +48,7 @@ postulate
   tl-cons-2 : ∀ {ℓ} {A : Set ℓ} (f : ℕ → A) → tl {A = A} (cons-2 f) ≡ cons-2 (f ∘ suc)
 
   hd-cons-2-inv : ∀ {ℓ} {A : Set ℓ} (f : ℕ → A) → hd (cons-2 f) ≡ f 0
-  
+
 cons-2-inv : ∀ {ℓ} {A : Set ℓ} -> stream A → (ℕ → A)
 cons-2-inv x 0 = hd x
 cons-2-inv x (suc n) = cons-2-inv (tl x) n
@@ -65,7 +65,7 @@ postulate
 
 postulate
   cons-2-iso : ∀ {ℓ} {A : Set ℓ} (b : stream A) → (cons-2 (cons-2-inv b) ≡ b)
--- cons-2-iso {A = A} b = 
+-- cons-2-iso {A = A} b =
 --   transport (sym (stream-expand A (cons-2 (cons-2-inv b)) b))
 --     ((hd (cons-2 (cons-2-inv b))
 --       ≡⟨ hd-cons-2 (cons-2-inv b) ⟩
@@ -83,7 +83,7 @@ postulate
 postulate
   cons-2-iso-2 : ∀ {ℓ} {A : Set ℓ} (b : ℕ → A) → (cons-2-inv (cons-2 b) ≡ b)
 -- cons-2-iso-2 {A = A} b =
---   funExt (λ {0 → 
+--   funExt (λ {0 →
 --     cons-2-inv (cons-2 b) 0
 --       ≡⟨ refl ⟩
 --     hd (cons-2 b)
@@ -106,7 +106,7 @@ cons-2-equality {A = A} =
 
 zip-2 : ∀ {ℓ} {A B : Set ℓ} → stream A × stream B → stream (A × B)
 zip-2 (x , y) = cons-2 λ n → cons-2-inv x n , cons-2-inv y n
-  
+
 zeros : stream ℕ
 zeros = cons-2 λ _ → 0
 
@@ -116,6 +116,6 @@ postulate
 
 zero-stream-tl : tl zeros ≡ zeros
 zero-stream-tl = cong (λ x → snd x (lift tt)) (out-of-cons-2 (λ _ → 0))
-  
+
 zero-stream-hd : hd (zeros) ≡ 0
 zero-stream-hd = cong fst (out-of-cons-2 (λ _ → 0))

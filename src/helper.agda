@@ -8,16 +8,15 @@ open import Cubical.Data.Unit
 open import Cubical.Data.Prod
 open import Cubical.Data.Nat as ℕ using (ℕ ; suc ; _+_ )
 open import Cubical.Data.Sigma
+open import Cubical.Data.Sum
 
 open import Cubical.Foundations.Transport
 open import Cubical.Foundations.Univalence
 open import Cubical.Foundations.Isomorphism
 open import Cubical.Foundations.Function
 open import Cubical.Foundations.Equiv
-
 open import Cubical.Foundations.GroupoidLaws
 open import Cubical.Foundations.Path
-
 open import Cubical.Foundations.Embedding
 open import Cubical.Foundations.FunExtEquiv
 
@@ -54,7 +53,7 @@ inv (sym-iso isom) = fun isom
 rightInv (sym-iso isom) = leftInv isom
 leftInv (sym-iso isom) = rightInv isom
 
--- 
+--
 
 identity-x : ∀ {ℓ} {A B : Set ℓ} (k : A -> A) -> k ≡ idfun A -> ∀ (x : A) -> k x ≡ x
 identity-x {A = A} k = funExt⁻
@@ -105,7 +104,7 @@ open import Cubical.Foundations.Equiv.Properties
      (equivIsEquiv
       (pathToEquiv
        (isoToPath isom))))
-  
+
 ≡-rel-a-inj' : ∀ {ℓ} {A B C : Set ℓ} (a : A -> B) (e : isEmbedding a) → ∀ {f g : C -> A} -> ∀ x → ((a (f x) ≡ a (g x)) ≡ (f x ≡ g x))
 ≡-rel-a-inj' a e {f = f} {g} x = sym (ua (cong a , e (f x) (g x)))
 
@@ -143,7 +142,7 @@ open import Cubical.Foundations.Equiv.Properties
   → (isom : Iso A B)
   → ∀ {x y : A}
   → ((fun isom) x ≡ (fun isom) y) ≡ (x ≡ y)
-≡-rel-a-inj-x isom {x} {y} = 
+≡-rel-a-inj-x isom {x} {y} =
   let tempx = λ {(lift tt) → x}
       tempy = λ {(lift tt) → y} in
    fun isom x ≡ fun isom y
@@ -156,7 +155,7 @@ open import Cubical.Foundations.Equiv.Properties
   ((fun isom) ∘ tempx) ≡ ((fun isom) ∘ tempy)
     ≡⟨ ≡-rel-a-inj isom ⟩
   tempx ≡ tempy
-    ≡⟨ sym (funExtPath) ⟩  
+    ≡⟨ sym (funExtPath) ⟩
   (∀ (t : Lift Unit) -> tempx t ≡ tempy t)
     ≡⟨ isoToPath (iso (λ x₁ → x₁ (lift tt))
                       (λ x₁ t → x₁)
@@ -255,7 +254,7 @@ leftInv (Σ-ap-iso₁ {i} {X = X} {X'} {Y} isom@(iso f g K H)) (x , y) = ΣPathP
             y ∎))
   where
     postulate
-      lem : cong f (H x) ≡ K (f x)  -- Vogt lemma -- law of excluded middle
+      lem : cong f (H x) ≡ K (f x)  -- Vogt lemma -- law of excluded middle -- Hfa≡fHa (equiv)
 
 Σ-ap₁ : ∀ {i} {X X' : Set i} {Y : X' → Set i}
           → (isom : X ≡ X')
@@ -279,6 +278,15 @@ leftInv (Σ-ap-iso₁ {i} {X = X} {X'} {Y} isom@(iso f g K H)) (x , y) = ΣPathP
   ≡ (Σ X' Y')
 Σ-ap  {X = X} {X'} {Y} {Y'} isom isom' = isoToPath (Σ-ap-iso (pathToIso isom) (pathToIso ∘ isom'))
 
+Σ-ap' :
+  ∀ {ℓ} {X X' : Set ℓ} {Y : X → Set ℓ} {Y' : X' → Set ℓ}
+  → (isom : X ≡ X')
+  → (PathP (λ i → isom i → Set _) Y Y')
+  ----------
+  → (Σ X Y)
+  ≡ (Σ X' Y')
+Σ-ap'  {ℓ} {X = X} {X'} {Y} {Y'} isom isom' = cong₂ (λ (a : Set ℓ) (b : a → Set ℓ) → Σ a λ x → b x) isom isom'
+
 ------------------
 -- ∏ properties --
 ------------------
@@ -290,10 +298,102 @@ postulate
     → ((x' : X') → Y (inv isom x') ≡ Y' x')
     → Iso ((x : X) → Y x)
            ((x' : X') → Y' x')
-    
+
   ∏-ap :
     ∀ {i j} {X X' : Set i} {Y : X → Set j} {Y' : X' → Set j}
     → (isom : X ≡ X')
     → ((x' : X') → Y (transport (sym isom) x') ≡ Y' x')
     → ((x : X) → Y x)
     ≡ ((x' : X') → Y' x')
+
+------------------------
+-- Unit / Contractive --
+------------------------
+
+IsoToiso-Iso : Iso (Iso Unit Unit) (Unit ≃ Unit)
+fst (fun IsoToiso-Iso x) = fun x
+snd (fun IsoToiso-Iso x) .equiv-proof = λ y → (tt , refl) , (λ y₁ i → tt , refl)
+inv IsoToiso-Iso = λ x → iso (λ x₁ → tt) (λ x₁ → tt) (λ b i → tt) λ a i → tt
+fst (rightInv IsoToiso-Iso b i) = (λ x → tt)
+snd (rightInv IsoToiso-Iso b i) .equiv-proof = λ y → (tt , (λ i₁ → tt)) , (λ y₁ i₁ → tt , (λ i₂ → tt))
+leftInv IsoToiso-Iso = refl-fun
+
+IsoToiso : (Iso Unit Unit) ≡ (Unit ≃ Unit)
+IsoToiso = isoToPath IsoToiso-Iso
+
+isis : isContr (Unit ≃ Unit) ≡ isContr (Iso Unit Unit)
+isis = cong isContr (sym IsoToiso) 
+
+unit-Iso-is-contractive : isContr (Iso Unit Unit)
+unit-Iso-is-contractive = iso (λ _ → tt) (λ _ → tt) refl-fun refl-fun , (λ y → refl)
+
+unit-≃-is-contractive : isContr (Unit ≃ Unit)
+unit-≃-is-contractive = transport (sym isis) unit-Iso-is-contractive
+
+lift-contr→contr-lift-Iso : Iso (Lift {ℓ-zero} {ℓ-suc ℓ-zero} (isContr (Unit ≃ Unit))) (isContr (Lift {ℓ-zero} {ℓ-suc ℓ-zero} (Unit ≃ Unit)))
+fun lift-contr→contr-lift-Iso x = (lift (lower x .fst)) , (λ y → cong lift (lower x .snd (lower y)))
+inv lift-contr→contr-lift-Iso x = lift ((lower (x .fst)) , (λ y → cong lower (x .snd (lift y))))
+rightInv lift-contr→contr-lift-Iso = refl-fun
+leftInv lift-contr→contr-lift-Iso = refl-fun
+
+lift-contr→contr-lift : Lift {ℓ-zero} {ℓ-suc ℓ-zero} (isContr (Unit ≃ Unit)) ≡ isContr (Lift {ℓ-zero} {ℓ-suc ℓ-zero} (Unit ≃ Unit))
+lift-contr→contr-lift = isoToPath lift-contr→contr-lift-Iso
+
+unit-≃-is-contractive-lift : isContr (Lift {ℓ-zero} {ℓ-suc ℓ-zero} (Unit ≃ Unit))
+unit-≃-is-contractive-lift = transport lift-contr→contr-lift (lift unit-≃-is-contractive)
+
+unit-≡-is-contractive : isContr (Unit ≡ Unit)
+unit-≡-is-contractive = transport (cong isContr (sym univalencePath)) unit-≃-is-contractive-lift
+
+inr-inj-unit : ∀ {R : Set} (a b : R) → (inr {A = Unit} {B = R} a ≡ inr b) ≡ (a ≡ b)
+inr-inj-unit a b =
+  (sym (ua (SumPath.Cover≃Path (inr a) (inr b)))) □ isoToPath (iso lower lift refl-fun refl-fun)
+
+transportComposite-□ : ∀ {ℓ} {A B C : Set ℓ} (p : A ≡ B) (q : B ≡ C) (x : A) → transport (p □ q) x ≡ transport q (transport p x)
+transportComposite-□ p q x = substComposite-□ (λ x₁ → x₁) p q x
+
+postulate
+  ad : ∀ {ℓ} {A B C : Set ℓ} (p : A ≡ B) (q : B ≡ C) → sym (p □ q) ≡ sym q □ sym p
+
+ass : ∀ {ℓ} {A B C : Set ℓ} (p : A ≡ B) (q : B ≡ C) (x : C) → transport⁻ (p □ q) x ≡ transport⁻ p (transport⁻ q x)
+ass p q x =
+  transport⁻ (p □ q) x
+    ≡⟨ refl ⟩
+  transport (sym (p □ q)) x
+    ≡⟨ cong (λ a → transport a x) (ad p q) ⟩
+  transport (sym q □ sym p) x
+    ≡⟨ transportComposite-□ (sym q) (sym p) x ⟩
+  transport⁻ p (transport⁻ q x) ∎
+
+asdf : ∀ {R} (r s : R) x → cong inr x ≡ transport⁻ (inr-inj-unit r s) x
+asdf r s x =
+  cong inr x
+    ≡⟨ refl ⟩
+  SumPath.decode (inr r) (inr s) (lift x)
+    ≡⟨ sym (uaβ (SumPath.Cover≃Path (inr r) (inr s)) (lift x)) ⟩
+  transport (ua (SumPath.Cover≃Path (inr r) (inr s))) (lift x)
+    ≡⟨ refl ⟩
+  transport⁻ (sym (ua (SumPath.Cover≃Path (inr r) (inr s)))) (lift x)
+    ≡⟨ cong (transport⁻ (sym (ua (SumPath.Cover≃Path (inr r) (inr s))))) (sym (uaβ (isoToEquiv (iso lift lower refl-fun refl-fun)) x)) ⟩
+  transport⁻ (sym (ua (SumPath.Cover≃Path (inr r) (inr s)))) (transport (ua (isoToEquiv (iso lift lower refl-fun refl-fun))) x)
+    ≡⟨ refl ⟩
+  transport⁻ (sym (ua (SumPath.Cover≃Path (inr r) (inr s)))) (transport (isoToPath (iso lift lower refl-fun refl-fun)) x)
+    ≡⟨ refl ⟩
+  transport⁻ (sym (ua (SumPath.Cover≃Path (inr r) (inr s)))) (transport⁻ (isoToPath (iso lower lift refl-fun refl-fun)) x)
+    ≡⟨ sym (ass (sym (ua (SumPath.Cover≃Path (inr r) (inr s)))) (isoToPath (iso lower lift refl-fun refl-fun)) x) ⟩
+  transport⁻ (sym (ua (SumPath.Cover≃Path (inr r) (inr s))) □ isoToPath (iso lower lift refl-fun refl-fun)) x
+    ≡⟨ refl ⟩
+  transport⁻ (inr-inj-unit r s) x ∎
+
+inr-contractive : ∀ {R} (r s : R) → isContr (r ≡ s) → isContr (inr {A = Unit} r ≡ inr s)
+inr-contractive r s x = cong inr (x .fst) , λ y →
+  cong inr (x .fst)
+    ≡⟨ cong (cong inr) (x .snd (transport (inr-inj-unit r s) y)) ⟩
+  cong inr (transport (inr-inj-unit r s) y)
+    ≡⟨ asdf r s (transport (inr-inj-unit r s) y) ⟩
+  transport⁻ (inr-inj-unit r s) (transport (inr-inj-unit r s) y)
+    ≡⟨ transport⁻Transport (inr-inj-unit r s) y ⟩
+  y ∎
+
+postulate
+  wanting : ∀ {ℓ} {R M : Set ℓ} (r s : R) (f : R → M) → (x : isContr (f r ≡ f s)) → ∀ (i : I) → Σ R λ y → x .fst i ≡ f y
