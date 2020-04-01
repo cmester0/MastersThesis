@@ -63,9 +63,6 @@ inv (lemma10-Iso) (u , q) z = (λ n → u n z) , λ n i → q n i z
 rightInv (lemma10-Iso) = refl-fun
 leftInv (lemma10-Iso) = refl-fun
 
--- lemma10 : ∀ {ℓ} {S : Container {ℓ}} (C,γ : Coalg₀ {S = S}) -> (C,γ .fst -> M S) ≡ Cone C,γ
--- lemma10 {S = S} C,γ@(C , γ) = isoToPath (lemma10-Iso {C,γ = C,γ})
-
 ------------------------------------
 -- Shifting M-type is an equality --
 ------------------------------------
@@ -106,33 +103,26 @@ lemma11-Iso {ℓ = ℓ} {S = S} X l =
     open AlgebraPropositionality
     open NatSection    
 
-    temp' : (x₀ : X 0) -> NatFiber NatAlgebraℕ ℓ
-    temp' x₀ = record { Fiber = X ; fib-zero = x₀ ; fib-suc = λ {n : ℕ} xₙ → l n xₙ }
+    X-fiber-over-ℕ : (x₀ : X 0) -> NatFiber NatAlgebraℕ ℓ
+    X-fiber-over-ℕ x₀ = record { Fiber = X ; fib-zero = x₀ ; fib-suc = λ {n : ℕ} xₙ → l n xₙ }
 
-    temp : (x₀ : X 0) → (z : Σ ((n : ℕ) → X n) λ x → (x 0 ≡ x₀) × (∀ n → (x (suc n)) ≡ l n (x n))) -> NatSection (temp' x₀)
-    temp = λ x₀ z → record { section = fst z ; sec-comm-zero = proj₁ (snd z) ; sec-comm-suc = proj₂ (snd z) }
+    X-section : (x₀ : X 0) → (z : Σ ((n : ℕ) → X n) λ x → (x 0 ≡ x₀) × (∀ n → (x (suc n)) ≡ l n (x n))) -> NatSection (X-fiber-over-ℕ x₀)
+    X-section = λ x₀ z → record { section = fst z ; sec-comm-zero = proj₁ (snd z) ; sec-comm-suc = proj₂ (snd z) }
 
-    helper : (x₀ : X 0) →
+    Z-is-Section : (x₀ : X 0) →
       Iso (Σ ((n : ℕ) → X n) λ x → (x 0 ≡ x₀) × (∀ n → (x (suc n)) ≡ l n (x n)))
-          (NatSection (temp' x₀))
-    fun (helper x₀) (x , (z , y)) = record { section = x ; sec-comm-zero = z ; sec-comm-suc = y }
-    inv (helper x₀) x = NatSection.section x , (sec-comm-zero x , sec-comm-suc x)
-    rightInv (helper x₀) = refl-fun
-    leftInv (helper x₀) (x , (z , y)) = refl
-
-    helper' : (x₀ : X 0)
-      → (Σ ((n : ℕ) → X n) λ x → (x 0 ≡ x₀) × (∀ n → (x (suc n)) ≡ l n (x n)))
-      ≡ (NatSection (temp' x₀))
-    helper' x₀ = isoToPath (helper x₀)
+          (NatSection (X-fiber-over-ℕ x₀))
+    fun (Z-is-Section x₀) (x , (z , y)) = record { section = x ; sec-comm-zero = z ; sec-comm-suc = y }
+    inv (Z-is-Section x₀) x = NatSection.section x , (sec-comm-zero x , sec-comm-suc x)
+    rightInv (Z-is-Section x₀) = refl-fun
+    leftInv (Z-is-Section x₀) (x , (z , y)) = refl
 
     -- S≡T
-    χ-prop' : (x₀ : X 0) → isProp (NatSection (temp' x₀))
-    χ-prop' x₀ a b = SectionProp.S≡T isNatInductiveℕ (temp x₀ (inv (helper x₀) a)) (temp x₀ (inv (helper x₀) b))
+    χ-prop' : (x₀ : X 0) → isProp (NatSection (X-fiber-over-ℕ x₀))
+    χ-prop' x₀ a b = SectionProp.S≡T isNatInductiveℕ (X-section x₀ (inv (Z-is-Section x₀) a)) (X-section x₀ (inv (Z-is-Section x₀) b))
 
     χ-prop : (x₀ : X 0) → isProp (Σ ((n : ℕ) → X n) λ x → (x 0 ≡ x₀) × (∀ n → (x (suc n)) ≡ l n (x n)))
-    χ-prop x₀ = subst isProp (sym (helper' x₀)) (χ-prop' x₀)
-
-    -- isProp→isContrPath
+    χ-prop x₀ = subst isProp (sym (isoToPath (Z-is-Section x₀))) (χ-prop' x₀)
 
     lift-l : X 0 → (n : ℕ) →  X n
     lift-l x₀ 0 = x₀
@@ -158,87 +148,6 @@ fun (α-iso-step-1-4-Iso {S = S@(A , B)}) = (λ a → ((λ n → a .fst n .fst) 
 inv (α-iso-step-1-4-Iso {S = S@(A , B)}) = (λ a → (λ n → (a .fst .fst n) , (a .snd .fst n)) , (λ n i → a .fst .snd n i , a .snd .snd n i))
 rightInv (α-iso-step-1-4-Iso {S = S@(A , B)}) = refl-fun
 leftInv (α-iso-step-1-4-Iso {S = S@(A , B)}) = refl-fun
-
--- α-iso-step-5'-Iso : ∀ {ℓ} {S : Container {ℓ}}
---     -> let (A , B) = S in
---     Iso
---       (Σ (L ((λ _ → A) ,, λ x → x)) λ a →
---         Σ ((n : ℕ) → B (a .fst n) → X (sequence S) n) λ u →
---           (n : ℕ) → transport (λ x → B (a .snd n x) → X (sequence S) n) (π (sequence S) ∘ u (suc n)) ≡ (u n))
---       (Σ A (λ a → Σ ((n : ℕ) → B a → X (sequence S) n) λ u → (n : ℕ) → π (sequence S) ∘ (u (suc n)) ≡ u n))
--- α-iso-step-5'-Iso {S = S@(A , B)} =
---   (Σ (L ((λ _ → A) ,, λ x → x)) λ a →
---      Σ ((n : ℕ) → B (a .fst n) → W S n) λ u →
---        (n : ℕ) → transport (λ x → B (a .snd n x) → W S n) (πₙ S ∘ u (suc n)) ≡ (u n))
---     Iso⟨ Σ-ap-iso (lemma11-Iso {S = S} (λ _ → A) λ _ x → x) (λ {(a , p) →
---        Σ-ap-iso (lemma11-temp (a , p)) (lemma11-temp-2-ext (a , p))}) ⟩
---   (Σ A λ a → Σ ((n : ℕ) → B a → W S n) λ u →
---      (n : ℕ) → transport (λ x → B a → W S n) (πₙ S ∘ u (suc n)) ≡ (u n))
---     Iso⟨ Σ-ap-iso₂ (λ a → Σ-ap-iso₂ λ u →
---          iso (λ x n → subst (λ k → k n ≡ u n) (funExt (λ n → transportRefl (πₙ S ∘ u (suc n)))) (x n))
---              (λ x n → subst (λ k → k n ≡ u n) (sym (funExt (λ n → transportRefl (πₙ S ∘ u (suc n))))) (x n))
---              (λ b i n → transportTransport⁻ (cong (λ k → k n ≡ u n) (funExt (λ n → transportRefl (πₙ S ∘ u (suc n))))) (b n) i)
---              (λ b i n → transport⁻Transport (cong (λ k → k n ≡ u n) (funExt (λ n → transportRefl (πₙ S ∘ u (suc n))))) (b n) i)) ⟩
---   Σ A (λ a → Σ ((n : ℕ) → B a → W S n) λ u →
---      (n : ℕ) → πₙ S ∘ u (suc n) ≡ u n) ∎Iso
---     where
---       lemma11-temp-Path :
---         (a : Σ ((n : ℕ) → A) (λ x → (n : ℕ) → x (suc n) ≡ x n))
---         → ((n : ℕ) → B (a .fst n) → W (A , B) n)
---         ≡ ((n : ℕ) → B (fun (lemma11-Iso {S = S} (λ _ → A) (λ _ x → x)) a) → W (A , B) n)
---       lemma11-temp-Path a = cong (λ k → (n : ℕ) → k n) (funExt λ n → λ i → B (lemma11-2-Iso {S = S} (a .fst) (a .snd) n i) → W (A , B) n)
-
---       lemma11-temp :
---         (a : Σ ((n : ℕ) → A) (λ x → (n : ℕ) → x (suc n) ≡ x n)) →
---           Iso
---             ((n : ℕ) → B (a .fst n) → W (A , B) n)
---             ((n : ℕ) → B (fun (lemma11-Iso {S = S} (λ _ → A) (λ _ x → x)) a) → W (A , B) n)
---       lemma11-temp = pathToIso ∘ lemma11-temp-Path 
-
---       postulate
---         lemma11-temp-2 :
---           (a : Σ ((n : ℕ) → A) (λ x → (n : ℕ) → x (suc n) ≡ x n)) →
---           (x : (n : ℕ) → B (a .fst n) → W (A , B) n) →
---           (n : ℕ) →
---           Iso
---             (subst (λ x₁ → B x₁ → W (A , B) n)
---                    (a .snd n)
---                    (λ x₁ → πₙ (A , B) (x (suc n) x₁))
---               ≡ x n)
---             (subst (λ x₁ → B x₁ → W (A , B) n)
---                    (\ _ -> fun (lemma11-Iso {S = S} (λ _ → A) (λ _ x₂ → x₂)) a)
---                    (λ x₁ → πₙ (A , B) (fun (lemma11-temp a) x (suc n) x₁))
---               ≡ fun (lemma11-temp a) x n)
-      
---       lemma11-temp-2-ext :
---           (a : Σ ((n : ℕ) → A) (λ x → (n : ℕ) → x (suc n) ≡ x n)) →
---           (x : (n : ℕ) → B (a .fst n) → W (A , B) n) →
---           Iso
---             ((n : ℕ) → transport (λ x₁ → B (snd a n x₁) → W (A , B) n) (λ x₁ → πₙ (A , B) (x (suc n) x₁)) ≡ x n)
---             ((n : ℕ) → transport (λ x₁ → B (fun (lemma11-Iso {S = S} (λ _ → A) (λ _ x₂ → x₂)) (fst a , snd a)) → W (A , B) n)
---                                  (λ x₁ → πₙ (A , B) (fun (lemma11-temp (fst a , snd a)) x (suc n) x₁)) ≡ fun (lemma11-temp (fst a , snd a)) x n)
---       fun (lemma11-temp-2-ext (a , p) x) x₁ n = fun (lemma11-temp-2 (a , p) x n) (x₁ n)
---       inv (lemma11-temp-2-ext (a , p) x) x₁ n = inv (lemma11-temp-2 (a , p) x n) (x₁ n)
---       rightInv (lemma11-temp-2-ext (a , p) x) x₁ i n = rightInv (lemma11-temp-2 (a , p) x n) (x₁ n) i
---       leftInv (lemma11-temp-2-ext (a , p) x) x₁ i n = leftInv (lemma11-temp-2 (a , p) x n) (x₁ n) i
-
-
-
-  -- (Σ (L ((λ _ → A) ,, λ x → x)) λ a →
-  --    Σ ((n : ℕ) → B (a .fst n) → W S n) λ u →
-  --      (n : ℕ) → transport (λ x → B (a .snd n x) → W S n) (πₙ S ∘ u (suc n)) ≡ (u n))
-  --   Iso⟨ Σ-ap-iso (lemma11-Iso {S = S} (λ _ → A) λ _ x → x) (λ {(a , p) →
-  --      Σ-ap-iso (lemma11-temp (a , p)) (lemma11-temp-2-ext (a , p))}) ⟩
-  -- (Σ A λ a → Σ ((n : ℕ) → B a → W S n) λ u →
-  --    (n : ℕ) → transport (λ x → B a → W S n) (πₙ S ∘ u (suc n)) ≡ (u n))
-  --   Iso⟨ Σ-ap-iso₂ (λ a → Σ-ap-iso₂ λ u →
-  --        iso (λ x n → subst (λ k → k n ≡ u n) (funExt (λ n → transportRefl (πₙ S ∘ u (suc n)))) (x n))
-  --            (λ x n → subst (λ k → k n ≡ u n) (sym (funExt (λ n → transportRefl (πₙ S ∘ u (suc n))))) (x n))
-  --            (λ b i n → transportTransport⁻ (cong (λ k → k n ≡ u n) (funExt (λ n → transportRefl (πₙ S ∘ u (suc n))))) (b n) i)
-  --            (λ b i n → transport⁻Transport (cong (λ k → k n ≡ u n) (funExt (λ n → transportRefl (πₙ S ∘ u (suc n))))) (b n) i)) ⟩
-  -- Σ A (λ a → Σ ((n : ℕ) → B a → W S n) λ u →
-  --    (n : ℕ) → πₙ S ∘ u (suc n) ≡ u n) ∎Iso
-
 
 α-iso-step-5'-Iso : ∀ {ℓ} {S : Container {ℓ}}
     -> let (A , B) = S in
