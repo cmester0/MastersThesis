@@ -30,9 +30,29 @@
 \usepackage{tikz-cd}
 \usepackage{xfrac} % \sfrac - sideways fraction
 
+\usepackage{amsthm}
+
+\theoremstyle{plain} % default
+\newtheorem{thm}{Theorem}[section]
+\newtheorem{lem}[thm]{Lemma}
+\newtheorem{prop}[thm]{Proposition}
+\newtheorem*{cor}{Corollary}
+
+\theoremstyle{definition}
+\newtheorem{defn}{Definition}[section]
+\newtheorem{conj}{Conjecture}[section]
+\newtheorem{exmp}{Example}[section]
+
+\theoremstyle{remark}
+\newtheorem*{rem}{Remark}
+\newtheorem*{note}{Note}
+\newtheorem{case}{Case}
+
 % Custom commands
 
-\newcommand*{\figref}[1]{Figure~\ref{#1}}
+\newcommand*{\lemref}[1]{Lemma~\ref{lem:#1}}
+\newcommand*{\figref}[1]{Figure~\ref{fig:#1}}
+
 
 \newcommand*{\set}[1]{\left\{#1\right\}}
 \newcommand*{\term}[1]{\textcolor{blue!80!black}{#1}}
@@ -53,21 +73,23 @@
 
 \newcommand*{\ssfrac}[2]{ {\LARGE \text{\sfrac{\ensuremath{#1}}{\ensuremath{#2}}}}}
 
+% \mathord
+
 \begin{document}
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
 
 \pagestyle{empty} 
 \pagenumbering{roman} 
 \vspace*{\fill}\noindent{\rule{\linewidth}{1mm}\\[4ex]
-{\Huge\sf M-types and Coinduction in HoTT and Cubical Type Theory}\\[2ex]
-{\huge\sf Lasse Letager Hansen, 201912345}\\[2ex]
-\noindent\rule{\linewidth}{1mm}\\[4ex]
-\noindent{\Large\sf Master's Thesis, Computer Science\\[1ex] 
-\today \\[1ex] Advisor: Bas Spitters\\[15ex]}\\[\fill]}
+  {\Huge\sf M-types and Coinduction in HoTT and Cubical Type Theory}\\[2ex]
+  {\huge\sf Lasse Letager Hansen, 201912345}\\[2ex]
+  \noindent\rule{\linewidth}{1mm}\\[4ex]
+  \noindent{\Large\sf Master's Thesis, Computer Science\\[1ex] 
+    \today \\[1ex] Advisor: Bas Spitters\\[15ex]}\\[\fill]}
 \epsfig{file=logo.eps}\clearpage
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
 
 \pagestyle{plain}
 \chapter*{Abstract}
@@ -96,7 +118,7 @@
 \pagenumbering{arabic}
 \setcounter{secnumdepth}{2}
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
 
 \chapter{Introduction}
 \label{ch:intro}
@@ -106,77 +128,131 @@
 \todo[inline]{example of a citation: \cite{amin2018}}
 \todo[inline]{get your bibtex entries from \url{https://dblp.org/}}
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
 
 \chapter{M-types}
 \label{ch:m-types}
 
 \section{Containers / Signatures}
-A Container (or Signature) is a pair \(\container{S} = (\type{A},\type{B})\) of types \(\vdash \type{A} : \universe{\mathcal{U}}\) and \(\term{a} : \type{A} \vdash \dependenttype{B}(\term{a}) : \universe{\mathcal{U}}\). From a container we can define a polynomial functor, defined for objects (types) as
-\begin{equation}
-  \begin{aligned}
-    \functor{P}_{\container{S}} &: \universe{\mathcal{U}} \rightarrow \universe{\mathcal{U}} \\
-    \functor{P}(\type{X}) := \functor{P}_{\container{S}}(\type{X}) &= \sum_{\term{a} : \type{A}} \dependenttype{B}(\term{a}) \rightarrow \type{X}
-  \end{aligned}
-\end{equation}
-and for a function \(\term{f} : \type{X} \rightarrow \type{Y}\) as
-\begin{equation}
-  \begin{aligned}
-    \functor{P}\term{f} &: \functor{P}\type{X} \rightarrow \functor{P}\type{Y} \\
-    \functor{P}\term{f}(\term{a},\term{g}) &= (a, \term{f} \circ \term{g}).
-  \end{aligned}
-\end{equation}
-As an example lets look at type for streams over the type \(\type{A}\), defined by the container \(\container{S} = (\type{A},\lambda\,\_, \unit)\), applying the polynomial functor we get
-\begin{equation}
-  \functor{P}_{\container{S}}(\type{X}) = \sum_{\term{a} : \type{A}} \unit \rightarrow \type{X},
-\end{equation}
-since we are working in a Category with exponentials, we get \(\unit \rightarrow \type{X} \equiv \type{X}^{\unit} \equiv \type{X}\). Furthermore \(\unit\) and \(\type{X}\) does not depend on \(\type{A}\), so this will be equivalent to the definition
-\begin{equation}
-  \functor{P}_{\container{S}}(\type{X}) = \type{A} \times \type{X}.
-\end{equation}
-Now we define the coalgebra for this functor with type
-\begin{equation}
-  \typeformer{Coalg}_{\container{S}} = \sum_{\type{C} : \universe{\mathcal{U}}} \type{C} \rightarrow \functor{P}\type{C}.
-\end{equation}
-We denote a coalgera of \(\type{C}\) and \(\term{\gamma}\) as \(\coalg{\type{C}}{\term{\gamma}}\). The coalgebra morphisms are defined as
-\begin{equation}
-  \begin{aligned}
-    \cdot~\function{\Rightarrow}~\cdot &: \typeformer{Coalg}_{\container{S}} \rightarrow \typeformer{Coalg}_{\container{S}} \\
-    \coalg{\type{C}}{\term{\gamma}}~\function{\Rightarrow}~\coalg{\type{D}}{\term{\delta}} &= \sum_{\term{f} : \type{C} \rightarrow \type{D}} \term{\delta} \circ \term{f} = \functor{P} \term{f} \circ \term{\gamma}
-  \end{aligned}
-\end{equation}
-\(\mathtt{M}\)-types can now be defined from a container \(\container{S}\) as the type \(\typeformer{M}_{\container{S}}\) such that the coalgebra for \(\typeformer{M}_{\container{S}}\) and \(\function{out} : \typeformer{M}_{\container{S}} \rightarrow \functor{P}_{\container{S}}(\typeformer{M}_{\container{S}})\) fulfills the property
-\begin{equation}
-  \typeformer{Final}_{\container{S}} := \sum_{(\coalg{\type{X}}{\term{\rho}} : \mathtt{Coalg}_{\container{S}})} \prod_{(\coalg{\type{C}}{\term{\term{\gamma}}} : \mathtt{Coalg}_{\container{S}})} \mathtt{isContr}(\coalg{\type{C}}{\term{\gamma}} \Rightarrow \coalg{\type{X}}{\term{\rho}})
-\end{equation}
-that is \(\prod_{(\coalg{\type{C}}{\term{\gamma}} : \mathtt{Coalg}_{\container{S}})} \mathtt{isContr}(\coalg{\type{C}}{\term{\gamma}} \Rightarrow \coalg{\typeformer{M}_{\container{S}}}{\function{out}})\). We denote this construction of the M-type as \(\typeformer{M}_{\containerpair{\type{A}}{\type{B}}}\) or \(\typeformer{M}_{\container{S}}\) or just \(\typeformer{M}\) when the Container is clear from the context.
-\\ \\
-If we continue our example for streams this will give us the \(\mathtt{M}\)-type, we can see that \(\functor{P}_{\container{S}}(\typeformer{M}) = \type{A} \times \typeformer{M}\), meaning we have the following diagram,
-\begin{figure}[h]
-  \centering
-  \begin{tikzcd}[row sep=large,column sep=large]
-    \type{A} & \type{A} \times \typeformer{M}_{\containerpair{A}{\lambda\,\_,\unit}} \ar[l,"\pi_1"'] \ar[r,"\pi_2"] & \typeformer{M}_{\containerpair{A}{\lambda\,\_,\unit}} \\
-    & \typeformer{M}_{\containerpair{A}{\lambda\,\_,\unit}} \ar[ul,"\function{hd}"] \ar[u,"\function{out}"'] \ar[ur,"\function{tl}"']
-  \end{tikzcd}
-  \caption{M-types of streams}
-\end{figure}
-where \(\function{out}\) is an isomorphism (because of the finality of the coalgebra), with inverse \(\function{in} : \functor{P}_{\container{S}}(\typeformer{M}) \rightarrow \typeformer{M}\). We now have a semantic for the rules we would expect for streams, if we let \(\function{cons} = \function{in}\) and \(\typeformer{stream}~\type{A} = \typeformer{M}_{\containerpair{\type{A}}{\lambda\,\_,\unit}}\),
-\begin{equation}
-  \infer[\mathtt{E}_{\function{hd}}]{\function{hd}~\term{s} : \type{A}}{\type{A} : \universe{\mathcal{U}} & \term{s} : \typeformer{stream}~\type{A}}
-\end{equation}
-\begin{equation}
-  \infer[\mathtt{E}_{\function{tl}}]{\function{tl}~\term{s} : \typeformer{stream}~\type{A}}{\type{A} : \universe{\mathcal{U}} & \term{s} : \typeformer{stream}~\type{A}}
-\end{equation}
-\begin{equation}
-  \infer[\mathtt{I}_{\function{cons}}]{\term{\function{cons}}~\term{x}~\term{xs} : \typeformer{stream}~\type{A}}{\type{A} : \universe{\mathcal{U}} & \term{x} : \type{A} & \term{xs} : \typeformer{stream}~\type{A}}
-\end{equation}
+\begin{defn}
+  A Container (or Signature) is a pair \(\container{S} = (\type{A},\type{B})\) of types \(\vdash \type{A} : \universe{\mathcal{U}}\) and \(\term{a} : \type{A} \vdash \dependenttype{B}(\term{a}) : \universe{\mathcal{U}}\). From a container we can define a polynomial functor, defined for objects (types) as
+  \begin{equation}
+    \begin{aligned}
+      \functor{P}_{\container{S}} &: \universe{\mathcal{U}} \rightarrow \universe{\mathcal{U}} \\
+      \functor{P}(\type{X}) := \functor{P}_{\container{S}}(\type{X}) &= \sum_{\term{a} : \type{A}} \dependenttype{B}(\term{a}) \rightarrow \type{X}
+    \end{aligned}
+  \end{equation}
+  and for a function \(\term{f} : \type{X} \rightarrow \type{Y}\) as
+  \begin{equation}
+    \begin{aligned}
+      \functor{P}\term{f} &: \functor{P}\type{X} \rightarrow \functor{P}\type{Y} \\
+      \functor{P}\term{f}(\term{a},\term{g}) &= (a, \term{f} \circ \term{g}).
+    \end{aligned}
+  \end{equation}
+\end{defn}
+\begin{exmp}
+  The type for streams over the type \(\type{A}\) is defined by the container \(\container{S} = (\type{A},\lambda\,\_, \unit)\), applying the polynomial functor we get
+  \begin{equation}
+    \functor{P}_{\container{S}}(\type{X}) = \sum_{\term{a} : \type{A}} \unit \rightarrow \type{X},
+  \end{equation}
+  since we are working in a Category with exponentials, we get \(\unit \rightarrow \type{X} \equiv \type{X}^{\unit} \equiv \type{X}\). Furthermore \(\unit\) and \(\type{X}\) does not depend on \(\type{A}\), so this will be equivalent to the definition
+  \begin{equation}
+    \functor{P}_{\container{S}}(\type{X}) = \type{A} \times \type{X}.
+  \end{equation}
+\end{exmp}
+\begin{defn}
+  The coalgebra for the functor \functor{P} is defined as
+  \begin{equation}
+    \typeformer{Coalg}_{\container{S}} = \sum_{\type{C} : \universe{\mathcal{U}}} \type{C} \rightarrow \functor{P}\type{C}.
+  \end{equation}
+  We denote a coalgera of \(\type{C}\) and \(\term{\gamma}\) as \(\coalg{\type{C}}{\term{\gamma}}\). The coalgebra morphisms are defined as
+  \begin{equation}
+    \begin{aligned}
+      \cdot~\function{\Rightarrow}~\cdot &: \typeformer{Coalg}_{\container{S}} \rightarrow \typeformer{Coalg}_{\container{S}} \\
+      \coalg{\type{C}}{\term{\gamma}}~\function{\Rightarrow}~\coalg{\type{D}}{\term{\delta}} &= \sum_{\term{f} : \type{C} \rightarrow \type{D}} \term{\delta} \circ \term{f} = \functor{P} \term{f} \circ \term{\gamma}
+    \end{aligned}
+  \end{equation}
+\end{defn}
+\begin{defn}
+  \(\mathtt{M}\)-types can now be defined from a container \(\container{S}\) as the type \(\typeformer{M}_{\container{S}}\) such that the coalgebra for \(\typeformer{M}_{\container{S}}\) and \(\function{out} : \typeformer{M}_{\container{S}} \rightarrow \functor{P}_{\container{S}}(\typeformer{M}_{\container{S}})\) fulfills the property
+  \begin{equation}
+    \typeformer{Final}_{\container{S}} := \sum_{(\coalg{\type{X}}{\term{\rho}} : \mathtt{Coalg}_{\container{S}})} \prod_{(\coalg{\type{C}}{\term{\term{\gamma}}} : \mathtt{Coalg}_{\container{S}})} \mathtt{isContr}(\coalg{\type{C}}{\term{\gamma}} \Rightarrow \coalg{\type{X}}{\term{\rho}})
+  \end{equation}
+  that is \(\prod_{(\coalg{\type{C}}{\term{\gamma}} : \mathtt{Coalg}_{\container{S}})} \mathtt{isContr}(\coalg{\type{C}}{\term{\gamma}} \Rightarrow \coalg{\typeformer{M}_{\container{S}}}{\function{out}})\). We denote this construction of the M-type as \(\typeformer{M}_{\containerpair{\type{A}}{\type{B}}}\) or \(\typeformer{M}_{\container{S}}\) or just \(\typeformer{M}\) when the Container is clear from the context.
+\end{defn}
+\begin{exmp}
+  If we continue our example for streams this will give us the \(\mathtt{M}\)-type, we can see that \(\functor{P}_{\container{S}}(\typeformer{M}) = \type{A} \times \typeformer{M}\), meaning we have the following diagram,
+  \begin{figure}[h]
+    \centering
+    \begin{tikzcd}[row sep=large,column sep=large]
+      \type{A} & \type{A} \times \typeformer{M}_{\containerpair{A}{\lambda\,\_,\unit}} \ar[l,"\pi_1"'] \ar[r,"\pi_2"] & \typeformer{M}_{\containerpair{A}{\lambda\,\_,\unit}} \\
+      & \typeformer{M}_{\containerpair{A}{\lambda\,\_,\unit}} \ar[ul,"\function{hd}"] \ar[u,"\function{out}"'] \ar[ur,"\function{tl}"']
+    \end{tikzcd}
+    \caption{M-types of streams}
+  \end{figure}
+  where \(\function{out}\) is an isomorphism (because of the finality of the coalgebra), with inverse \(\function{in} : \functor{P}_{\container{S}}(\typeformer{M}) \rightarrow \typeformer{M}\). We now have a semantic for the rules we would expect for streams, if we let \(\function{cons} = \function{in}\) and \(\typeformer{stream}~\type{A} = \typeformer{M}_{\containerpair{\type{A}}{\lambda\,\_,\unit}}\),
+  \begin{equation}
+    \infer[\mathtt{E}_{\function{hd}}]{\function{hd}~\term{s} : \type{A}}{\type{A} : \universe{\mathcal{U}} & \term{s} : \typeformer{stream}~\type{A}}
+  \end{equation}
+  \begin{equation}
+    \infer[\mathtt{E}_{\function{tl}}]{\function{tl}~\term{s} : \typeformer{stream}~\type{A}}{\type{A} : \universe{\mathcal{U}} & \term{s} : \typeformer{stream}~\type{A}}
+  \end{equation}
+  \begin{equation}
+    \infer[\mathtt{I}_{\function{cons}}]{\term{\function{cons}}~\term{x}~\term{xs} : \typeformer{stream}~\type{A}}{\type{A} : \universe{\mathcal{U}} & \term{x} : \type{A} & \term{xs} : \typeformer{stream}~\type{A}}
+  \end{equation}  
+\end{exmp}
+\begin{lem} \label{lem:limit-collapse}
+  We will now show that given \(\ell : \prod_{(n : \mathbb{N})} (X_{n} \rightarrow X_{n+1})\) and \(y : \sum_{x : \prod_{(n : \mathbb{N})} X_n} x_{n + 1} \equiv l_n (x_n)\) we can collapse the chain \(\mathcal{L} \equiv X_0\). We define this collapse by the equivalence
+  \begin{align}
+    \function{fun}_{\mathcal{L}collapse}~(x , y) &= x_0 \\
+    \function{inv}_{\mathcal{L}collapse}~x_0 &= (\lambda n, \function{transport}~\ell^n~x_0) , (\lambda\,n, \mathtt{refl}_{\function{transport}~\ell^{(n+1)}~x_0}) \\
+    \function{rinv}~x_0 &= \mathtt{refl}_{x_0} \\
+    \function{linv}~(x , y) &= ?
+  \end{align}
+  So we want to show
+  \begin{equation}
+    (\lambda n, \function{transport}~\ell^n~x_0) , (\lambda\,n, \mathtt{refl}_{\function{transport}~\ell^{(n+1)}~x_0}) \equiv (x,y)
+  \end{equation}
+  
 
+\end{lem}
+\begin{thm}
+  We want to proof the construction of \function{in} and \function{out} for the container \(\containerpair{A}{B}\) more precisely we want to define the equality
+  \begin{equation}
+    shift : \mathcal{L} \equiv P\mathcal{L}    
+  \end{equation}
+  where \(P\mathcal{L}\) is the limit of a shifted sequence. We do this we the two helper lemmas
+  \begin{equation}
+    \alpha : \mathcal{L}^P \equiv P\mathcal{L}
+  \end{equation}
+  \begin{equation}
+    \mathcal{L}unique : \mathcal{L} \equiv \mathcal{L}^P
+  \end{equation}
+  We can define \(\mathcal{L}unique\) by the equivalence
+  \begin{align}
+    \function{fun}_{\mathcal{L}unique}~(a , b) &= \left( \lambda\,n, \begin{cases} \constant{tt} & n = 0 \\ a~m & n = m + 1 \end{cases}\right) , \left(\lambda\,n \begin{cases} \mathtt{refl}_{\constant{tt}} & n = 0 \\ b~m & n = m + 1 \end{cases}\right) \\
+    \function{inv}_{\mathcal{L}unique}~(a , b) &= a \circ \function{incr} , b \circ \function{incr} \\
+    \function{rinv}_{\mathcal{L}unique}~(a , b) &= \mathtt{refl} \\
+    \function{linv}_{Lunique}~(a , b) &= \mathtt{refl}
+  \end{align}
+  The definition of \(\alpha\) follows from \lemref{limit-collapse}, 
+  \begin{align}
+    \mathcal{L}^P &\equiv \sum_{(u : \mathcal{L}_{(\lambda\_,A,\function{id})})} \prod_{(n : \mathbb{N})} \pi_{(n)} \circ u_{n+1} \equiv_{\lambda\,x, B(\pi_2\,a\,n\,x) \rightarrow X_n} u_n \\
+        &\equiv \sum_{(a : A)} \sum_{(u : \prod_{(n : \mathbb{N})} B a \rightarrow X_n)} \prod_{(n : \mathbb{N})} \pi_{(n)} \circ u_{n+1} \equiv u_n \\
+        &\equiv P\mathcal{L}
+  \end{align}
+  We can then define \(shift\) as
+  \begin{equation}
+    shift = \function{sym}~\alpha \cdot \mathcal{L}unique
+  \end{equation}
+  Then we define \(\function{in} = \function{transport}~shift\) and \(\function{out} = \function{transport}~(\function{sym}~shift)\), since \function{in} and \function{out} are part of an equality relation (\(shift\)), they become embeddings.
+\end{thm}
 \section{Closure properties of M-types}
 We define the product of two containers
 \begin{equation}
   \containerpair{\type{A}}{\type{B}} \times \containerpair{\type{C}}{\type{D}} \equiv \containerpair{\type{A} \times \type{C}}{\lambda\,(\term{a} , \term{c}), \typeformer{B}~\term{a} \times \typeformer{D}~\term{c}},
 \end{equation}
-we can lift this rule, through the diagram in \figref{fig:container-products}, used to define M-types.
+we can lift this rule, through the diagram in \figref{container-products}, used to define M-types.
 \begin{figure}[h]
   \centering
   \begin{tikzcd}[row sep=huge,column sep=huge]
@@ -197,13 +273,13 @@ We now prove that
 \end{equation}
 by induction on \(n\). For \(n = 0\), we have \(\unit \times \unit \equiv \unit\). For \(n = m + 1\), we may assume
 \begin{equation}
-{\functor{P}_{\containerpair{\type{A}}{\type{B}}}}^m~\unit \times {\functor{P}_{\containerpair{\type{C}}{\type{D}}}}^m~\unit \equiv {\functor{P}_{\containerpair{\type{A}}{\type{B}} \times \containerpair{\type{C}}{\type{D}}}}^m~\unit,
+  {\functor{P}_{\containerpair{\type{A}}{\type{B}}}}^m~\unit \times {\functor{P}_{\containerpair{\type{C}}{\type{D}}}}^m~\unit \equiv {\functor{P}_{\containerpair{\type{A}}{\type{B}} \times \containerpair{\type{C}}{\type{D}}}}^m~\unit,
 \end{equation}
 in the following
 \begin{align}
   &~ {\functor{P}_{\containerpair{\type{A}}{\type{B}}}}^{m+1}~\unit \times {\functor{P}_{\containerpair{\type{C}}{\type{D}}}}^{m+1}~\unit \\
-   \equiv&~ \functor{P}_{\containerpair{\type{A}}{\type{B}}} ({\functor{P}_{\containerpair{\type{A}}{\type{B}}}}^m~\unit) \times \functor{P}_{\containerpair{\type{C}}{\type{D}}} ({\functor{P}_{\containerpair{\type{C}}{\type{D}}}}^m~\unit) \\
-   \equiv&~ \sum_{\term{a} : \type{A}} \type{B}~\term{a} \rightarrow {\functor{P}_{\containerpair{\type{A}}{\type{B}}}}^m~\unit \times \sum_{\term{c} : \type{C}} \type{D}~\term{c} \rightarrow {\functor{P}_{\containerpair{\type{C}}{\type{D}}}}^m~\unit \\
+  \equiv&~ \functor{P}_{\containerpair{\type{A}}{\type{B}}} ({\functor{P}_{\containerpair{\type{A}}{\type{B}}}}^m~\unit) \times \functor{P}_{\containerpair{\type{C}}{\type{D}}} ({\functor{P}_{\containerpair{\type{C}}{\type{D}}}}^m~\unit) \\
+  \equiv&~ \sum_{\term{a} : \type{A}} \type{B}~\term{a} \rightarrow {\functor{P}_{\containerpair{\type{A}}{\type{B}}}}^m~\unit \times \sum_{\term{c} : \type{C}} \type{D}~\term{c} \rightarrow {\functor{P}_{\containerpair{\type{C}}{\type{D}}}}^m~\unit \\
   \equiv&~ \sum_{\term{a} , \term{c} : \type{A} \times \type{C}} (\type{B}~\term{a} \rightarrow {\functor{P}_{\containerpair{\type{A}}{\type{B}}}}^m~\unit) \times (\type{D}~\term{c} \rightarrow {\functor{P}_{\containerpair{\type{C}}{\type{D}}}}^m~\unit) \\
   \equiv&~ \sum_{\term{a} , \term{c} : \type{A} \times \type{C}} \type{B}~\term{a} \times \type{D}~\term{c} \rightarrow {\functor{P}_{\containerpair{\type{A}}{\type{B}}}}^m~\unit \times {\functor{P}_{\containerpair{\type{C}}{\type{D}}}}^m~\unit \\
   \equiv&~ \sum_{\term{a} , \term{c} : \type{A} \times \type{C}} \type{B}~\term{a} \times \type{D}~\term{c} \rightarrow {\functor{P}_{\containerpair{\type{A}}{\type{B}} \times \containerpair{\type{C}}{\type{D}}}}^m~\unit \\
@@ -222,7 +298,7 @@ as expected, transporting along equality \eqref{eq:zip-equality} gives us the de
 
 
 \section{Co-induction Principle for M-types}
-We can now construct a bisimulation: forall coalgebras \(\coalg{\type{C}}{\term{\gamma}} : \typeformer{Coalg}_{\container{S}}\), if we have a relation \(\typeformer{\mathcal{R}} : \type{C} \rightarrow \type{C} \rightarrow \universe{\mathcal{U}}\), and a type \(\type{\overline{\mathcal{R}}} = \sum_{\term{a} : \type{C}} \sum_{\term{b} : \type{C}} \typeformer{\mathcal{R}}~\term{a}~\term{b}\), such that \(\type{\overline{\mathcal{R}}}\) and \(\term{\alpha}_{\type{\overline{\mathcal{R}}}} : \type{\overline{\mathcal{R}}} \rightarrow \functor{P}(\type{\overline{\mathcal{R}}})\) forms a \(\functor{P}\)-coalgebra \(\coalg{\type{\overline{\mathcal{R}}}}{\term{\alpha}_{\type{\overline{\mathcal{R}}}}} : \mathtt{Coalg}_{\container{S}}\), making the diagram in \figref{fig:coalgebra-coinduction-definition} commute (where \(\Longrightarrow\) are \(\functor{P}\)-coalgebra morphisms).
+We can now construct a bisimulation: forall coalgebras \(\coalg{\type{C}}{\term{\gamma}} : \typeformer{Coalg}_{\container{S}}\), if we have a relation \(\typeformer{\mathcal{R}} : \type{C} \rightarrow \type{C} \rightarrow \universe{\mathcal{U}}\), and a type \(\type{\overline{\mathcal{R}}} = \sum_{\term{a} : \type{C}} \sum_{\term{b} : \type{C}} \typeformer{\mathcal{R}}~\term{a}~\term{b}\), such that \(\type{\overline{\mathcal{R}}}\) and \(\term{\alpha}_{\type{\overline{\mathcal{R}}}} : \type{\overline{\mathcal{R}}} \rightarrow \functor{P}(\type{\overline{\mathcal{R}}})\) forms a \(\functor{P}\)-coalgebra \(\coalg{\type{\overline{\mathcal{R}}}}{\term{\alpha}_{\type{\overline{\mathcal{R}}}}} : \mathtt{Coalg}_{\container{S}}\), making the diagram in \figref{coalgebra-coinduction-definition} commute (where \(\Longrightarrow\) are \(\functor{P}\)-coalgebra morphisms).
 \begin{figure}[h]
   \centering
   \begin{tikzcd}[row sep=huge,column sep=huge]
@@ -231,7 +307,7 @@ We can now construct a bisimulation: forall coalgebras \(\coalg{\type{C}}{\term{
   \caption{Bisimulation for a coalgebra}
   \label{fig:coalgebra-coinduction-definition}
 \end{figure}
-\noindent Furthermore for any bisimulation over a final \(\functor{P}\)-coalgebra \(\coalg{\typeformer{M}}{\term{\mathtt{out}}}:\mathtt{Coalg}_{\container{S}}\) we get the diagram in \figref{fig:final-coalgebra-coinduction},
+\noindent Furthermore for any bisimulation over a final \(\functor{P}\)-coalgebra \(\coalg{\typeformer{M}}{\term{\mathtt{out}}}:\mathtt{Coalg}_{\container{S}}\) we get the diagram in \figref{final-coalgebra-coinduction},
 \begin{figure}[h]
   \centering
   \begin{tikzcd}[row sep=huge,column sep=huge]
@@ -279,13 +355,13 @@ Since we know that M-types preserves the H-level, we can use set-truncated quoti
 \item   Show that this is the final (quotiented) coalgebra. Does this generalize to QM-types, and what are those constructively ??
 \end{itemize}
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
 
 \chapter{Contractive}
 We want to show that
 \begin{align}
   &\sum_{(a : A)} \sum_{(u : \prod_{(n : \mathbb{N})} B~a \rightarrow X_n)} \prod_{(n : \mathbb{N})} \pi_{(n)} \circ (u_{n + 1}) \equiv u_n \\
-  \equiv& \sum_{(a : \sum_{(a : (n : \mathbb{N}) \rightarrow A)} \prod_{(n : \mathbb{N})} a_{n+1} \equiv a_n))} \sum_{(u : (n : \mathbb{N}) \rightarrow B~(\pi_1~a)_n \rightarrow X_n)} \prod_{(n : \mathbb{N})} \pi_{(n)} \circ u_{n+1} \equiv_{(\lambda\,x, B~((\pi_2~a)_n~x)) \rightarrow X_n)} u_n
+  \equiv& \sum_{(a : \sum_{(a : (n : \mathbb{N}) \rightarrow A)} \prod_{(n : \mathbb{N})} a_{n+1} \equiv a_n)} \sum_{(u : (n : \mathbb{N}) \rightarrow B~(\pi_1~a)_n \rightarrow X_n)} \prod_{(n : \mathbb{N})} \pi_{(n)} \circ u_{n+1} \equiv_{(\lambda\,x, B~((\pi_2~a)_n~x)) \rightarrow X_n)} u_n
 \end{align}
 we have the two functions
 \begin{equation}
@@ -327,7 +403,7 @@ so we want
 \end{figure}
 
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
 
 \chapter{Examples of M-types}
 \section{TODO: Place these subsections}
@@ -349,7 +425,7 @@ We define our bisimulation coalgebra from the strong bisimulation relation \(\ma
 Now we just need to define \(\term{\alpha}_{\type{\overline{\mathcal{R}}}}\) \todo{define the \(\alpha_{\overline{R}}\) function}. Now we have a bisimulation relation, which is equivalent to equality, using what we showed in the previous section.
 
 \subsection{Zip Function}
-We want the diagram in \figref{fig:zip-computation-rules} to commute,
+We want the diagram in \figref{zip-computation-rules} to commute,
 \begin{figure}[h]
   \centering
   \begin{tikzcd}[row sep=huge,column sep=huge]
@@ -369,10 +445,10 @@ meaning we get the computation rules
 \end{equation}
 we can define the zip function as we did in the end of the last section. Another way to define the zip function is more directly, using the following lifting property of M-types
 \begin{equation}
-\begin{aligned}
-  &\function{lift_M}~\left(x : \prod_{n : \mathbb{N}} (\type{A} \rightarrow {\functor{P}_{\container{S}}}^n~\unit)\right)~\left(u : \prod_{n : \mathbb{N}} (\type{A} \rightarrow \pi_n (x_{n+1} a) \equiv x_n a)\right) (a : \type{A}) : \function{M}~\container{S} := \\
-  &\qquad\qquad (\lambda\,n, x~n~a) , (\lambda\,n~i, p~n~a~i).
-\end{aligned} \label{eq:M-lift}
+  \begin{aligned}
+    &\function{lift_M}~\left(x : \prod_{n : \mathbb{N}} (\type{A} \rightarrow {\functor{P}_{\container{S}}}^n~\unit)\right)~\left(u : \prod_{n : \mathbb{N}} (\type{A} \rightarrow \pi_n (x_{n+1} a) \equiv x_n a)\right) (a : \type{A}) : \function{M}~\container{S} := \\
+    &\qquad\qquad (\lambda\,n, x~n~a) , (\lambda\,n~i, p~n~a~i).
+  \end{aligned} \label{eq:M-lift}
 \end{equation}
 To use this definition, we first define some helper functions
 \begin{equation}
@@ -399,9 +475,9 @@ zero case \(X\)
 Sucessor case \(X\)
 \begin{align} 
   \function{zip}_X~(m+1)~(x,y) &\equiv (\function{hd}~x, \function{hd}~y),(\lambda\,\_,\function{zip}_X~m~(\function{tl}~x,\function{tl}~y)) \\
-   &\equiv (\function{hd}~x, \function{hd}~y),(\lambda\,\_, {?}~(\function{tl}~a)) \\
-   &\equiv (\function{hd}~(\texttt{transport}_{?} a)),(\lambda\,\_, \texttt{transport}_{?} (\function{tl}~a)) \\
-   &\equiv transport_? a \\
+                               &\equiv (\function{hd}~x, \function{hd}~y),(\lambda\,\_, {?}~(\function{tl}~a)) \\
+                               &\equiv (\function{hd}~(\texttt{transport}_{?} a)),(\lambda\,\_, \texttt{transport}_{?} (\function{tl}~a)) \\
+                               &\equiv transport_? a \\
 \end{align}
 Zero case \(\pi\): \((\lambda\,i, \function{zip}_\pi~0~(x,y)~i \equiv refl)\).
 \begin{align}
@@ -522,7 +598,7 @@ meaning we get the following diagram.
 \subsection{Tree}
 Now lets look at the example where we remove the \(\function{Tau}\) constructor. We let
 \begin{equation}
-\container{S} = \left(\type{R} + \sum_{\type{A} : \universe{\mathcal{U}}} \typeformer{E}~\type{A}~,~\lambda \{ \texttt{inl}~\_ \rightarrow \empt ~;~ \texttt{inr}~(\type{A},\term{e}) \rightarrow \type{A} \} \right).
+  \container{S} = \left(\type{R} + \sum_{\type{A} : \universe{\mathcal{U}}} \typeformer{E}~\type{A}~,~\lambda \{ \texttt{inl}~\_ \rightarrow \empt ~;~ \texttt{inr}~(\type{A},\term{e}) \rightarrow \type{A} \} \right).
 \end{equation}
 This will give us the polynomial functor
 \begin{equation}
@@ -568,7 +644,7 @@ Giving us the diagram
   \caption{TODO}
 \end{figure}
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
 
 \chapter{Additions to the Cubical Agda Library}
 \section{Lemma 10}
@@ -610,14 +686,14 @@ For all \(\term{X} : \type{\mathbb{N}} \rightarrow \universe{U}\) and \(p : \pro
 
 \todo[inline]{conclude on the problem statement from the introduction}
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
 
 \cleardoublepage
 \addcontentsline{toc}{chapter}{Bibliography}
 \bibliographystyle{plain} 
 \bibliography{Thesis}
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
 
 \cleardoublepage
 \appendix
