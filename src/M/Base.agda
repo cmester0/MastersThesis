@@ -98,10 +98,9 @@ lemma11-Iso {ℓ = ℓ} {S = S} X l =
              (λ {(z , x , p , q) → refl})
              refl-fun ⟩
   (Σ (X 0) (λ z -> Σ ((n : ℕ) → X n) (λ x → (x 0 ≡ z) × ((n : ℕ) → x (suc n) ≡ l n (x n)))))
-    Iso⟨ {!!} ⟩  
-    -- Iso⟨ Σ-ap-iso₂ (λ z → contr-⊤-iso (χ z))⟩
-  -- (Σ (X 0) (λ z -> Lift Unit))
-  --   Iso⟨ iso (λ x → x .fst) (λ x → x , (lift tt)) refl-fun refl-fun ⟩
+    Iso⟨ Σ-ap-iso₂ (λ z → contr-⊤-iso (χ z))⟩
+  (Σ (X 0) (λ z -> Lift Unit))
+    Iso⟨ iso (λ x → x .fst) (λ x → x , (lift tt)) refl-fun refl-fun ⟩
   X 0 ∎Iso
   where
     open AlgebraPropositionality
@@ -130,17 +129,17 @@ lemma11-Iso {ℓ = ℓ} {S = S} X l =
     χ-prop' : (x₀ : X 0) → isProp (NatSection (temp' x₀))
     χ-prop' x₀ a b = SectionProp.S≡T isNatInductiveℕ (temp x₀ (inv (helper x₀) a)) (temp x₀ (inv (helper x₀) b))
 
-    asdfafds : ∀ A B (k : A ≡ B) → isProp (k i0) ≡ isProp (k i1)
-    asdfafds A B k = λ i → isProp (k i)
-
     χ-prop : (x₀ : X 0) → isProp (Σ ((n : ℕ) → X n) λ x → (x 0 ≡ x₀) × (∀ n → (x (suc n)) ≡ l n (x n)))
-    χ-prop x₀ =
-      transport (asdfafds (NatSection (temp' x₀))
-                          (Σ ((n : ℕ) → X n) (λ x → (x 0 ≡ x₀) × (∀ n → x (suc n) ≡ l n (x n))))
-                             (sym (helper' x₀))) (χ-prop' x₀)
+    χ-prop x₀ = subst isProp (sym (helper' x₀)) (χ-prop' x₀)
+
+    -- isProp→isContrPath
+
+    lift-l : X 0 → (n : ℕ) →  X n
+    lift-l x₀ 0 = x₀
+    lift-l x₀ (suc n) = l n (lift-l x₀ n)
 
     χ : (x₀ : X 0) → isContr ( Σ ((n : ℕ) → X n) λ x → (x 0 ≡ x₀) × (∀ n → (x (suc n)) ≡ l n (x n)) )
-    χ x₀ = {!!} -- isNatHInitial -- isContrΣ
+    χ x₀ = inhProp→isContr ((lift-l x₀) , (refl , λ n → refl)) (χ-prop x₀)
 
 -- Same as leftInv1'
 lemma11-2-Iso : ∀ {ℓ} {S : Container {ℓ}} a p n → a n ≡ fun (lemma11-Iso {S = S} (λ _ → S .fst) (λ _ x₂ → x₂)) (a , p) -- = a 0
@@ -278,19 +277,20 @@ leftInv (α-iso-step-1-4-Iso {S = S@(A , B)}) = refl-fun
           ≡⟨ (≡-rel-a-inj-x (pathToIso n)) ⟩
         transport m a ≡ b ∎  
 
-      lemma11-temp-2 :
-        (a : Σ ((n : ℕ) → A) (λ x → (n : ℕ) → x (suc n) ≡ x n)) →
-        (x : (n : ℕ) → B (a .fst n) → X (sequence (A , B)) n) →
-        (n : ℕ) → 
-        Iso
-          (PathP (λ x₁ → B (a .snd n x₁) → W (A , B) n) (λ x₁ → πₙ (A , B) (x (suc n) x₁)) (x n))
-          (transport (λ i → B (a .fst 0) → W (A , B) n) (λ x₁ → πₙ (A , B) (fun (lemma11-temp a) x (suc n) x₁)) ≡ fun (lemma11-temp a) x n)
-      lemma11-temp-2 a x n =
-        PathP (λ x₁ → B (a .snd n x₁) → W (A , B) n) (πₙ (A , B) ∘ (x (suc n))) (x n)
-          Iso⟨ pathToIso (PathP≡Path (λ x₁ → B (a .snd n x₁) → W (A , B) n) (πₙ (A , B) ∘ (x (suc n))) (x n)) ⟩
-        transport (λ x₁ → B (a .snd n x₁) → W (A , B) n) (πₙ (A , B) ∘ (x (suc n))) ≡ x n
-          Iso⟨ {!!} ⟩
-        transport (λ i → B (a .fst 0) → W (A , B) n) (πₙ (A , B) ∘ (fun (lemma11-temp a) x (suc n))) ≡ fun (lemma11-temp a) x n ∎Iso
+      postulate
+        lemma11-temp-2 :
+          (a : Σ ((n : ℕ) → A) (λ x → (n : ℕ) → x (suc n) ≡ x n)) →
+          (x : (n : ℕ) → B (a .fst n) → X (sequence (A , B)) n) →
+          (n : ℕ) → 
+          Iso
+            (PathP (λ x₁ → B (a .snd n x₁) → W (A , B) n) (λ x₁ → πₙ (A , B) (x (suc n) x₁)) (x n))
+            (transport (λ i → B (a .fst 0) → W (A , B) n) (λ x₁ → πₙ (A , B) (fun (lemma11-temp a) x (suc n) x₁)) ≡ fun (lemma11-temp a) x n)
+      -- lemma11-temp-2 a x n =
+      --   PathP (λ x₁ → B (a .snd n x₁) → W (A , B) n) (πₙ (A , B) ∘ (x (suc n))) (x n)
+      --     Iso⟨ pathToIso (PathP≡Path (λ x₁ → B (a .snd n x₁) → W (A , B) n) (πₙ (A , B) ∘ (x (suc n))) (x n)) ⟩
+      --   transport (λ x₁ → B (a .snd n x₁) → W (A , B) n) (πₙ (A , B) ∘ (x (suc n))) ≡ x n
+      --     Iso⟨ {!!} ⟩
+      --   transport (λ i → B (a .fst 0) → W (A , B) n) (πₙ (A , B) ∘ (fun (lemma11-temp a) x (suc n))) ≡ fun (lemma11-temp a) x n ∎Iso
       -- fun (lemma11-temp-2 a x n) = {!!}
       -- inv (lemma11-temp-2 a x n) = {!!}
       -- rightInv (lemma11-temp-2 a x n) = {!!}
