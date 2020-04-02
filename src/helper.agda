@@ -121,8 +121,6 @@ open import Cubical.Foundations.Equiv.Properties
     ≡⟨ funExtPath ⟩
   f ≡ g ∎
 
--- (a : A -> B) (b : B -> A) -> a ∘ b ≡ idfun B -> b ∘ a ≡ idfun A
-
 ≡-rel-b-inj :
   ∀ {ℓ} {A B C : Set ℓ} (isom : Iso A B) →
   ∀ {f g : C -> B} →
@@ -291,13 +289,126 @@ leftInv (Σ-ap-iso₁ {i} {X = X} {X'} {Y} isom@(iso f g K H)) (x , y) = ΣPathP
 -- ∏ properties --
 ------------------
 
+coherent : ∀ {i j} {X : Set i} {Y : Set j} → Iso X Y → Set _
+coherent = λ x → ∀ f -> cong (fun x) (leftInv x f) ≡ rightInv x (fun x f)
+
+coherent' : ∀ {i j} {X : Set i}{Y : Set j} → Iso X Y → Set _
+coherent' f = ∀ y → cong (inv f) (rightInv f y) ≡ leftInv f (inv f y)
+
+asdf : ∀ {i j} (X : Set i) (Y : Set j) → Set _
+asdf X Y = Σ (Iso X Y) coherent
+
 postulate
-  ∏-ap-iso :
-    ∀ {i j} {X X' : Set i} {Y : X → Set j} {Y' : X' → Set j}
-    → (isom : Iso X X')
-    → ((x' : X') → Y (inv isom x') ≡ Y' x')
-    → Iso ((x : X) → Y x)
-           ((x' : X') → Y' x')
+  ap' : ∀ {i j} {X : Set i}{Y : X → Set j}
+        {x x' : X}(f : (x : X) → Y x)(p : x ≡ x')
+      → subst Y p (f x) ≡ f x'
+-- ap' a b = {!!}
+
+subst-naturality : ∀ {i i' j} {X : Set i} {Y : Set i'}
+                   {x x' : X} (P : Y → Set j)
+                   (f : X → Y)(p : x ≡ x')(u : P (f x))
+                 → subst (P ∘ f) p u ≡ subst P (cong f p) u
+subst-naturality _ _ _ _ = refl
+
+-- technical lemma: substiting a fixpoint proof into itself is like
+-- applying the function
+lem-subst-fixpoint : ∀ {i}{X : Set i}
+                     (f : X → X)(x : X)
+                     (p : f x ≡ x)
+                   → subst (λ x → f x ≡ x) (sym p) p
+                   ≡ cong f p
+lem-subst-fixpoint {i}{X} f x p =
+    subst (λ x → f x ≡ x) (p ⁻¹) p
+  ≡⟨ lem (f x) (sym p) ⟩ 
+    cong f (sym (sym p)) ∙ p ∙ sym p
+  ≡⟨ cong (λ z → cong f z ∙ p ∙ sym p) (symInvo p) ⟩ -- (double-inverse p) ⟩
+    cong f p ∙ p ∙ sym p
+  ≡⟨ refl ⟩ -- associativity (ap f p) p (sym p)
+    cong f p ∙ (p ∙ sym p)
+  ≡⟨ cong (λ z → cong f p ∙ z) (rCancel p) ⟩ -- (left-inverse p)
+    cong f p ∙ refl
+  ≡⟨ sym (rUnit (cong f p)) ⟩
+    cong f p
+  ∎
+  where
+    postulate
+      lem : (y : X) (q : x ≡ y)
+        → subst (λ z → f z ≡ z) q p
+        ≡ cong f (sym q) ∙ p ∙ q
+    -- lem y q = {!!} -- sym (lUnit p)
+    
+lem-whiskering : ∀ {i} {X : Set i}
+                 (f : X → X) (H : (x : X) → f x ≡ x)
+                 (x : X) → cong f (H x) ≡ H (f x)
+lem-whiskering f H x =
+    cong f (H x)
+  ≡⟨ sym (lem-subst-fixpoint f x (H x)) ⟩
+    subst (λ z → f z ≡ z) (sym (H x)) (H x)
+  ≡⟨ ap' H (sym (H x)) ⟩
+    H (f x)
+  ∎
+    
+co-coherence : ∀ {i j}{X : Set i}{Y : Set j}
+               (isom : Iso X Y)
+             → coherent isom
+             → coherent' isom
+co-coherence (iso f g K H) coherence y =
+  subst (λ z → cong g (K z) ≡ H (g z)) (K y) lem
+  where
+    postulate
+      lem : cong g (K (f (g y)))
+        ≡ H (g (f (g y)))
+    -- lem = 
+    --     cong g (K (f (g y)))
+    --   ≡⟨ cong (cong g) (sym (coherence (g y))) ⟩
+    --     cong g (cong f (H (g y)))
+    --   ≡⟨ {!!} ⟩ -- ap-hom f g _
+    --     cong (g ∘ f) (H (g y))
+    --   ≡⟨ lem-whiskering (g ∘ f) H (g y) ⟩
+    --     H (g (f (g y)))
+    --   ∎
+
+postulate
+  Π-iso :
+    ∀ {i i' j} {X : Set i} {X' : Set i'} {Y : X → Set j} {Y' : X' → Set j}
+    (isom : Iso X X')
+    → (Iso ((x : X) → Y x) ((x' : X') → Y (inv isom x')))
+-- Π-iso {X = X}  {X'} {Y} {Y'} (iso f g K H) =
+--   iso (λ h x' → h (g x'))
+--       (λ h' x → subst Y (H x) (h' (f x)))
+--       (λ h' → funExt λ x' → cong (λ p → subst Y p _) (sym {!!}) ∙ sym (subst-naturality Y g (K x') _) ∙ ap' h' (K x'))
+--       (λ h → funExt λ x → ap' h (H x))
+--   where γ' = {!!} -- co-coherence (iso f g H K) γ
+
+  
+-- record
+      -- { to = λ h x' → h (g x')
+      -- ; from = λ h' x → subst Y (H x) (h' (f x))
+      -- ; iso₁ = λ h → funext λ x → ap' h (H x)
+      -- ; iso₂ = λ h' → funext λ x' →
+      --         ap (λ p → subst Y p _) (sym (γ' x'))
+      --       · sym (subst-naturality Y g (K x') _)
+      --       · ap' h' (K x') }
+
+-- where γ' = co-coherence (iso f g H K) γ
+
+postulate
+  Π-ap-iso : ∀ {i i' j}{X : Set i}{X' : Set i'}
+             {Y : X → Set j}{Y' : X' → Set j}
+           → (isom : Iso X X')
+           → ((x' : X') → Iso (Y (inv isom x')) (Y' x'))
+           → Iso ((x : X) → Y x)
+                 ((x' : X') → Y' x')
+-- Π-ap-iso {X = X}{X'}{Y}{Y'} isom isom' =
+--   iso (λ x x' → {!!}) {!!} {!!} {!!}
+
+postulate
+  -- ∏-ap-iso :
+  --   ∀ {i j} {X X' : Set i} {Y : X → Set j} {Y' : X' → Set j}
+  --   → (isom : Iso X X')
+  --   → ((x' : X') → Y (inv isom x') ≡ Y' x')
+  --   → Iso ((x : X) → Y x)
+  --          ((x' : X') → Y' x')
 
   ∏-ap :
     ∀ {i j} {X X' : Set i} {Y : X → Set j} {Y' : X' → Set j}
