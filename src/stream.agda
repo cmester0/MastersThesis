@@ -20,6 +20,7 @@ open import M
 open import helper
 open import Container
 open import Container-M-type
+open import Coalg
 
 open import Cubical.Foundations.Embedding
 
@@ -45,35 +46,6 @@ hd {A} S = out-fun S .fst
 
 tl : ∀ {A : Set} -> stream A -> stream A
 tl {A} S = out-fun S .snd tt
-
-open isEquiv
-
--- hd-isEmbedding : ∀ {A} → isEmbedding (hd {A = A})
--- fst (fst (equiv-proof (hd-isEmbedding {A} w z) y)) =
---   {!!}
---      ≡⟨ {!!} ⟩
---   {!!} ∎
--- snd (fst (equiv-proof (hd-isEmbedding {A} w z) y)) = {!!}
--- snd (equiv-proof (hd-isEmbedding {A} w z) y) = {!!}
-
--- --------------------
--- -- Cons-injective --
--- --------------------
-
--- cons-inj : ∀ {ℓ} {A : Set ℓ} (x : A) (xs : stream A) (y : A) (ys : stream A) → (cons x xs ≡ cons y ys) ≡ (x ≡ y) × (xs ≡ ys)
--- cons-inj x xs y ys =
---   cons x xs ≡ cons y ys
---      ≡⟨ in-inj-x ⟩
---   (x , λ {(lift tt) → xs}) ≡ (y , λ {(lift tt) → ys})
---      ≡⟨ sym Σ-split ⟩
---   (x ≡ y) ×Σ ((λ { (lift tt) → xs }) ≡ (λ { (lift tt) → ys }))
---      ≡⟨ cong (λ a → (x ≡ y) ×Σ a) (isoToPath (iso (λ a → funExt⁻ a (lift tt))
---                                                     (λ a → cong (λ b → λ {(lift tt) → b}) a)
---                                                     (λ b → refl)
---                                                     (λ a → refl))) ⟩
---   (x ≡ y) ×Σ (xs ≡ ys)
---      ≡⟨ sym A×B≡A×ΣB ⟩
---   (x ≡ y) × (xs ≡ ys) ∎
 
 -------------------------------
 -- Expanding stream equality --
@@ -295,34 +267,36 @@ bisim-nat a b nat-bisim = bisim (bisim-nat' a b nat-bisim)
 stream-equality-iso-1 : ∀ {A : Set} → (b : Stream A) → stream-to-Stream (Stream-to-stream b) ≡ b
 stream-equality-iso-1 b = bisim-nat (stream-to-Stream (Stream-to-stream b)) b (helper b)
 
-stream-equality-iso-2₁ : ∀ {A : Set} → (a : stream A) (n : ℕ) → Stream-to-stream (stream-to-Stream a) .fst n ≡ a .fst n
-stream-equality-iso-2₁ (a , b) 0 =
-  Stream-to-stream (stream-to-Stream (a , b)) .fst 0
-    ≡⟨ refl ⟩
-  Stream-to-stream-func-x 0 (stream-to-Stream (a , b))
-    ≡⟨ refl ⟩
-  lift tt
-    ≡⟨ refl ⟩
-  a 0 ∎
-stream-equality-iso-2₁ {A = A} (a , b) (suc n) =
-  Stream-to-stream (stream-to-Stream (a , b)) .fst (suc n)
-    ≡⟨ refl ⟩
-  Stream-to-stream-func-x (suc n) (stream-to-Stream (a , b))
-    ≡⟨ refl ⟩
-  (hd (a , b) , λ _ → Stream-to-stream-func-x {A = A} n (stream-to-Stream {A = A} (tl (a , b))))
-    ≡⟨ {!!} ⟩ -- cong (λ k → hd (a , b) , λ _ → k) (stream-equality-iso-2₁-x (a , b) (suc n))
-  (hd (a , b) , λ _ → tl (a , b) .fst n)
-    ≡⟨ {!!} ⟩
-  a (suc n) ∎
+postulate
+  stream-equality-iso-2₁ : ∀ {A : Set} → (a : stream A) (n : ℕ) → Stream-to-stream (stream-to-Stream a) .fst n ≡ a .fst n
+-- stream-equality-iso-2₁ (a , b) 0 =
+--   Stream-to-stream (stream-to-Stream (a , b)) .fst 0
+--     ≡⟨ refl ⟩
+--   Stream-to-stream-func-x 0 (stream-to-Stream (a , b))
+--     ≡⟨ refl ⟩
+--   lift tt
+--     ≡⟨ refl ⟩
+--   a 0 ∎
+-- stream-equality-iso-2₁ {A = A} (a , b) (suc n) =
+--   Stream-to-stream (stream-to-Stream (a , b)) .fst (suc n)
+--     ≡⟨ refl ⟩
+--   Stream-to-stream-func-x (suc n) (stream-to-Stream (a , b))
+--     ≡⟨ refl ⟩
+--   (hd (a , b) , λ _ → Stream-to-stream-func-x {A = A} n (stream-to-Stream {A = A} (tl (a , b))))
+--     ≡⟨ {!!} ⟩ -- cong (λ k → hd (a , b) , λ _ → k) (stream-equality-iso-2₁-x (a , b) (suc n))
+--   (hd (a , b) , λ _ → tl (a , b) .fst n)
+--     ≡⟨ {!!} ⟩
+--   a (suc n) ∎
 
-stream-equality-iso-2 : ∀ {A : Set} → (a : stream A) → Stream-to-stream (stream-to-Stream a) ≡ a
-stream-equality-iso-2 (a , b) =
-  Stream-to-stream (stream-to-Stream (a , b))
-    ≡⟨ refl ⟩
-  (λ n → Stream-to-stream-func-x n (stream-to-Stream (a , b))) ,
-  (λ n → Stream-to-stream-func-π n (stream-to-Stream (a , b)))
-    ≡⟨ (λ i → (λ n → stream-equality-iso-2₁ (a , b) n i) , {!!}) ⟩
-  (a , b) ∎
+postulate
+  stream-equality-iso-2 : ∀ {A : Set} → (a : stream A) → Stream-to-stream (stream-to-Stream a) ≡ a
+-- stream-equality-iso-2 (a , b) =
+--   Stream-to-stream (stream-to-Stream (a , b))
+--     ≡⟨ refl ⟩
+--   (λ n → Stream-to-stream-func-x n (stream-to-Stream (a , b))) ,
+--   (λ n → Stream-to-stream-func-π n (stream-to-Stream (a , b)))
+--     ≡⟨ (λ i → (λ n → stream-equality-iso-2₁ (a , b) n i) , {!!}) ⟩
+--   (a , b) ∎
 
 stream-equality : ∀ {A : Set} -> stream A ≡ Stream A
 stream-equality = isoToPath (iso stream-to-Stream Stream-to-stream stream-equality-iso-1 stream-equality-iso-2)
@@ -344,3 +318,16 @@ hd-zeros-transported = hd-to-head (transportRefl Zeros i0)
 
 tl-zeros-transported : tl zeros-transported ≡ zeros-transported
 tl-zeros-transported = tl-to-tail (transportRefl Zeros i0)
+
+-------------------------------------
+-- Coinduction of M types (stream) --
+-------------------------------------
+
+-- stream-relation : {!!}
+-- stream-relation = {!!}
+
+-- stream-bisim : ∀ A → bisimulation (stream-S A) M-coalg stream-relation
+-- stream-bisim = {!!}
+
+-- stream-coinduction : ∀ s t → coinduction ? ? ?
+-- stream-coinduction = ?
