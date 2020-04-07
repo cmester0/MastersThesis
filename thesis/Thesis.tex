@@ -30,6 +30,9 @@
 \usepackage{tikz-cd}
 \usepackage{xfrac} % \sfrac - sideways fraction
 
+
+\allowdisplaybreaks % allow breaks in align and equation (a new page for example) 
+
 \usepackage{amsthm}
 
 \theoremstyle{plain} % default
@@ -202,19 +205,13 @@
   \end{equation}  
 \end{exmp}
 \begin{lem} \label{lem:limit-collapse}
-  We will now show that given \(\ell : \prod_{(n : \mathbb{N})} (X_{n} \rightarrow X_{n+1})\) and \(y : \sum_{x : \prod_{(n : \mathbb{N})} X_n} x_{n + 1} \equiv l_n (x_n)\) we can collapse the chain \(\mathcal{L} \equiv X_0\). We define this collapse by the equivalence
+  Given \(\ell : \prod_{(n : \mathbb{N})} (X_{n} \rightarrow X_{n+1})\) and \(y : \sum_{x : \prod_{(n : \mathbb{N})} X_n} x_{n + 1} \equiv l_n (x_n)\) we can collapse the chain \(\mathcal{L} \equiv X_0\). We define this collapse by the equivalence
   \begin{align}
-    \function{fun}_{\mathcal{L}collapse}~(x , y) &= x_0 \\
+    \function{fun}_{\mathcal{L}collapse}~(x , r) &= x_0 \\
     \function{inv}_{\mathcal{L}collapse}~x_0 &= (\lambda n, \function{transport}~\ell^n~x_0) , (\lambda\,n, \mathtt{refl}_{\function{transport}~\ell^{(n+1)}~x_0}) \\
     \function{rinv}~x_0 &= \mathtt{refl}_{x_0} \\
-    \function{linv}~(x , y) &= ?
   \end{align}
-  So we want to show
-  \begin{equation}
-    (\lambda n, \function{transport}~\ell^n~x_0) , (\lambda\,n, \mathtt{refl}_{\function{transport}~\ell^{(n+1)}~x_0}) \equiv (x,y)
-  \end{equation}
-  
-
+  For \(\function{linv}~(x , r)\) we define a fiber \((X , z, l)\) over \(\mathbb{N}\) given some \(z : X_0\). Then any element of the type \(\sum_{x : \prod_{(n : \mathbb{N})} X_n} x_{n + 1} \equiv l_n (x_n)\) is equal to a section over this fiber, specifically \(y\) is equal to a fiber. Since this section is defined over \(\mathbb{N}\) which is an initial algebra for the functor \(GY = \unit + Y\), we get that the section are contractible, meaning \(y \equiv \function{inv}_{\mathcal{L}collapse} (\function{fun}_{\mathcal{L}collapse}~y)\), since both are equal to such sections.
 \end{lem}
 \begin{thm}
   We want to proof the construction of \function{in} and \function{out} for the container \(\containerpair{A}{B}\) more precisely we want to define the equality
@@ -248,11 +245,16 @@
   Then we define \(\function{in} = \function{transport}~shift\) and \(\function{out} = \function{transport}~(\function{sym}~shift)\), since \function{in} and \function{out} are part of an equality relation (\(shift\)), they become embeddings.
 \end{thm}
 \section{Closure properties of M-types}
-We define the product of two containers
-\begin{equation}
-  \containerpair{\type{A}}{\type{B}} \times \containerpair{\type{C}}{\type{D}} \equiv \containerpair{\type{A} \times \type{C}}{\lambda\,(\term{a} , \term{c}), \typeformer{B}~\term{a} \times \typeformer{D}~\term{c}},
-\end{equation}
-we can lift this rule, through the diagram in \figref{container-products}, used to define M-types.
+We want to show that M-types are closed under simple operations, we start by looking at the product.
+\subsection{Product of M-types}
+We start with containers and work up to M-types.
+\begin{defn}
+  The product of two containers is defined as
+  \begin{equation}
+    \containerpair{\type{A}}{\type{B}} \times \containerpair{\type{C}}{\type{D}} \equiv \containerpair{\type{A} \times \type{C}}{\lambda\,(\term{a} , \term{c}), \typeformer{B}~\term{a} \times \typeformer{D}~\term{c}}.
+  \end{equation}
+\end{defn}
+\noindent We can lift this rule, through the diagram in \figref{container-products}, used to define M-types.
 \begin{figure}[h]
   \centering
   \begin{tikzcd}[row sep=huge,column sep=huge]
@@ -264,76 +266,98 @@ we can lift this rule, through the diagram in \figref{container-products}, used 
     \functor{P}_{\containerpair{\type{A}}{\type{B}}}~\unit \ar[d,"\pi_{(0)}"] & \functor{P}_{\containerpair{\type{A}}{\type{B}} \times \containerpair{\type{C}}{\type{D}}}~\unit \ar[l] \ar[r] \ar[d,"\pi_{(0)}"] & \functor{P}_{\containerpair{\type{C}}{\type{D}}}~\unit \ar[d,"\pi_{(0)}"] \\
     \unit & \unit \ar[l,"\texttt{refl}"] \ar[r,"\texttt{refl}"'] & \unit
   \end{tikzcd}
-  \caption{TODO}
+  \caption{Diagram for products of chains}
   \label{fig:container-products}
 \end{figure}
-We now prove that
-\begin{equation}
-  {\functor{P}_{\containerpair{\type{A}}{\type{B}}}}^n~\unit \times {\functor{P}_{\containerpair{\type{C}}{\type{D}}}}^n~\unit \equiv {\functor{P}_{\containerpair{\type{A}}{\type{B}} \times \containerpair{\type{C}}{\type{D}}}}^n~\unit,
-\end{equation}
-by induction on \(n\). For \(n = 0\), we have \(\unit \times \unit \equiv \unit\). For \(n = m + 1\), we may assume
-\begin{equation}
-  {\functor{P}_{\containerpair{\type{A}}{\type{B}}}}^m~\unit \times {\functor{P}_{\containerpair{\type{C}}{\type{D}}}}^m~\unit \equiv {\functor{P}_{\containerpair{\type{A}}{\type{B}} \times \containerpair{\type{C}}{\type{D}}}}^m~\unit,
-\end{equation}
-in the following
-\begin{align}
-  &~ {\functor{P}_{\containerpair{\type{A}}{\type{B}}}}^{m+1}~\unit \times {\functor{P}_{\containerpair{\type{C}}{\type{D}}}}^{m+1}~\unit \\
-  \equiv&~ \functor{P}_{\containerpair{\type{A}}{\type{B}}} ({\functor{P}_{\containerpair{\type{A}}{\type{B}}}}^m~\unit) \times \functor{P}_{\containerpair{\type{C}}{\type{D}}} ({\functor{P}_{\containerpair{\type{C}}{\type{D}}}}^m~\unit) \\
-  \equiv&~ \sum_{\term{a} : \type{A}} \type{B}~\term{a} \rightarrow {\functor{P}_{\containerpair{\type{A}}{\type{B}}}}^m~\unit \times \sum_{\term{c} : \type{C}} \type{D}~\term{c} \rightarrow {\functor{P}_{\containerpair{\type{C}}{\type{D}}}}^m~\unit \\
-  \equiv&~ \sum_{\term{a} , \term{c} : \type{A} \times \type{C}} (\type{B}~\term{a} \rightarrow {\functor{P}_{\containerpair{\type{A}}{\type{B}}}}^m~\unit) \times (\type{D}~\term{c} \rightarrow {\functor{P}_{\containerpair{\type{C}}{\type{D}}}}^m~\unit) \\
-  \equiv&~ \sum_{\term{a} , \term{c} : \type{A} \times \type{C}} \type{B}~\term{a} \times \type{D}~\term{c} \rightarrow {\functor{P}_{\containerpair{\type{A}}{\type{B}}}}^m~\unit \times {\functor{P}_{\containerpair{\type{C}}{\type{D}}}}^m~\unit \\
-  \equiv&~ \sum_{\term{a} , \term{c} : \type{A} \times \type{C}} \type{B}~\term{a} \times \type{D}~\term{c} \rightarrow {\functor{P}_{\containerpair{\type{A}}{\type{B}} \times \containerpair{\type{C}}{\type{D}}}}^m~\unit \\
-  \equiv&~ \functor{P}_{\containerpair{\type{A}}{\type{B}} \times \containerpair{\type{C}}{\type{D}}} ({\functor{P}_{\containerpair{\type{A}}{\type{B}} \times \containerpair{\type{C}}{\type{D}}}}^m~\unit) \\
-  \equiv&~ {\functor{P}_{\containerpair{\type{A}}{\type{B}} \times \containerpair{\type{C}}{\type{D}}}}^{m+1}~\unit
-\end{align}
-taking the limit we get
-\begin{equation}
-  \typeformer{M}_{\containerpair{\type{A}}{\type{B}}} \times \typeformer{M}_{\containerpair{\type{C}}{\type{D}}} \equiv \typeformer{M}_{\containerpair{\type{A}}{\type{B}} \times \containerpair{\type{C}}{\type{D}}}
-\end{equation}
-as an example hereof lets look at streams, where we actually get
+
+\begin{thm}
+  For any \(n : \mathbb{N}\) the following is true
+  \begin{equation}
+    {\functor{P}_{\containerpair{\type{A}}{\type{B}}}}^n~\unit \times {\functor{P}_{\containerpair{\type{C}}{\type{D}}}}^n~\unit \equiv {\functor{P}_{\containerpair{\type{A}}{\type{B}} \times \containerpair{\type{C}}{\type{D}}}}^n~\unit. \label{eq:polynomial-functor-product}
+  \end{equation}
+  
+  \begin{proof}
+    We do induction on \(n\), for \(n = 0\), we have \(\unit \times \unit \equiv \unit\). For \(n = m + 1\), we may assume
+    \begin{equation}
+      {\functor{P}_{\containerpair{\type{A}}{\type{B}}}}^m~\unit \times {\functor{P}_{\containerpair{\type{C}}{\type{D}}}}^m~\unit \equiv {\functor{P}_{\containerpair{\type{A}}{\type{B}} \times \containerpair{\type{C}}{\type{D}}}}^m~\unit,
+    \end{equation}
+    in the following
+    \begin{align}
+      &~ {\functor{P}_{\containerpair{\type{A}}{\type{B}}}}^{m+1}~\unit \times {\functor{P}_{\containerpair{\type{C}}{\type{D}}}}^{m+1}~\unit \\
+      \equiv&~ \functor{P}_{\containerpair{\type{A}}{\type{B}}} ({\functor{P}_{\containerpair{\type{A}}{\type{B}}}}^m~\unit) \times \functor{P}_{\containerpair{\type{C}}{\type{D}}} ({\functor{P}_{\containerpair{\type{C}}{\type{D}}}}^m~\unit) \\
+      \equiv&~ \sum_{\term{a} : \type{A}} \type{B}~\term{a} \rightarrow {\functor{P}_{\containerpair{\type{A}}{\type{B}}}}^m~\unit \times \sum_{\term{c} : \type{C}} \type{D}~\term{c} \rightarrow {\functor{P}_{\containerpair{\type{C}}{\type{D}}}}^m~\unit \\
+      \equiv&~ \sum_{\term{a} , \term{c} : \type{A} \times \type{C}} (\type{B}~\term{a} \rightarrow {\functor{P}_{\containerpair{\type{A}}{\type{B}}}}^m~\unit) \times (\type{D}~\term{c} \rightarrow {\functor{P}_{\containerpair{\type{C}}{\type{D}}}}^m~\unit) \\
+      \equiv&~ \sum_{\term{a} , \term{c} : \type{A} \times \type{C}} \type{B}~\term{a} \times \type{D}~\term{c} \rightarrow {\functor{P}_{\containerpair{\type{A}}{\type{B}}}}^m~\unit \times {\functor{P}_{\containerpair{\type{C}}{\type{D}}}}^m~\unit \\
+      \equiv&~ \sum_{\term{a} , \term{c} : \type{A} \times \type{C}} \type{B}~\term{a} \times \type{D}~\term{c} \rightarrow {\functor{P}_{\containerpair{\type{A}}{\type{B}} \times \containerpair{\type{C}}{\type{D}}}}^m~\unit \\
+      \equiv&~ \functor{P}_{\containerpair{\type{A}}{\type{B}} \times \containerpair{\type{C}}{\type{D}}} ({\functor{P}_{\containerpair{\type{A}}{\type{B}} \times \containerpair{\type{C}}{\type{D}}}}^m~\unit) \\
+      \equiv&~ {\functor{P}_{\containerpair{\type{A}}{\type{B}} \times \containerpair{\type{C}}{\type{D}}}}^{m+1}~\unit
+    \end{align}
+  \end{proof}
+  taking the limit of \eqref{eq:polynomial-functor-product} we get
+  \begin{equation}
+    \typeformer{M}_{\containerpair{\type{A}}{\type{B}}} \times \typeformer{M}_{\containerpair{\type{C}}{\type{D}}} \equiv \typeformer{M}_{\containerpair{\type{A}}{\type{B}} \times \containerpair{\type{C}}{\type{D}}}.
+  \end{equation}
+\end{thm}
+\begin{exmp} For streams we get
 \begin{equation}
   \typeformer{stream}~\type{A} \times \typeformer{stream}~\type{B} \equiv \typeformer{M}_{\containerpair{\type{A}}{\lambda~\_,\unit}} \times \typeformer{M}_{\containerpair{\type{B}}{\lambda~\_,\unit}} \equiv \typeformer{M}_{\containerpair{\type{A}}{\lambda~\_,\unit} \times \containerpair{\type{B}}{\lambda~\_,\unit}} \equiv \typeformer{stream}~(\type{A} \times \type{B}) \label{eq:zip-equality}
 \end{equation}
-as expected, transporting along equality \eqref{eq:zip-equality} gives us the definition for \function{zip}.
-
+as expected. Transporting along \eqref{eq:zip-equality} gives us a definition for \function{zip}.
+\end{exmp}
 
 \section{Co-induction Principle for M-types}
-We can now construct a bisimulation: forall coalgebras \(\coalg{\type{C}}{\term{\gamma}} : \typeformer{Coalg}_{\container{S}}\), if we have a relation \(\typeformer{\mathcal{R}} : \type{C} \rightarrow \type{C} \rightarrow \universe{\mathcal{U}}\), and a type \(\type{\overline{\mathcal{R}}} = \sum_{\term{a} : \type{C}} \sum_{\term{b} : \type{C}} \typeformer{\mathcal{R}}~\term{a}~\term{b}\), such that \(\type{\overline{\mathcal{R}}}\) and \(\term{\alpha}_{\type{\overline{\mathcal{R}}}} : \type{\overline{\mathcal{R}}} \rightarrow \functor{P}(\type{\overline{\mathcal{R}}})\) forms a \(\functor{P}\)-coalgebra \(\coalg{\type{\overline{\mathcal{R}}}}{\term{\alpha}_{\type{\overline{\mathcal{R}}}}} : \mathtt{Coalg}_{\container{S}}\), making the diagram in \figref{coalgebra-coinduction-definition} commute (where \(\Longrightarrow\) are \(\functor{P}\)-coalgebra morphisms).
-\begin{figure}[h]
-  \centering
-  \begin{tikzcd}[row sep=huge,column sep=huge]
-    \coalg{\type{C}}{\term{\gamma}} & \coalg{\type{\overline{\mathcal{R}}}}{\term{\alpha}_{\type{\overline{\mathcal{R}}}}} \ar[l,Rightarrow,"{\pi_1}^{\type{\overline{\mathcal{R}}}}"'] \ar[r,Rightarrow,"{\pi_2}^{\type{\overline{\mathcal{R}}}}"] & \coalg{\type{C}}{\term{\gamma}}
-  \end{tikzcd}
-  \caption{Bisimulation for a coalgebra}
-  \label{fig:coalgebra-coinduction-definition}
-\end{figure}
-\noindent Furthermore for any bisimulation over a final \(\functor{P}\)-coalgebra \(\coalg{\typeformer{M}}{\term{\mathtt{out}}}:\mathtt{Coalg}_{\container{S}}\) we get the diagram in \figref{final-coalgebra-coinduction},
-\begin{figure}[h]
-  \centering
-  \begin{tikzcd}[row sep=huge,column sep=huge]
-    \coalg{\typeformer{M}}{\function{out}} & \coalg{\type{\overline{\mathcal{R}}}}{\term{\alpha}_{\type{\overline{\mathcal{R}}}}} \ar[l,Rightarrow,"{\pi_1}^{\type{\overline{\mathcal{R}}}}"'] \ar[r,Rightarrow,"{\pi_2}^{\type{\overline{\mathcal{R}}}}"] & \coalg{\typeformer{M}}{\function{out}}
-  \end{tikzcd}
-  \caption{Bisimulation principle for final coalgebra}
-  \label{fig:final-coalgebra-coinduction}
-\end{figure}
-\noindent where \(\pi_1^{\type{\overline{\mathcal{R}}}} = ~! = \pi_2^{\type{\overline{\mathcal{R}}}}\), which means given \(\term{r} : \term{\mathcal{R}}(\term{m},\term{m'})\) we get \(\term{m} = \pi_1^{\type{\overline{\mathcal{R}}}} (\term{m}, \term{m'}, \term{r}) = \pi_2^{\type{\overline{\mathcal{R}}}} (\term{m}, \term{m'}, \term{r}) = \term{m'}\).
+We can now construct a bisimulation
+
+\begin{defn}
+  Forall coalgebras \(\coalg{\type{C}}{\term{\gamma}} : \typeformer{Coalg}_{\container{S}}\), given a relation \(\typeformer{\mathcal{R}} : \type{C} \rightarrow \type{C} \rightarrow \universe{\mathcal{U}}\) and a type \(\type{\overline{\mathcal{R}}} = \sum_{\term{a} : \type{C}} \sum_{\term{b} : \type{C}} \typeformer{\mathcal{R}}~\term{a}~\term{b}\), such that \(\type{\overline{\mathcal{R}}}\) and \(\term{\alpha}_{\type{\overline{\mathcal{R}}}} : \type{\overline{\mathcal{R}}} \rightarrow \functor{P}(\type{\overline{\mathcal{R}}})\) forms a \(\functor{P}\)-coalgebra \(\coalg{\type{\overline{\mathcal{R}}}}{\term{\alpha}_{\type{\overline{\mathcal{R}}}}} : \mathtt{Coalg}_{\container{S}}\), making the diagram in \figref{coalgebra-coinduction-definition} commute (\(\Longrightarrow\) represents \(\functor{P}\)-coalgebra morphisms).  
+  \begin{figure}[h]
+    \centering
+    \begin{tikzcd}[row sep=huge,column sep=huge]
+      \coalg{\type{C}}{\term{\gamma}} & \coalg{\type{\overline{\mathcal{R}}}}{\term{\alpha}_{\type{\overline{\mathcal{R}}}}} \ar[l,Rightarrow,"{\pi_1}^{\type{\overline{\mathcal{R}}}}"'] \ar[r,Rightarrow,"{\pi_2}^{\type{\overline{\mathcal{R}}}}"] & \coalg{\type{C}}{\term{\gamma}}
+    \end{tikzcd}
+    \caption{Bisimulation for a coalgebra}
+    \label{fig:coalgebra-coinduction-definition}
+  \end{figure}
+\end{defn}
+\begin{defn}
+  \noindent For any bisimulation over a final \(\functor{P}\)-coalgebra \(\coalg{\typeformer{M}}{\term{\mathtt{out}}}:\mathtt{Coalg}_{\container{S}}\) we get the diagram in \figref{final-coalgebra-coinduction},
+  
+  \begin{figure}[h]
+    \centering
+    \begin{tikzcd}[row sep=huge,column sep=huge]
+      \coalg{\typeformer{M}}{\function{out}} & \coalg{\type{\overline{\mathcal{R}}}}{\term{\alpha}_{\type{\overline{\mathcal{R}}}}} \ar[l,Rightarrow,"{\pi_1}^{\type{\overline{\mathcal{R}}}}"'] \ar[r,Rightarrow,"{\pi_2}^{\type{\overline{\mathcal{R}}}}"] & \coalg{\typeformer{M}}{\function{out}}
+    \end{tikzcd}
+    \caption{Bisimulation principle for final coalgebra}
+    \label{fig:final-coalgebra-coinduction}
+  \end{figure}
+  \noindent where \(\pi_1^{\type{\overline{\mathcal{R}}}} = ~! = \pi_2^{\type{\overline{\mathcal{R}}}}\), which means given \(\term{r} : \term{\mathcal{R}}(\term{m},\term{m'})\) we get the equation
+  \begin{equation}
+    \term{m} = \pi_1^{\type{\overline{\mathcal{R}}}} (\term{m}, \term{m'}, \term{r}) = \pi_2^{\type{\overline{\mathcal{R}}}} (\term{m}, \term{m'}, \term{r}) = \term{m'}.
+  \end{equation}
+\end{defn}
 \\ \\
 \todo[inline]{Better introduction to this proof!}
-We want to define a co-induction principle from any bisimulation relation over a final coalgebra, that is if \(\term{R}\) gives a bisimulation, then it is true that
+\begin{thm}[Co-induction principle]
+  Given a bisimulation relation over a final coalgebra, that is if \(\term{R}\) gives a bisimulation, then 
 \begin{equation}
   \term{R} \equiv \term{\equiv}
 \end{equation}
-meaning we can use the relation \(\term{R}\), to show that two things of an \texttt{M}-type are equivalent. So we want to construct an isomorphism between \(\term{R}\) and the equivalence relation \(\equiv\), to do this we must construct functions
+meaning we can use the relation \(\term{R}\), to show equivalence between two elements of an \texttt{M}-type.
+
+\begin{proof}
+So we want to construct an isomorphism between \(\term{R}\) and the equivalence relation \(\equiv\), to do this we must construct functions
 \begin{align}
-  \term{p} &: \term{R} \rightarrow \term{\equiv} \\
-  \term{q} &: \term{\equiv} \rightarrow \term{R}
+  \function{fun}_{bisim} &: \term{R} \rightarrow \term{\equiv} \\
+  \function{inv}_{bisim} &: \term{\equiv} \rightarrow \term{R}
 \end{align}
 and relations
 \begin{align}
-  \term{\alpha} &: \term{p} \circ \term{q} \equiv \term{\mathtt{id}_{\equiv}} \\
-  \term{\beta} &: \term{q} \circ \term{p} \equiv \term{\mathtt{id}_{R}}
+  \function{rinv}_{bisim} &: \function{fun}_{bisim} \circ \function{inv}_{bisim} \equiv \term{\mathtt{id}_{\equiv}} \\
+  \function{linv}_{bisim} &: \function{inv}_{bisim} \circ \function{fun}_{bisim} \equiv \term{\mathtt{id}_{R}}
 \end{align}
+\end{proof}
 \todo[inline]{Complete the construction of equality from any bisimulation relation over an M-type}
+\end{thm}
 
 \section{Quotient M-type}
 Since we know that M-types preserves the H-level, we can use set-truncated quotients, to define quotient M-types, for examples we can define weak bisimulation of the delay monad as
@@ -477,7 +501,7 @@ Sucessor case \(X\)
   \function{zip}_X~(m+1)~(x,y) &\equiv (\function{hd}~x, \function{hd}~y),(\lambda\,\_,\function{zip}_X~m~(\function{tl}~x,\function{tl}~y)) \\
                                &\equiv (\function{hd}~x, \function{hd}~y),(\lambda\,\_, {?}~(\function{tl}~a)) \\
                                &\equiv (\function{hd}~(\texttt{transport}_{?} a)),(\lambda\,\_, \texttt{transport}_{?} (\function{tl}~a)) \\
-                               &\equiv transport_? a \\
+                               &\equiv \mathtt{transport}_?~a \\
 \end{align}
 Zero case \(\pi\): \((\lambda\,i, \function{zip}_\pi~0~(x,y)~i \equiv refl)\).
 \begin{align}
@@ -647,39 +671,11 @@ Giving us the diagram
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
 
 \chapter{Additions to the Cubical Agda Library}
-\section{Lemma 10}
-\texttt{M}-types are part of a final coalgebra, formally \(\forall\,\container{S}~\coalg{\type{C}}{\term{\gamma}}, (\coalg{\type{C}}{\term{\gamma}} \Rightarrow \coalg{\typeformer{M}}{\term{\mathtt{out}}}) \equiv \unit\)
-\begin{align}
-  U &\equiv \sum_{f : C \rightarrow \mathcal{L}} \mathtt{out} \circ f \equiv \mathtt{step}~f \\
-    &\equiv \sum_{f : C \rightarrow \mathcal{L}} \mathtt{in} \circ \mathtt{out} \circ f \equiv \mathtt{in} \circ \mathtt{step}~f\\
-    &\equiv \sum_{f : C \rightarrow \mathcal{L}} f \equiv \mathtt{in} \circ \mathtt{step}~f\\
-    &\equiv \sum_{f : C \rightarrow \mathcal{L}} f \equiv \Psi~f\\
-    &\equiv \sum_{c : Cone} e~c \equiv \Psi~(e~c)\\
-    &\equiv \sum_{c : Cone} e~c \equiv e~(\phi~c) \\
-    &\equiv \sum_{c : Cone} c \equiv \phi~c \\
-    &\equiv \sum_{(u,q) : Cone} (u , q) \equiv (\phi_0~u , \phi_1~u~q) \\
-    &\equiv \sum_{(u,q) : Cone} \sum_{p : u \equiv \phi_0~u} q \equiv_{\lambda i, Cone_1 (p~i)} \phi_1~u~q \\
-    &\equiv \sum_{(u,p) : \sum_{u : Cone_0} u \equiv \phi_0~u} \sum_{q : Cone_1~u} q \equiv_{\lambda i, Cone_1 (p~i)} \phi_1~u~q \\
-    &\equiv \sum_{q : Cone_1 u_0} q \equiv_{\lambda i, Cone_1 (funExt~p_0~i)} \phi_1~u_0~q \\
-    &\vdots \\
-    &\equiv \unit
-\end{align}
-
-\section{Lemma 13}
-\begin{align}
-  &~\sum_{((a,q):\sum_{a : \mathbb{N} \rightarrow A} \prod_{n : \mathbb{N}} a_{n+1} \equiv a_n)} \sum_{(u : \prod_{n : \mathbb{N}} B a_n \rightarrow X_n)} \prod_{(n : \mathbb{N})} \pi \circ u_{n + 1} \equiv_{\lambda i, B (q_n~i) \rightarrow X_n} u_n \\
-  \equiv&~\sum_{a : A} \sum_{u : \prod_{n : \mathbb{N}} B a \rightarrow X_n} \prod_{n : \mathbb{N}} \pi \circ u_{n+1} \equiv u_n \\
-  \equiv&~\sum_{a : A} \sum_{u : \prod_{n : \mathbb{N}} B a \rightarrow X_n} \prod_{n : \mathbb{N}} \pi \circ u_{n+1} \equiv u_n
-\end{align}
-
-\section{Missing postulates}
-\subsubsection{Combine}
-For all \(\term{X} : \type{\mathbb{N}} \rightarrow \universe{U}\) and \(p : \prod_{n : \type{\mathbb{N}}} \term{X}~(n + 1) \rightarrow \term{X}~n \rightarrow \universe{U}\)
-\begin{align}
-  &~\sum_{\term{x_0} : \type{X_0}} \sum_{\term{y} : \prod_{\term{n} : \type{\mathbb{N}}} \type{X_{n+1}}} (\term{p}~\type{y_0}~\type{x_0}) \times \left(\prod_{\term{n} : \type{\mathbb{N}}} \term{p}~\type{y_{n + 1}}~\type{y_n}\right) \\
-  \equiv&~\sum_{\term{x_0} : \type{X_0}} \sum_{\term{y} : \prod_{\term{n} : \type{\mathbb{N}}} \type{X_{n+1}}} (\term{p}~\type{y_0}~\type{x_0}) \times \left(\prod_{\term{n} : \type{\mathbb{N}}} \term{p}~\type{y_{n + 1}}~\type{y_n}\right) \\
-  \equiv&~\sum_{\term{x} : \prod_{\term{n} : \type{\mathbb{N}}} \rightarrow \type{X_n}} (\term{p}~\type{x_1}~\type{x_0}) \times \left(\prod_{\term{n} : \type{\mathbb{N}}} → \term{p}~\type{x_{n+2}}~\type{x_{n+1}}\right)
-\end{align}
+\section{\(\function{\Sigma ap}\)}
+\begin{equation}
+  \function{\Sigma ap} : \left(\sum_{x : X} Y x \equiv \sum_{x' : X'} Y' x' \right) ~ \equiv ~ \left( \sum_{p : X \equiv X'} Y \equiv_p Y' \right)
+\end{equation}
+\todo[inline]{Describe the proof of this? / Is this relevant / Should it be in the appendix?}
 
 \chapter{Conclusion}
 \label{ch:conclusion}

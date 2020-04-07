@@ -23,26 +23,28 @@ open import Container-M-type
 
 open import Cubical.Foundations.Embedding
 
+open import Cubical.Foundations.Path
+
 module stream where
 
 --------------------------------------
 -- Stream definitions using M-types --
 --------------------------------------
 
-stream-S : ∀ {ℓ} (A : Set ℓ) -> Container {ℓ}
-stream-S A = (A , (λ _ → Lift Unit))
+stream-S : ∀ (A : Set) -> Container
+stream-S A = (A , (λ _ → Unit))
 
-stream : ∀ {ℓ} (A : Set ℓ) -> Set ℓ
+stream : ∀ (A : Set) -> Set
 stream A = M (stream-S A)
 
-cons : ∀ {ℓ} {A : Set ℓ} -> A -> stream A -> stream A
-cons x xs = in-fun (x , λ { (lift tt) -> xs } )
+cons : ∀ {A : Set} -> A -> stream A -> stream A
+cons x xs = in-fun (x , λ { tt -> xs } )
 
-hd : ∀ {ℓ} {A : Set ℓ} -> stream A -> A
+hd : ∀ {A : Set} -> stream A -> A
 hd {A} S = out-fun S .fst
 
-tl : ∀ {ℓ} {A : Set ℓ} -> stream A -> stream A
-tl {A} S = out-fun S .snd (lift tt)
+tl : ∀ {A : Set} -> stream A -> stream A
+tl {A} S = out-fun S .snd tt
 
 open isEquiv
 
@@ -54,228 +56,291 @@ open isEquiv
 -- snd (fst (equiv-proof (hd-isEmbedding {A} w z) y)) = {!!}
 -- snd (equiv-proof (hd-isEmbedding {A} w z) y) = {!!}
 
---------------------
--- Cons-injective --
---------------------
+-- --------------------
+-- -- Cons-injective --
+-- --------------------
 
-cons-inj : ∀ {ℓ} {A : Set ℓ} (x : A) (xs : stream A) (y : A) (ys : stream A) → (cons x xs ≡ cons y ys) ≡ (x ≡ y) × (xs ≡ ys)
-cons-inj x xs y ys =
-  cons x xs ≡ cons y ys
-     ≡⟨ in-inj-x ⟩
-  (x , λ {(lift tt) → xs}) ≡ (y , λ {(lift tt) → ys})
-     ≡⟨ sym Σ-split ⟩
-  (x ≡ y) ×Σ ((λ { (lift tt) → xs }) ≡ (λ { (lift tt) → ys }))
-     ≡⟨ cong (λ a → (x ≡ y) ×Σ a) (isoToPath (iso (λ a → funExt⁻ a (lift tt))
-                                                    (λ a → cong (λ b → λ {(lift tt) → b}) a)
-                                                    (λ b → refl)
-                                                    (λ a → refl))) ⟩
-  (x ≡ y) ×Σ (xs ≡ ys)
-     ≡⟨ sym A×B≡A×ΣB ⟩
-  (x ≡ y) × (xs ≡ ys) ∎
-
--- -------------------------------
--- -- Expanding stream equality --
--- -------------------------------
-
--- stream-expand-2 : ∀ {ℓ} {A : Set ℓ} {s t : stream A} → (s ≡ t) ≡ (cons (hd s) (tl s) ≡ cons (hd t) (tl t))
--- stream-expand-2 = sym in-out-id
-
--- stream-expand-1 : ∀ {ℓ} {A : Set ℓ} {a c : A} {b d : stream A} → (cons a b ≡ cons c d) ≡ (a ≡ c) × (b ≡ d)
--- stream-expand-1 {a = a} {c} {b} {d} =
---   (cons a b ≡ cons c d)
---     ≡⟨ in-inj-x ⟩
---   ((a , (λ { (lift tt) → b })) ≡ (c , (λ { (lift tt) → d })))
---     ≡⟨ sym Σ-split-iso ⟩
---   (Σ (a ≡ c) (λ _ → (λ { (lift tt) → b }) ≡ λ { (lift tt) → d }))
---      ≡⟨ isoToPath (iso (λ {(x , y) → x , funExt⁻ y (lift tt)}) (λ {(x , y) → x , funExt (λ { (lift tt) → y})}) (λ b₁ → refl) λ a₁ → refl) ⟩
---   (Σ (a ≡ c) (λ _ → b ≡ d))
+-- cons-inj : ∀ {ℓ} {A : Set ℓ} (x : A) (xs : stream A) (y : A) (ys : stream A) → (cons x xs ≡ cons y ys) ≡ (x ≡ y) × (xs ≡ ys)
+-- cons-inj x xs y ys =
+--   cons x xs ≡ cons y ys
+--      ≡⟨ in-inj-x ⟩
+--   (x , λ {(lift tt) → xs}) ≡ (y , λ {(lift tt) → ys})
+--      ≡⟨ sym Σ-split ⟩
+--   (x ≡ y) ×Σ ((λ { (lift tt) → xs }) ≡ (λ { (lift tt) → ys }))
+--      ≡⟨ cong (λ a → (x ≡ y) ×Σ a) (isoToPath (iso (λ a → funExt⁻ a (lift tt))
+--                                                     (λ a → cong (λ b → λ {(lift tt) → b}) a)
+--                                                     (λ b → refl)
+--                                                     (λ a → refl))) ⟩
+--   (x ≡ y) ×Σ (xs ≡ ys)
 --      ≡⟨ sym A×B≡A×ΣB ⟩
---   ((a ≡ c) × (b ≡ d)) ∎
+--   (x ≡ y) × (xs ≡ ys) ∎
 
--- stream-expand : ∀ {ℓ} (A : Set ℓ) (s t : stream A) → (s ≡ t) ≡ (hd s ≡ hd t) × (tl s ≡ tl t)
--- stream-expand A s t = stream-expand-2 □ stream-expand-1
+-------------------------------
+-- Expanding stream equality --
+-------------------------------
 
--- postulate
---   stream-cons-expand : ∀ {ℓ} {A : Set ℓ} (s : stream A) → s ≡ (cons (hd s) (tl s))
+stream-expand-2 : ∀ {A : Set} {s t : stream A} → (s ≡ t) ≡ (cons (hd s) (tl s) ≡ cons (hd t) (tl t))
+stream-expand-2 = sym in-out-id
 
--- hd-is-hd : ∀ {ℓ} (A : Set ℓ) (x : A) (xs : stream A) → hd (cons x xs) ≡ x
--- hd-is-hd A x xs =
---   hd (cons x xs)
+stream-expand-1 : ∀ {A : Set} {a c : A} {b d : stream A} → (cons a b ≡ cons c d) ≡ (a ≡ c) × (b ≡ d)
+stream-expand-1 {a = a} {c} {b} {d} =
+  (cons a b ≡ cons c d)
+    ≡⟨ in-inj-x ⟩
+  ((a , (λ { tt → b })) ≡ (c , (λ { tt → d })))
+    ≡⟨ sym Σ-split ⟩
+  (Σ (a ≡ c) (λ _ → (λ { tt → b }) ≡ λ { tt → d }))
+     ≡⟨ isoToPath (iso (λ {(x , y) → x , funExt⁻ y tt}) (λ {(x , y) → x , funExt (λ { tt → y})}) (λ b₁ → refl) λ a₁ → refl) ⟩
+  (Σ (a ≡ c) (λ _ → b ≡ d))
+     ≡⟨ sym A×B≡A×ΣB ⟩
+  ((a ≡ c) × (b ≡ d)) ∎
+
+stream-expand : ∀ (A : Set) (s t : stream A) → (s ≡ t) ≡ (hd s ≡ hd t) × (tl s ≡ tl t)
+stream-expand A s t = stream-expand-2 ∙ stream-expand-1
+
+hd-is-hd : ∀ (A : Set) (x : A) (xs : stream A) → hd (cons x xs) ≡ x
+hd-is-hd A x xs =
+  hd (cons x xs)
+    ≡⟨ cong (λ a → a .fst) (funExt⁻ (out-inverse-in {S = stream-S A}) (x , λ { tt → xs })) ⟩
+  x ∎
+
+tl-is-tl : ∀ (A : Set) (x : A) (xs : stream A) → tl (cons x xs) ≡ xs
+tl-is-tl A x xs =
+  tl (cons x xs)
+    ≡⟨ cong (λ a → a .snd tt) (funExt⁻ (out-inverse-in {S = stream-S A}) (x , λ { tt → xs })) ⟩
+  xs ∎
+
+--------------------------
+-- Stream using M-types --
+--------------------------
+
+stream-pair-M : ∀ (A B : Set) → stream A × stream B ≡ M (Container-product (stream-S A) (stream-S B))
+stream-pair-M A B = M-product-equality (stream-S A) (stream-S B)
+
+Container-product-streams : ∀ (A B : Set) → Container-product (stream-S A) (stream-S B) ≡ stream-S (A × B)
+Container-product-streams A B =
+  Container-product (stream-S A) (stream-S B)
+    ≡⟨ refl ⟩
+  (A × B , λ x → Unit × Unit )
+    ≡⟨ (λ i → (A × B) , λ _ → sym diagonal-unit i) ⟩
+  (A × B , λ x → Unit )
+    ≡⟨ refl ⟩
+  stream-S (A × B) ∎
+
+stream-pair : ∀ (A B : Set) → stream A × stream B ≡ stream (A × B)
+stream-pair A B = stream-pair-M A B ∙ λ i → M (Container-product-streams A B i)
+
+zip : ∀ {A B : Set} → stream A × stream B → stream (A × B)
+zip {A = A} {B} = transport (stream-pair A B)
+
+------------------------
+-- Record stream type --
+------------------------
+
+record Stream {ℓ} (A : Set ℓ) : Set ℓ where
+  coinductive
+  constructor _,_
+  field
+    head : A
+    tail : Stream A
+
+open Stream
+
+-- Bisimulation
+record _≈_ {ℓ} {A : Set ℓ} (x y : Stream A) : Set ℓ where
+  coinductive
+  field
+    ≈head : head x ≡ head y
+    ≈tail : tail x ≈ tail y
+
+open _≈_
+
+bisim : ∀ {ℓ} {A : Set ℓ} → {x y : Stream A} → x ≈ y → x ≡ y
+head (bisim x≈y i) = ≈head x≈y i
+tail (bisim x≈y i) = bisim (≈tail x≈y) i
+
+misib : ∀ {ℓ} {A : Set ℓ} → {x y : Stream A} → x ≡ y → x ≈ y
+≈head (misib p) = λ i → head (p i)
+≈tail (misib p) = misib (λ i → tail (p i))
+
+iso1 : ∀ {ℓ} {A : Set ℓ} → {x y : Stream A} → (p : x ≡ y) → bisim (misib p) ≡ p
+head (iso1 p i j) = head (p j)
+tail (iso1 p i j) = iso1 (λ i → tail (p i)) i j
+
+iso2 : ∀ {ℓ} {A : Set ℓ} → {x y : Stream A} → (p : x ≈ y) → misib (bisim p) ≡ p
+≈head (iso2 p i) = ≈head p
+≈tail (iso2 p i) = iso2 (≈tail p) i
+
+path≃bisim : ∀ {A : Set} → {x y : Stream A} → (x ≡ y) ≃ (x ≈ y)
+path≃bisim = isoToEquiv (iso misib bisim iso2 iso1)
+
+path≡bisim : ∀ {A : Set} → {x y : Stream A} → (x ≡ y) ≡ (x ≈ y)
+path≡bisim = ua path≃bisim
+
+------------------------------
+-- Equality of stream types --
+------------------------------
+
+stream-to-Stream : ∀ {A : Set} → stream A → Stream A
+head (stream-to-Stream x) = (hd x)
+tail (stream-to-Stream x) = (stream-to-Stream (tl x))
+
+Stream-to-stream-func-x : ∀ {A : Set} (n : ℕ) -> Stream A → X (sequence (stream-S A)) n
+Stream-to-stream-func-x 0 x = lift tt
+Stream-to-stream-func-x (suc n) x = head x , λ _ → Stream-to-stream-func-x n (tail x)
+
+Stream-to-stream-func-π : ∀ {A : Set} (n : ℕ) (a : Stream A) → π (sequence (stream-S A)) (Stream-to-stream-func-x (suc n) a) ≡ Stream-to-stream-func-x n a
+Stream-to-stream-func-π 0 a = refl {x = lift tt}
+Stream-to-stream-func-π (suc n) a = λ i → head a , λ _ → Stream-to-stream-func-π n (tail a) i
+
+Stream-to-stream : ∀ {A : Set} -> Stream A -> stream A
+Stream-to-stream s = lift-to-M Stream-to-stream-func-x Stream-to-stream-func-π s
+
+hd-to-head : ∀ {A : Set} (b : Stream A) → hd (Stream-to-stream b) ≡ head b
+hd-to-head {A = A} b = refl
+
+head-to-hd : ∀ {A : Set} (b : stream A) → head (stream-to-Stream b) ≡ hd b
+head-to-hd {A = A} b = refl
+
+tail-to-tl : ∀ {A : Set} (b : stream A) → tail (stream-to-Stream b) ≡ stream-to-Stream (tl b)
+tail-to-tl b = refl
+
+-- tl-to-tail : ∀ {A : Set} (b : Stream A) → tl (Stream-to-stream b) ≡ Stream-to-stream (tail b)
+-- tl-to-tail {A = A} b =
+--   tl (Stream-to-stream b)
 --     ≡⟨ refl ⟩
---   hd (in-fun (x , λ { (lift tt) → xs }))
+--   (λ n → transport (refl {x = W (stream-S A) n}) (Stream-to-stream-func-x n (tail b))) ,
+--   (λ n i → (transport (isoToPath (compIso (pathToIso (cong (λ a → a) (PathP≡Path (λ x → Lift Unit → W (stream-S A) n) (πₙ (stream-S A) ∘ (λ (_ : Lift Unit) → Stream-to-stream-func-x (suc n) (tail b))) (λ (_ : Lift Unit) → Stream-to-stream-func-x n (tail b)))))
+--             (compIso (sym-iso (≡-rel-a-inj-x-Iso (pathToIso (refl {x = Lift Unit → W (stream-S A) n}))))
+--             (compIso (pathToIso
+--               (cong (λ a → (λ (_ : Lift Unit) → a) ≡ (λ (_ : Lift Unit) → transport (refl {x = W (stream-S A) n}) (Stream-to-stream-func-x n (tail b))))
+--                     (sym (substComposite (λ k → W (stream-S A) n) (refl {x = head b})
+--                          (α-iso-step-5-Iso-helper0 {S = stream-S A} (λ n → head b) (λ n → refl {x = head b}) n)
+--                          (πₙ (stream-S A) (Stream-to-stream-func-x (suc n) (tail b)))))))
+--                      (pathToIso (cong (λ a → a ≡ (λ (_ : Lift Unit) → transport (refl {x = W (stream-S A) n}) (Stream-to-stream-func-x n (tail b)))) (funExt λ (_ : Lift Unit) →
+--                                 (substCommSlice (λ k → W (stream-S A) (suc n))
+--                                                 (λ k → W (stream-S A) n)
+--                                                 (λ a x  → (πₙ (stream-S A)) x)
+--                                                 (α-iso-step-5-Iso-helper0 {S = stream-S A} (λ n → head b) (λ n i → head b) n)
+--                                                 (Stream-to-stream-func-x (suc n) (tail b))))))))))
+--                     (funExt λ _ → Stream-to-stream-func-π n (tail b))) i (lift tt))
 --     ≡⟨ refl ⟩
---   out-fun (in-fun (x , λ { (lift tt) → xs })) .fst
---     ≡⟨ (λ i → out-inverse-in {S = stream-S A} i (x , λ { (lift tt) → xs }) .fst) ⟩
---   x ∎
-
--- tl-is-tl : ∀ {ℓ} (A : Set ℓ) (x : A) (xs : stream A) → tl (cons x xs) ≡ xs
--- tl-is-tl A x xs =
---   tl (cons x xs)
+--   (λ n → transport (refl {x = W (stream-S A) n}) (Stream-to-stream-func-x n (tail b))) ,
+--   (λ n i → (transport (isoToPath (compIso (pathToIso (cong (λ a → a) (PathP≡Path (λ x → Lift Unit → W (stream-S A) n) (πₙ (stream-S A) ∘ (λ (_ : Lift Unit) → Stream-to-stream-func-x (suc n) (tail b))) (λ (_ : Lift Unit) → Stream-to-stream-func-x n (tail b)))))
+--             (compIso (sym-iso (
+--   let x = λ (_ : Lift Unit) → transport (refl {x = W (stream-S A) n}) (πₙ (stream-S A) (Stream-to-stream-func-x (suc n) (tail b)))
+--       y = λ (_ : Lift Unit) → Stream-to-stream-func-x n (tail b)
+--   in
+--   transport (refl {x = Lift Unit → W (stream-S A) n}) x ≡ transport (refl {x = Lift Unit → W (stream-S A) n}) y
+--     Iso⟨ iso (λ x₁ t → x₁)
+--              (λ x₁ → x₁ (lift tt))
+--              refl-fun
+--              refl-fun ⟩
+--   (∀ (t : Lift Unit) -> (transport (refl {x = Lift Unit → W (stream-S A) n}) x ≡ transport (refl {x = Lift Unit → W (stream-S A) n}) y))
+--     Iso⟨ cong-iso (λ a → ∀ (x : Lift Unit) → a x) (funExt (\(_ : Lift Unit) ->
+--            sym (ua (cong (transport (refl {x = Lift Unit → W (stream-S A) n})) ,
+--                     (isEquiv→isEmbedding (equivIsEquiv (isoToEquiv (pathToIso (refl {x = (_ : Lift Unit) → W (stream-S A) n})))))
+--                       (λ (_ : Lift Unit) → transport (refl {x = W (stream-S A) n}) (πₙ (stream-S A) (Stream-to-stream-func-x (suc n) (tail b))))
+--                       (λ (_ : Lift Unit) → Stream-to-stream-func-x n (tail b)))))) ⟩
+--   (∀ (t : Lift Unit) -> x ≡ y)
+--      Iso⟨ iso (λ x₁ → x₁ (lift tt))
+--               (λ x₁ t → x₁)
+--               refl-fun
+--               refl-fun ⟩
+--   x ≡ y ∎Iso)) 
+--             (compIso (pathToIso
+--               (cong (λ a → (λ (_ : Lift Unit) → a) ≡ (λ (_ : Lift Unit) → transport (refl {x = W (stream-S A) n}) (Stream-to-stream-func-x n (tail b))))
+--                     (sym (substComposite (λ k → W (stream-S A) n) (refl {x = head b})
+--                          (α-iso-step-5-Iso-helper0 {S = stream-S A} (λ n → head b) (λ n → refl {x = head b}) n)
+--                          (πₙ (stream-S A) (Stream-to-stream-func-x (suc n) (tail b)))))))
+--                      (pathToIso (cong (λ a → a ≡ (λ (_ : Lift Unit) → transport (refl {x = W (stream-S A) n}) (Stream-to-stream-func-x n (tail b)))) (funExt λ (_ : Lift Unit) →
+--                                 (substCommSlice (λ k → W (stream-S A) (suc n))
+--                                                 (λ k → W (stream-S A) n)
+--                                                 (λ a x  → (πₙ (stream-S A)) x)
+--                                                 (α-iso-step-5-Iso-helper0 {S = stream-S A} (λ n → head b) (λ n i → head b) n)
+--                                                 (Stream-to-stream-func-x (suc n) (tail b))))))))))
+--                     (funExt λ _ → Stream-to-stream-func-π n (tail b))) i (lift tt))
+--       ≡⟨ {!!} ⟩ 
+--   (λ n → Stream-to-stream-func-x n (tail b)) ,
+--   (λ n → Stream-to-stream-func-π n (tail b))
 --     ≡⟨ refl ⟩
---   tl (in-fun (x , λ { (lift tt) → xs }))
---     ≡⟨ refl ⟩
---   out-fun (in-fun (x , λ { (lift tt) → xs })) .snd (lift tt)
---     ≡⟨ (λ i → out-inverse-in {S = stream-S A} i (x , λ { (lift tt) → xs }) .snd (lift tt)) ⟩
---   xs ∎
+--   Stream-to-stream (tail b) ∎
+--   where
+--     open Iso
 
--- --------------------------
--- -- Stream using M-types --
--- --------------------------
+postulate
+  tl-to-tail : ∀ {A : Set} (b : Stream A) → tl (Stream-to-stream b) ≡ Stream-to-stream (tail b)
 
--- stream-pair-M : ∀ {ℓ} (A B : Set ℓ) → stream A × stream B ≡ M (Container-product (stream-S A) (stream-S B))
--- stream-pair-M A B = M-product-equality (stream-S A) (stream-S B)
+nth : ∀ {ℓ} {A : Set ℓ} → ℕ → (b : Stream A) → A
+nth 0 b = head b
+nth (suc n) b = nth n (tail b)
 
--- Container-product-streams : ∀ {ℓ} (A B : Set ℓ) → Container-product (stream-S A) (stream-S B) ≡ stream-S (A × B)
--- Container-product-streams A B =
---   Container-product (stream-S A) (stream-S B)
---     ≡⟨ refl ⟩
---   (A × B , λ x → Lift Unit × Lift Unit )
---     ≡⟨ (λ i → (A × B) , λ _ → sym diagonal-unit i) ⟩
---   (A × B , λ x → Lift Unit )
---     ≡⟨ refl ⟩
---   stream-S (A × B) ∎
+helper : ∀ {A : Set} → (b : Stream A) → ((n : ℕ) → nth n (stream-to-Stream (Stream-to-stream b)) ≡ nth n b)
+helper b 0 = head-to-hd (Stream-to-stream b) ∙ hd-to-head b
+helper b (suc n) =
+  nth (suc n) (stream-to-Stream (Stream-to-stream b))
+    ≡⟨ refl ⟩
+  nth n (tail (stream-to-Stream (Stream-to-stream b)))
+    ≡⟨ cong (nth n) (tail-to-tl (Stream-to-stream b) ∙ cong stream-to-Stream (tl-to-tail b)) ⟩
+  nth n (stream-to-Stream (Stream-to-stream (tail b)))
+    ≡⟨ helper (tail b) n ⟩
+  nth n (tail b) ∎
 
--- stream-pair : ∀ {ℓ} (A B : Set ℓ) → stream A × stream B ≡ stream (A × B)
--- stream-pair A B = stream-pair-M A B □ λ i → M (Container-product-streams A B i)
+bisim-nat' : ∀ {ℓ} {A : Set ℓ} → (a b : Stream A) → ((n : ℕ) → nth n a ≡ nth n b) -> a ≈ b
+≈head (bisim-nat' a b nat-bisim) = nat-bisim 0
+≈tail (bisim-nat' a b nat-bisim) = bisim-nat' (tail a) (tail b) (nat-bisim ∘ suc)
 
--- zip : ∀ {ℓ} {A B : Set ℓ} → stream A × stream B → stream (A × B)
--- zip {A = A} {B} = transport (stream-pair A B)
+bisim-nat : ∀ {ℓ} {A : Set ℓ} → (a b : Stream A) → ((n : ℕ) → nth n a ≡ nth n b) -> a ≡ b
+bisim-nat a b nat-bisim = bisim (bisim-nat' a b nat-bisim)
 
--- ------------------------
--- -- Record stream type --
--- ------------------------
+stream-equality-iso-1 : ∀ {A : Set} → (b : Stream A) → stream-to-Stream (Stream-to-stream b) ≡ b
+stream-equality-iso-1 b = bisim-nat (stream-to-Stream (Stream-to-stream b)) b (helper b)
 
--- record Stream {ℓ} (A : Set ℓ) : Set ℓ where
---   coinductive
---   constructor _,_
---   field
---     head : A
---     tail : Stream A
+stream-equality-iso-2₁ : ∀ {A : Set} → (a : stream A) (n : ℕ) → Stream-to-stream (stream-to-Stream a) .fst n ≡ a .fst n
+stream-equality-iso-2₁ (a , b) 0 =
+  Stream-to-stream (stream-to-Stream (a , b)) .fst 0
+    ≡⟨ refl ⟩
+  Stream-to-stream-func-x 0 (stream-to-Stream (a , b))
+    ≡⟨ refl ⟩
+  lift tt
+    ≡⟨ refl ⟩
+  a 0 ∎
+stream-equality-iso-2₁ {A = A} (a , b) (suc n) =
+  Stream-to-stream (stream-to-Stream (a , b)) .fst (suc n)
+    ≡⟨ refl ⟩
+  Stream-to-stream-func-x (suc n) (stream-to-Stream (a , b))
+    ≡⟨ refl ⟩
+  (hd (a , b) , λ _ → Stream-to-stream-func-x {A = A} n (stream-to-Stream {A = A} (tl (a , b))))
+    ≡⟨ {!!} ⟩ -- cong (λ k → hd (a , b) , λ _ → k) (stream-equality-iso-2₁-x (a , b) (suc n))
+  (hd (a , b) , λ _ → tl (a , b) .fst n)
+    ≡⟨ {!!} ⟩
+  a (suc n) ∎
 
--- open Stream
+stream-equality-iso-2 : ∀ {A : Set} → (a : stream A) → Stream-to-stream (stream-to-Stream a) ≡ a
+stream-equality-iso-2 (a , b) =
+  Stream-to-stream (stream-to-Stream (a , b))
+    ≡⟨ refl ⟩
+  (λ n → Stream-to-stream-func-x n (stream-to-Stream (a , b))) ,
+  (λ n → Stream-to-stream-func-π n (stream-to-Stream (a , b)))
+    ≡⟨ (λ i → (λ n → stream-equality-iso-2₁ (a , b) n i) , {!!}) ⟩
+  (a , b) ∎
 
--- -- Bisimulation
--- record _≈_ {ℓ} {A : Set ℓ} (x y : Stream A) : Set ℓ where
---   coinductive
---   field
---     ≈head : head x ≡ head y
---     ≈tail : tail x ≈ tail y
+stream-equality : ∀ {A : Set} -> stream A ≡ Stream A
+stream-equality = isoToPath (iso stream-to-Stream Stream-to-stream stream-equality-iso-1 stream-equality-iso-2)
 
--- open _≈_
+------------------------------------------------------
+-- Defining stream examples by transporting records --
+------------------------------------------------------
 
--- bisim : ∀ {ℓ} {A : Set ℓ} → {x y : Stream A} → x ≈ y → x ≡ y
--- head (bisim x≈y i) = ≈head x≈y i
--- tail (bisim x≈y i) = bisim (≈tail x≈y) i
+Zeros : Stream ℕ
+head Zeros = 0
+tail Zeros = Zeros
 
--- misib : ∀ {ℓ} {A : Set ℓ} → {x y : Stream A} → x ≡ y → x ≈ y
--- ≈head (misib p) = λ i → head (p i)
--- ≈tail (misib p) = misib (λ i → tail (p i))
+zeros-transported : stream ℕ
+zeros-transported = transport (sym stream-equality) Zeros
 
--- iso1 : ∀ {ℓ} {A : Set ℓ} → {x y : Stream A} → (p : x ≡ y) → bisim (misib p) ≡ p
--- head (iso1 p i j) = head (p j)
--- tail (iso1 p i j) = iso1 (λ i → tail (p i)) i j
+-- It is now easy to show computation properties for the M-types:
+hd-zeros-transported : hd zeros-transported ≡ 0
+hd-zeros-transported = hd-to-head (transportRefl Zeros i0)
 
--- iso2 : ∀ {ℓ} {A : Set ℓ} → {x y : Stream A} → (p : x ≈ y) → misib (bisim p) ≡ p
--- ≈head (iso2 p i) = ≈head p
--- ≈tail (iso2 p i) = iso2 (≈tail p) i
-
--- path≃bisim : ∀ {ℓ} {A : Set ℓ} → {x y : Stream A} → (x ≡ y) ≃ (x ≈ y)
--- path≃bisim = isoToEquiv (iso misib bisim iso2 iso1)
-
--- path≡bisim : ∀ {ℓ} {A : Set ℓ} → {x y : Stream A} → (x ≡ y) ≡ (x ≈ y)
--- path≡bisim = ua path≃bisim
-
--- ------------------------------
--- -- Equality of stream types --
--- ------------------------------
-
--- stream-to-Stream : ∀ {ℓ} {A : Set ℓ} → stream A → Stream A
--- head (stream-to-Stream x) = (hd x)
--- tail (stream-to-Stream x) = (stream-to-Stream (tl x))
-
--- Stream-to-stream-func-x : ∀ {ℓ} {A : Set ℓ} (n : ℕ) -> Stream A → X (sequence (stream-S A)) n
--- Stream-to-stream-func-x 0 x = lift tt
--- Stream-to-stream-func-x (suc n) x = head x , λ x₁ → Stream-to-stream-func-x n (tail x)
-
--- Stream-to-stream-func-π : ∀ {ℓ} {A : Set ℓ} (n : ℕ) (a : Stream A) → π (sequence (stream-S A)) (Stream-to-stream-func-x (suc n) a) ≡ Stream-to-stream-func-x n a
--- Stream-to-stream-func-π 0 a = refl
--- Stream-to-stream-func-π (suc n) a = λ i → head a , λ _ → Stream-to-stream-func-π n (tail a) i
-
--- Stream-to-stream : ∀ {ℓ} {A : Set ℓ} -> Stream A -> stream A
--- Stream-to-stream s = lift-to-M Stream-to-stream-func-x Stream-to-stream-func-π s
-
--- postulate
---   head-to-hd : ∀ {ℓ} {A : Set ℓ} (b : stream A) → head (stream-to-Stream b) ≡ hd b
---   hd-to-head : ∀ {ℓ} {A : Set ℓ} (b : Stream A) → hd (Stream-to-stream b) ≡ head b
---   tail-to-tl : ∀ {ℓ} {A : Set ℓ} (b : stream A) → tail (stream-to-Stream b) ≡ stream-to-Stream (tl b)
---   tl-to-tail : ∀ {ℓ} {A : Set ℓ} (b : Stream A) → tl (Stream-to-stream b) ≡ Stream-to-stream (tail b)
-
--- nth : ∀ {ℓ} {A : Set ℓ} → ℕ → (b : Stream A) → A
--- nth 0 b = head b
--- nth (suc n) b = nth n (tail b)
-
--- helper : ∀ {ℓ} {A : Set ℓ} → (b : Stream A) → ((n : ℕ) → nth n (stream-to-Stream (Stream-to-stream b)) ≡ nth n b)
--- helper b 0 = head-to-hd (Stream-to-stream b) □ hd-to-head b
--- helper b (suc n) =
---   nth (suc n) (stream-to-Stream (Stream-to-stream b))
---     ≡⟨ refl ⟩
---   nth n (tail (stream-to-Stream (Stream-to-stream b)))
---     ≡⟨ cong (nth n) (tail-to-tl (Stream-to-stream b) □ cong stream-to-Stream (tl-to-tail b)) ⟩
---   nth n (stream-to-Stream (Stream-to-stream (tail b)))
---     ≡⟨ helper (tail b) n ⟩
---   nth n (tail b) ∎
-
--- bisim-nat' : ∀ {ℓ} {A : Set ℓ} → (a b : Stream A) → ((n : ℕ) → nth n a ≡ nth n b) -> a ≈ b
--- ≈head (bisim-nat' a b nat-bisim) = nat-bisim 0
--- ≈tail (bisim-nat' a b nat-bisim) = bisim-nat' (tail a) (tail b) (nat-bisim ∘ suc)
-
--- bisim-nat : ∀ {ℓ} {A : Set ℓ} → (a b : Stream A) → ((n : ℕ) → nth n a ≡ nth n b) -> a ≡ b
--- bisim-nat a b nat-bisim = bisim (bisim-nat' a b nat-bisim)
-
--- stream-equality-iso-1 : ∀ {ℓ} {A : Set ℓ} → (b : Stream A) → stream-to-Stream (Stream-to-stream b) ≡ b
--- stream-equality-iso-1 b = bisim-nat (stream-to-Stream (Stream-to-stream b)) b (helper b)
-
--- postulate
---   stream-equality-iso-2₁ : ∀ {ℓ} {A : Set ℓ} → (a : stream A) → (λ n → Stream-to-stream-func-x n (record { head = hd a ; tail = stream-to-Stream (tl a) })) ≡ a .fst
--- -- stream-equality-iso-2₁  a i 0 = lift tt
--- -- stream-equality-iso-2₁  a i (suc n) = {!!} , λ x → {!!}
-
---   stream-equality-iso-2₂ : ∀ {ℓ} {A : Set ℓ} → (a : stream A) → PathP (λ i → (n : ℕ) → π (sequence (stream-S A)) (stream-equality-iso-2₁ a i (suc n)) ≡ stream-equality-iso-2₁ a i n) (λ n i → Stream-to-stream-func-π n (record { head = hd a ; tail = stream-to-Stream (tl a) }) i) (snd a)
-
---   stream-to-Stream-unfold : ∀ {ℓ} {A : Set ℓ} (a : stream A) → (stream-to-Stream a) ≡ (record { head = hd a ; tail = stream-to-Stream (tl a) })
-
--- stream-equality-iso-2 : ∀ {ℓ} {A : Set ℓ} → (a : stream A) → Stream-to-stream (stream-to-Stream a) ≡ a
--- stream-equality-iso-2 a =
---   Stream-to-stream (stream-to-Stream a)
---     ≡⟨ refl ⟩
---   (λ n → Stream-to-stream-func-x n (stream-to-Stream a)) ,
---   (λ n → Stream-to-stream-func-π n (stream-to-Stream a))
---     ≡⟨ (λ i → ((λ n → cong (Stream-to-stream-func-x n) (stream-to-Stream-unfold a) i)) ,
---                ((λ n → cong (Stream-to-stream-func-π n) (stream-to-Stream-unfold a) i))) ⟩
---   (λ n → Stream-to-stream-func-x n (record { head = hd a ; tail = stream-to-Stream (tl a) })) ,
---   (λ n → Stream-to-stream-func-π n (record { head = hd a ; tail = stream-to-Stream (tl a) }))
---     ≡⟨ ΣPathP (stream-equality-iso-2₁ a , stream-equality-iso-2₂ a) ⟩
---   (a .fst , a .snd)
---     ≡⟨ refl ⟩
---   a ∎
-
--- stream-equality : ∀ {ℓ} {A : Set ℓ} -> stream A ≡ Stream A
--- stream-equality = isoToPath (iso stream-to-Stream Stream-to-stream stream-equality-iso-1 stream-equality-iso-2)
-
--- ------------------------------------------------------
--- -- Defining stream examples by transporting records --
--- ------------------------------------------------------
-
--- Zeros : Stream ℕ
--- head Zeros = 0
--- tail Zeros = Zeros
-
--- zeros-transported : stream ℕ
--- zeros-transported = transport (sym stream-equality) Zeros
-
--- -- It is now easy to show computation properties for the M-types:
--- hd-zeros-transported : hd zeros-transported ≡ 0
--- hd-zeros-transported = hd-to-head (transportRefl Zeros i0)
-
--- tl-zeros-transported : tl zeros-transported ≡ zeros-transported
--- tl-zeros-transported = tl-to-tail (transportRefl Zeros i0)
+tl-zeros-transported : tl zeros-transported ≡ zeros-transported
+tl-zeros-transported = tl-to-tail (transportRefl Zeros i0)

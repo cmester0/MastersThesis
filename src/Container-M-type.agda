@@ -30,13 +30,13 @@ open Iso
 Container-product : ∀ {ℓ} (_ _ : Container {ℓ}) -> Container {ℓ}
 Container-product (A , B) (C , D) = (A × C , λ x → B (proj₁ x) × D (proj₂ x) )
 
-P-product :
-  ∀ {ℓ} {A C : Set ℓ} {B : A -> Set ℓ} {D : C -> Set ℓ}
-  -> ((n : ℕ) -> W (A , B) n) × ((n : ℕ) -> W (C , D) n)
-  ------------------------
-  -> (n : ℕ) -> W (Container-product (A , B) (C , D)) n
-P-product (x , y) 0 = lift tt
-P-product (x , y) (suc n) = ((x (suc n) .fst) , (y (suc n) .fst)) , λ _ → P-product (x , y) n
+-- P-product :
+--   ∀ {ℓ} {A C : Set ℓ} {B : A -> Set ℓ} {D : C -> Set ℓ}
+--   -> ((n : ℕ) -> W (A , B) n) × ((n : ℕ) -> W (C , D) n)
+--   ------------------------
+--   -> (n : ℕ) -> W (Container-product (A , B) (C , D)) n
+-- P-product (x , y) 0 = lift tt
+-- P-product (x , y) (suc n) = ((x (suc n) .fst) , (y (suc n) .fst)) , λ _ → P-product (x , y) n
 
 -- P-product-inv₁ :
 --   ∀ {ℓ} {A C : Set ℓ} {B : A -> Set ℓ} {D : C -> Set ℓ}

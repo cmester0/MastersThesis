@@ -24,43 +24,67 @@ open import helper
 
 module M.Properties where
 
+open Iso
+
 open import M.Base
 open import Container
 
 -- in-fun and out-fun are inverse
 
-open Iso
+in-inverse-out :
+  ∀ {ℓ} {S : Container {ℓ}} →
+  (in-fun ∘ out-fun) ≡ idfun (M S)
+in-inverse-out {S = S} = funExt (rightInv {A = P₀ (M S)} {B = M S} (shift-iso {S = S}))
 
-in-inverse-out : ∀ {ℓ} {S : Container {ℓ}} -> (in-fun ∘ out-fun {S = S}) ≡ idfun (M S)
-in-inverse-out {S = S} i a = rightInv {A = P₀ (M S)} {B = M S} (shift-iso {S = S}) a i
+out-inverse-in :
+  ∀ {ℓ} {S : Container {ℓ}} →
+  (out-fun ∘ in-fun) ≡ idfun (P₀ (M S))
+out-inverse-in {S = S} = funExt (leftInv {A = P₀ {S = S} (M S)} {B = M S} (shift-iso {S = S}))
 
-out-inverse-in : ∀ {ℓ} {S : Container {ℓ}} -> (out-fun {S = S} ∘ in-fun {S = S}) ≡ idfun (P₀ (M S))
-out-inverse-in {S = S} i a = leftInv {A = P₀ {S = S} (M S)} {B = M S} (shift-iso {S = S}) a i
-
-in-out-id : ∀ {ℓ} {S : Container {ℓ}} -> ∀ {x y} → (in-fun (out-fun {S = S} x) ≡ in-fun (out-fun {S = S} y)) ≡ (x ≡ y)
-in-out-id {x = x} {y} =
-  (in-fun (out-fun x) ≡ in-fun (out-fun y))
-    ≡⟨ cong₂ _≡_ (funExt⁻ in-inverse-out x) (funExt⁻ in-inverse-out y) ⟩
-  (x ≡ y) ∎
+in-out-id :
+  ∀ {ℓ} {S : Container {ℓ}} →
+  ∀ {x y} →
+  (in-fun (out-fun {S = S} x) ≡ in-fun (out-fun y)) ≡ (x ≡ y)
+in-out-id {S = S} {x = x} {y} i = (funExt⁻ in-inverse-out x i) ≡ (funExt⁻ in-inverse-out y i)
 
 -- Embeddings
 
-in-embedding : ∀ {ℓ} {S : Container {ℓ}} → isEmbedding {A = P₀ (M S)} {B = M S} (in-fun {S = S})
-in-embedding = isEquiv→isEmbedding (equivIsEquiv (isoToEquiv shift-iso))
+in-embedding :
+  ∀ {ℓ} {S : Container {ℓ}} → 
+  isEmbedding (in-fun {S = S})
+in-embedding {S = S} = ≡-to-embedding {A = P₀ (M S)} {C = M S} shift-iso 
 
-out-embedding : ∀ {ℓ} {S : Container {ℓ}} → isEmbedding (out-fun {S = S})
-out-embedding = isEquiv→isEmbedding (equivIsEquiv (isoToEquiv (sym-iso shift-iso)))
-
+out-embedding :
+  ∀ {ℓ} {S : Container {ℓ}} →
+  isEmbedding (out-fun {S = S})
+out-embedding {S = S} = ≡-to-embedding {A = M S} {C = P₀ {S = S} (M S)} (sym-iso shift-iso)
+ 
 -- constructor properties
 
-in-inj : ∀ {ℓ} {S : Container {ℓ}} {Z : Set ℓ} -> ∀ {f g : Z → P₀ (M S)} -> (in-fun ∘ f ≡ in-fun ∘ g) ≡ (f ≡ g)
-in-inj = ≡-rel-a-inj shift-iso
+in-inj :
+  ∀ {ℓ} {S : Container {ℓ}} →
+  {Z : Set ℓ}
+  → ∀ {f g : Z → P₀ (M S)}
+  → (in-fun ∘ f ≡ in-fun ∘ g) ≡ (f ≡ g)
+in-inj {ℓ} {S = S} {Z = Z} {f = f} {g = g} =
+  ≡-rel-a-inj {ℓ = ℓ} {A = P₀ (M S)} {B = M S} {C = Z} (shift-iso) {f = f} {g = g}
 
-out-inj : ∀ {ℓ} {S : Container {ℓ}} {Z : Set ℓ} -> ∀ {f g : Z → M S} -> (out-fun ∘ f ≡ out-fun ∘ g) ≡ (f ≡ g)
-out-inj = ≡-rel-b-inj (iso in-fun out-fun (funExt⁻ in-inverse-out) (funExt⁻ out-inverse-in))
+out-inj :
+  ∀ {ℓ} {S : Container {ℓ}} →
+  {Z : Set ℓ} →
+  ∀ {f g : Z → M S}
+  → (out-fun ∘ f ≡ out-fun ∘ g) ≡ (f ≡ g)
+out-inj {ℓ} {S = S} {Z = Z} {f = f} {g = g} =
+  ≡-rel-b-inj (shift-iso)
 
-in-inj-x : ∀ {ℓ} {S : Container {ℓ}} -> ∀ {x y : P₀ (M S)} -> (in-fun x ≡ in-fun y) ≡ (x ≡ y)
+in-inj-x :
+  ∀ {ℓ} {S : Container {ℓ}} →
+  ∀ {x y : P₀ (M S)}
+  → (in-fun x ≡ in-fun y) ≡ (x ≡ y)
 in-inj-x {ℓ} {S = S} {x = x} {y} = ≡-rel-a-inj-x shift-iso
 
-out-inj-x : ∀ {ℓ} {S : Container {ℓ}} -> ∀ {x y : M S} -> (out-fun x ≡ out-fun y) ≡ (x ≡ y)
+out-inj-x :
+  ∀ {ℓ} {S : Container {ℓ}} →
+  ∀ {x y : M S}
+  → (out-fun x ≡ out-fun y) ≡ (x ≡ y)
 out-inj-x {ℓ} {S = S} {x = x} {y} = ≡-rel-b-inj-x shift-iso
