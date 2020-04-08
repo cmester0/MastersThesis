@@ -45,7 +45,7 @@ in-out-id :
   ∀ {ℓ} {S : Container {ℓ}} →
   ∀ {x y} →
   (in-fun (out-fun {S = S} x) ≡ in-fun (out-fun y)) ≡ (x ≡ y)
-in-out-id {S = S} {x = x} {y} i = (funExt⁻ in-inverse-out x i) ≡ (funExt⁻ in-inverse-out y i)
+in-out-id {S = S} {x = x} {y} i = (in-inverse-out i x) ≡ (in-inverse-out i y)
 
 -- Embeddings
 
@@ -75,7 +75,7 @@ out-inj :
   ∀ {f g : Z → M S}
   → (out-fun ∘ f ≡ out-fun ∘ g) ≡ (f ≡ g)
 out-inj {ℓ} {S = S} {Z = Z} {f = f} {g = g} =
-  ≡-rel-b-inj (shift-iso)
+  ≡-rel-b-inj {ℓ = ℓ} {A = P₀ (M S)} {B = M S} {C = Z} (shift-iso) {f = f} {g = g}
 
 in-inj-x :
   ∀ {ℓ} {S : Container {ℓ}} →

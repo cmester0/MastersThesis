@@ -53,11 +53,6 @@ inv (sym-iso isom) = fun isom
 rightInv (sym-iso isom) = leftInv isom
 leftInv (sym-iso isom) = rightInv isom
 
-cong-iso :
-  ∀ {ℓ} {A : Set (ℓ-suc ℓ)} {x y : A} (f : (a : A) → Set ℓ) (p : x ≡ y) →
-  Iso (f x) (f y)
-cong-iso f p = pathToIso (cong f p)
-
 funExt-iso :
   ∀ {ℓ} {A : Set ℓ} {B : A → Set ℓ} (f g : (x : A) → Set ℓ) →
   (∀ (x : A) → Iso (f x) (g x)) → Iso (∀ x → f x) (∀ x → g x)
@@ -82,11 +77,6 @@ leftInv (Σ-split-iso) = refl-fun
 Σ-split-iso' : ∀ {ℓ} {A B : Set ℓ} {a a' : A} {b' b : B} → (Σ (a ≡ a') (λ q → b ≡ b')) ≡ ((a , b) ≡ (a' , b'))
 Σ-split-iso' = ua Σ≡
 
-subst-hom : ∀ {i j} {X : Set i}(P : X → Set j){x y z : X}
-          → (p : x ≡ y)(q : y ≡ z)(u : P x)
-          → subst P q (subst P p u) ≡ subst P (p ∙ q) u
-subst-hom {X = X} P {x = x} {y = y} {z = z} p q u = sym (substComposite P p q u)
-
 Σ-ap-iso₂ : ∀ {i j} {X : Set i}
           → {Y Y' : X → Set j}
           → ((x : X) → Iso (Y x) (Y' x))
@@ -103,16 +93,6 @@ leftInv (Σ-ap-iso₂ {X = X} {Y} {Y'} isom) (x , y') = ΣPathP (refl , leftInv 
           → Σ X Y ≡ Σ X Y'
 Σ-ap₂ {X = X} {Y} {Y'} isom = isoToPath (Σ-ap-iso₂ (pathToIso ∘ isom))
 
-sym-refl : ∀ {ℓ} {X Y : Set ℓ} {f : X → Y} {g : Y → X} → (a : (∀ b → f (g b) ≡ b)) → ∀ b → (sym (a b) ∙ (a b)) ≡ λ _ → b
-sym-refl a b =
-  sym (a b) ∙ (a b)
-    ≡⟨ lUnit (sym (a b) ∙ (a b)) ⟩
-  refl ∙ sym (a b) ∙ (a b)
-    ≡⟨ assoc refl (sym (a b)) (a b) ⟩
-  (refl ∙ sym (a b)) ∙ (a b)
-    ≡⟨ compPathr-cancel (a b) refl ⟩
-  refl ∎
-
 postulate
   naturality-1 : ∀ {ℓ} {A B : Set ℓ} (p : Iso A B) (x : A) → cong (fun p) (leftInv p x) ≡ rightInv p (fun p x)
   naturality-2 : ∀ {ℓ} {A B : Set ℓ} (p : Iso A B) (x : B) → cong (inv p) (rightInv p x) ≡ leftInv p (inv p x)
@@ -128,25 +108,27 @@ postulate
 fun (Σ-ap-iso₁ {i} {X = X} {X'} {Y} isom) x = (fun isom) (x .fst) , x .snd
 inv (Σ-ap-iso₁ {i} {X = X} {X'} {Y} isom) x = (inv isom) (x .fst) , subst Y (sym (rightInv isom (x .fst))) (x .snd)
 rightInv (Σ-ap-iso₁ {i} {X = X} {X'} {Y} isom) (x , y) = ΣPathP (rightInv isom x ,
-  transport (sym (PathP≡Path (λ j → cong Y (rightInv isom x) j) (subst Y (sym (rightInv isom x)) y) y))
-            (subst Y (rightInv isom x) (subst Y (sym (rightInv isom x)) y)
-              ≡⟨ sym (substComposite Y (sym (rightInv isom x)) (rightInv isom x) y) ⟩
-            subst Y ((sym (rightInv isom x)) ∙ (rightInv isom x)) y
-              ≡⟨ (cong (λ a → subst Y a y) (sym-refl {f = fun isom} {g = inv isom} (rightInv isom) x)) ⟩
-            subst Y refl y
-              ≡⟨ substRefl {B = Y} y ⟩
-            y ∎))
+  transport
+    (sym (PathP≡Path (λ j → cong Y (rightInv isom x) j) (subst Y (sym (rightInv isom x)) y) y))
+    (subst Y (rightInv isom x) (subst Y (sym (rightInv isom x)) y)
+      ≡⟨ sym (substComposite Y (sym (rightInv isom x)) (rightInv isom x) y) ⟩
+    subst Y ((sym (rightInv isom x)) ∙ (rightInv isom x)) y
+      ≡⟨ (cong (λ a → subst Y a y) (lCancel (rightInv isom x))) ⟩
+    subst Y refl y
+      ≡⟨ substRefl {B = Y} y ⟩
+    y ∎))
 leftInv (Σ-ap-iso₁ {i} {X = X} {X'} {Y} isom) (x , y) = ΣPathP (leftInv isom x ,
-  transport (sym (PathP≡Path (λ j → Y (fun isom (leftInv isom x j))) (subst Y (sym ((rightInv isom) (fun isom x))) y) y))
-            (subst Y (cong (fun isom) (leftInv isom x)) (subst Y (sym ((rightInv isom) (fun isom x))) y)
-              ≡⟨ sym (substComposite Y (sym ((rightInv isom) (fun isom x))) (λ j → fun isom (leftInv isom x j)) y) ⟩
-            subst Y (sym ((rightInv isom) (fun isom x)) ∙ (cong (fun isom) (leftInv isom x))) y
-              ≡⟨ cong (λ a → subst Y (sym ((rightInv isom) (fun isom x)) ∙ a) y) (naturality-1 isom x) ⟩
-            subst Y (sym ((rightInv isom) (fun isom x)) ∙ (rightInv isom) (fun isom x)) y
-              ≡⟨ cong (λ a → subst Y a y) (sym-refl {f = fun isom} {g = inv isom} (rightInv isom) (fun isom x)) ⟩
-            subst Y (refl) y
-              ≡⟨ substRefl {B = Y} y ⟩
-            y ∎))
+  transport
+    (sym (PathP≡Path (λ j → Y (fun isom (leftInv isom x j))) (subst Y (sym ((rightInv isom) (fun isom x))) y) y))
+    (subst Y (cong (fun isom) (leftInv isom x)) (subst Y (sym ((rightInv isom) (fun isom x))) y)
+      ≡⟨ sym (substComposite Y (sym ((rightInv isom) (fun isom x))) (λ j → fun isom (leftInv isom x j)) y) ⟩
+    subst Y (sym ((rightInv isom) (fun isom x)) ∙ (cong (fun isom) (leftInv isom x))) y
+      ≡⟨ cong (λ a → subst Y (sym ((rightInv isom) (fun isom x)) ∙ a) y) (naturality-1 isom x) ⟩
+    subst Y (sym ((rightInv isom) (fun isom x)) ∙ (rightInv isom) (fun isom x)) y
+      ≡⟨ cong (λ a → subst Y a y) (lCancel (rightInv isom (fun isom x))) ⟩
+    subst Y (refl) y
+      ≡⟨ substRefl {B = Y} y ⟩
+    y ∎))
 
 Σ-ap₁ : ∀ {i} {X X' : Set i} {Y : X' → Set i}
           → (isom : X ≡ X')
@@ -229,32 +211,39 @@ funExtIso = iso funExt funExt⁻ refl-fun refl-fun
 ≡-rel-a-inj' a e {f = f} {g} x = sym (ua (cong a , e (f x) (g x)))
 
 ≡-rel-a-inj-Iso-helper-3 :
-  ∀ {ℓ} {A B C : Set ℓ} (isom : Iso A B)
-  → ∀ {f g : C -> A}
-  → (x : C) → (fun isom (f x) ≡ fun isom (g x)) ≡ (f x ≡ g x)
-≡-rel-a-inj-Iso-helper-3 {A = A} {B} {C} isom {f = f} {g} =
-  ≡-rel-a-inj' {A = A} {B} {C} (fun isom) (≡-to-embedding {A = A} {B} {C} isom) {f = f} {g = g}
-
-abstract
-  ≡-rel-a-inj-Iso-helper :
     ∀ {ℓ} {A B C : Set ℓ} (isom : Iso A B)
     → ∀ {f g : C -> A}
-    → Iso (∀ x → (fun isom) (f x) ≡ (fun isom) (g x)) (∀ x → f x ≡ g x)
-  ≡-rel-a-inj-Iso-helper {A = A} {B} {C} isom {f = f} {g} =
-    pathToIso (cong (λ a → ∀ x → a x) (funExt λ x → ≡-rel-a-inj-Iso-helper-3 isom {f = f} {g = g} x))
+    → (x : C) → (fun isom (f x) ≡ fun isom (g x)) ≡ (f x ≡ g x)
+≡-rel-a-inj-Iso-helper-3 {A = A} {B} {C} isom {f = f} {g} =
+    ≡-rel-a-inj' {A = A} {B} {C} (fun isom) (≡-to-embedding {A = A} {B} {C} isom) {f = f} {g = g}
 
-≡-rel-a-inj-Iso :
+abstract
+  pathCongFunExt :
+    ∀ {ℓ} {A : Set ℓ} (a b : (x : A) → Set ℓ)
+    → (∀ x → (a x) ≡ (b x))
+    → Iso (∀ x → a x) (∀ x → b x) 
+  pathCongFunExt a b p =
+    pathToIso (cong (λ k → ∀ x → k x) (funExt p))
+
+≡-rel-a-inj-Iso-helper :
   ∀ {ℓ} {A B C : Set ℓ} (isom : Iso A B)
   → ∀ {f g : C -> A}
-  → Iso (fun isom ∘ f ≡ fun isom ∘ g) (f ≡ g)
+  → Iso (∀ x → (fun isom) (f x) ≡ (fun isom) (g x)) (∀ x → f x ≡ g x)
+≡-rel-a-inj-Iso-helper {A = A} {B} {C} isom {f = f} {g} =
+  pathCongFunExt (λ x → fun isom (f x) ≡ fun isom (g x)) (λ x → f x ≡ g x) (≡-rel-a-inj-Iso-helper-3 isom {f = f} {g = g})
+
+≡-rel-a-inj-Iso :
+    ∀ {ℓ} {A B C : Set ℓ} (isom : Iso A B)
+    → ∀ {f g : C -> A}
+    → Iso (fun isom ∘ f ≡ fun isom ∘ g) (f ≡ g)
 ≡-rel-a-inj-Iso {A = A} {B} {C} isom {f = f} {g} =
-  (fun isom) ∘ f ≡ (fun isom) ∘ g
-    Iso⟨ sym-iso funExtIso ⟩
-  (∀ x → (fun isom) (f x) ≡ (fun isom) (g x))
-     Iso⟨ ≡-rel-a-inj-Iso-helper isom ⟩
-  (∀ x → f x ≡ g x)
-     Iso⟨ funExtIso ⟩
-  f ≡ g ∎Iso
+    (fun isom) ∘ f ≡ (fun isom) ∘ g
+      Iso⟨ sym-iso funExtIso ⟩
+    (∀ x → (fun isom) (f x) ≡ (fun isom) (g x))
+      Iso⟨ ≡-rel-a-inj-Iso-helper isom ⟩
+    (∀ x → f x ≡ g x)
+      Iso⟨ funExtIso ⟩
+    f ≡ g ∎Iso
 
 ≡-rel-a-inj :
   ∀ {ℓ} {A B C : Set ℓ} (isom : Iso A B)
@@ -325,24 +314,3 @@ abstract
 
 diagonal-unit : Unit ≡ Unit × Unit
 diagonal-unit = isoToPath (iso (λ x → tt , tt) (λ x → tt) (λ {(tt , tt) i → tt , tt}) λ {tt i → tt})
-
--- ------------------
--- -- ∏ properties --
--- ------------------
-
--- -- Only used in coalg?
--- postulate
---   Π-ap-iso : ∀ {i i' j}{X : Set i}{X' : Set i'}
---              {Y : X → Set j}{Y' : X' → Set j}
---            → (isom : Iso X X')
---            → ((x' : X') → Iso (Y (inv isom x')) (Y' x'))
---            → Iso ((x : X) → Y x)
---                  ((x' : X') → Y' x')
-
--- postulate
---   ∏-ap :
---     ∀ {i j} {X X' : Set i} {Y : X → Set j} {Y' : X' → Set j}
---     → (isom : X ≡ X')
---     → ((x' : X') → Y (transport (sym isom) x') ≡ Y' x')
---     → ((x : X) → Y x)
---     ≡ ((x' : X') → Y' x')

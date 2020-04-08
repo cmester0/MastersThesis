@@ -177,15 +177,7 @@ sym-α-iso-step-6 : ∀ {ℓ} {S : Container {ℓ}}
         (Σ A (λ a → Σ ((n : ℕ) → B a → X (sequence S) n) λ u → (n : ℕ) → π (sequence S) ∘ (u (suc n)) ≡ u n))
 sym-α-iso-step-6 {S = S@(A , B)} =
   Σ-ap-iso₂ λ x → lemma10-Iso {C,γ = B x , λ _ → x , (λ x₁ → x₁)}
-
--- -- Lemma 13
--- α-iso : ∀ {ℓ} {S : Container {ℓ}} -> L (PX,Pπ S) ≡ P₀ {S = S} (M S) -- L^P ≡ PL
--- α-iso {S = S@(A , B)} = isoToPath (compIso (α-iso-step-1-4-Iso) (compIso (α-iso-step-5-Iso) (sym-iso sym-α-iso-step-6)))
-
------------------------------------------------------
--- Shifting the limit of a chain is an equivalence --
------------------------------------------------------
-
+ 
 comp-α-iso-step-1-4-Iso-Sym-L-unique-iso : ∀ {ℓ} {S : Container {ℓ}} -> let (A , B) = S in Iso (Σ (Σ ((n : ℕ) → A) (λ a → (n : ℕ) → a (suc n) ≡ a n)) λ a → Σ ((n : ℕ) → B (a .fst n) → X (sequence S) n) λ u → (n : ℕ) → PathP (λ x → B (a .snd n x) → X (sequence S) n) (π (sequence S) ∘ u (suc n)) (u n))  (L (sequence S))
 fun comp-α-iso-step-1-4-Iso-Sym-L-unique-iso (a , b) = (λ { 0 → lift tt ; (suc n) → (a .fst n) , (b .fst n)}) , λ { 0 → refl {x = lift tt} ; (suc m) i → a .snd m i , b .snd m i }
 inv comp-α-iso-step-1-4-Iso-Sym-L-unique-iso x = ((λ n → (x .fst) (suc n) .fst) , λ n i → (x .snd) (suc n) i .fst) , (λ n → (x .fst) (suc n) .snd) , λ n i → (x .snd) (suc n) i .snd
@@ -194,6 +186,10 @@ fst (rightInv comp-α-iso-step-1-4-Iso-Sym-L-unique-iso (b , c) i) (suc n) = ref
 snd (rightInv comp-α-iso-step-1-4-Iso-Sym-L-unique-iso (b , c) i) 0 = refl
 snd (rightInv comp-α-iso-step-1-4-Iso-Sym-L-unique-iso (b , c) i) (suc n) = c (suc n)
 leftInv comp-α-iso-step-1-4-Iso-Sym-L-unique-iso (a , b) = refl
+
+-----------------------------------------------------
+-- Shifting the limit of a chain is an equivalence --
+-----------------------------------------------------
 
 shift-iso : ∀ {ℓ} {S : Container {ℓ}} -> Iso (P₀ {S = S} (M S)) (M S)
 shift-iso {S = S@(A , B)} = (compIso sym-α-iso-step-6 (compIso (sym-iso (α-iso-step-5-Iso {S = S})) (comp-α-iso-step-1-4-Iso-Sym-L-unique-iso {S = S})))

@@ -123,7 +123,7 @@ step {C,γ = C,γ} {Y = Y} f = P₁ f  ∘ C,γ .snd
 --   cong (inv (lemma10-Iso {C,γ = C,γ}))
 --        (ΣPathP (funExt₂ (λ n z → {!!}) , {!!}) ∙ cong Φ (rightInv (lemma10-Iso {C,γ = C,γ}) (c₀ , c₁)))
 
-postulate
+postulate -- Naturality
   commutivity : ∀ {ℓ} {S : Container {ℓ}} {C,γ : Coalg₀ {S = S}}
     → let e = inv (lemma10-Iso {C,γ = C,γ}) in
     Ψ {C,γ = C,γ} ∘ e ≡ e ∘ Φ {C,γ = C,γ}
@@ -164,19 +164,26 @@ postulate
   missing-2 : ∀ {ℓ} {S : Container {ℓ}} {C,γ : Coalg₀ {S = S}} -> ((x : Lift Unit) → Lift {ℓ-zero} {ℓ} Unit ≡ (Σ (Cone₁ {C,γ = C,γ} ((fun (missing-0-Iso {C,γ = C,γ}) x) .fst)) (λ q → PathP (λ i → Cone₁ {C,γ = C,γ} ((fun (missing-0-Iso {C,γ = C,γ}) x) .snd i)) q (ϕ₁ {C,γ = C,γ} ((fun (missing-0-Iso {C,γ = C,γ}) x) .fst) q))))
 
 abstract
-  U-is-Unit-Iso :
-    ∀ {ℓ} {S : Container {ℓ}} (C,γ : Coalg₀ {S = S})
-    ------------------------------------
-    → Iso {ℓ = ℓ} {ℓ' = ℓ} (C,γ ⇒ M-coalg) (Lift Unit)
-  U-is-Unit-Iso {ℓ = ℓ} {S = S} C,γ@(C , γ) =
-    let e = inv (lemma10-Iso {C,γ = C,γ}) in
-    let 𝓛 = M S in
-    U {C,γ = C,γ}
+  computation-abstract'0 : ∀ {ℓ} {S : Container {ℓ}} {C,γ : Coalg₀ {S = S}} {f g : C,γ .fst → P₀ (M S)} → Iso (in-fun ∘ f ≡ in-fun ∘ g) (f ≡ g)
+  computation-abstract'0 {ℓ} {S} {C,γ} {f} {g} =
+    (≡-rel-a-inj-Iso {ℓ = ℓ} {A = P₀ (M S)} {B = M S} {C = C,γ .fst} (shift-iso)) {f = f} {g = g}
+
+  computation-abstract'1 : ∀ {ℓ} {S : Container {ℓ}} {C,γ : Coalg₀ {S = S}} (f : C,γ .fst → M S) → in-fun ∘ out-fun ∘ f ≡ f
+  computation-abstract'1 {S = S} f = (identity-f-r {k = in-fun ∘ out-fun {S = S}} (in-inverse-out {S = S}) f)
+
+U-is-Unit-Iso :
+  ∀ {ℓ} {S : Container {ℓ}} (C,γ : Coalg₀ {S = S})
+  ------------------------------------
+  → Iso {ℓ = ℓ} {ℓ' = ℓ} (C,γ ⇒ M-coalg) (Lift Unit)
+U-is-Unit-Iso {ℓ = ℓ} {S = S} C,γ@(C , γ) =
+  let e = inv (lemma10-Iso {C,γ = C,γ}) in
+  let 𝓛 = M S in
+    U {C,γ = C,γ}  
       Iso⟨ refl-iso ⟩
     Σ (C → 𝓛) (λ f → out-fun ∘ f ≡ step {C,γ = C,γ} f)
-      Iso⟨ Σ-ap-iso₂ (λ f → pathToIso (sym in-inj)) ⟩
+      Iso⟨ Σ-ap-iso₂ (λ f → sym-iso (computation-abstract'0 {C,γ = C,γ} {f = out-fun ∘ f} {g = step {C,γ = C,γ} f})) ⟩
     Σ (C → 𝓛) (λ f → in-fun ∘ out-fun ∘ f ≡ in-fun ∘ step {C,γ = C,γ} f)
-      Iso⟨ Σ-ap-iso₂ (λ f → pathToIso λ i → identity-f-r {k = in-fun ∘ out-fun {S = S}} in-inverse-out f i ≡ in-fun ∘ step {C,γ = C,γ} f) ⟩
+      Iso⟨ Σ-ap-iso₂ (λ f → pathToIso (cong (λ k → k ≡ in-fun ∘ step {C,γ = C,γ} f) (computation-abstract'1 {C,γ = C,γ} f))) ⟩
     Σ (C -> 𝓛) (λ f → f ≡ in-fun ∘ step {C,γ = C,γ} f)
       Iso⟨ refl-iso ⟩
     Σ (C → 𝓛) (λ f → f ≡ Ψ {C,γ = C,γ} f)
@@ -184,7 +191,7 @@ abstract
     Σ (Cone C,γ) (λ c → e c ≡ Ψ {C,γ = C,γ} (e c))
       Iso⟨ Σ-ap-iso₂ (λ c → pathToIso λ i → e c ≡ funExt⁻ (commutivity {C,γ = C,γ}) c i) ⟩
     Σ (Cone C,γ) (λ c → e c ≡ e (Φ {C,γ = C,γ} c))
-      Iso⟨ Σ-ap-iso₂ (λ c → pathToIso (e-inj {C,γ = C,γ})) ⟩
+      Iso⟨ Σ-ap-iso₂ (λ c → e-inj-Iso {C,γ = C,γ}) ⟩
     Σ (Cone C,γ) (λ c → c ≡ Φ {C,γ = C,γ} c)
       Iso⟨ refl-iso ⟩
     Σ (Cone C,γ) (λ { (u , q) → (u , q) ≡ (ϕ₀ {C,γ = C,γ} u , ϕ₁ {C,γ = C,γ} u q)})
@@ -208,12 +215,11 @@ square-helper {x = x} {y} {z} p q {h = h} = sym (assoc p q h)
 isContrIsPropPath : ∀ {ℓ} {A : Set ℓ} → (x : isContr A) → ∀ y → isProp (x .fst ≡ y)
 isContrIsPropPath {A = A} x y = isContr→isProp (isContr→isContrPath x (x .fst) y)
 
-abstract
-  contr-is-ext-Iso-helper : ∀ {ℓ} {A B : Set ℓ} -> (p : Iso A B) -> ((a : A) → Iso (∀ y → a ≡ y) (∀ y → (fun p a) ≡ y))
-  fun (contr-is-ext-Iso-helper (iso f g rightI leftI) a) = (λ x y → cong f (x (g y)) ∙ rightI y)
-  inv (contr-is-ext-Iso-helper (iso f g rightI leftI) a) = (λ x y → sym (leftI a) ∙ cong g (x (f y)) ∙ leftI y)
-  rightInv (contr-is-ext-Iso-helper p@(iso f g rightI leftI) a) = (λ b →  funExt λ y → isContrIsPropPath (f a , b) y (cong f (sym (leftI a) ∙ cong g (b (f (g y))) ∙ leftI (g y)) ∙ rightI y) (b y))
-  leftInv (contr-is-ext-Iso-helper p@(iso f g rightI leftI) a) = (λ b → funExt λ y → isContrIsPropPath (a , b) y (sym (leftI a) ∙ cong g (cong f (b (g (f y))) ∙ rightI (f y)) ∙ leftI y) (b y))
+contr-is-ext-Iso-helper : ∀ {ℓ} {A B : Set ℓ} -> (p : Iso A B) -> ((a : A) → Iso (∀ y → a ≡ y) (∀ y → (fun p a) ≡ y))
+fun (contr-is-ext-Iso-helper (iso f g rightI leftI) a) x y = cong f (x (g y)) ∙ rightI y
+inv (contr-is-ext-Iso-helper (iso f g rightI leftI) a) x y = sym (leftI a) ∙ cong g (x (f y)) ∙ leftI y
+rightInv (contr-is-ext-Iso-helper p@(iso f g rightI leftI) a) b = funExt λ y → isContrIsPropPath (f a , b) y (cong f (sym (leftI a) ∙ cong g (b (f (g y))) ∙ leftI (g y)) ∙ rightI y) (b y)
+leftInv (contr-is-ext-Iso-helper p@(iso f g rightI leftI) a) b = funExt λ y → isContrIsPropPath (a , b) y (sym (leftI a) ∙ cong g (cong f (b (g (f y))) ∙ rightI (f y)) ∙ leftI y) (b y)
   
 -- Can this be generalized to Iso A B → Iso (H A) (H B) , not just for H = isContr ?
 contr-is-ext-Iso : ∀ {ℓ} {A B : Set ℓ} -> Iso A B -> Iso (isContr A) (isContr B) -- Σ[ x ∈ A ] (∀ y → x ≡ y)
@@ -225,11 +231,6 @@ contr-is-ext = cong isContr
 U-contr : ∀ {ℓ} {S : Container {ℓ}} {C,γ : Coalg₀ {S = S}} -> ∀ (x : U {C,γ = C,γ}) -> isContr (U {C,γ = C,γ})
 U-contr {ℓ} {C,γ = C,γ} x =
   inv (contr-is-ext-Iso {A = U {C,γ = C,γ}} (U-is-Unit-Iso C,γ)) (lift tt , λ { (lift tt) -> refl })
-
--- U-contr : ∀ {ℓ} {S : Container {ℓ}} {C,γ : Coalg₀ {S = S}} -> ∀ (x : U {C,γ = C,γ}) -> isContr (U {C,γ = C,γ})
--- U-contr {ℓ} {C,γ = C,γ} x =
---   transport (sym (contr-is-ext {A = U {C,γ = C,γ}} (U-is-Unit C,γ)))
---             (lift tt , λ { (lift tt) -> refl })
 
 ----------------------------------------------------
 -- Finality properties for bisimulation relations --
