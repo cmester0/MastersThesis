@@ -11,8 +11,6 @@ open import Cubical.HITs.SetQuotients
 
 module QIIT where
 
-
-
 record partiality-monad {A : Set} : Set₁ where
   field
     A⊥ : Set

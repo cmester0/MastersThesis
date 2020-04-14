@@ -281,16 +281,3 @@ hd-zeros-transported = hd-to-head (transportRefl Zeros i0)
 
 tl-zeros-transported : tl zeros-transported ≡ zeros-transported
 tl-zeros-transported = tl-to-tail (transportRefl Zeros i0)
-
--------------------------------------
--- Coinduction of M types (stream) --
--------------------------------------
-
--- stream-relation : {!!}
--- stream-relation = {!!}
-
--- stream-bisim : ∀ A → bisimulation (stream-S A) M-coalg stream-relation
--- stream-bisim = {!!}
-
--- stream-coinduction : ∀ s t → coinduction ? ? ?
--- stream-coinduction = ?

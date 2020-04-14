@@ -58,7 +58,7 @@
 
 
 \newcommand*{\set}[1]{\left\{#1\right\}}
-\newcommand*{\term}[1]{\textcolor{blue!80!black}{#1}}
+\newcommand*{\term}[1]{\textcolor{green!70!black}{#1}} % \textcolor{blue!80!black}
 \newcommand*{\type}[1]{\textcolor{magenta!90!black}{#1}}
 \newcommand*{\dependenttype}[1]{\textcolor{magenta!70!black}{#1}}
 \newcommand*{\container}[1]{\textcolor{red}{#1}}
@@ -206,44 +206,50 @@
   \end{equation}  
 \end{exmp}
 \begin{lem} \label{lem:limit-collapse}
-  Given \(\ell : \prod_{(n : \mathbb{N})} (X_{n} \rightarrow X_{n+1})\) and \(y : \sum_{x : \prod_{(n : \mathbb{N})} X_n} x_{n + 1} \equiv l_n (x_n)\) we can collapse the chain \(\mathcal{L} \equiv X_0\). We define this collapse by the equivalence
-  \begin{align}
-    \function{fun}_{\mathcal{L}collapse}~(x , r) &= x_0 \\
-    \function{inv}_{\mathcal{L}collapse}~x_0 &= (\lambda n, \function{transport}~\ell^n~x_0) , (\lambda\,n, \mathtt{refl}_{\function{transport}~\ell^{(n+1)}~x_0}) \\
-    \function{rinv}~x_0 &= \mathtt{refl}_{x_0} \\
-  \end{align}
-  For \(\function{linv}~(x , r)\) we define a fiber \((X , z, l)\) over \(\mathbb{N}\) given some \(z : X_0\). Then any element of the type \(\sum_{x : \prod_{(n : \mathbb{N})} X_n} x_{n + 1} \equiv l_n (x_n)\) is equal to a section over this fiber, specifically \(y\) is equal to a fiber. Since this section is defined over \(\mathbb{N}\) which is an initial algebra for the functor \(GY = \unit + Y\), we get that the section are contractible, meaning \(y \equiv \function{inv}_{\mathcal{L}collapse} (\function{fun}_{\mathcal{L}collapse}~y)\), since both are equal to such sections.
+  Given \(\ell : \prod_{(n : \mathbb{N})} (X_{n} \rightarrow X_{n+1})\) and \(y : \sum_{x : \prod_{(n : \mathbb{N})} X_n} x_{n + 1} \equiv l_n (x_n)\) we can collapse the chain \(\mathcal{L} \equiv X_0\).
+  \begin{proof}
+    We define this collapse by the equivalence
+    \begin{align}
+      \function{fun}_{\mathcal{L}collapse}~(x , r) &= x_0 \\
+      \function{inv}_{\mathcal{L}collapse}~x_0 &= (\lambda n, \function{transport}~\ell^n~x_0) , (\lambda\,n, \mathtt{refl}_{\function{transport}~\ell^{(n+1)}~x_0}) \\
+      \function{rinv}~x_0 &= \mathtt{refl}_{x_0}
+    \end{align}
+    For \(\function{linv}~(x , r)\) we define a fiber \((X , z, l)\) over \(\mathbb{N}\) given some \(z : X_0\). Then any element of the type \(\sum_{x : \prod_{(n : \mathbb{N})} X_n} x_{n + 1} \equiv l_n (x_n)\) is equal to a section over this fiber, specifically \(y\) is equal to a fiber. Since this section is defined over \(\mathbb{N}\) which is an initial algebra for the functor \(GY = \unit + Y\), we get that the section are contractible, meaning \(y \equiv \function{inv}_{\mathcal{L}collapse} (\function{fun}_{\mathcal{L}collapse}~y)\), since both are equal to such sections.
+\end{proof}
 \end{lem}
 \begin{thm}
   We want to proof the construction of \function{in} and \function{out} for the container \(\containerpair{A}{B}\) more precisely we want to define the equality
   \begin{equation}
     shift : \mathcal{L} \equiv P\mathcal{L}    
   \end{equation}
-  where \(P\mathcal{L}\) is the limit of a shifted sequence. We do this we the two helper lemmas
-  \begin{equation}
-    \alpha : \mathcal{L}^P \equiv P\mathcal{L}
-  \end{equation}
-  \begin{equation}
-    \mathcal{L}unique : \mathcal{L} \equiv \mathcal{L}^P
-  \end{equation}
-  We can define \(\mathcal{L}unique\) by the equivalence
-  \begin{align}
-    \function{fun}_{\mathcal{L}unique}~(a , b) &= \left( \lambda\,n, \begin{cases} \constant{tt} & n = 0 \\ a~m & n = m + 1 \end{cases}\right) , \left(\lambda\,n \begin{cases} \mathtt{refl}_{\constant{tt}} & n = 0 \\ b~m & n = m + 1 \end{cases}\right) \\
+  where \(P\mathcal{L}\) is the limit of a shifted sequence.
+  \begin{proof}
+    We do this we the two helper lemmas
+    \begin{equation}
+      \alpha : \mathcal{L}^P \equiv P\mathcal{L}
+    \end{equation}
+    \begin{equation}
+      \mathcal{L}unique : \mathcal{L} \equiv \mathcal{L}^P
+    \end{equation}
+    We can define \(\mathcal{L}unique\) by the equivalence
+    \begin{align}
+      \function{fun}_{\mathcal{L}unique}~(a , b) &= \left( \lambda\,n, \begin{cases} \constant{tt} & n = 0 \\ a~m & n = m + 1 \end{cases}\right) , \left(\lambda\,n \begin{cases} \mathtt{refl}_{\constant{tt}} & n = 0 \\ b~m & n = m + 1 \end{cases}\right) \\
     \function{inv}_{\mathcal{L}unique}~(a , b) &= a \circ \function{incr} , b \circ \function{incr} \\
     \function{rinv}_{\mathcal{L}unique}~(a , b) &= \mathtt{refl} \\
     \function{linv}_{Lunique}~(a , b) &= \mathtt{refl}
-  \end{align}
-  The definition of \(\alpha\) follows from \lemref{limit-collapse}, 
-  \begin{align}
-    \mathcal{L}^P &\equiv \sum_{(u : \mathcal{L}_{(\lambda\_,A,\function{id})})} \prod_{(n : \mathbb{N})} \pi_{(n)} \circ u_{n+1} \equiv_{\lambda\,x, B(\pi_2\,a\,n\,x) \rightarrow X_n} u_n \\
-        &\equiv \sum_{(a : A)} \sum_{(u : \prod_{(n : \mathbb{N})} B a \rightarrow X_n)} \prod_{(n : \mathbb{N})} \pi_{(n)} \circ u_{n+1} \equiv u_n \\
-        &\equiv P\mathcal{L}
-  \end{align}
-  We can then define \(shift\) as
-  \begin{equation}
-    shift = \function{sym}~\alpha \cdot \mathcal{L}unique
-  \end{equation}
-  Then we define \(\function{in} = \function{transport}~shift\) and \(\function{out} = \function{transport}~(\function{sym}~shift)\), since \function{in} and \function{out} are part of an equality relation (\(shift\)), they become embeddings.
+    \end{align}
+    The definition of \(\alpha\) follows from \lemref{limit-collapse}, 
+    \begin{align}
+      \mathcal{L}^P &\equiv \sum_{(u : \mathcal{L}_{(\lambda\_,A,\function{id})})} \prod_{(n : \mathbb{N})} \pi_{(n)} \circ u_{n+1} \equiv_{\lambda\,x, B(\pi_2\,a\,n\,x) \rightarrow X_n} u_n \\
+          &\equiv \sum_{(a : A)} \sum_{(u : \prod_{(n : \mathbb{N})} B a \rightarrow X_n)} \prod_{(n : \mathbb{N})} \pi_{(n)} \circ u_{n+1} \equiv u_n \\
+          &\equiv P\mathcal{L}
+    \end{align}
+    We can then define \(shift\) as
+    \begin{equation}
+      shift = \function{sym}~\alpha \cdot \mathcal{L}unique
+    \end{equation}
+    Then we define \(\function{in} = \function{transport}~shift\) and \(\function{out} = \function{transport}~(\function{sym}~shift)\), since \function{in} and \function{out} are part of an equality relation (\(shift\)), they become embeddings.
+    \end{proof}
 \end{thm}
 \section{Closure properties of \texttt{M}-types}
 We want to show that \texttt{M}-types are closed under simple operations, we start by looking at the product.
@@ -293,11 +299,11 @@ We start with containers and work up to \texttt{M}-types.
       \equiv&~ \functor{P}_{\containerpair{\type{A}}{\type{B}} \times \containerpair{\type{C}}{\type{D}}} ({\functor{P}_{\containerpair{\type{A}}{\type{B}} \times \containerpair{\type{C}}{\type{D}}}}^m~\unit) \\
       \equiv&~ {\functor{P}_{\containerpair{\type{A}}{\type{B}} \times \containerpair{\type{C}}{\type{D}}}}^{m+1}~\unit
     \end{align}
-  \end{proof}
-  taking the limit of \eqref{eq:polynomial-functor-product} we get
+    taking the limit of \eqref{eq:polynomial-functor-product} we get
   \begin{equation}
     \typeformer{M}_{\containerpair{\type{A}}{\type{B}}} \times \typeformer{M}_{\containerpair{\type{C}}{\type{D}}} \equiv \typeformer{M}_{\containerpair{\type{A}}{\type{B}} \times \containerpair{\type{C}}{\type{D}}}.
   \end{equation}
+  \end{proof}
 \end{thm}
 \begin{exmp} For streams we get
 \begin{equation}
@@ -307,7 +313,7 @@ as expected. Transporting along \eqref{eq:zip-equality} gives us a definition fo
 \end{exmp}
 
 \section{Co-induction Principle for \texttt{M}-types}
-We can now construct a bisimulation
+We can now construct a co-induction principle given a bisimulation relation
 
 \begin{defn}
   Forall coalgebras \(\coalg{\type{C}}{\term{\gamma}} : \typeformer{Coalg}_{\container{S}}\), given a relation \(\relation{\mathcal{R}} : \type{C} \rightarrow \type{C} \rightarrow \universe{\mathcal{U}}\) and a type \(\type{\overline{\mathcal{R}}} = \sum_{\term{a} : \type{C}} \sum_{\term{b} : \type{C}} \term{a}~\relation{\mathcal{R}}~\term{b}\), such that \(\type{\overline{\mathcal{R}}}\) and \(\term{\alpha}_{\relation{\mathcal{R}}} : \type{\overline{\mathcal{R}}} \rightarrow \functor{P}(\type{\overline{\mathcal{R}}})\) forms a \(\functor{P}\)-coalgebra \(\coalg{\type{\overline{\mathcal{R}}}}{\term{\alpha}_{\relation{\mathcal{R}}}} : \mathtt{Coalg}_{\container{S}}\), making the diagram in \figref{coalgebra-coinduction-definition} commute (\(\Longrightarrow\) represents \(\functor{P}\)-coalgebra morphisms).  
@@ -336,11 +342,12 @@ We can now construct a bisimulation
     \term{m} = \pi_1^{\type{\overline{\mathcal{R}}}} (\term{m}, \term{m'}, \term{r}) = \pi_2^{\type{\overline{\mathcal{R}}}} (\term{m}, \term{m'}, \term{r}) = \term{m'}.
   \end{equation}
 \end{defn}
-\todo[inline]{What makes a relation a bisimulation? Is bisim and equality equal. Try to complete the construction of equality from any bisimulation relation over an \texttt{M}-type}
 
 \section{Quotient \texttt{M}-type}
 Since we know that \texttt{M}-types preserves the H-level, we can use set-truncated quotients, to define quotient \texttt{M}-types, for examples we can define weak bisimulation of the delay monad as
 \todo[inline]{Quotients of the delay monad}
+
+\subsection{Quotient inductive-inductive types (QIITs)}
 
 \section{TODO}
 \begin{itemize}
@@ -410,6 +417,7 @@ so we want
 
 \chapter{Examples of \texttt{M}-types}
 \section{TODO: Place these subsections}
+\todo[inline]{What makes a relation a bisimulation? Is bisim and equality equal.}
 \subsection{Identity Bisimulation}
 Lets start with a simple example of a bisimulation namely the one given by the identity relation for any \texttt{M}-type.
 \begin{lem}
@@ -425,14 +433,14 @@ Lets start with a simple example of a bisimulation namely the one given by the i
   \end{equation}
   and the two projections
   \begin{align}
-    \pi_1^{\type{\overline{\equiv}}} &= \texttt{funExt}~\lambda\,(a,b,r), \texttt{refl}_{\function{out}\,a} \\
-    \pi_2^{\type{\overline{\equiv}}} &= \texttt{funExt}~\lambda\,(a,b,r), \texttt{cong}_{\function{out}}~(\texttt{sym}~r).
+    \pi_1^{\type{\overline{\equiv}}} &= (\pi_1 , \texttt{funExt}~\lambda\,(a,b,r), \texttt{refl}_{\function{out}\,a}) \\
+    \pi_2^{\type{\overline{\equiv}}} &= (\pi_2 , \texttt{funExt}~\lambda\,(a,b,r), \texttt{cong}_{\function{out}}~(\texttt{sym}~r)).
   \end{align}
   This defines the bisimulation, given by the diagram in \figref{id-bisim}.
   \begin{figure}[h]
     \centering
     \begin{tikzcd}
-      \coalg{\typeformer{M}}{\function{out}} & \coalg{\type{\overline{\equiv}}}{\term{\alpha}_{\equiv}} \ar[l,Rightarrow,"{\pi_1}^{\type{\overline{\equiv}}}"'] \ar[r,Rightarrow,"{\pi_2}^{\type{\overline{\equiv}}}"] & \coalg{\typeformer{M}}{\function{out}}
+      \coalg{\typeformer{M}}{\function{out}} & \coalg{\type{\overline{\equiv}}}{\function{\alpha}_{\equiv}} \ar[l,Rightarrow,"{\pi_1}^{\type{\overline{\equiv}}}"'] \ar[r,Rightarrow,"{\pi_2}^{\type{\overline{\equiv}}}"] & \coalg{\typeformer{M}}{\function{out}}
     \end{tikzcd}
     \caption{Identity bisimulation}
     \label{fig:id-bisim}
@@ -441,54 +449,42 @@ Lets start with a simple example of a bisimulation namely the one given by the i
 \end{lem}
 \subsection{Bisimulation of Streams}
 \todo[inline]{TODO}
-\subsection{Bisimulation of Delay monad}
-We want to define a bisimulation relation \(\relation{\approx_{delay}}\) for the delay monad, 
+\subsection{Bisimulation of Delay Monad}
+We want to define a strong bisimulation relation \(\relation{\sim_{delay}}\) for the delay monad, 
 \begin{defn}
-  The relation \(\relation{\approx_{delay}}\) is defined by the following rules
+  The relation \(\relation{\sim_{delay}}\) is defined by the following rules
   \begin{equation}
-    \infer[\mathtt{EqNow}]{\function{now}~\term{r}~\relation{\approx_{delay}}~\function{now}~\term{r} : \universe{\mathcal{U}}}{\type{R} : \universe{U} & \term{r} : \type{R}}
+    \infer[\mathtt{now}\hspace{-1mm}\sim]{\function{now}~\term{r}~\relation{\sim_{delay}}~\function{now}~\term{r} : \universe{\mathcal{U}}}{\type{R} : \universe{U} & \term{r} : \type{R}}
   \end{equation}
   \begin{equation}
-    \infer[\mathtt{EqLater}]{\function{later}~t~\relation{\approx_{delay}}~\function{later}~u : \universe{\mathcal{U}}}{\type{R} : \universe{\mathcal{U}} & \term{t} : \typeformer{delay}~\type{R} & \term{u} : \typeformer{delay}~\type{R} & \term{t}~\relation{\approx^{\infty}_{delay}}~\term{u} : \universe{\mathcal{U}}}
-  \end{equation}
-  where \(\relation{\approx^{\infty}_{delay}}\) is defined as
-  \begin{equation}
-    \infer[\mathtt{force}]{x~\relation{\approx^{\infty}_{delay}}~y}{x~\relation{\approx_{delay}}~y}
+    \infer[\mathtt{later}\hspace{-1mm}\sim]{\function{later}~\term{t}~\relation{\sim_{delay}}~\function{later}~\term{u} : \universe{\mathcal{U}}}{\type{R} : \universe{\mathcal{U}} & \term{t} : \typeformer{delay}~\type{R} & \term{u} : \typeformer{delay}~\type{R} & \term{t}~\relation{\sim_{delay}}~\term{u} : \universe{\mathcal{U}}}
   \end{equation}
 \end{defn}
-\begin{lem}
-  The relation \(\relation{\approx_{delay}}\) is reflexive, meaning \(\forall\,(x : \typeformer{delay}~\type{R}), x~\relation{\approx_{delay}}~x\).
-  \begin{proof}
-    We do case analysis on \(x\). We start by \(x = \function{now}~r\) meaning we have to show
-    \begin{equation}
-      \function{now}~r~\relation{\approx_{delay}}~\function{now}~r
-    \end{equation}
-    which is true, by \texttt{EqNow}. For \(x = \function{later}~t\), we get
-    \begin{equation}
-      \function{later}~t~\relation{\approx_{delay}}~\function{later}~t
-    \end{equation}
-    which by \texttt{EqLater}, becomes \(t~\relation{\approx^\infty_{delay}}~t\). Meaning we must show \(\relation{\approx^\infty_{delay}}\) is reflexive, but this follows directly by \texttt{force} the induction hypothesis that \(\relation{\approx_{delay}}\) is reflexive.
-  \end{proof}
-\end{lem}
 \begin{thm}
-  The relation \(\approx_{delay}\) is a bisimulation for \(\typeformer{delay}~\type{R}\).
+  The relation \(\relation{\sim_{delay}}\) is a bisimulation for \(\typeformer{delay}~\type{R}\).
   \begin{proof}
     First we define the function
     \begin{equation}
       \begin{aligned}
-        \function{\alpha}_{\relation{\approx_{delay}}} &: \type{\overline{\approx_{delay}}} \rightarrow \functor{P} (\type{\overline{\approx_{delay}}}) \\
-        \function{\alpha}_{\relation{\approx_{delay}}} (x , y) &:= \pi_1~(\function{out}~x)~,~(\lambda\,b, (\pi_2~(\function{out}~x)~b \,,\, \texttt{refl}_{(\pi_2\,(\function{out}\,x)\,b)}))
+        \function{\alpha}_{\relation{\sim_{delay}}} &: \type{\overline{\sim_{delay}}} \rightarrow \functor{P} (\type{\overline{\sim_{delay}}}) \\
+        \function{\alpha}_{\relation{\sim_{delay}}}~(\term{a} , \term{b} , \mathtt{now}\hspace{-1mm}\sim\term{r}) &:= (\mathtt{inr}~\term{r} , \lambda\,(\,)) \\
+        \function{\alpha}_{\relation{\sim_{delay}}}~(\term{a} , \term{b} , \mathtt{later}\hspace{-1mm}\sim\term{x}~\term{y}~\term{q}) &:= (\mathtt{inl}~\constant{tt} , \lambda\,\_, (\term{x} , \term{y} , \term{q}))
       \end{aligned}
     \end{equation}
     then we define the projections
       \begin{align}
-        \pi_1^{\type{\overline{\equiv}}} &= \texttt{funExt}~\lambda\,(a,b,r), \texttt{refl}_{\function{out}\,a} \\
-        \pi_2^{\type{\overline{\equiv}}} &= \texttt{funExt}~\lambda\,(a,b,r), \texttt{cong}_{\function{out}}~(R_{eq}~r),
+        \pi_1^{\type{\overline{\sim_{delay}}}} &= \left( \pi_1 ~~ , ~~ \texttt{funExt}~\lambda\,(\term{a},\term{b},p), \begin{cases} (\mathtt{inr}~\term{r} , \lambda\,(\,)) & p = \mathtt{now}\hspace{-1mm}\sim\term{r} \\ (\mathtt{inl}~\constant{tt} , \lambda\,\_, x) & p = \mathtt{later}\hspace{-1mm}\sim\term{x}~\term{y}~\term{q}\end{cases} \right) \\
+        \pi_2^{\type{\overline{\sim_{delay}}}} &= \left( \pi_2 ~~ , ~~ \texttt{funExt}~\lambda\,(\term{a},\term{b},p), \begin{cases} (\mathtt{inr}~\term{r} , \lambda\,(\,)) & p = \mathtt{now}\hspace{-1mm}\sim\term{r} \\ (\mathtt{inl}~\constant{tt} , \lambda\,\_, y) & p = \mathtt{later}\hspace{-1mm}\sim\term{x}~\term{y}~\term{q}\end{cases} \right) \\
       \end{align}
-      where
-      \begin{equation}
-        R_{eq}~(a , b , r) = \begin{cases} \mathtt{refl} & r = \mathtt{EqNow} \\ \mathtt{refl} & r = \mathtt{EqLater}~r' \end{cases}
-      \end{equation}
+      This defines the bisimulation, given by the diagram in \figref{delay-strong-bisim}.
+      \begin{figure}[h]
+        \centering
+        \begin{tikzcd}[column sep = large]
+          \coalg{\typeformer{delay}~\type{R}}{\function{out}} & \coalg{\type{\overline{\sim_{\texttt{delay}}}}}{\function{\alpha}_{\relation{\sim_{delay}}}} \ar[l,Rightarrow,"\pi_1^{\type{\overline{\sim_{delay}}}}"'] \ar[r,Rightarrow,"\pi_2^{\type{\overline{\sim_{delay}}}}"] & \coalg{\typeformer{delay}~\type{R}}{\function{out}}
+        \end{tikzcd}
+        \caption{Strong bisimulation for delay monad}
+        \label{fig:delay-strong-bisim}
+      \end{figure}
   \end{proof}
 \end{thm}
 
