@@ -6,9 +6,11 @@ open import Coalg
 
 open import Cubical.Data.Unit
 open import Cubical.Data.Nat
+open import Cubical.Data.Sigma
 open import Cubical.Data.Sum
 open import Cubical.Data.Empty
 open import Cubical.Data.Bool
+open import Cubical.Data.Prod
 
 open import Cubical.Codata.Stream
 
@@ -18,10 +20,12 @@ open import Cubical.Foundations.Univalence
 open import Cubical.Foundations.Isomorphism
 open import Cubical.Foundations.Equiv
 open import Cubical.Foundations.Univalence
+open import Cubical.Foundations.FunExtEquiv
 
 open import Cubical.HITs.SetQuotients
 
 open import Container
+open import helper
 
 module bisim-examples where
 
@@ -30,57 +34,83 @@ module bisim-examples where
 -------------------------------
 
 Δ : ∀ {ℓ} {S : Container {ℓ}} -> bisimulation S M-coalg (_≡_)
-αᵣ (Δ {S = S}) = λ a → fst (M-coalg .snd (a .fst)) , (λ b → snd (M-coalg .snd (a .fst)) b , (snd (M-coalg .snd (a .fst)) b , refl))
-rel₁ (Δ {S = S}) = funExt λ x → refl
-rel₂ (Δ {S = S}) = funExt λ x → λ i → M-coalg .snd (x .snd .snd (~ i))
+αᵣ (Δ {S = S}) (a , b , r) = fst (out-fun a) , (λ x → snd (out-fun a) x , (snd (out-fun a) x , refl {x = snd (out-fun a) x}))
+rel₁ (Δ {S = S}) = funExt λ {(a , b , r) → refl {x = out-fun a}}
+rel₂ (Δ {S = S}) = funExt λ {(a , b , r) → cong (out-fun) (sym r)}
 
----------------------------------
--- Quotienting the delay monad --
----------------------------------
+--------------------------------------
+-- Bisimulation for the delay monad --
+--------------------------------------
 
 mutual
-  data delay≈ {R} : (delay R) -> (delay R) -> Set where
-    EqNow : ∀ {r} -> ∀ {b} -> delay≈ (in-fun (inr r , b)) (in-fun (inr r , b))
-    EqLater : ∀ {t} -> (∞delay≈ (in-fun (out-fun (t tt))) (in-fun (out-fun (t tt)))) -> delay≈ (in-fun (inl tt , t)) (in-fun (inl tt , t))
+  data Strongly-bisimilar {R} : (x y : delay R) → Set where
+    now-cong   : ∀ {r} → Strongly-bisimilar (delay-ret r) (delay-ret r)
+    later-cong : ∀ {x y} → ∞Strongly-bisimilar (in-fun (out-fun x)) (in-fun (out-fun y)) → Strongly-bisimilar (delay-tau x) (delay-tau y)
 
-  record ∞delay≈ {R} (x : delay R) (y : delay R) : Set where
+  record ∞Strongly-bisimilar {R} (x y : delay R) : Set where
     coinductive
     field
-      force : delay≈ x y
+      force : Strongly-bisimilar x y
 
-open ∞delay≈
+open ∞Strongly-bisimilar public
 
-data weak-delay≈ {R} : (delay R) -> (delay R) -> Set where
-  EqNow : ∀ {r s} -> r ≡ s -> weak-delay≈ (delay-ret r) (delay-ret s)
-  EqLater : ∀ {t u} -> weak-delay≈ t u -> weak-delay≈ (delay-tau t) (delay-tau u)
-  EqLaterL : ∀ {t u} -> weak-delay≈ t u -> weak-delay≈ (delay-tau t) u
-  EqLaterR : ∀ {t u} -> weak-delay≈ t u -> weak-delay≈ t (delay-tau u)
+private
+  _∼_ = Strongly-bisimilar
+  _∞∼_ = ∞Strongly-bisimilar
+  
+helper-transport : ∀ {R} {x y : delay R} → in-fun (out-fun x) ∼ in-fun (out-fun y) ≡ x ∼ y
+helper-transport {x = x} {y} i = in-inverse-out i x ∼ in-inverse-out i y
 
-delay≈-in-out : ∀ {R} {x : delay R} -> delay≈ (in-fun (out-fun x)) (in-fun (out-fun x)) -> delay≈ x x
-delay≈-in-out {x = x} = λ p → transp (λ i → delay≈ (funExt⁻ in-inverse-out x i) (funExt⁻ in-inverse-out x i)) i0 p
+∞helper-transport : ∀ {R} {x y : delay R} → in-fun (out-fun x) ∞∼ in-fun (out-fun y) ≡ x ∞∼ y
+∞helper-transport {x = x} {y} i = in-inverse-out i x ∞∼ in-inverse-out i y
 
-delay≈-in-out-L : ∀ {R} {x y : delay R} -> delay≈ (in-fun (out-fun x)) y -> delay≈ x y
-delay≈-in-out-L {x = x} {y = y} = λ p → transp (λ i → delay≈ (funExt⁻ in-inverse-out x i) y) i0 p
+ret-general : ∀ {R} (r : R) (b : ⊥ → delay R) → in-fun (inr r , b) ≡ (delay-ret r)
+ret-general r b i = in-fun (inr r , isContr→isProp isContr⊥→A b (λ ()) i)
 
-delay≈-in-out-R : ∀ {R} {x y : delay R} -> delay≈ x (in-fun (out-fun y)) -> delay≈ x y
-delay≈-in-out-R {x = x} {y = y} = λ p → transp (λ i → delay≈ x (funExt⁻ in-inverse-out y i)) i0 p
+mutual
+  ∞delay≈-refl-helper : ∀ {R} {x : delay R} → in-fun (out-fun x) ∞∼ in-fun (out-fun x)
+  force (∞delay≈-refl-helper {x = x}) = delay≈-refl-helper {x = out-fun x}
 
--- mutual
---   ∞delay≈-refl-helper : ∀ {R} (x₁ : Σ (delay-S R .fst) (λ x₂ → delay-S R .snd x₂ → M (delay-S R))) → ∞delay≈ (in-fun x₁) (in-fun x₁)
---   force (∞delay≈-refl-helper x) = delay≈-refl-helper x
+  delay≈-refl-helper : ∀ {R} {x : P₀ (delay R)} → (in-fun x) ∼ (in-fun x)
+  delay≈-refl-helper {x = inr r , b} =
+    let temp = (cong (λ a → in-fun (inr r , a)) (isContr→isProp isContr⊥→A (λ ()) b)) in
+      transport (λ i → temp i ∼ temp i) now-cong
+  delay≈-refl-helper {x = inl tt , t} = later-cong (∞delay≈-refl-helper {x = t tt})
 
---   delay≈-refl-helper : ∀ {R} (x₁ : Σ (delay-S R .fst) (λ x₂ → delay-S R .snd x₂ → M (delay-S R))) → delay≈ (in-fun x₁) (in-fun x₁)
---   delay≈-refl-helper (inr r , b) = EqNow
---   delay≈-refl-helper (inl tt , b) = EqLater (∞delay≈-refl-helper (out-fun (b tt)))
+delay≈-refl : ∀ {R} {x : delay R} → x ∼ x
+delay≈-refl {x = x} = transport helper-transport (delay≈-refl-helper {x = out-fun x})
 
--- delay≈-refl : ∀ {R} {x} -> delay≈ {R} x x
--- delay≈-refl {R = R} {x = x} = delay≈-in-out (case out-fun x return (λ x₁ → delay≈ (in-fun x₁) (in-fun x₁)) of delay≈-refl-helper)
+later≈ : ∀ {R} {x y : delay R} → in-fun (out-fun x) ∼ in-fun (out-fun y) → delay-tau x ∼ delay-tau y
+later≈ p = later-cong (record { force = p })
 
--- postulate
---   delay-bisimulation-helper : ∀ {R} (x : Σ (M (delay-S R)) (λ a → Σ (M (delay-S R)) (delay≈ a))) → fst (snd x) ≡ fst x
+weak-R-bar : forall {R} -> Set
+weak-R-bar {R} = Σ (M (delay-S R)) (λ a → Σ (M (delay-S R)) (_∼_ a))
 
--- delay-bisimulation : ∀ {R : Set} -> bisimulation (delay-S R) M-coalg (delay≈ {R})
--- delay-bisimulation {R} = bisimulation-property (delay-S R) (delay≈) (delay≈-refl) delay-bisimulation-helper
+alpha : forall {R} -> weak-R-bar {R = R} -> P₀ {S = delay-S R} (weak-R-bar {R = R})
+alpha (a , b , now-cong {r}) = inr r , λ ()
+alpha (a , b , later-cong {x} {y} p) = inl tt , λ _ → x , y , transport helper-transport (force p)
 
--- delay≈≡≡ : ∀ {A} -> delay≈ {A} ≡ _≡_
--- delay≈≡≡ = coinduction-is-equality delay≈ delay-bisimulation delay≈-refl
+alpha-coalg : ∀ {R} → Coalg₀
+alpha-coalg {R} = weak-R-bar {R = R} , alpha
+
+pi : ∀ {R} → (alpha-coalg {R = R}) ⇒ M-coalg
+pi = lim-terminal .fst
+
+pi-1 : ∀ {R} → (alpha-coalg {R = R}) ⇒ M-coalg {S = delay-S R}
+fst (pi-1) = fst
+snd (pi-1) i (a , b , (now-cong {r})) = out-inverse-in i (inr r , λ ())
+snd (pi-1 {R}) i (a , b , (later-cong {x} {y} p)) = out-inverse-in i (inl tt , λ _ → x) 
+
+pi-2 : ∀ {R} → (alpha-coalg {R = R}) ⇒ M-coalg
+fst (pi-2) = fst ∘ snd
+snd (pi-2) i (a , b , (now-cong {r})) = out-inverse-in i (inr r , λ ())
+snd (pi-2 {R}) i (a , b , (later-cong {x} {y} p)) = out-inverse-in i (inl tt , λ _ → y)
+
+temp : ∀ {R} → pi-1 ≡ pi-2
+temp {R} = final-coalg-property-2 (alpha-coalg {R = R}) M-final-coalg pi-1 pi-2
+
+delay-bisim : ∀ {R} → bisimulation (delay-S R) M-coalg _∼_
+delay-bisim = record { αᵣ = alpha ; rel₁ = pi-1 .snd ; rel₂ = pi-2 .snd }
+
+delay-coinduction : ∀ {R} {m m'} → m ∼ m' → m ≡ m'
+delay-coinduction {R} = coinduction (_∼_ {R}) delay-bisim

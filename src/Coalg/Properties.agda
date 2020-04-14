@@ -20,11 +20,11 @@ open import Cubical.Foundations.Path
 
 open import helper
 
-module Coalg.Properties where
-
 open import Coalg.Base
 open import Container
 open import M
+
+module Coalg.Properties where
 
 open Iso
 
@@ -49,39 +49,6 @@ PM-coalg {S = S} =
 
 Final : ∀ {ℓ} {S : Container {ℓ}} -> Set (ℓ-suc ℓ)
 Final {S = S} = Σ (Coalg₀ {S = S}) λ X,ρ → ∀ (C,γ : Coalg₀ {S = S}) -> isContr (_⇒_ {S = S} (C,γ) (X,ρ))
-
--------------------------------
--- Bisimilarity of Coalgebra --
--------------------------------
-
--- Strong bisimulation ?
-record bisimulation {ℓ} (S : Container {ℓ}) (C,γ : Coalg₀ {S = S}) (R : C,γ .fst -> C,γ .fst -> Set ℓ) : Set (ℓ-suc ℓ) where
-  coinductive
-  -- field R : C,γ .fst -> C,γ .fst -> Set ℓ
-
-  R⁻ = Σ (C,γ .fst) (λ a -> Σ (C,γ .fst) (λ b -> R a b))
-
-  π₁ : R⁻ -> C,γ .fst
-  π₁ = fst
-
-  π₂ : R⁻ -> C,γ .fst
-  π₂ = fst ∘ snd
-
-  field
-    αᵣ : R⁻ -> P₀ {S = S} R⁻
-    rel₁ : (C,γ .snd) ∘ π₁ ≡ P₁ π₁ ∘ αᵣ
-    rel₂ : (C,γ .snd) ∘ π₂ ≡ P₁ π₂ ∘ αᵣ
-
-  R⁻-coalg : Coalg₀
-  R⁻-coalg = R⁻ , αᵣ
-
-  prod₁ : R⁻-coalg ⇒ C,γ
-  prod₁ = π₁ , rel₁
-
-  prod₂ : R⁻-coalg ⇒ C,γ
-  prod₂ = π₂ , rel₂
-
-open bisimulation public
 
 --------------------------------------------------------
 -- Properties of Bisimulations and (Final) Coalgebras --
@@ -163,13 +130,19 @@ postulate
 
   missing-2 : ∀ {ℓ} {S : Container {ℓ}} {C,γ : Coalg₀ {S = S}} -> ((x : Lift Unit) → Lift {ℓ-zero} {ℓ} Unit ≡ (Σ (Cone₁ {C,γ = C,γ} ((fun (missing-0-Iso {C,γ = C,γ}) x) .fst)) (λ q → PathP (λ i → Cone₁ {C,γ = C,γ} ((fun (missing-0-Iso {C,γ = C,γ}) x) .snd i)) q (ϕ₁ {C,γ = C,γ} ((fun (missing-0-Iso {C,γ = C,γ}) x) .fst) q))))
 
-abstract
-  computation-abstract'0 : ∀ {ℓ} {S : Container {ℓ}} {C,γ : Coalg₀ {S = S}} {f g : C,γ .fst → P₀ (M S)} → Iso (in-fun ∘ f ≡ in-fun ∘ g) (f ≡ g)
-  computation-abstract'0 {ℓ} {S} {C,γ} {f} {g} =
-    (≡-rel-a-inj-Iso {ℓ = ℓ} {A = P₀ (M S)} {B = M S} {C = C,γ .fst} (shift-iso)) {f = f} {g = g}
+computation-abstract'0 : ∀ {ℓ} {S : Container {ℓ}} {C,γ : Coalg₀ {S = S}} {f g : C,γ .fst → P₀ (M S)} → Iso (in-fun ∘ f ≡ in-fun ∘ g) (f ≡ g)
+computation-abstract'0 {ℓ} {S} {C,γ} {f} {g} = temp
+  where
+    abstract
+      temp : Iso (in-fun ∘ f ≡ in-fun ∘ g) (f ≡ g)
+      temp = ≡-rel-a-inj-Iso {ℓ = ℓ} {A = P₀ (M S)} {B = M S} {C = C,γ .fst} (shift-iso {S = S}) {f = f} {g = g}
 
-  computation-abstract'1 : ∀ {ℓ} {S : Container {ℓ}} {C,γ : Coalg₀ {S = S}} (f : C,γ .fst → M S) → in-fun ∘ out-fun ∘ f ≡ f
-  computation-abstract'1 {S = S} f = (identity-f-r {k = in-fun ∘ out-fun {S = S}} (in-inverse-out {S = S}) f)
+computation-abstract'1 : ∀ {ℓ} {S : Container {ℓ}} {C,γ : Coalg₀ {S = S}} (f : C,γ .fst → M S) → in-fun ∘ out-fun ∘ f ≡ f
+computation-abstract'1 {S = S} = temp
+  where
+    abstract
+      temp : ∀ f → in-fun ∘ out-fun ∘ f ≡ f
+      temp = identity-f-r {k = in-fun ∘ out-fun {S = S}} (in-inverse-out {S = S})
 
 U-is-Unit-Iso :
   ∀ {ℓ} {S : Container {ℓ}} (C,γ : Coalg₀ {S = S})
@@ -204,14 +177,6 @@ U-is-Unit-Iso {ℓ = ℓ} {S = S} C,γ@(C , γ) =
       Iso⟨ (iso (λ x → lift tt) (λ _ → lift tt , lift tt) (λ b i → lift tt) (λ a i → lift tt , lift tt)) ⟩
     Lift {ℓ-zero} {ℓ} Unit ∎Iso
 
-introduce-square :
-  ∀ {ℓ} {A : Set ℓ} {x y z : A} (p : x ≡ y) (q : y ≡ z) → p ∙ q ≡ (x ≡⟨ p ⟩ y ≡⟨ q ⟩ z ∎)
-introduce-square {x = x} {y} {z} p q = p ∙ q ≡⟨ rUnit (p ∙ q) ⟩ (p ∙ q) ∙ refl  ≡⟨ sym (assoc p q refl) ⟩ (x ≡⟨ p ⟩ y ≡⟨ q ⟩ z ∎) ∎
-
-square-helper :
-  ∀ {ℓ} {A : Set ℓ} {x y z w : A} (p : x ≡ y) (q : y ≡ z) {h : z ≡ w} → (x ≡⟨ p ∙ q ⟩ h) ≡ (x ≡⟨ p ⟩ y ≡⟨ q ⟩ h)
-square-helper {x = x} {y} {z} p q {h = h} = sym (assoc p q h)
-
 isContrIsPropPath : ∀ {ℓ} {A : Set ℓ} → (x : isContr A) → ∀ y → isProp (x .fst ≡ y)
 isContrIsPropPath {A = A} x y = isContr→isProp (isContr→isContrPath x (x .fst) y)
 
@@ -228,16 +193,15 @@ contr-is-ext-Iso {A = A} {B} p = Σ-ap-iso p (contr-is-ext-Iso-helper p)
 contr-is-ext : ∀ {ℓ} {A B : Set ℓ} -> A ≡ B -> isContr A ≡ isContr B
 contr-is-ext = cong isContr
 
-U-contr : ∀ {ℓ} {S : Container {ℓ}} {C,γ : Coalg₀ {S = S}} -> ∀ (x : U {C,γ = C,γ}) -> isContr (U {C,γ = C,γ})
-U-contr {ℓ} {C,γ = C,γ} x =
-  inv (contr-is-ext-Iso {A = U {C,γ = C,γ}} (U-is-Unit-Iso C,γ)) (lift tt , λ { (lift tt) -> refl })
+U-contr : ∀ {ℓ} {S : Container {ℓ}} {C,γ : Coalg₀ {S = S}} -> isContr (U {C,γ = C,γ})
+U-contr {ℓ} {C,γ = C,γ} = inv (contr-is-ext-Iso {A = U {C,γ = C,γ}} (U-is-Unit-Iso C,γ)) (lift tt , λ { (lift tt) -> refl })
 
 ----------------------------------------------------
 -- Finality properties for bisimulation relations --
 ----------------------------------------------------
 
 lim-terminal : ∀ {ℓ} {S : Container {ℓ}} {C,γ : Coalg₀ {S = S}} → isContr (C,γ ⇒ M-coalg)
-lim-terminal {C,γ = C,γ} = inv (U-is-Unit-Iso C,γ) (lift tt) , λ y → U-contr {C,γ = C,γ} y .snd y
+lim-terminal {C,γ = C,γ} = inv (U-is-Unit-Iso C,γ) (lift tt) , U-contr {C,γ = C,γ} .snd
 
 coalg-unfold : ∀ {ℓ} {S : Container {ℓ}} -> (C,γ : Coalg₀ {S = S}) -> (_⇒_ {S = S} (C,γ) (M-coalg {S = S}))  -- unique function into final coalg
 coalg-unfold C,γ = lim-terminal {C,γ = C,γ} .fst
@@ -256,63 +220,3 @@ M-final-coalg {ℓ} {S = S} = M-coalg , λ C,γ → lim-terminal {C,γ = C,γ}
 
 final-coalg-property-2 : ∀ {ℓ} {S : Container {ℓ}} -> (C : Coalg₀ {S = S}) -> (F : Final {S = S}) -> ∀ (f g : C ⇒ F .fst) -> f ≡ g
 final-coalg-property-2 C F f g = (sym (F .snd C .snd f)) ∙ (F .snd C .snd g) -- follows from contractability
-
-final-property : ∀ {ℓ} (S : Container {ℓ}) R -> (sim : bisimulation S M-coalg R) -> prod₁ sim ≡ prod₂  sim
-final-property S R sim = final-coalg-property-2 {S = S} (R⁻-coalg sim) (M-final-coalg {S = S}) (prod₁ sim) (prod₂ sim)
-
-final-property-2 : ∀ {ℓ} (S : Container {ℓ}) R -> (sim : bisimulation S M-coalg R) -> π₁ sim ≡ π₂  sim
-final-property-2 S R sim = cong fst (final-property S R sim)
-
-bisimulation-property :
-  ∀ {ℓ} (S : Container {ℓ}) (R : M S -> M S -> Set ℓ)
-  → (∀ {x} -> R x x)
-  → ((x : Σ (M S) (λ a → Σ (M S) (R a))) → fst (snd x) ≡ fst x)
-  ------------------------------
-  → bisimulation S M-coalg R
-αᵣ (bisimulation-property S R R-refl _) ( a , b ) = fst (out-fun a) , λ x → (snd (out-fun a) x) , ((snd (out-fun a) x) , R-refl)
-rel₁ (bisimulation-property S R _ _) = funExt λ x → refl
-rel₂ (bisimulation-property S R _ R-eq) = funExt λ x i → out-fun {S = S} (R-eq x i)
-
--------------------------------------------------------------
--- Coinduction principle for M-types (≈ Coinductive types) --
--------------------------------------------------------------
-
--- coinduction proof by: m ≡ π₁(m,m',r) ≡ π₂(m,m',r) ≡ m'
-coinduction : ∀ {ℓ} {S : Container {ℓ}} R -> (sim : bisimulation S M-coalg R) -> ∀ {m m' : M S} -> R m m' -> m ≡ m'
-coinduction {S = S} R sim {m} {m'} r = funExt⁻ (final-property-2 S R sim) (m , (m' , r))
-
-coinduction⁻ : ∀ {ℓ} {S : Container {ℓ}} R -> (sim : bisimulation S M-coalg R) -> (∀ {x} -> R x x) ->  ∀ {m m' : M S} -> m ≡ m' -> R m m'
-coinduction⁻ {S = S} R sim k {m} {m'} r = subst (R m) r k
-  
--- postulate
---   coinduction-iso1 :
---     ∀ {ℓ} {S : Container {ℓ}} R
---     → (sim : bisimulation S M-coalg R)
---     → (R-refl : ∀ {x} -> R x x) →
---     ∀ {m} {m'} (p : m ≡ m')
---     → (coinduction R sim {m} {m'}) (coinduction⁻ R sim R-refl p) ≡ p
-    
--- postulate
---   coinduction-iso2 :
---     ∀ {ℓ} {S : Container {ℓ}} R
---     → (sim : bisimulation S M-coalg R)
---     → (R-refl : ∀ {x} -> R x x) →
---     ∀ {m} {m'} (p : R m m')
---     → (coinduction⁻ R sim R-refl (coinduction R sim {m} {m'} p)) ≡ p
-
--- coinduction-is-equality : ∀ {ℓ} {S : Container {ℓ}} R ->
---   (sim : bisimulation S M-coalg R) ->
---   (R-refl : ∀ {x} -> R x x) ->
---   R ≡ _≡_
--- coinduction-is-equality R sim R-refl =
---   funExt λ m →
---   funExt λ m' →
---     isoToPath (iso
---       (coinduction R sim {m} {m'})
---       (coinduction⁻ R sim R-refl)
---       (coinduction-iso1 R sim R-refl)
---       (coinduction-iso2 R sim R-refl))
-
--- ----------------
--- -- CoFixpoint --
--- ----------------

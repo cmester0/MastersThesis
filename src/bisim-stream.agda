@@ -17,6 +17,8 @@ open import Cubical.Foundations.Equiv
 open import Cubical.Codata.Stream
 open import Cubical.Data.Prod
 
+open import Container
+
 module bisim-stream where
 
 ----------------------------------------
@@ -48,8 +50,30 @@ tl≈ (stream≈-trans s t) = stream≈-trans (tl≈ s) (tl≈ t)
 -- Bisimulation Principle --
 ----------------------------
 
-postulate
-  stream≈-helper : ∀ {A} -> (x : Σ (stream A) (λ a → Σ (stream A) (stream≈ a))) -> (fst (x .snd)) ≡ (fst x)
+stream-lift : ∀ {A : Set} -> (x : stream A) -> x ≡ (lift-direct-M (x .fst) (x .snd))
+stream-lift x = refl
+
+-- stream≈-helper-0 : ∀ {A : Set} (x : Σ (stream A) (λ a → Σ (stream A) (stream≈ a))) -> (x .fst .fst ≡ x .snd .fst .fst)
+-- stream≈-helper-0 (a , b , r) i 0 = lift tt
+-- stream≈-helper-0 (a , b , r) i (suc n) = {!!} , (λ x → {!!})
+
+-- hd≈ r {!!}
+-- stream≈-helper-0 (a , b , r) i 0 = lift tt
+-- stream≈-helper-0 (a , b , r) i (suc n) = (hd≈ r i) , (λ x → stream≈-helper-0 (tl a , tl b , tl≈ r) i n)
+
+-- stream≈-helper-1 : ∀ {A : Set} (x : Σ (stream A) (λ a → Σ (stream A) (stream≈ a))) (i : I) → (n : ℕ) → (π (sequence (stream-S A)) (stream≈-helper-0 x i (suc n)) ≡ stream≈-helper-0 x i n)
+-- stream≈-helper-1 (a , b , r) i 0 j = lift tt
+-- stream≈-helper-1 (a , b , r) i (suc n) j = (hd≈ r i) , (λ x → stream≈-helper-1 ? ? ? ?)
+
+stream≈-helper : ∀ {A} -> (x : Σ (stream A) (λ a → Σ (stream A) (stream≈ a))) -> (fst x) ≡ (fst (x .snd))
+stream≈-helper {A = A} (a , b , r) = (transport (sym (stream-expand A a b)) (hd≈ r , {!!})) -- cong tl refl
+
+-- stream-expand
+
+-- stream≈-helper (a , b , r) i = stream≈-helper-0 (a , b , r) i , stream≈-helper-1 (a , b , r) i
+-- (λ {0 → {!!} ; (suc n) → ?}) , (λ {0 → {!!} ; (suc n) → ?})
+
+-- transport (sym stream-expand-2) λ i → cons (hd≈ r (~ i)) (stream≈-helper (tl a , tl b , tl≈ r) i) -- λ i → cons (hd≈ r (~ i)) (stream≈-helper {!!} {!!})
 
 stream-bisimulation : ∀ {A} -> bisimulation (stream-S A) M-coalg (stream≈)
 stream-bisimulation {A} = bisimulation-property (stream-S A) stream≈ stream≈-refl stream≈-helper

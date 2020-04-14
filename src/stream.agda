@@ -14,6 +14,8 @@ open import Cubical.Foundations.Isomorphism
 open import Cubical.Foundations.Function using ( _∘_ )
 open import Cubical.Foundations.Transport
 
+open import Cubical.Codata.Stream
+
 -- open import Cubical.Codata.Stream
 
 open import M
@@ -104,53 +106,13 @@ stream-pair A B = stream-pair-M A B ∙ λ i → M (Container-product-streams A 
 zip : ∀ {A B : Set} → stream A × stream B → stream (A × B)
 zip {A = A} {B} = transport (stream-pair A B)
 
-------------------------
--- Record stream type --
-------------------------
-
-record Stream {ℓ} (A : Set ℓ) : Set ℓ where
-  coinductive
-  constructor _,_
-  field
-    head : A
-    tail : Stream A
-
-open Stream
-
--- Bisimulation
-record _≈_ {ℓ} {A : Set ℓ} (x y : Stream A) : Set ℓ where
-  coinductive
-  field
-    ≈head : head x ≡ head y
-    ≈tail : tail x ≈ tail y
-
-open _≈_
-
-bisim : ∀ {ℓ} {A : Set ℓ} → {x y : Stream A} → x ≈ y → x ≡ y
-head (bisim x≈y i) = ≈head x≈y i
-tail (bisim x≈y i) = bisim (≈tail x≈y) i
-
-misib : ∀ {ℓ} {A : Set ℓ} → {x y : Stream A} → x ≡ y → x ≈ y
-≈head (misib p) = λ i → head (p i)
-≈tail (misib p) = misib (λ i → tail (p i))
-
-iso1 : ∀ {ℓ} {A : Set ℓ} → {x y : Stream A} → (p : x ≡ y) → bisim (misib p) ≡ p
-head (iso1 p i j) = head (p j)
-tail (iso1 p i j) = iso1 (λ i → tail (p i)) i j
-
-iso2 : ∀ {ℓ} {A : Set ℓ} → {x y : Stream A} → (p : x ≈ y) → misib (bisim p) ≡ p
-≈head (iso2 p i) = ≈head p
-≈tail (iso2 p i) = iso2 (≈tail p) i
-
-path≃bisim : ∀ {A : Set} → {x y : Stream A} → (x ≡ y) ≃ (x ≈ y)
-path≃bisim = isoToEquiv (iso misib bisim iso2 iso1)
-
-path≡bisim : ∀ {A : Set} → {x y : Stream A} → (x ≡ y) ≡ (x ≈ y)
-path≡bisim = ua path≃bisim
-
 ------------------------------
 -- Equality of stream types --
 ------------------------------
+
+open Stream
+open Equality≅Bisimulation
+open _≈_
 
 stream-to-Stream : ∀ {A : Set} → stream A → Stream A
 head (stream-to-Stream x) = (hd x)
@@ -167,8 +129,9 @@ Stream-to-stream-func-π (suc n) a = λ i → head a , λ _ → Stream-to-stream
 Stream-to-stream : ∀ {A : Set} -> Stream A -> stream A
 Stream-to-stream s = lift-to-M Stream-to-stream-func-x Stream-to-stream-func-π s
 
-hd-to-head : ∀ {A : Set} (b : Stream A) → hd (Stream-to-stream b) ≡ head b
-hd-to-head {A = A} b = refl
+postulate
+  hd-to-head : ∀ {A : Set} (b : Stream A) → hd (Stream-to-stream b) ≡ head b
+-- hd-to-head {A = A} b = refl -- (can compute)
 
 head-to-hd : ∀ {A : Set} (b : stream A) → head (stream-to-Stream b) ≡ hd b
 head-to-hd {A = A} b = refl
@@ -240,9 +203,9 @@ tail-to-tl b = refl
 --     open Iso
 
 postulate
-  tl-to-tail : ∀ {A : Set} (b : Stream A) → tl (Stream-to-stream b) ≡ Stream-to-stream (tail b)
+  tl-to-tail : ∀ {A : Set} (b : Stream A) → tl (Stream-to-stream b) ≡ Stream-to-stream (tail b) -- should this be able to compute ??
 
-nth : ∀ {ℓ} {A : Set ℓ} → ℕ → (b : Stream A) → A
+nth : ∀ {A : Set} → ℕ → (b : Stream A) → A
 nth 0 b = head b
 nth (suc n) b = nth n (tail b)
 
@@ -257,11 +220,11 @@ helper b (suc n) =
     ≡⟨ helper (tail b) n ⟩
   nth n (tail b) ∎
 
-bisim-nat' : ∀ {ℓ} {A : Set ℓ} → (a b : Stream A) → ((n : ℕ) → nth n a ≡ nth n b) -> a ≈ b
+bisim-nat' : ∀ {A : Set} → (a b : Stream A) → ((n : ℕ) → nth n a ≡ nth n b) -> a ≈ b
 ≈head (bisim-nat' a b nat-bisim) = nat-bisim 0
 ≈tail (bisim-nat' a b nat-bisim) = bisim-nat' (tail a) (tail b) (nat-bisim ∘ suc)
 
-bisim-nat : ∀ {ℓ} {A : Set ℓ} → (a b : Stream A) → ((n : ℕ) → nth n a ≡ nth n b) -> a ≡ b
+bisim-nat : ∀ {A : Set} → (a b : Stream A) → ((n : ℕ) → nth n a ≡ nth n b) -> a ≡ b
 bisim-nat a b nat-bisim = bisim (bisim-nat' a b nat-bisim)
 
 stream-equality-iso-1 : ∀ {A : Set} → (b : Stream A) → stream-to-Stream (Stream-to-stream b) ≡ b

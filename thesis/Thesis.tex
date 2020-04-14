@@ -68,6 +68,7 @@
 \newcommand*{\empt}{\type{\textbf{0}}}
 \newcommand*{\coalg}[2]{#1\texttt{-}#2}
 
+\newcommand*{\relation}[1]{\textcolor{gray}{\ensuremath{\mathtt{#1}}}}
 \newcommand*{\constant}[1]{\textcolor{orange!60!black}{\ensuremath{\mathtt{#1}}}}
 
 \newcommand*{\function}[1]{\textcolor{blue!60!black}{\ensuremath{\mathtt{#1}}}}
@@ -85,7 +86,7 @@
 \pagestyle{empty} 
 \pagenumbering{roman} 
 \vspace*{\fill}\noindent{\rule{\linewidth}{1mm}\\[4ex]
-  {\Huge\sf M-types and Coinduction in HoTT and Cubical Type Theory}\\[2ex]
+  {\Huge\sf \texttt{M}-types and Coinduction in HoTT and Cubical Type Theory}\\[2ex]
   {\huge\sf Lasse Letager Hansen, 201912345}\\[2ex]
   \noindent\rule{\linewidth}{1mm}\\[4ex]
   \noindent{\Large\sf Master's Thesis, Computer Science\\[1ex] 
@@ -133,7 +134,7 @@
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
 
-\chapter{M-types}
+\chapter{\texttt{M}-types}
 \label{ch:m-types}
 
 \section{Containers / Signatures}
@@ -181,7 +182,7 @@
   \begin{equation}
     \typeformer{Final}_{\container{S}} := \sum_{(\coalg{\type{X}}{\term{\rho}} : \mathtt{Coalg}_{\container{S}})} \prod_{(\coalg{\type{C}}{\term{\term{\gamma}}} : \mathtt{Coalg}_{\container{S}})} \mathtt{isContr}(\coalg{\type{C}}{\term{\gamma}} \Rightarrow \coalg{\type{X}}{\term{\rho}})
   \end{equation}
-  that is \(\prod_{(\coalg{\type{C}}{\term{\gamma}} : \mathtt{Coalg}_{\container{S}})} \mathtt{isContr}(\coalg{\type{C}}{\term{\gamma}} \Rightarrow \coalg{\typeformer{M}_{\container{S}}}{\function{out}})\). We denote this construction of the M-type as \(\typeformer{M}_{\containerpair{\type{A}}{\type{B}}}\) or \(\typeformer{M}_{\container{S}}\) or just \(\typeformer{M}\) when the Container is clear from the context.
+  that is \(\prod_{(\coalg{\type{C}}{\term{\gamma}} : \mathtt{Coalg}_{\container{S}})} \mathtt{isContr}(\coalg{\type{C}}{\term{\gamma}} \Rightarrow \coalg{\typeformer{M}_{\container{S}}}{\function{out}})\). We denote this construction of the \texttt{M}-type as \(\typeformer{M}_{\containerpair{\type{A}}{\type{B}}}\) or \(\typeformer{M}_{\container{S}}\) or just \(\typeformer{M}\) when the Container is clear from the context.
 \end{defn}
 \begin{exmp}
   If we continue our example for streams this will give us the \(\mathtt{M}\)-type, we can see that \(\functor{P}_{\container{S}}(\typeformer{M}) = \type{A} \times \typeformer{M}\), meaning we have the following diagram,
@@ -191,7 +192,7 @@
       \type{A} & \type{A} \times \typeformer{M}_{\containerpair{A}{\lambda\,\_,\unit}} \ar[l,"\pi_1"'] \ar[r,"\pi_2"] & \typeformer{M}_{\containerpair{A}{\lambda\,\_,\unit}} \\
       & \typeformer{M}_{\containerpair{A}{\lambda\,\_,\unit}} \ar[ul,"\function{hd}"] \ar[u,"\function{out}"'] \ar[ur,"\function{tl}"']
     \end{tikzcd}
-    \caption{M-types of streams}
+    \caption{\texttt{M}-types of streams}
   \end{figure}
   where \(\function{out}\) is an isomorphism (because of the finality of the coalgebra), with inverse \(\function{in} : \functor{P}_{\container{S}}(\typeformer{M}) \rightarrow \typeformer{M}\). We now have a semantic for the rules we would expect for streams, if we let \(\function{cons} = \function{in}\) and \(\typeformer{stream}~\type{A} = \typeformer{M}_{\containerpair{\type{A}}{\lambda\,\_,\unit}}\),
   \begin{equation}
@@ -244,17 +245,17 @@
   \end{equation}
   Then we define \(\function{in} = \function{transport}~shift\) and \(\function{out} = \function{transport}~(\function{sym}~shift)\), since \function{in} and \function{out} are part of an equality relation (\(shift\)), they become embeddings.
 \end{thm}
-\section{Closure properties of M-types}
-We want to show that M-types are closed under simple operations, we start by looking at the product.
-\subsection{Product of M-types}
-We start with containers and work up to M-types.
+\section{Closure properties of \texttt{M}-types}
+We want to show that \texttt{M}-types are closed under simple operations, we start by looking at the product.
+\subsection{Product of \texttt{M}-types}
+We start with containers and work up to \texttt{M}-types.
 \begin{defn}
   The product of two containers is defined as
   \begin{equation}
     \containerpair{\type{A}}{\type{B}} \times \containerpair{\type{C}}{\type{D}} \equiv \containerpair{\type{A} \times \type{C}}{\lambda\,(\term{a} , \term{c}), \typeformer{B}~\term{a} \times \typeformer{D}~\term{c}}.
   \end{equation}
 \end{defn}
-\noindent We can lift this rule, through the diagram in \figref{container-products}, used to define M-types.
+\noindent We can lift this rule, through the diagram in \figref{container-products}, used to define \texttt{M}-types.
 \begin{figure}[h]
   \centering
   \begin{tikzcd}[row sep=huge,column sep=huge]
@@ -305,62 +306,40 @@ We start with containers and work up to M-types.
 as expected. Transporting along \eqref{eq:zip-equality} gives us a definition for \function{zip}.
 \end{exmp}
 
-\section{Co-induction Principle for M-types}
+\section{Co-induction Principle for \texttt{M}-types}
 We can now construct a bisimulation
 
 \begin{defn}
-  Forall coalgebras \(\coalg{\type{C}}{\term{\gamma}} : \typeformer{Coalg}_{\container{S}}\), given a relation \(\typeformer{\mathcal{R}} : \type{C} \rightarrow \type{C} \rightarrow \universe{\mathcal{U}}\) and a type \(\type{\overline{\mathcal{R}}} = \sum_{\term{a} : \type{C}} \sum_{\term{b} : \type{C}} \typeformer{\mathcal{R}}~\term{a}~\term{b}\), such that \(\type{\overline{\mathcal{R}}}\) and \(\term{\alpha}_{\type{\overline{\mathcal{R}}}} : \type{\overline{\mathcal{R}}} \rightarrow \functor{P}(\type{\overline{\mathcal{R}}})\) forms a \(\functor{P}\)-coalgebra \(\coalg{\type{\overline{\mathcal{R}}}}{\term{\alpha}_{\type{\overline{\mathcal{R}}}}} : \mathtt{Coalg}_{\container{S}}\), making the diagram in \figref{coalgebra-coinduction-definition} commute (\(\Longrightarrow\) represents \(\functor{P}\)-coalgebra morphisms).  
+  Forall coalgebras \(\coalg{\type{C}}{\term{\gamma}} : \typeformer{Coalg}_{\container{S}}\), given a relation \(\relation{\mathcal{R}} : \type{C} \rightarrow \type{C} \rightarrow \universe{\mathcal{U}}\) and a type \(\type{\overline{\mathcal{R}}} = \sum_{\term{a} : \type{C}} \sum_{\term{b} : \type{C}} \term{a}~\relation{\mathcal{R}}~\term{b}\), such that \(\type{\overline{\mathcal{R}}}\) and \(\term{\alpha}_{\relation{\mathcal{R}}} : \type{\overline{\mathcal{R}}} \rightarrow \functor{P}(\type{\overline{\mathcal{R}}})\) forms a \(\functor{P}\)-coalgebra \(\coalg{\type{\overline{\mathcal{R}}}}{\term{\alpha}_{\relation{\mathcal{R}}}} : \mathtt{Coalg}_{\container{S}}\), making the diagram in \figref{coalgebra-coinduction-definition} commute (\(\Longrightarrow\) represents \(\functor{P}\)-coalgebra morphisms).  
   \begin{figure}[h]
     \centering
     \begin{tikzcd}[row sep=huge,column sep=huge]
-      \coalg{\type{C}}{\term{\gamma}} & \coalg{\type{\overline{\mathcal{R}}}}{\term{\alpha}_{\type{\overline{\mathcal{R}}}}} \ar[l,Rightarrow,"{\pi_1}^{\type{\overline{\mathcal{R}}}}"'] \ar[r,Rightarrow,"{\pi_2}^{\type{\overline{\mathcal{R}}}}"] & \coalg{\type{C}}{\term{\gamma}}
+      \coalg{\type{C}}{\term{\gamma}} & \coalg{\type{\overline{\mathcal{R}}}}{\term{\alpha}_{\relation{\mathcal{R}}}} \ar[l,Rightarrow,"{\pi_1}^{\type{\overline{\mathcal{R}}}}"'] \ar[r,Rightarrow,"{\pi_2}^{\type{\overline{\mathcal{R}}}}"] & \coalg{\type{C}}{\term{\gamma}}
     \end{tikzcd}
     \caption{Bisimulation for a coalgebra}
     \label{fig:coalgebra-coinduction-definition}
   \end{figure}
 \end{defn}
-\begin{defn}
-  \noindent For any bisimulation over a final \(\functor{P}\)-coalgebra \(\coalg{\typeformer{M}}{\term{\mathtt{out}}}:\mathtt{Coalg}_{\container{S}}\) we get the diagram in \figref{final-coalgebra-coinduction},
+\begin{defn}[Co-induction principle]
+  \noindent Given a relation \(\relation{\mathcal{R}}\), that is part of a bisimulation over a final \(\functor{P}\)-coalgebra \(\coalg{\typeformer{M}}{\term{\mathtt{out}}}:\mathtt{Coalg}_{\container{S}}\) we get the diagram in \figref{final-coalgebra-coinduction},
   
   \begin{figure}[h]
     \centering
     \begin{tikzcd}[row sep=huge,column sep=huge]
-      \coalg{\typeformer{M}}{\function{out}} & \coalg{\type{\overline{\mathcal{R}}}}{\term{\alpha}_{\type{\overline{\mathcal{R}}}}} \ar[l,Rightarrow,"{\pi_1}^{\type{\overline{\mathcal{R}}}}"'] \ar[r,Rightarrow,"{\pi_2}^{\type{\overline{\mathcal{R}}}}"] & \coalg{\typeformer{M}}{\function{out}}
+      \coalg{\typeformer{M}}{\function{out}} & \coalg{\type{\overline{\mathcal{R}}}}{\term{\alpha}_{\relation{\mathcal{R}}}} \ar[l,Rightarrow,"{\pi_1}^{\type{\overline{\mathcal{R}}}}"'] \ar[r,Rightarrow,"{\pi_2}^{\type{\overline{\mathcal{R}}}}"] & \coalg{\typeformer{M}}{\function{out}}
     \end{tikzcd}
     \caption{Bisimulation principle for final coalgebra}
     \label{fig:final-coalgebra-coinduction}
   \end{figure}
-  \noindent where \(\pi_1^{\type{\overline{\mathcal{R}}}} = ~! = \pi_2^{\type{\overline{\mathcal{R}}}}\), which means given \(\term{r} : \term{\mathcal{R}}(\term{m},\term{m'})\) we get the equation
+  \noindent where \(\pi_1^{\type{\overline{\mathcal{R}}}} = ~! = \pi_2^{\type{\overline{\mathcal{R}}}}\), which means given \(\term{r} : \term{m}~\relation{\mathcal{R}}~\term{m'}\) we get the equation
   \begin{equation}
     \term{m} = \pi_1^{\type{\overline{\mathcal{R}}}} (\term{m}, \term{m'}, \term{r}) = \pi_2^{\type{\overline{\mathcal{R}}}} (\term{m}, \term{m'}, \term{r}) = \term{m'}.
   \end{equation}
 \end{defn}
-\\ \\
-\todo[inline]{Better introduction to this proof!}
-\begin{thm}[Co-induction principle]
-  Given a bisimulation relation over a final coalgebra, that is if \(\term{R}\) gives a bisimulation, then 
-\begin{equation}
-  \term{R} \equiv \term{\equiv}
-\end{equation}
-meaning we can use the relation \(\term{R}\), to show equivalence between two elements of an \texttt{M}-type.
+\todo[inline]{What makes a relation a bisimulation? Is bisim and equality equal. Try to complete the construction of equality from any bisimulation relation over an \texttt{M}-type}
 
-\begin{proof}
-So we want to construct an isomorphism between \(\term{R}\) and the equivalence relation \(\equiv\), to do this we must construct functions
-\begin{align}
-  \function{fun}_{bisim} &: \term{R} \rightarrow \term{\equiv} \\
-  \function{inv}_{bisim} &: \term{\equiv} \rightarrow \term{R}
-\end{align}
-and relations
-\begin{align}
-  \function{rinv}_{bisim} &: \function{fun}_{bisim} \circ \function{inv}_{bisim} \equiv \term{\mathtt{id}_{\equiv}} \\
-  \function{linv}_{bisim} &: \function{inv}_{bisim} \circ \function{fun}_{bisim} \equiv \term{\mathtt{id}_{R}}
-\end{align}
-\end{proof}
-\todo[inline]{Complete the construction of equality from any bisimulation relation over an M-type}
-\end{thm}
-
-\section{Quotient M-type}
-Since we know that M-types preserves the H-level, we can use set-truncated quotients, to define quotient M-types, for examples we can define weak bisimulation of the delay monad as
+\section{Quotient \texttt{M}-type}
+Since we know that \texttt{M}-types preserves the H-level, we can use set-truncated quotients, to define quotient \texttt{M}-types, for examples we can define weak bisimulation of the delay monad as
 \todo[inline]{Quotients of the delay monad}
 
 \section{TODO}
@@ -369,14 +348,14 @@ Since we know that M-types preserves the H-level, we can use set-truncated quoti
 \item coinduction in Coq is broken
 \item bisim \(\Rightarrow\) eq
 \item copattern matching
-\item cubical agda. Relation between M-types defined by coinduction/copattern matching and contructed from W-types
+\item cubical agda. Relation between \texttt{M}-types defined by coinduction/copattern matching and contructed from W-types
 \item   In agda, coinductive types are defined using Record types, which are Sigma-types. 
 \item   In cubical agda, 3.2.2 the issue of productivity is discussed. This can probably be made precise using guarded types.
 \item streams defined by guarded recursion vs coinduction in guarded cubical agda. 
 \item    p3 of the guarded cubical agda paper describes how semantic productivity improves over syntactic productivity
-\item Reduction of co-inductive types in Coq/agda to (indexed) M-types. Like reduction of strictly positive inductive types to W-types. https://ncatlab.org/nlab/show/W-type
+\item Reduction of co-inductive types in Coq/agda to (indexed) \texttt{M}-types. Like reduction of strictly positive inductive types to W-types. https://ncatlab.org/nlab/show/W-type
 \item QIITs have been formalized in agda using private types. Can this also be done in cubical agda (ie without cheating).
-\item   Show that this is the final (quotiented) coalgebra. Does this generalize to QM-types, and what are those constructively ??
+\item   Show that this is the final (quotiented) coalgebra. Does this generalize to Q\texttt{M}-types, and what are those constructively ??
 \end{itemize}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
@@ -429,12 +408,90 @@ so we want
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
 
-\chapter{Examples of M-types}
+\chapter{Examples of \texttt{M}-types}
 \section{TODO: Place these subsections}
+\subsection{Identity Bisimulation}
+Lets start with a simple example of a bisimulation namely the one given by the identity relation for any \texttt{M}-type.
+\begin{lem}
+  The identity relation \((\cdot \equiv \cdot)\) is a bisimulation for any final coalgebra \(\coalg{\typeformer{M}_{\container{S}}}{\function{out}}\) defined over an \texttt{M}-type.
+  
+  \begin{proof}
+  We first define the function
+  \begin{equation}
+    \begin{aligned}
+      \function{\alpha}_{\equiv} &: \type{\overline{\equiv}} \rightarrow \functor{P}(\type{\overline{\equiv}}) \\
+      \function{\alpha}_{\equiv} (x , y) &:= \pi_1~(\function{out}~x)~,~(\lambda\,b, (\pi_2~(\function{out}~x)~b \,,\, \texttt{refl}_{(\pi_2\,(\function{out}\,x)\,b)}))
+    \end{aligned}
+  \end{equation}
+  and the two projections
+  \begin{align}
+    \pi_1^{\type{\overline{\equiv}}} &= \texttt{funExt}~\lambda\,(a,b,r), \texttt{refl}_{\function{out}\,a} \\
+    \pi_2^{\type{\overline{\equiv}}} &= \texttt{funExt}~\lambda\,(a,b,r), \texttt{cong}_{\function{out}}~(\texttt{sym}~r).
+  \end{align}
+  This defines the bisimulation, given by the diagram in \figref{id-bisim}.
+  \begin{figure}[h]
+    \centering
+    \begin{tikzcd}
+      \coalg{\typeformer{M}}{\function{out}} & \coalg{\type{\overline{\equiv}}}{\term{\alpha}_{\equiv}} \ar[l,Rightarrow,"{\pi_1}^{\type{\overline{\equiv}}}"'] \ar[r,Rightarrow,"{\pi_2}^{\type{\overline{\equiv}}}"] & \coalg{\typeformer{M}}{\function{out}}
+    \end{tikzcd}
+    \caption{Identity bisimulation}
+    \label{fig:id-bisim}
+  \end{figure}
+\end{proof}
+\end{lem}
 \subsection{Bisimulation of Streams}
 \todo[inline]{TODO}
 \subsection{Bisimulation of Delay monad}
-\todo[inline]{TODO}
+We want to define a bisimulation relation \(\relation{\approx_{delay}}\) for the delay monad, 
+\begin{defn}
+  The relation \(\relation{\approx_{delay}}\) is defined by the following rules
+  \begin{equation}
+    \infer[\mathtt{EqNow}]{\function{now}~\term{r}~\relation{\approx_{delay}}~\function{now}~\term{r} : \universe{\mathcal{U}}}{\type{R} : \universe{U} & \term{r} : \type{R}}
+  \end{equation}
+  \begin{equation}
+    \infer[\mathtt{EqLater}]{\function{later}~t~\relation{\approx_{delay}}~\function{later}~u : \universe{\mathcal{U}}}{\type{R} : \universe{\mathcal{U}} & \term{t} : \typeformer{delay}~\type{R} & \term{u} : \typeformer{delay}~\type{R} & \term{t}~\relation{\approx^{\infty}_{delay}}~\term{u} : \universe{\mathcal{U}}}
+  \end{equation}
+  where \(\relation{\approx^{\infty}_{delay}}\) is defined as
+  \begin{equation}
+    \infer[\mathtt{force}]{x~\relation{\approx^{\infty}_{delay}}~y}{x~\relation{\approx_{delay}}~y}
+  \end{equation}
+\end{defn}
+\begin{lem}
+  The relation \(\relation{\approx_{delay}}\) is reflexive, meaning \(\forall\,(x : \typeformer{delay}~\type{R}), x~\relation{\approx_{delay}}~x\).
+  \begin{proof}
+    We do case analysis on \(x\). We start by \(x = \function{now}~r\) meaning we have to show
+    \begin{equation}
+      \function{now}~r~\relation{\approx_{delay}}~\function{now}~r
+    \end{equation}
+    which is true, by \texttt{EqNow}. For \(x = \function{later}~t\), we get
+    \begin{equation}
+      \function{later}~t~\relation{\approx_{delay}}~\function{later}~t
+    \end{equation}
+    which by \texttt{EqLater}, becomes \(t~\relation{\approx^\infty_{delay}}~t\). Meaning we must show \(\relation{\approx^\infty_{delay}}\) is reflexive, but this follows directly by \texttt{force} the induction hypothesis that \(\relation{\approx_{delay}}\) is reflexive.
+  \end{proof}
+\end{lem}
+\begin{thm}
+  The relation \(\approx_{delay}\) is a bisimulation for \(\typeformer{delay}~\type{R}\).
+  \begin{proof}
+    First we define the function
+    \begin{equation}
+      \begin{aligned}
+        \function{\alpha}_{\relation{\approx_{delay}}} &: \type{\overline{\approx_{delay}}} \rightarrow \functor{P} (\type{\overline{\approx_{delay}}}) \\
+        \function{\alpha}_{\relation{\approx_{delay}}} (x , y) &:= \pi_1~(\function{out}~x)~,~(\lambda\,b, (\pi_2~(\function{out}~x)~b \,,\, \texttt{refl}_{(\pi_2\,(\function{out}\,x)\,b)}))
+      \end{aligned}
+    \end{equation}
+    then we define the projections
+      \begin{align}
+        \pi_1^{\type{\overline{\equiv}}} &= \texttt{funExt}~\lambda\,(a,b,r), \texttt{refl}_{\function{out}\,a} \\
+        \pi_2^{\type{\overline{\equiv}}} &= \texttt{funExt}~\lambda\,(a,b,r), \texttt{cong}_{\function{out}}~(R_{eq}~r),
+      \end{align}
+      where
+      \begin{equation}
+        R_{eq}~(a , b , r) = \begin{cases} \mathtt{refl} & r = \mathtt{EqNow} \\ \mathtt{refl} & r = \mathtt{EqLater}~r' \end{cases}
+      \end{equation}
+  \end{proof}
+\end{thm}
+
 \subsection{Bisimulation of ITrees}
 We define our bisimulation coalgebra from the strong bisimulation relation \(\mathcal{R}\), defined by the following rules.
 \begin{equation}
@@ -446,7 +503,7 @@ We define our bisimulation coalgebra from the strong bisimulation relation \(\ma
 \begin{equation}
   \infer[\mathtt{EqVis}]{\mathtt{Vis}~\term{e}~\term{k_1} \cong \mathtt{Tau}~\term{e}~\term{k_2}}{\type{A} : \universe{\mathcal{U}} & \term{e} : \typeformer{E}~\type{A} & \term{k_1},\term{k_2} : \type{A} \rightarrow \mathtt{itree}~\typeformer{E}~\type{R} & \term{t} \cong \term{u}}
 \end{equation}
-Now we just need to define \(\term{\alpha}_{\type{\overline{\mathcal{R}}}}\) \todo{define the \(\alpha_{\overline{R}}\) function}. Now we have a bisimulation relation, which is equivalent to equality, using what we showed in the previous section.
+Now we just need to define \(\term{\alpha}_{\relation{\mathcal{R}}}\) \todo{define the \(\alpha_{\relation{R}}\) function}. Now we have a bisimulation relation, which is equivalent to equality, using what we showed in the previous section.
 
 \subsection{Zip Function}
 We want the diagram in \figref{zip-computation-rules} to commute,
@@ -467,7 +524,7 @@ meaning we get the computation rules
 \begin{equation}
   \function{zip} \circ (\function{tl} \times \function{tl}) \equiv \function{tl} \circ \function{zip}
 \end{equation}
-we can define the zip function as we did in the end of the last section. Another way to define the zip function is more directly, using the following lifting property of M-types
+we can define the zip function as we did in the end of the last section. Another way to define the zip function is more directly, using the following lifting property of \texttt{M}-types
 \begin{equation}
   \begin{aligned}
     &\function{lift_M}~\left(x : \prod_{n : \mathbb{N}} (\type{A} \rightarrow {\functor{P}_{\container{S}}}^n~\unit)\right)~\left(u : \prod_{n : \mathbb{N}} (\type{A} \rightarrow \pi_n (x_{n+1} a) \equiv x_n a)\right) (a : \type{A}) : \function{M}~\container{S} := \\
@@ -535,7 +592,7 @@ We want to show that we get the expected properties, such as
 \end{align}
 
 \subsubsection{Spin}
-We want to define spin, as being the fixed point \(\mathtt{spin} = \mathtt{later}~\mathtt{spin}\), so that is again a final coalgebra, but of a M-type (which is a final coalgebra)
+We want to define spin, as being the fixed point \(\mathtt{spin} = \mathtt{later}~\mathtt{spin}\), so that is again a final coalgebra, but of a \texttt{M}-type (which is a final coalgebra)
 
 \begin{figure}[h]
   \centering
@@ -547,7 +604,7 @@ We want to define spin, as being the fixed point \(\mathtt{spin} = \mathtt{later
 \end{figure}
 \noindent Since it is final, it also must be unique, meaning that there is just one program that spins forever, without returning a value, meaning every other program must return a value. If we just
 
-\section{Stream Formalization using M-types}
+\section{Stream Formalization using \texttt{M}-types}
 As described earlier, given a type \(\type{A}\) we define the stream of that type as
 \begin{equation}
   \typeformer{stream}~\type{A} := \typeformer{M}_{\containerpair{\type{A}}{\lambda\,\_,\unit}}
@@ -573,7 +630,7 @@ and the other direction is also true
                                                      &\equiv \function{in}~(\function{out}~s) \\
                                                      &\equiv s.
 \end{align}
-When forming elements of the M-type, we want to do it by lifting it though the definition of the M-type, meaning we want to define a function \(\function{cons'} : (\type{\mathbb{N}} \rightarrow \type{A}) \rightarrow \typeformer{stream}~\type{A}\) as
+When forming elements of the \texttt{M}-type, we want to do it by lifting it though the definition of the \texttt{M}-type, meaning we want to define a function \(\function{cons'} : (\type{\mathbb{N}} \rightarrow \type{A}) \rightarrow \typeformer{stream}~\type{A}\) as
 \begin{equation}
   \function{cons'} f = \function{lift_M}~(\lambda\,c\,n, f~c)
 \end{equation}

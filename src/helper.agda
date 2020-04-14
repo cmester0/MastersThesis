@@ -20,6 +20,8 @@ open import Cubical.Foundations.Path
 open import Cubical.Foundations.Embedding
 open import Cubical.Foundations.FunExtEquiv
 
+open import Cubical.Foundations.HLevels
+
 module helper where
 
 refl-fun : ∀ {ℓ} {A : Set ℓ} (x : A) → x ≡ x
@@ -202,7 +204,13 @@ transport-iso isom = funExt (transportRefl ∘ fun isom)
   → (isom : Iso A B)
   -------------------------------
   → isEmbedding (fun isom)
-≡-to-embedding {A = A} {B} {C} isom = (isEquiv→isEmbedding (equivIsEquiv (isoToEquiv isom)))
+≡-to-embedding {A = A} {B} {C} isom = temp (isEquiv→hasPropFibers (isoToIsEquiv isom))
+  where    
+    abstract
+      temp : hasPropFibers (fun isom) → isEmbedding (fun isom)
+      temp = hasPropFibers→isEmbedding
+      -- = hasPropFibers→isEmbedding
+      -- isEquiv→isEmbedding
 
 funExtIso : ∀ {ℓ ℓ₁} {A : Type ℓ} {B : A → Type ℓ₁} {f g : (x : A) → B x} → Iso (∀ x → f x ≡ g x) (f ≡ g)
 funExtIso = iso funExt funExt⁻ refl-fun refl-fun
@@ -217,13 +225,12 @@ funExtIso = iso funExt funExt⁻ refl-fun refl-fun
 ≡-rel-a-inj-Iso-helper-3 {A = A} {B} {C} isom {f = f} {g} =
     ≡-rel-a-inj' {A = A} {B} {C} (fun isom) (≡-to-embedding {A = A} {B} {C} isom) {f = f} {g = g}
 
-abstract
-  pathCongFunExt :
-    ∀ {ℓ} {A : Set ℓ} (a b : (x : A) → Set ℓ)
-    → (∀ x → (a x) ≡ (b x))
-    → Iso (∀ x → a x) (∀ x → b x) 
-  pathCongFunExt a b p =
-    pathToIso (cong (λ k → ∀ x → k x) (funExt p))
+pathCongFunExt :
+  ∀ {ℓ} {A : Set ℓ} (a b : (x : A) → Set ℓ)
+  → (∀ x → (a x) ≡ (b x))
+  → Iso (∀ x → a x) (∀ x → b x) 
+pathCongFunExt a b p =
+  pathToIso (cong (λ k → ∀ x → k x) (funExt p))
 
 ≡-rel-a-inj-Iso-helper :
   ∀ {ℓ} {A B C : Set ℓ} (isom : Iso A B)
