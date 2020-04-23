@@ -86,7 +86,7 @@
 \pagestyle{empty} 
 \pagenumbering{roman} 
 \vspace*{\fill}\noindent{\rule{\linewidth}{1mm}\\[4ex]
-  {\Huge\sf \texttt{M}-types and Coinduction in HoTT and Cubical Type Theory}\\[2ex]
+  {\Huge\sf \texttt{M}-types and Co-induction in HoTT and Cubical Type Theory}\\[2ex]
   {\huge\sf Lasse Letager Hansen, 201912345}\\[2ex]
   \noindent\rule{\linewidth}{1mm}\\[4ex]
   \noindent{\Large\sf Master's Thesis, Computer Science\\[1ex] 
@@ -169,7 +169,7 @@
   \begin{equation}
     \typeformer{Coalg}_{\container{S}} = \sum_{\type{C} : \universe{\mathcal{U}}} \type{C} \rightarrow \functor{P}\type{C}.
   \end{equation}
-  We denote a coalgera of \(\type{C}\) and \(\term{\gamma}\) as \(\coalg{\type{C}}{\term{\gamma}}\). The coalgebra morphisms are defined as
+  We denote a coalgebra of \(\type{C}\) and \(\term{\gamma}\) as \(\coalg{\type{C}}{\term{\gamma}}\). The coalgebra morphisms are defined as
   \begin{equation}
     \begin{aligned}
       \cdot~\function{\Rightarrow}~\cdot &: \typeformer{Coalg}_{\container{S}} \rightarrow \typeformer{Coalg}_{\container{S}} \\
@@ -314,9 +314,10 @@ as expected. Transporting along \eqref{eq:zip-equality} gives us a definition fo
 
 \section{Co-induction Principle for \texttt{M}-types}
 We can now construct a co-induction principle given a bisimulation relation
+% Let (S;  S) and (T;  T) be F-systems. A subsetRSTof the Cartesianproduct ofSandTis called anF-bisimulationbetweenSandTif there exists anF-transition structureR:R!F(R) such that the projections fromRtoSandTareF-homomorphisms
 
 \begin{defn}
-  Forall coalgebras \(\coalg{\type{C}}{\term{\gamma}} : \typeformer{Coalg}_{\container{S}}\), given a relation \(\relation{\mathcal{R}} : \type{C} \rightarrow \type{C} \rightarrow \universe{\mathcal{U}}\) and a type \(\type{\overline{\mathcal{R}}} = \sum_{\term{a} : \type{C}} \sum_{\term{b} : \type{C}} \term{a}~\relation{\mathcal{R}}~\term{b}\), such that \(\type{\overline{\mathcal{R}}}\) and \(\term{\alpha}_{\relation{\mathcal{R}}} : \type{\overline{\mathcal{R}}} \rightarrow \functor{P}(\type{\overline{\mathcal{R}}})\) forms a \(\functor{P}\)-coalgebra \(\coalg{\type{\overline{\mathcal{R}}}}{\term{\alpha}_{\relation{\mathcal{R}}}} : \mathtt{Coalg}_{\container{S}}\), making the diagram in \figref{coalgebra-coinduction-definition} commute (\(\Longrightarrow\) represents \(\functor{P}\)-coalgebra morphisms).  
+  For all coalgebras \(\coalg{\type{C}}{\term{\gamma}} : \typeformer{Coalg}_{\container{S}}\), given a relation \(\relation{\mathcal{R}} : \type{C} \rightarrow \type{C} \rightarrow \universe{\mathcal{U}}\) and a type \(\type{\overline{\mathcal{R}}} = \sum_{\term{a} : \type{C}} \sum_{\term{b} : \type{C}} \term{a}~\relation{\mathcal{R}}~\term{b}\), such that \(\type{\overline{\mathcal{R}}}\) and \(\term{\alpha}_{\relation{\mathcal{R}}} : \type{\overline{\mathcal{R}}} \rightarrow \functor{P}(\type{\overline{\mathcal{R}}})\) forms a \(\functor{P}\)-coalgebra \(\coalg{\type{\overline{\mathcal{R}}}}{\term{\alpha}_{\relation{\mathcal{R}}}} : \mathtt{Coalg}_{\container{S}}\), making the diagram in \figref{coalgebra-co-induction-definition} commute (\(\Longrightarrow\) represents \(\functor{P}\)-coalgebra morphisms).  
   \begin{figure}[h]
     \centering
     \begin{tikzcd}[row sep=huge,column sep=huge]
@@ -327,7 +328,7 @@ We can now construct a co-induction principle given a bisimulation relation
   \end{figure}
 \end{defn}
 \begin{defn}[Co-induction principle]
-  \noindent Given a relation \(\relation{\mathcal{R}}\), that is part of a bisimulation over a final \(\functor{P}\)-coalgebra \(\coalg{\typeformer{M}}{\term{\mathtt{out}}}:\mathtt{Coalg}_{\container{S}}\) we get the diagram in \figref{final-coalgebra-coinduction},
+  \noindent Given a relation \(\relation{\mathcal{R}}\), that is part of a bisimulation over a final \(\functor{P}\)-coalgebra \(\coalg{\typeformer{M}}{\term{\mathtt{out}}}:\mathtt{Coalg}_{\container{S}}\) we get the diagram in \figref{final-coalgebra-co-induction},
   
   \begin{figure}[h]
     \centering
@@ -344,24 +345,85 @@ We can now construct a co-induction principle given a bisimulation relation
 \end{defn}
 
 \section{Quotient \texttt{M}-type}
-Since we know that \texttt{M}-types preserves the H-level, we can use set-truncated quotients, to define quotient \texttt{M}-types, for examples we can define weak bisimulation of the delay monad as
+We want to construct a quotient \texttt{M}-type, and we know that \texttt{M}-types are an algebraic theory? Meaning we want to define quotient algebra...
+
+We want to construct a quotiented M type, which is given as a final bisimulation and a final coalgebra, and relations between them. This is a special case for a cofree coalgebra, namely starting at \(X = \unit\).
+
+\\ \\
+Since we know that \texttt{M}-types preserves the H-level, we can use set-truncated quotients, to define quotient \texttt{M}-types, for examples we can define weak bisimulation of the delay monad asq
 \todo[inline]{Quotients of the delay monad}
 
 \subsection{Quotient inductive-inductive types (QIITs)}
+\todo[inline]{What is a QIIT concretely?}
+
+\subsection{QM-types}
+A QM-type is a quotiented M-type, we try to define this as a quotient on containers. We define container quotients as
+\begin{equation}
+  
+\end{equation}
+
+\\ \\
+We want to define QM-types as the final coalgebra satisfying a set of equations. The construction takes inspiration from \cite{Infinitary-QIITs}
+\subsubsection{Cofree Coalgebra}
+We want to define a cofree coalgebra over a container \(\containerpair{A}{\lambda\,\_, \empt}\).
+\\ \\
+This is defined as the left adjoint to the forgetful functor \(\function{U} : \coalg{\type{C}}{\term{\gamma}} \rightarrow \type{C}\) as \(\function{F} : \type{C} \rightarrow \coalg{\type{C}}{\term{\gamma}}\).
+
+\begin{figure}[h]
+  \centering
+  \begin{tikzcd}[row sep=huge,column sep=huge]
+    \functor{P} \type{A} \ar[d] \ar[d,"\epsilon"] \\
+    \type{A} & \type{M} \ar[l,"\alpha"] \ar[ul,"\alpha^\sharp"']
+  \end{tikzcd}
+  \caption{Cofree Coalgebra}
+  \label{fig:cofree-coalgebra}
+\end{figure}
+
+A coalgebra PA is cofree on A iff for all coalgebras M and mappings \(\alpha : UM \rightarrow C\) there is a unique morphism \(\alpha^\sharp : M \rightarrow TC\) such that the diagram \figref{cofree-coalgebra} commutes
+
+\subsubsection{Equation system}
+We start by defining a equation system called a covariety \cite{Hughes}\cite{Covariety} of a coalgebra (dual of variety of an algebra).
+\\ \\
+Complete covarities are closed under bisimulation.
+
+\section{Strongly Extensional (Coalgebra)}
+
+
+% https://en.wikipedia.org/wiki/Variety_(universal_algebra)
+% Hughes
+% Alexander Kurz
+
+\begin{defn}
+  A equation system is given by
+  \begin{equation}
+    EqSys : \sum_{(E : \universe{\mathcal{U}})} \sum_{(V : \type{E} \rightarrow \universe{\mathcal{U}})} ((e : E) \rightarrow T (V e)) \times ((e : E) \rightarrow T (V e))
+  \end{equation}
+  where \(\type{E}\) representing the equations, and variables for the given equations, given by the type \(\typeformer{V}\), and \(T\) is the free coalgebra.
+\end{defn}
+
+\subsection{in progress}
+Let \(\functor{G}\) be functors and \(v : \functor{P} \rightarrow \functor{G}\) a natural transformation. Suppose that for any type \(\type{V}\), the functor \((\lambda\,\_ \rightarrow \type{V}) \times\functor{F}\) has a final coalgebra. Then there exists for any G-coalgebra \(\coalg{\type{C}}{\function{\gamma}}\) an \(P\)-coalgebra \(\coalg{S_C}{\alpha}\) and a \(\functor{G}\)-homomorphism \(\varepsilon:\coalg{S_C}{v_{S_C} \circ \alpha} \Rightarrow \coalg{C}{\gamma}\), satisfying the universal property: for any \(P\)-coalg \(\coalg{U}{\alpha_U}\) and any G-homomorphism \(f : \coalg{U}{v_U \circ \alpha_U} \Rightarrow \coalg{C}{\gamma}\) there exists a unique \(P\)-homomorphism \(\tilde{f} : \coalg{U}{\alpha_u} \Rightarrow \coalg{S_C}{\alpha}\) such that \(\varepsilon \circ \tilde{f} = f\). The \(P\)-coalg \(\coalg{S_c}{\alpha}\) (and \(\varepsilon\)) is called cofree on the G-coalgebra \(\coalg{C}{\gamma}\). \cite[theorem 17.1]{UniversalCoalgebra}.
+\\ \\
+The coalgebra generated by the polynomial functor over the container \(\containerpair{A}{B}\) is a cofree coalgebra. We can now define a quotient, by defining a equation system at the same time, as we define the \texttt{M}-type type. The equation systems is defined on a type \(E : \mathcal{U}\) with variables of type \(V : E \rightarrow \mathcal{U}\), each equation is given by functions \(l,r : C \rightarrow A\) for some type \(C\). A coalgebra satisfies the equation system iff \((t : B (l c) \rightarrow MQ) \rightarrow (s : B (r c) \rightarrow MQ) \rightarrow l c \equiv r c\) is inhabited.
+\begin{equation}
+  
+\end{equation}
+
+
 
 \section{TODO}
 \begin{itemize}
 \item Resumption Monad transformer
-\item coinduction in Coq is broken
+\item co-induction in Coq is broken
 \item bisim \(\Rightarrow\) eq
 \item copattern matching
-\item cubical agda. Relation between \texttt{M}-types defined by coinduction/copattern matching and contructed from W-types
-\item   In agda, coinductive types are defined using Record types, which are Sigma-types. 
-\item   In cubical agda, 3.2.2 the issue of productivity is discussed. This can probably be made precise using guarded types.
-\item streams defined by guarded recursion vs coinduction in guarded cubical agda. 
-\item    p3 of the guarded cubical agda paper describes how semantic productivity improves over syntactic productivity
-\item Reduction of co-inductive types in Coq/agda to (indexed) \texttt{M}-types. Like reduction of strictly positive inductive types to W-types. https://ncatlab.org/nlab/show/W-type
-\item QIITs have been formalized in agda using private types. Can this also be done in cubical agda (ie without cheating).
+\item cubical Agda. Relation between \texttt{M}-types defined by co-induction/copattern matching and constructed from W-types
+\item   In Agda, co-inductive types are defined using Record types, which are Sigma-types. 
+\item   In cubical Agda, 3.2.2 the issue of productivity is discussed. This can probably be made precise using guarded types.
+\item streams defined by guarded recursion vs co-induction in guarded cubical Agda. 
+\item    p3 of the guarded cubical Agda paper describes how semantic productivity improves over syntactic productivity
+\item Reduction of co-inductive types in Coq/Agda to (indexed) \texttt{M}-types. Like reduction of strictly positive inductive types to W-types. https://ncatlab.org/nlab/show/W-type
+\item QIITs have been formalized in Agda using private types. Can this also be done in cubical Agda (ie without cheating).
 \item   Show that this is the final (quotiented) coalgebra. Does this generalize to Q\texttt{M}-types, and what are those constructively ??
 \end{itemize}
 
@@ -549,7 +611,7 @@ zero case \(X\)
 \begin{equation}
   \function{zip}_X~0~(x,y) \equiv \unit
 \end{equation}
-Sucessor case \(X\)
+Successor case \(X\)
 \begin{align} 
   \function{zip}_X~(m+1)~(x,y) &\equiv (\function{hd}~x, \function{hd}~y),(\lambda\,\_,\function{zip}_X~m~(\function{tl}~x,\function{tl}~y)) \\
                                &\equiv (\function{hd}~x, \function{hd}~y),(\lambda\,\_, {?}~(\function{tl}~a)) \\

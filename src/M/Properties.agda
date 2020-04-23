@@ -15,10 +15,12 @@ open import Cubical.Foundations.Transport
 open import Cubical.Foundations.Univalence
 open import Cubical.Foundations.Isomorphism
 open import Cubical.Foundations.Function
-open import Cubical.Foundations.FunExtEquiv
-open import Cubical.Foundations.Embedding
+
 open import Cubical.Core.Glue
 open import Cubical.Foundations.Equiv
+
+open import Cubical.Functions.FunExtEquiv
+open import Cubical.Functions.Embedding
 
 open import helper
 
@@ -49,15 +51,15 @@ in-out-id {S = S} {x = x} {y} i = (in-inverse-out i x) ≡ (in-inverse-out i y)
 
 -- Embeddings
 
-in-embedding :
-  ∀ {ℓ} {S : Container {ℓ}} → 
-  isEmbedding (in-fun {S = S})
-in-embedding {S = S} = ≡-to-embedding {A = P₀ (M S)} {C = M S} shift-iso 
+-- in-embedding :
+--   ∀ {ℓ} {S : Container {ℓ}} → 
+--   isEmbedding (in-fun {S = S})
+-- in-embedding {S = S} = ≡-to-embedding {A = P₀ (M S)} {C = M S} shift-iso 
 
-out-embedding :
-  ∀ {ℓ} {S : Container {ℓ}} →
-  isEmbedding (out-fun {S = S})
-out-embedding {S = S} = ≡-to-embedding {A = M S} {C = P₀ {S = S} (M S)} (sym-iso shift-iso)
+-- out-embedding :
+--   ∀ {ℓ} {S : Container {ℓ}} →
+--   isEmbedding (out-fun {S = S})
+-- out-embedding {S = S} = ≡-to-embedding {A = M S} {C = P₀ {S = S} (M S)} (sym-iso shift-iso)
  
 -- constructor properties
 

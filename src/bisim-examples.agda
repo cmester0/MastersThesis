@@ -6,7 +6,7 @@ open import Coalg
 
 open import Cubical.Data.Unit
 open import Cubical.Data.Nat
-open import Cubical.Data.Sigma
+open import Cubical.Data.Sigma hiding (_×_)
 open import Cubical.Data.Sum
 open import Cubical.Data.Empty
 open import Cubical.Data.Bool
@@ -20,12 +20,16 @@ open import Cubical.Foundations.Univalence
 open import Cubical.Foundations.Isomorphism
 open import Cubical.Foundations.Equiv
 open import Cubical.Foundations.Univalence
-open import Cubical.Foundations.FunExtEquiv
+open import Cubical.Functions.FunExtEquiv
+
+open import Cubical.Relation.Binary
 
 open import Cubical.HITs.SetQuotients
 
 open import Container
 open import helper
+
+open import Cubical.Data.Nat.Order
 
 module bisim-examples where
 
@@ -87,11 +91,71 @@ weak-delay-coinduction {R} p = delay-coinduction (sim p)
 delay-set-quotiented : ∀ R → Set
 delay-set-quotiented R = (delay R) / (_≈_ {R}) -- equality by eq/
 
+-- delay-set-quotiented-bisim' : ∀ R → ∀ (x y : delay R) → (([ x ] ≡ [ y ]) ≡ (x ≈ y))
+-- delay-set-quotiented-bisim' R x y = isoToPath (iso {!!} (λ x₁ → cong ([_] {R = _≈_}) (weak-delay-coinduction x₁)) {!!} {!!})
+
+weak-delay-prop : ∀ {R} → BinaryRelation.isPropValued (_≈_ {R = R}) -- {R = _≈_}
+weak-delay-prop x y = {!!}
+
+weak-delay-isEquivRel : ∀ {R} → BinaryRelation.isEquivRel (_≈_ {R = R}) -- {R = _≈_}
+weak-delay-isEquivRel = {!!}
+
+delay-set-quotiented-bisim : ∀ R → ∀ (x y : delay R) → (([ x ] ≡ [ y ]) ≡ (x ≈ y))
+delay-set-quotiented-bisim R x y = ua (isEquivRel→isEffective {R = _≈_} weak-delay-prop weak-delay-isEquivRel x y)
+
+-- (isEquivRel→isEffective ? ? x y)
+
+--------------
+-- Sequence --
+--------------
+
+ismon : ∀ {A : Set} → (g : ℕ → A ⊎ Unit) → Set
+ismon g = (n : ℕ)
+  → (g n ≡ g (suc n))
+  ⊎ ((g n ≡ inr tt) × ((g (suc n) ≡ inr tt) → ⊥))
+
+Seq : ∀ {A : Set} → Set
+Seq {A} = (Σ (ℕ → A ⊎ Unit) ismon)
+
+asda : ∀ (A : Set) (g : ℕ → A ⊎ Unit) (a : ismon g) → ismon {A = A} (λ {0 → inr tt ; (suc n) → g n})
+asda A g a 0 = inr {!!}
+asda A g a (suc n) = inl {!!}
+
+shift : ∀ {A} → Seq {A} → Seq {A}
+shift (g , a) =
+  (λ {0 → inr tt ; (suc n) → g n}) ,
+  {!!}
+
+-- case g 0 return (λ x → {!!}) of λ x → {!!}
+
+unshift : ∀ {A} → Seq {A} → Seq {A}
+unshift (g , a) = g ∘ suc , a ∘ suc
+
+j : ∀ {A} → delay A → Seq {A}
+j {A} m = case out-fun m return (λ x → Seq {A}) of
+  λ {(inr a , b) → (λ x → inl a) , (λ n → inl refl)
+    ;(inl tt , t) → shift (j (t tt))}
+
+
+-- h : ∀ {A} → Seq {A} → delay A
+-- h (g , a) with g 0
+-- ... | (inl r) = delay-ret r
+-- ... | (inr _) = delay-tau (h (unshift (g , a)))
+
+-- ksd : ∀ {A} b → h {A} (j b) ≡ b
+-- ksd b =
+--   transport (λ i → h (j (in-inverse-out i b)) ≡ in-inverse-out i b)
+--   (case out-fun b return (λ x → h (j (in-fun x)) ≡ in-fun x) of λ {(inr a , c) →
+--     h (j (in-fun (inr a , c))) ≡⟨ {!!} ⟩ delay-ret a ≡⟨ {!!} ⟩ in-fun (inr a , c) ∎})
+
+-- delay-is-seq : ∀ {R} → delay R ≡ Seq {R}
+-- delay-is-seq = isoToPath (iso j h (λ b → {!!}) {!!})
+
 ----------------------
 -- Partiality monad --
 ----------------------
 
-record partiality-monad {A : Set} : Set₁ where
+record partiality-monad (A : Set) : Set₁ where
   field
     A⊥ : Set
     _⊑_ : A⊥ → A⊥ → Set
@@ -108,3 +172,33 @@ record partiality-monad {A : Set} : Set₁ where
     ⊑-prop : isProp ({x y : A⊥} → x ⊑ y)
     ⊑-0 : {(s , p) : Σ (ℕ → A⊥) λ s → (n : ℕ) → s n ⊑ s (suc n)} → (n : ℕ) → s n ⊑ ⊔ (s , p)
     ⊑-1 : {(s , p) : (Σ (ℕ → A⊥) λ s → (n : ℕ) → s n ⊑ s (suc n))} → (x : A⊥) → (n : ℕ) → s n ⊑ x → ⊔ (s , p) ⊑ x
+
+    -- quotient : ∀ x y → x ⊑ y 
+
+open partiality-monad
+
+remove-tau : {!!}
+
+partiality-monad-delay : ∀ {R} → partiality-monad R
+A⊥ (partiality-monad-delay {R}) = {!!}
+_⊑_ (partiality-monad-delay {R}) x y = {!!}
+
+η (partiality-monad-delay {R}) x = 1 , ((inr x , λ ()) , λ x₁ → inr x , λ ())
+⊥ₐ (partiality-monad-delay) = 0 , lift tt , λ x₁ → lift tt -- never
+-- ⊔ (partiality-monad-delay) (f , m) = (λ n → f n .fst n) , (λ n → f (suc n) .snd n ∙ cong (λ a → a .fst n) (sym (weak-delay-coinduction (m n))))
+-- α (partiality-monad-delay) x y z w = weak-delay-coinduction z
+
+⊑-refl (partiality-monad-delay) = {!!}
+⊑-trans (partiality-monad-delay) x y = {!!}
+⊑-⊥ (partiality-monad-delay) = {!!} , {!!}
+
+never-x : ∀ {R} n → X (sequence (delay-S R)) n
+never-x 0 = lift tt
+never-x (suc n) = inl tt , λ _ → never-x n
+
+never-π : ∀ {R} n → π (sequence (delay-S R)) (never-x (suc n)) ≡ never-x n
+never-π 0 = refl {x = lift tt}
+never-π (suc n) i = inl tt , λ _ → never-π n i
+
+never : ∀ {R} → delay R
+never = never-x , never-π

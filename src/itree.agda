@@ -23,7 +23,7 @@ open import Cubical.Foundations.Transport
 
 open import Cubical.Data.Sigma
 
-open import Cubical.Foundations.Embedding
+open import Cubical.Functions.Embedding
 
 module itree where
 

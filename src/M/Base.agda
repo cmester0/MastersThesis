@@ -3,7 +3,7 @@
 open import Cubical.Data.Unit
 open import Cubical.Data.Prod
 open import Cubical.Data.Nat as ℕ using (ℕ ; suc ; _+_ )
-open import Cubical.Data.Sigma
+open import Cubical.Data.Sigma hiding (_×_)
 open import Cubical.Data.Sum
 open import Cubical.Data.Nat.Algebra
 
@@ -15,12 +15,12 @@ open import Cubical.Foundations.Isomorphism
 open import Cubical.Foundations.Function
 open import Cubical.Foundations.GroupoidLaws
 open import Cubical.Foundations.Path
-open import Cubical.Foundations.FunExtEquiv
+open import Cubical.Functions.FunExtEquiv
 open import Cubical.Foundations.Equiv
 
 open import Cubical.Foundations.HLevels
 
-open import Cubical.Foundations.Embedding
+open import Cubical.Functions.Embedding
 
 open import helper
 open import Container
@@ -200,9 +200,8 @@ leftInv comp-α-iso-step-1-4-Iso-Sym-L-unique-iso (a , b) = refl
 -- Shifting the limit of a chain is an equivalence --
 -----------------------------------------------------
 
-abstract
-  shift-iso : ∀ {ℓ} {S : Container {ℓ}} -> Iso (P₀ {S = S} (M S)) (M S)
-  shift-iso {S = S@(A , B)} = (compIso sym-α-iso-step-6 (compIso (sym-iso (α-iso-step-5-Iso {S = S})) (comp-α-iso-step-1-4-Iso-Sym-L-unique-iso {S = S})))
+shift-iso : ∀ {ℓ} {S : Container {ℓ}} -> Iso (P₀ {S = S} (M S)) (M S)
+shift-iso {S = S@(A , B)} = (compIso sym-α-iso-step-6 (compIso (sym-iso (α-iso-step-5-Iso {S = S})) (comp-α-iso-step-1-4-Iso-Sym-L-unique-iso {S = S})))
 
 -- shift : ∀ {ℓ} {S : Container {ℓ}} -> P₀ {S = S} (M S) ≡ M S
 -- shift {S = S@(A , B)} = isoToPath shift-iso -- lemma 13 & lemma 12

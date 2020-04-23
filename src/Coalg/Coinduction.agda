@@ -7,7 +7,8 @@ open import Cubical.Data.Prod
 
 open import Cubical.Foundations.Function using ( _∘_ )
 open import Cubical.Foundations.Prelude
-open import Cubical.Foundations.Embedding
+
+open import Cubical.Functions.Embedding
 
 open import helper
 

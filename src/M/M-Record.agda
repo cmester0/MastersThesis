@@ -15,12 +15,12 @@ open import Cubical.Foundations.Isomorphism
 open import Cubical.Foundations.Function
 open import Cubical.Foundations.GroupoidLaws
 open import Cubical.Foundations.Path
-open import Cubical.Foundations.FunExtEquiv
 open import Cubical.Foundations.Equiv
 
 open import Cubical.Foundations.HLevels
 
-open import Cubical.Foundations.Embedding
+open import Cubical.Functions.FunExtEquiv
+open import Cubical.Functions.Embedding
 
 open import helper
 open import Container
