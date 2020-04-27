@@ -52,6 +52,14 @@ record bisimulation {ℓ} (S : Container {ℓ}) (C,γ : Coalg₀ {S = S}) (R : C
 
 open bisimulation public
 
+-- record coalgebraic-bisimulation {ℓ} {S T : Container {ℓ}} (C,γ : Coalg₀ {S = S}) (D,δ : Coalg₀ {S = T}) (R : C,γ .fst → D,δ .fst → Set) : Set ℓ where
+--   field
+--     fdsa : ∀ (x : C,γ .fst) → (y : D,δ .fst) → (r : R x y) → (a : C,γ .fst → C,γ .fst) → Σ (D,δ .fst) (R (a x))
+--     fdsb : ∀ (x : C,γ .fst) → (y : D,δ .fst) → (r : R x y) → (a : D,δ .fst → D,δ .fst) → Σ (C,γ .fst) (λ x' → R x' (a y))
+    
+-- bisim-final : ∀ {ℓ} {S T : Container {ℓ}} R → coalgebraic-bisimulation (M-coalg {S = S}) (M-coalg {S = T}) R  → Final {S = S}
+-- bisim-final {S = S} {T} R bisim = ((M-coalg {S = S} .fst → M-coalg {S = T} .fst) , {!!}) , {!!}
+
 final-property : ∀ {ℓ} (S : Container {ℓ}) R -> (sim : bisimulation S M-coalg R) -> prod₁ sim ≡ prod₂  sim
 final-property S R sim = final-coalg-property-2 {S = S} (R⁻-coalg sim) (M-final-coalg {S = S}) (prod₁ sim) (prod₂ sim)
 

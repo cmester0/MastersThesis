@@ -79,17 +79,17 @@ Delay-to-delay-π {R} (suc n) (later t) i = (inl tt , λ {tt → Delay-to-delay-
 Delay-to-delay : ∀ {R} → Delay R → delay R
 Delay-to-delay x = lift-to-M Delay-to-delay-x Delay-to-delay-π x
 
-postulate
-  delay-equality-section : ∀ {R} (b : Delay R) → delay-to-Delay (Delay-to-delay b) ≡ b
--- delay-equality-section {R} (now r) = refl
--- delay-equality-section {R} (later t) = {!!} -- todo
+-- postulate
+--   delay-equality-section : ∀ {R} (b : Delay R) → delay-to-Delay (Delay-to-delay b) ≡ b
+-- -- delay-equality-section {R} (now r) = refl
+-- -- delay-equality-section {R} (later t) = {!!} -- todo
 
-postulate
-  delay-equality-retraction : ∀ {R} (b : delay R) → Delay-to-delay (delay-to-Delay b) ≡ b
--- delay-equality-retraction = {!!}
+-- postulate
+--   delay-equality-retraction : ∀ {R} (b : delay R) → Delay-to-delay (delay-to-Delay b) ≡ b
+-- -- delay-equality-retraction = {!!}
 
-delay-equality : ∀ {R : Set} -> delay R ≡ Delay R
-delay-equality = isoToPath (iso delay-to-Delay Delay-to-delay delay-equality-section delay-equality-retraction)
+-- delay-equality : ∀ {R : Set} -> delay R ≡ Delay R
+-- delay-equality = isoToPath (iso delay-to-Delay Delay-to-delay delay-equality-section delay-equality-retraction)
 
 -- Bottom element raised
 data ⊥₁ : Set₁ where

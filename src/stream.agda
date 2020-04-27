@@ -202,8 +202,11 @@ tail-to-tl b = refl
 --   where
 --     open Iso
 
-postulate
-  tl-to-tail : ∀ {A : Set} (b : Stream A) → tl (Stream-to-stream b) ≡ Stream-to-stream (tail b) -- should this be able to compute ??
+-- postulate
+--   tl-to-tail : ∀ {A : Set} (b : Stream A) → tl (Stream-to-stream b) ≡ Stream-to-stream (tail b) -- should this be able to compute ??
+
+tl-to-tail : ∀ {A : Set} (b : Stream A) → tl (Stream-to-stream b) ≡ Stream-to-stream (tail b)
+tl-to-tail = {!!}
 
 nth : ∀ {A : Set} → ℕ → (b : Stream A) → A
 nth 0 b = head b

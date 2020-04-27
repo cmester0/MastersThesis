@@ -124,13 +124,18 @@
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
 
-\chapter{Introduction}
+\chapter{Introduction} % Everyone interested should be able to read this!
 \label{ch:intro}
 
 \todo[inline]{motivate and explain the problem to be addressed}
 
 \todo[inline]{example of a citation: \cite{amin2018}}
 \todo[inline]{get your bibtex entries from \url{https://dblp.org/}}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
+
+\chapter{Background Theory}
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
 
@@ -348,20 +353,88 @@ We can now construct a co-induction principle given a bisimulation relation
 We want to construct a quotient \texttt{M}-type, and we know that \texttt{M}-types are an algebraic theory? Meaning we want to define quotient algebra...
 
 We want to construct a quotiented M type, which is given as a final bisimulation and a final coalgebra, and relations between them. This is a special case for a cofree coalgebra, namely starting at \(X = \unit\).
-
 \\ \\
 Since we know that \texttt{M}-types preserves the H-level, we can use set-truncated quotients, to define quotient \texttt{M}-types, for examples we can define weak bisimulation of the delay monad asq
 \todo[inline]{Quotients of the delay monad}
 
 \subsection{Quotient inductive-inductive types (QIITs)}
+"A quotient inductive-inductive type (QIIT) can be seen as a multi-sorted algebraic theory wheresorts can be indexed over each other" - "Constructing Quotient Inductive-Inductive Types"
+
+"W-types can be seen informally as the free algebras for signatureswith operationsof possibly infinite arity, but no equations." -- \url{https://arxiv.org/pdf/1201.3898.pdf}
+
+A quotient inductive-inductive type (QIIT) is a type together with a relation defined on that type, and then quotiented by that relation.
 \todo[inline]{What is a QIIT concretely?}
+\subsubsection{Partiality monad}
+A simple example of a quotient inductive-inductive type is the partiality monad over \(\type{R}\), defined as a type
+\begin{align}
+  D &: \typeformer{delay}~\type{R} \\
+  now &: \type{R} \rightarrow D \\
+  later &: D \rightarrow D
+\end{align}
+together with a relation (indexed over the type) and properties
+\begin{align}
+  (\cdot \approx \cdot) &: D \rightarrow D \rightarrow \universe{\mathcal{U}} \\
+  \approx_{now} &: (r : R) \rightarrow now~r \approx now~r \\
+  \approx_{laterL} &: (x~y : D) \rightarrow later~x \approx y \\
+  \approx_{laterR} &: (x~y : D) \rightarrow x \approx later~y
+\end{align}
+and then the quotiented equality
+\begin{align}
+  later~x \equiv x
+\end{align}
+
+\subsubsection{Partiality from Delay monad}
+We want to define an ordering on the delay monad, we do this by counting the number of \texttt{later}s, letting the infinitely delayed element \texttt{never}, be the bottom element of the ordering. So we get
+\begin{equation}
+  \infer{\constant{never} \sqsubseteq \term{x}}{\term{x} : \typeformer{Delay}~\type{R}}
+\end{equation}
+\begin{equation}
+  \infer[\sqsubseteq_{\mathtt{now}}]{\term{x} \sqsubseteq \function{now}~\term{a}}{\term{x} : \typeformer{Delay}~\type{R} & \term{a} : \type{R} & \term{x} \downarrow \term{a}}
+\end{equation}
+\begin{equation}
+  \infer=[\sqsubseteq_{\mathtt{later}}]{\function{later}~\term{x} \sqsubseteq \function{later}~\term{y}}{\term{x} \sqsubseteq \term{y}}
+\end{equation}
+given these two rules, we want to show that we actually have an ordering. So first we want to show that we get reflexivity, we do the proof by structural induction.
+
+\begin{lem}
+  The bottom element of the relation \(\sqsubseteq\) is \(\constant{never}\), meaning for all x we get \(\constant{never} \sqsubseteq x\).
+  \begin{proof}
+    If \(x = \)
+  \end{proof}
+\end{lem}
+  
+\begin{lem}
+  The relation \(\sqsubseteq\) is reflexive.
+  \begin{proof}
+    If \(\term{x} = \function{now}~\term{a}\) then we know that \(\term{x} \downarrow \term{a}\) meaning by the rule \(\sqsubseteq_{\mathtt{now}}\), we have \(\function{now}~\term{a} \sqsubseteq \function{now}~\term{a}\). If we have \(\term{x} = \function{later}~\term{y}\) then by the rule \(\sqsubseteq_{\mathtt{later}}\) we just need to show \(\term{y} \sqsubseteq \term{y}\), which is true by the induction hypothesis.
+  \end{proof}
+\end{lem}
+
+\begin{lem}
+  For all \(\term{x} : \typeformer{Delay}~\type{R}\) we have \(\function{now}~\term{a} \sqsubseteq \term{x}\) implies that \(\term{x} = \function{now}~\term{a}\).
+  \begin{proof}
+    If \(\term{x} = \function{now}~\term{b}\), then \(\function{now}~\term{a} \downarrow \term{b}\), but this means that \(\term{a} \equiv \term{b}\). If 
+  \end{proof}
+\end{lem}
+
+\begin{lem}
+  The relation \(\sqsubseteq\) is transitive.
+  \begin{proof}
+    Again we do case analysis \(x \sqsubseteq y \sqsubseteq z\), if \(x \sqsubseteq y\) is \(\sqsubseteq_{\mathtt{now}}\) then we know \(x \downarrow a\) and \(y = \function{now}~a\), then it must be the case that \(z = \function{now}~a\) as well, since the only element \(\function{now}~a\) is "less defined" than is itself.
+  \end{proof}
+\end{lem}
+
+
+% Sierpinski set
+% Rosolini’s dominance
+
+% non-termination monad -- Partiality monad - completely iterative monad (on 1 -> 1)
 
 \subsection{QM-types}
 A QM-type is a quotiented M-type, we try to define this as a quotient on containers. We define container quotients as
 \begin{equation}
-  
+  asfd
 \end{equation}
-
 \\ \\
 We want to define QM-types as the final coalgebra satisfying a set of equations. The construction takes inspiration from \cite{Infinitary-QIITs}
 \subsubsection{Cofree Coalgebra}
@@ -382,12 +455,11 @@ This is defined as the left adjoint to the forgetful functor \(\function{U} : \c
 A coalgebra PA is cofree on A iff for all coalgebras M and mappings \(\alpha : UM \rightarrow C\) there is a unique morphism \(\alpha^\sharp : M \rightarrow TC\) such that the diagram \figref{cofree-coalgebra} commutes
 
 \subsubsection{Equation system}
-We start by defining a equation system called a covariety \cite{Hughes}\cite{Covariety} of a coalgebra (dual of variety of an algebra).
+We start by defining a equation system called a covariety \cite{Hughes} of a coalgebra (dual of variety of an algebra).
 \\ \\
 Complete covarities are closed under bisimulation.
 
 \section{Strongly Extensional (Coalgebra)}
-
 
 % https://en.wikipedia.org/wiki/Variety_(universal_algebra)
 % Hughes
@@ -405,11 +477,6 @@ Complete covarities are closed under bisimulation.
 Let \(\functor{G}\) be functors and \(v : \functor{P} \rightarrow \functor{G}\) a natural transformation. Suppose that for any type \(\type{V}\), the functor \((\lambda\,\_ \rightarrow \type{V}) \times\functor{F}\) has a final coalgebra. Then there exists for any G-coalgebra \(\coalg{\type{C}}{\function{\gamma}}\) an \(P\)-coalgebra \(\coalg{S_C}{\alpha}\) and a \(\functor{G}\)-homomorphism \(\varepsilon:\coalg{S_C}{v_{S_C} \circ \alpha} \Rightarrow \coalg{C}{\gamma}\), satisfying the universal property: for any \(P\)-coalg \(\coalg{U}{\alpha_U}\) and any G-homomorphism \(f : \coalg{U}{v_U \circ \alpha_U} \Rightarrow \coalg{C}{\gamma}\) there exists a unique \(P\)-homomorphism \(\tilde{f} : \coalg{U}{\alpha_u} \Rightarrow \coalg{S_C}{\alpha}\) such that \(\varepsilon \circ \tilde{f} = f\). The \(P\)-coalg \(\coalg{S_c}{\alpha}\) (and \(\varepsilon\)) is called cofree on the G-coalgebra \(\coalg{C}{\gamma}\). \cite[theorem 17.1]{UniversalCoalgebra}.
 \\ \\
 The coalgebra generated by the polynomial functor over the container \(\containerpair{A}{B}\) is a cofree coalgebra. We can now define a quotient, by defining a equation system at the same time, as we define the \texttt{M}-type type. The equation systems is defined on a type \(E : \mathcal{U}\) with variables of type \(V : E \rightarrow \mathcal{U}\), each equation is given by functions \(l,r : C \rightarrow A\) for some type \(C\). A coalgebra satisfies the equation system iff \((t : B (l c) \rightarrow MQ) \rightarrow (s : B (r c) \rightarrow MQ) \rightarrow l c \equiv r c\) is inhabited.
-\begin{equation}
-  
-\end{equation}
-
-
 
 \section{TODO}
 \begin{itemize}
@@ -474,10 +541,44 @@ so we want
   \label{fig:contractive}
 \end{figure}
 
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \chapter{Examples of \texttt{M}-types}
+
+\section{The Partiality monad}
+To construct the partiality monad, we start with the delay monad, and the preorder
+\begin{equation}
+\forall x, \bot \sqsubseteq x
+\end{equation}
+\begin{equation}
+\forall\,x, x \sqsubseteq x
+\end{equation}
+\begin{equation}
+\forall\,x\,y\,z, x \sqsubseteq y \rightarrow y \sqsubseteq z \rightarrow x \sqsubseteq z
+\end{equation}
+we can then define the partiality monad
+
+The partiality monad \((-)_\bot\) is a way of adding partiality to a given computation. Along with the partiality monad, we also get a partial ordering \((\cdot \sqsubseteq \cdot)\), by
+\begin{equation}
+\forall x, \bot \sqsubseteq x
+\end{equation}
+\begin{equation}
+\forall\,x, x \sqsubseteq x
+\end{equation}
+\begin{equation}
+\forall\,x\,y\,z, x \sqsubseteq y \rightarrow y \sqsubseteq z \rightarrow x \sqsubseteq z
+\end{equation}
+\begin{equation}
+\forall\,x\,y, x \sqsubseteq y \rightarrow y \sqsubseteq x \rightarrow x \equiv y
+\end{equation}
+We now want to show that we can construct the partiality monad from the delay monad. We need an operation that given an element of the delay monad, maps to an element of the partiality monad.
+\begin{equation}
+  \function{now}~x = x + \unit
+\end{equation}
+\begin{equation}
+  \function{later}~y = y
+\end{equation}
+
 \section{TODO: Place these subsections}
 \todo[inline]{What makes a relation a bisimulation? Is bisim and equality equal.}
 \subsection{Identity Bisimulation}

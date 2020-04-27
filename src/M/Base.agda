@@ -129,7 +129,7 @@ leftInv (α-iso-step-1-4-Iso {S = S@(A , B)}) = refl-fun
   ∀ {ℓ} {S : Container {ℓ}}
   -> let (A , B) = S in (a : (ℕ -> A)) (p : (n : ℕ) → a (suc n) ≡ a n) (n : ℕ)
   -> a n ≡ a 0
-α-iso-step-5-Iso-helper0 a p 0 = refl
+α-iso-step-5-Iso-helper0 a p 0 = refl {x = a 0}
 α-iso-step-5-Iso-helper0 {S = S} a p (suc n) = p n ∙ α-iso-step-5-Iso-helper0 {S = S} a p n
 
 α-iso-step-5-Iso-helper1-Iso :
@@ -234,9 +234,29 @@ lift-to-M x p a = (λ n → x n a) , (λ n → p n a)
 --   ≡ ((lift-x (suc 0) s .fst) , (λ z → (λ n → (subst (λ k → (n : ℕ) → k n) (funExt λ n → cong (λ k → S .snd k → W S n) (α-iso-step-5-Iso-helper0 {S = S} (λ n → lift-x (suc n) s .fst) ((λ n i → lift-π (suc n) s i .fst)) n)) (λ n → lift-x (suc n) s .snd)) n z) , (λ n → funExt⁻ ((subst (λ k → (n : ℕ) → k n) (funExt λ n → α-iso-step-5-Iso-helper1 (λ n → lift-x (suc n) s .fst) (λ n i → lift-π (suc n) s i .fst) (λ n → lift-x (suc n) s .snd) n) (λ n i → lift-π (suc n) s i .snd)) n) z)))
 -- out-lift-to-M {S = S} lift-x lift-π s = refl
 
+lift-x-general :
+  ∀ {ℓ} {S : Container {ℓ}}
+  → (ℕ → S .fst) → (n : ℕ) -> W S n
+lift-x-general _ 0 = lift tt
+lift-x-general f (suc n) = f n , λ x → lift-x-general f n
+
+lift-π-general :
+  ∀ {ℓ} {S : Container {ℓ}}
+  (f : ℕ → S .fst) → (∀ n → f (suc n) ≡ f n) → (n : ℕ) → πₙ S (lift-x-general f (suc n)) ≡ lift-x-general f n
+lift-π-general _ k 0 = refl {x = lift tt}
+lift-π-general f k (suc n) i = k n i , λ x → lift-π-general f k n i
+
+lift-to-M-general : ∀ {ℓ} {S : Container {ℓ}}
+  → (x :  ℕ → S .fst)
+  → (π : ∀ n → x (suc n) ≡ x n)
+  ---------------
+  → (M S)
+lift-to-M-general x π = lift-x-general x , lift-π-general x π 
+
 lift-direct-M : ∀ {ℓ} {S : Container {ℓ}}
   → (x : (n : ℕ) → X (sequence S) n)
   → ((n : ℕ) →  π (sequence S) (x (suc n)) ≡ x n)
   ---------------
   → M S
 lift-direct-M x p = x , p
+

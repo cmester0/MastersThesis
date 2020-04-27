@@ -49,6 +49,19 @@ in-out-id :
   (in-fun (out-fun {S = S} x) ≡ in-fun (out-fun y)) ≡ (x ≡ y)
 in-out-id {S = S} {x = x} {y} i = (in-inverse-out i x) ≡ (in-inverse-out i y)
 
+-- helper function
+
+M-coinduction :
+  ∀ {ℓ} {S : Container {ℓ}}
+  → (k : M S → Set ℓ)
+  → ((x : P₀ {S = S} (M S)) → k (in-fun x))
+  ---------------
+  → ((x : M S) → (k x))
+M-coinduction k x x₁ =
+  transport (λ i → k (in-inverse-out i x₁))
+  (case out-fun x₁ return (λ x₂ → k (in-fun x₂)) of x)
+
+
 -- Embeddings
 
 -- in-embedding :
