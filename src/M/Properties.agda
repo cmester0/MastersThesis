@@ -61,6 +61,13 @@ M-coinduction k x x₁ =
   transport (λ i → k (in-inverse-out i x₁))
   (case out-fun x₁ return (λ x₂ → k (in-fun x₂)) of x)
 
+M-coinduction-const :
+  ∀ {ℓ} {S : Container {ℓ}}
+  → (k : Set ℓ)
+  → ((x : P₀ {S = S} (M S)) → k)
+  ---------------
+  → ((x : M S) → k)
+M-coinduction-const k x x₁ = case out-fun x₁ return (λ x₂ → k) of x
 
 -- Embeddings
 
