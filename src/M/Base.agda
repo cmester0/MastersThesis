@@ -131,7 +131,7 @@ shift-iso {S = S@(A , B)} = (compIso sym-α-iso-step-6 (compIso (sym-iso (α-iso
       PathP (λ x → B (p n x) → W S n) (πₙ S ∘ u (suc n)) (u n)
         Iso⟨ pathToIso (PathP≡Path (λ x → B (p n x) → W S n) (πₙ S ∘ u (suc n)) (u n)) ⟩
       subst (λ k → B k → W S n) (p n) (πₙ S ∘ u (suc n)) ≡ (u n)
-        Iso⟨ (sym-iso (≡-rel-a-inj-x-Iso (pathToIso (cong (λ k → B k → W S n) (α-iso-step-5-Iso-helper0 a p n))))) ⟩
+        Iso⟨ temp ⟩
       (subst (λ k → B k → W S n) (α-iso-step-5-Iso-helper0 {S = S} a p n) (subst (λ k → B k → W S n) (p n) (πₙ S ∘ u (suc n)))
              ≡
       subst (λ k → B k → W S n) (α-iso-step-5-Iso-helper0 {S = S} a p n) (u n))
@@ -145,6 +145,9 @@ shift-iso {S = S@(A , B)} = (compIso sym-α-iso-step-6 (compIso (sym-iso (α-iso
       πₙ S ∘ subst (λ k → B k → W S (suc n)) (α-iso-step-5-Iso-helper0 a p (suc n)) (u (suc n))
         ≡
       subst (λ k → B k → W S n) (α-iso-step-5-Iso-helper0 {S = S} a p n) (u n) ∎Iso
+      where
+        abstract
+          temp = (sym-iso (≡-rel-a-inj-x-Iso (pathToIso (cong (λ k → B k → W S n) (α-iso-step-5-Iso-helper0 a p n)))))
 
     α-iso-step-5-Iso-helper1 :
       ∀ {ℓ} {S : Container {ℓ}}

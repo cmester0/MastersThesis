@@ -176,7 +176,7 @@ Homotopy type theory
 \section{Cubical Type Theory}
 
 \section{Cubical Agda}
-\todo{Axioms of cubical Agda}
+\todo[inline]{Axioms of cubical Agda}
 The theory of cubical Agda is a Cartesian closed category, meaning get exponentials.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
@@ -263,7 +263,7 @@ In this section we will introduce containers (also known as signatures), and sho
   or more precisely \(\function{hd} = \pi_1 \circ \function{out}\) and \(\function{tl} = \pi_2 \circ \function{out}\).
 \end{exmp}
 \begin{defn}
-  Chains are defined as ... \todo{define chains, \(\function{\pi}_{(n)}\) and \(\type{X}_n\)}
+  Chains are defined as ... \todo[inline]{define chains, \(\function{\pi}_{(n)}\) and \(\type{X}_n\)}
 \end{defn}
 \begin{lem} \label{lem:function-to-M-type-is-cone}
   For all coalgebras \(\coalg{\type{C}}{\function{\gamma}}\) for the container \(\container{S}\), we get \(\type{C} \rightarrow \typeformer{M}_{\container{S}} \equiv \typeformer{Cone}_{\coalg{\type{C}}{\function{\gamma}}}\), where \(\typeformer{Cone} = \sum_{(\function{f} : \prod_{(n : \type{\mathbb{N}})} \type{C} \rightarrow \type{X}_n)} \prod_{(n : \type{\mathbb{N}})} \function{\pi}_{(n)} \circ (\function{f}_{(n+1)}) \equiv f_n\)
@@ -420,47 +420,136 @@ and then the quotiented equality
 \subsubsection{Delay monad to Sequences}
 We define
 \begin{equation}
-  \mathtt{Seq}_A = \sum_{(\function{g} : \type{\mathbb{N}} \rightarrow \type{A} + \unit)} \prod_{(n : \type{\mathbb{N}})} (g_n \equiv g_{n+1})  + ((g_n \equiv \mathtt{inr}~\constant{tt}) \times (g_{n+1} \not\equiv \mathtt{inr}~\constant{tt}))
+  \mathtt{Seq}_A = \sum_{(\function{g} : \type{\mathbb{N}} \rightarrow \type{A} + \unit)} \prod_{(n : \type{\mathbb{N}})} (\function{g}_n \equiv \function{g}_{n+1})  + ((\function{g}_n \equiv \mathtt{inr}~\constant{tt}) \times (\function{g}_{n+1} \not\equiv \mathtt{inr}~\constant{tt}))
 \end{equation}
-that is either the value \(\forall n, g_n \equiv g_{n+1}\) meaning terminated \(g = \function{inl}~a\) or never terminating \(\function{inr}~\constant{tt}\). Otherwise there is an \(n\), where it switches.
-\begin{align}
-  \function{shift} &: \mathtt{Seq}_A \rightarrow \mathtt{Seq}_A \\
-  \function{shift}&~(g , q) = \begin{cases} g_0 & n = 0 \\ g_m & n = m + 1 \end{cases} , \begin{cases} \begin{cases} \begin{cases} \mathtt{inl}~(\sym{(\pi_1~v)}) & q_0 = \mathtt{inr}~v \\ \mathtt{inl}~\mathtt{refl} & q_0 = \mathtt{inl}~v \end{cases} & g_0 = \mathtt{inr}~\constant{tt} \\ \mathtt{inl}~\mathtt{refl} & g_0 = \mathtt{inl}~r \end{cases} & n = 0\\ q_m & n = m + 1 \end{cases}
-\end{align}
-\begin{align}
-  \function{unshift} &: \mathtt{Seq}_A \rightarrow \mathtt{Seq}_A \\
-  \function{unshift}&~(g , a) = g \circ \mathtt{suc} , a \circ \mathtt{suc}
-\end{align}
-\begin{align}
-  \function{shift\text{-}unshift} &: \forall\,g,~\function{shift}~(\function{unshift}~g) \equiv g \\
-  \function{shift\text{-}unshift}&~g = ?
-\end{align}
-\begin{align}
-  \function{unshift\text{-}shift} &: \forall\,g,~\function{unshift}~(\function{shift}~g) \equiv g \\
-  \function{unshift\text{-}shift}&~g = \mathtt{refl}
-\end{align}
-We define
-\begin{align}
-  \function{j} &: \typeformer{Delay}~R \rightarrow \typeformer{Seq}_A \\
-  \function{j}&~(\mathtt{now}~a) = \lambda\,n,\mathtt{inl}~a~ \\
-  \function{j}&~(\mathtt{later}~x) = \function{shift}~(j~x)
-\end{align}
-\begin{align}
-  \function{h} &: \typeformer{Seq}_A \rightarrow \typeformer{Delay}~R \\
-  \function{h}&~g = \begin{cases} \function{now}~r & g_0 = \mathtt{inl}~r \\ \function{later}~(h~(\function{unshift}~g)) & g_0 = \mathtt{inr}~t \end{cases}
-\end{align}
-\begin{align}
-  \function{j\text{-}h} &: \forall\,g \rightarrow \function{j}~(\function{h}~g) \equiv g \\
-  \function{j\text{-}h}&~g = \begin{cases} (\lambda n, \mathtt{inl}~r) \equiv \mathtt{inl}~r & g_0 = \mathtt{inl}~r \\ \mathtt{cong}~\function{shift}~(\function{j\text{-}h}~(\function{unshift}~g)) \ct \function{shift\text{-}unshift}~g & g_0 = \mathtt{inr}~t \end{cases}
-\end{align}
-\begin{align}
-  \function{h\text{-}j} &: \forall\,t \rightarrow \function{h}~(\function{j}~t) \equiv t \\
-  \function{h\text{-}j}&~(\function{now}~a) = \mathtt{refl} \\
-  \function{h\text{-}j}&~(\function{later}~x) = \mathtt{cong}~(\function{later} \circ h)~\function{unshift\text{-}shift} \ct \mathtt{cong}~\function{later}~(\function{h\text{-}j}~x)
-\end{align}
-
+that is sequences are \(\mathtt{inr}~\constant{tt}\) until they reach a point where it switches to \(\mathtt{inl}~\term{r}\) for some value \(\term{r}\). There are also the special cases of already terminated, meaning only \(\mathtt{inl}~\term{r}\) and never teminating meaning only \(\mathtt{inr}~\constant{tt}\). \todo[inline]{Some comment about decidable equivalence needed to show that \(\function{g}_{n+1} \not\equiv \mathtt{inr}~\constant{tt}\)} We define an operation to shift the sequence by inserting an element at \(n = 0\)
+\begin{equation}
+  \begin{aligned}
+    \function{shift} &: \mathtt{Seq}_A \rightarrow \mathtt{Seq}_A \\
+    \function{shift}&~(\function{g} , \function{q})~(\term{z_g} , \term{z_q}) = \begin{cases} \term{z_g} & n = 0 \\ \function{g}_m & n = m + 1 \end{cases} , \begin{cases} \term{z_q} & n = 0\\ \function{q}_m & n = m + 1 \end{cases},
+  \end{aligned}
+\end{equation}
+and a function to remove the first element
+\begin{equation}
+  \begin{aligned}
+    \function{unshift} &: \mathtt{Seq}_A \rightarrow \mathtt{Seq}_A \\
+    \function{unshift}&~(\function{g} , \function{q}) = \function{g} \circ \mathtt{suc} , \function{q} \circ \mathtt{suc}.
+  \end{aligned}
+\end{equation}
+These two functions are inverse, since unshifting a value followed by a shift, where we reintroduce the value we just remove, does not change the value, said in another way the function
+\begin{equation}
+  \lambda\,(\function{g},\function{a}), \function{shift}~(\function{unshift}~(\function{g},\function{a}))~(\function{g}_0,\function{a}_0)
+\end{equation}
+is the identity function. Similarly if we shift followed by an unshift, we just introduce a value to instantly remove it, meaning the value does not matter, again the function
+\begin{equation}
+  \lambda\,(\function{g},\function{a}),~\function{unshift}~(\function{shift}~(\function{g},\function{a})~\_)
+\end{equation}
+is the identity function. We can now define an equivalence between \(\typeformer{delay}~\type{R}\) and \(\typeformer{Seq}_{\type{R}}\), where later are equivalent to shifts, and \(\function{now}~\term{r}\) is equivalent to the infinite sequence of \(\mathtt{inl}~\term{r}\). We define
+\begin{equation}
+  \begin{aligned}
+    \function{j} &: \typeformer{Delay}~R \rightarrow \typeformer{Seq}_A \\
+    \function{j}&~(\function{now}~\term{a}) = (\lambda\,\_,\mathtt{inl}~\term{a}) , (\lambda\,\_,\mathtt{inl}~\mathtt{refl}) \\
+    \function{j}&~(\function{later}~\term{x}) = \function{shift}~(\function{j}~\term{x})~\_
+  \end{aligned}
+\end{equation}
+\todo[inline]{what should \_ be here?}
+\begin{equation}
+  \begin{aligned}
+    \function{h} &: \typeformer{Seq}_A \rightarrow \typeformer{Delay}~R \\
+    \function{h}&~(\function{g} , \function{q}) = \begin{cases} \function{now}~\term{r} & \function{g}_0 = \mathtt{inl}~\term{r} \\ \function{later}~(\function{h}~(\function{unshift}~\term{g})) & \function{g}_0 = \mathtt{inr}~\constant{tt} \end{cases}
+  \end{aligned}
+\end{equation}
+with the right and left identities
+\begin{equation}
+  \begin{aligned}
+    \function{j\text{-}h} &: \forall\,(\function{g},\function{q}) \rightarrow \function{j}~(\function{h}~(\function{g},\function{q})) \equiv (\function{g},\function{q}) \\
+    \function{j\text{-}h}&~(\function{g},\function{q}) = \begin{cases} \mathtt{refl}  & \function{g}_0 = \mathtt{inl}~\term{r} \\ \mathtt{cong}~\function{shift}~(\function{j\text{-}h}~(\function{unshift}~(\function{g} , \function{q}))) \ct \function{shift\text{-}unshift}~(\function{g} , \function{q}) & \function{g}_0 = \mathtt{inr}~\constant{tt} \end{cases}
+  \end{aligned}
+\end{equation}
+\begin{equation}
+  \begin{aligned}
+    \function{h\text{-}j} &: \forall\,\term{t} \rightarrow \function{h}~(\function{j}~\term{t}) \equiv \term{t} \\
+    \function{h\text{-}j}&~(\function{now}~\term{a}) = \mathtt{refl} \\
+    \function{h\text{-}j}&~(\function{later}~\term{x}) = \mathtt{cong}~(\function{later} \circ \function{h})~\function{unshift\text{-}shift} \ct \mathtt{cong}~\function{later}~(\function{h\text{-}j}~\term{x})
+  \end{aligned}
+\end{equation}
 \subsubsection{Sequence to Partiality monad}
+We define a termination relation for sequences
+\begin{equation}
+  \begin{aligned}
+    \relation{\downarrow_{\mathtt{Seq}}} &: \typeformer{Seq}_{\type{A}} \rightarrow \type{A} \rightarrow \universe{\mathcal{U}} \\
+    (s,q)~\relation{\downarrow_{\mathtt{Seq}}}&~a = \sum_{(n : \mathbb{N})} s_n \equiv \mathtt{inl}~a
+  \end{aligned}
+\end{equation}
+We define an ordering relation on a sequence
+\begin{equation}
+  (s,q)~\relation{\sqsubseteq_{\mathtt{Seq}}}~(t,p) = \prod_{(a : \type{A})} \left(\|s~\relation{\downarrow_{\mathtt{Seq}}}~a\| \rightarrow \| t~\relation{\downarrow_{\mathtt{Seq}}}~a\|\right)
+\end{equation}
+the bottom element \(\constant{\bot}\) of the ordering is the never terminating sequence, where all values are \(\mathtt{inr}~\constant{tt}\). The unit \(\eta\) is defined, given some \(r\), as the terminated sequence of all \(\mathtt{inl}~r\).
+\todo[inline]{\(\alpha_{\mathtt{Seq}}\) and \(\bigsqcup_{\mathtt{Seq}}\)}
+We show the properties of the ordering, reflexivity \(\forall\,(g,q), (g,q)~\relation{\sqsubseteq_{\mathtt{Seq}}}~(g,q)\)
+\begin{equation}
+  \lambda\,\_ , \mathtt{id}_{\|g~\relation{\downarrow_{\mathtt{Seq}}}~a\|}
+\end{equation}
+transitivity, \(tra_0 : (g,q)~\relation{\sqsubseteq_{\mathtt{Seq}}}~(s,p)\) and \(tra_1 : (s,p)~\relation{\sqsubseteq_{\mathtt{Seq}}}~(t,v)\) implies \((g,q)~\relation{\sqsubseteq_{\mathtt{Seq}}}~(t,v)\)
+\begin{equation}
+  \lambda\,a, (tra_1~a) \circ (tra_0~a)
+\end{equation}
+we define a function
+\begin{equation}
+  \begin{aligned}
+    \function{w} &: \typeformer{Seq}_{\type{A}} \rightarrow \type{A}_{\bot} \\
+    \function{w}&~(\function{g},\function{q}) = \bigsqcup ([\function{\eta}|\constant{\bot}] \circ \function{g} , ?)
+  \end{aligned}
+\end{equation}
 
+\todo[inline]{Quotient the relation and Seq by weak bisimilarity, to get a partial order with correct equality in \(\alpha\)!}
+
+
+
+\subsubsection{Building the Partiality Monad as an M-type (Dialgebra?)}
+\todo[inline]{Is this possible?}
+% We want an object \(\constant{\bot} : \type{A}_{\bot}\), which can be seen as a function \(\unit \rightarrow \type{A}_{\bot}\), as defined in \figref{partiality-monad-M-type-0}
+% \begin{figure}[h]
+%   \centering
+%   \begin{tikzcd}[row sep=huge,column sep=huge]
+%     \unit \ar[r] \ar[dr,"\bot"'] & A_{\bot} + \unit \ar[d,shift left,"\function{in}"] \\
+%     & \type{A}_{\bot} \ar[u,shift left,"\function{out}"]
+%   \end{tikzcd}
+%   \caption{Partiality monad as M-type (0)}
+%   \label{fig:partiality-monad-M-type-0}
+% \end{figure}
+% we then want to add the unit of the monad \(\eta : \type{A} \rightarrow \type{A}_\bot\), this is done in \figref{partiality-monad-M-type-1}
+% \begin{figure}[h]
+%   \centering
+%   \begin{tikzcd}[row sep=huge,column sep=huge]
+%     \unit \ar[r] \ar[dr,"\bot"'] & A_{\bot} + \unit + A \ar[d,shift left,"\function{in}"] & A \ar[l] \ar[ld,"\eta"] \\
+%     & \type{A}_{\bot} \ar[u,shift left,"\function{out}"]
+%   \end{tikzcd}
+%   \caption{Partiality monad as M-type (1)}
+%   \label{fig:partiality-monad-M-type-1}
+% \end{figure}
+% we now want to define an ordering on \(A\) as in \figref{partiality-monad-M-type-2}
+% \begin{figure}[h]
+%   \centering
+%   \begin{tikzcd}[row sep=huge,column sep=huge]
+%     \unit \ar[r] \ar[dr,"\bot"'] & \type{A}_{\bot} + \unit + \type{A} \ar[d,shift left,"\function{in}"] & \type{A} \ar[l] \ar[ld,"\eta"] \\
+%     & \type{A}_{\bot} \ar[u,shift left,"\function{out}"] \\
+%     & \unit + \type{A} \ar[u,shift left,bend left=60,""'{name=lear}] \ar[u, shift right,bend right=60, ""{name=riar}] \ar[Rightarrow,to path=(lear)--(riar)\tikztonodes,"\sqsubseteq"]
+%   \end{tikzcd}
+%   \caption{Partiality monad as M-type (2)}
+%   \label{fig:partiality-monad-M-type-2}
+% \end{figure}
+% \begin{figure}[h]
+%   \centering
+%   \begin{tikzcd}[row sep=huge,column sep=huge]
+%     \unit \ar[r] \ar[dr,"\bot"'] & \type{A}_{\bot} + \unit + \type{A} \ar[d,shift left,"\function{in}"] & \type{A} \ar[l] \ar[ld,"\eta"] \\
+%     & \type{A}_{\bot} \ar[u,shift left,"\function{out}"] \ar[d,shift left] \ar[d,shift right] \\
+%     & \type{A}_{\bot} \times \type{A}_{\bot} \ar[r,"\sqsubseteq"] & \universe{\mathcal{U}}
+%   \end{tikzcd}
+%   \caption{Partiality monad as M-type (3)}
+%   \label{fig:partiality-monad-M-type-3}
+% \end{figure}
 
 \subsubsection{Partiality from Delay monad}
 We want to define an ordering on the delay monad, we do this by counting the number of \texttt{later}s, letting the infinitely delayed element \texttt{never}, be the bottom element of the ordering. So we get
@@ -479,7 +568,7 @@ given these two rules, we want to show that we actually have an ordering. So fir
   The bottom element of the relation \(\sqsubseteq\) is \(\constant{never}\), meaning for all \(\term{x}\) we get \(\constant{never} \sqsubseteq \term{x}\).
   \begin{proof}
     If \(\term{x} = \function{now}~\term{a}\) then we get \(???\)
-    \todo{is this true by assumption}
+    \todo[inline]{is this true by assumption}
   \end{proof}
 \end{lem}
   
@@ -647,6 +736,18 @@ as expected. Transporting along \eqref{eq:zip-equality} gives us a definition fo
 
 \chapter{Examples of \texttt{M}-types}
 
+\section{Automaton}
+An automaton is defined as a set of state \(\type{V}\) and an alphabet \(\type{\alpha}\) and a transition function \(\function{\delta} : \type{V} \rightarrow \type{\alpha} \rightarrow \type{V}\). This gives us the diagram in \figref{automaton}
+\begin{figure}[h]
+  \centering
+  \begin{tikzcd}[row sep=huge,column sep=huge]
+    \type{V} \times (\type{V} \rightarrow \type{\alpha} \rightarrow \type{V}) \ar[dr,"build"'] \ar[r] & M & M \ar[dl,"step"] \\
+    & M
+  \end{tikzcd}
+  \caption{automaton}
+  \label{fig:automaton}
+\end{figure}
+
 \section{The Partiality monad}
 To construct the partiality monad, we start with the delay monad, and the preorder
 \begin{equation}
@@ -764,7 +865,7 @@ We define our bisimulation coalgebra from the strong bisimulation relation \(\ma
 \begin{equation}
   \infer[\mathtt{EqVis}]{\mathtt{Vis}~\term{e}~\term{k_1} \cong \mathtt{Tau}~\term{e}~\term{k_2}}{\type{A} : \universe{\mathcal{U}} & \term{e} : \typeformer{E}~\type{A} & \term{k_1},\term{k_2} : \type{A} \rightarrow \mathtt{itree}~\typeformer{E}~\type{R} & \term{t} \cong \term{u}}
 \end{equation}
-Now we just need to define \(\term{\alpha}_{\relation{\mathcal{R}}}\) \todo{define the \(\alpha_{\relation{R}}\) function}. Now we have a bisimulation relation, which is equivalent to equality, using what we showed in the previous section.
+Now we just need to define \(\term{\alpha}_{\relation{\mathcal{R}}}\) \todo[inline]{define the \(\alpha_{\relation{R}}\) function}. Now we have a bisimulation relation, which is equivalent to equality, using what we showed in the previous section.
 
 \subsection{Zip Function}
 We want the diagram in \figref{zip-computation-rules} to commute,
@@ -913,7 +1014,7 @@ Elimination rules
 \end{equation}
 
 \subsection{Delay Monad}
-We start by looking at itrees without the \(\function{Vis}\) constructor, this type is also know as the delay monad\todo{check this statement}. We construct this type by letting \(\container{S} = (\unit + \type{R},\lambda \{ \texttt{inl}~\_ \rightarrow \unit~;~\texttt{inr}~\_ \rightarrow \empt \})\), we then get the polynomial functor
+We start by looking at itrees without the \(\function{Vis}\) constructor, this type is also know as the delay monad\todo[inline]{check this statement}. We construct this type by letting \(\container{S} = (\unit + \type{R},\lambda \{ \texttt{inl}~\_ \rightarrow \unit~;~\texttt{inr}~\_ \rightarrow \empt \})\), we then get the polynomial functor
 \begin{equation}
   \functor{P}_{\container{S}}(\type{X}) = \sum_{\term{x} : \unit + \type{R}} \lambda \{ \texttt{inl}~\_ \rightarrow \unit ; \texttt{inr}~\_ \rightarrow \empt\}~\term{x} \rightarrow \type{X},
 \end{equation}
@@ -935,7 +1036,7 @@ meaning we get the following diagram.
   \end{tikzcd}
   \caption{Delay monad}
 \end{figure}
-\noindent Meaning we can define the operations \(\function{now}\) and \(\function{later}\) using \(\function{in} = \function{out}^{-1}\) together with the injections \(\mathtt{inl}\) and \(\mathtt{inr}\). \todo{(Later = Tau, Ret = Now)}
+\noindent Meaning we can define the operations \(\function{now}\) and \(\function{later}\) using \(\function{in} = \function{out}^{-1}\) together with the injections \(\mathtt{inl}\) and \(\mathtt{inr}\). \todo[inline]{(Later = Tau, Ret = Now)}
 
 \subsection{Tree}
 Now lets look at the example where we remove the \(\function{Tau}\) constructor. We let

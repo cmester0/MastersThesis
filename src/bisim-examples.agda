@@ -137,59 +137,16 @@ module _ where
   ismon' {A} g n = (g n ≡ g (suc n))
                  ⊎ ((g n ≡ inr tt) × ((g (suc n) ≡ inr tt) → ⊥))
 
-  Seq : ∀ {A : Set} → Set
-  Seq {A} = (Σ (ℕ → A ⊎ Unit) (λ g → ismon g))
+  Seq : Set → Set
+  Seq A = (Σ (ℕ → A ⊎ Unit) (λ g → ismon g))
 
   postulate
     inl-inr-disjoint : ∀ {ℓ} {A : Set ℓ} (x : A) → inl x ≡ inr tt → ⊥
 
-  -- shift-1 : ∀ {A} → Seq {A} → Seq {A}
-  -- fst (shift-1 (g , a)) 0 = inr tt -- should this be g 0 ?
-  -- fst (shift-1 (g , a)) (suc n) = g n 
-  -- snd (shift-1 (g , a)) 0 =
-  --   case a 0 return (λ x → ismon' (fst (shift-1 (g , (λ { 0 → x ; (suc n) → a (suc n) })))) 0) of
-  --     λ {(inr v) → inl (sym (proj₁ v))
-  --       ;(inl v) → case g 0 return (λ x → ismon' (λ { 0 → inr tt ; (suc 0) → x ; (suc (suc n)) → g (suc n) }) 0) of
-  --                       λ { (inl j) → inr (refl , inl-inr-disjoint j)
-  --                         ; (inr tt) → inl refl}}
-  -- snd (shift-1 (g , a)) (suc n) = a n
-
-  -- shift-0 : ∀ {A} → Seq {A} → Seq {A}
-  -- fst (shift-0 (g , a)) 0 = g 0
-  -- fst (shift-0 (g , a)) (suc n) = g n
-  -- snd (shift-0 (g , a)) 0 = inl refl
-  -- snd (shift-0 (g , a)) (suc n) = a n
-
-  -- shift : ∀ {A} → (va : A ⊎ Unit) → (t : Seq {A}) → Seq {A}
-  -- shift (inr tt) = shift-1
-  -- shift (inl r) = shift-0
-
-  -- shift-unshift-helper : ∀ {A} → (t : Seq {A}) → (x : ℕ) → fst (shift (fst t 0) (unshift t)) x ≡ fst t x
-  -- shift-unshift-helper (g , a) 0 with a 0
-  -- shift-unshift-helper (g , a) 0 | (inl v) with g 0
-  -- ... | (inr tt) = refl
-  -- ... | (inl m) = sym v
-  -- shift-unshift-helper (g , a) 0 | (inr v) =
-  --   fst (shift (g 0) (g ∘ suc , a ∘ suc)) 0 
-  --     ≡⟨ cong (λ k → fst (shift k (g ∘ suc , a ∘ suc)) 0) (proj₁ v) ⟩
-  --   inr tt
-  --     ≡⟨ sym (proj₁ v) ⟩
-  --   g 0 ∎
-  -- shift-unshift-helper (g , a) (suc n) with g 0
-  -- ... | (inl r) = refl
-  -- ... | (inr tt) = refl
-  
-  -- shift-unshift : ∀ {A} t → shift {A = A} (fst t 0) (unshift t) ≡ t
-  -- shift-unshift (g , a) =
-  --   ΣPathP (funExt (shift-unshift-helper (g , a)) , temp)
-  --   where
-  --     postulate
-  --       temp : PathP (λ i → ismon (funExt (shift-unshift-helper (g , a)) i)) (snd (shift (g 0) (unshift (g , a)))) a
-
-  shift : ∀ {A} → (t : Seq {A}) → Σ (A ⊎ Unit) (λ va → ismon' (λ {0 → va ; (suc n) → fst t n}) 0) → Seq {A}
+  shift : ∀ {A} → (t : Seq A) → Σ (A ⊎ Unit) (λ va → ismon' (λ {0 → va ; (suc n) → fst t n}) 0) → Seq A
   shift (g , a) (va , mon) = (λ {0 → va ; (suc n) → g n}) , (λ {0 → mon ; (suc n) → a n})
 
-  shift' : ∀ {A} → Seq {A} → Seq {A}
+  shift' : ∀ {A} → Seq A → Seq A
   shift' t =
     shift t
       ((inr tt) ,
@@ -197,7 +154,7 @@ module _ where
         λ {(inl r) → inr (refl , inl-inr-disjoint r)
           ;(inr tt) → inl refl}))
 
-  unshift : ∀ {A} → Seq {A} → Seq {A}
+  unshift : ∀ {A} → Seq A → Seq A
   unshift (g , a) = g ∘ suc , a ∘ suc
   
   -- works for any -- (fst t 0)
@@ -208,110 +165,310 @@ module _ where
   shift-unshift (g , a) =
     ΣPathP ((funExt λ {0 → refl ; (suc n) → refl }) , λ {i 0 → a 0 ; i (suc n) → a (suc n)})
 
--- ----------------------------------
--- -- Sequence equivalent to Delay --
--- ----------------------------------
+----------------------------------
+-- Sequence equivalent to Delay --
+----------------------------------
 
--- -- module _ where
--- --   abstract
--- --     mutual
--- --       ∞j : ∀ {A} → P₀ {S = delay-S A} (delay A) → Seq {A}
--- --       ∞j {A} (inl a , _) = (λ _ → inl a) , (λ _ → inl refl)
--- --       ∞j {A} (inr tt , t) = shift (inr tt) (j (t tt))
+{-# TERMINATING #-} -- Do something about this!
+j : ∀ {A} → Delay A → Seq A
+j (now a) = (λ x → inl a) , (λ n → inl refl)
+j (later x) = shift' (j (force x))
+  where open ∞Delay
+
+-- {-# NO_POSITIVITY_CHECK #-}
+{-# TERMINATING #-} -- Do something about this!
+h : ∀ {A} → Seq A → Delay A
+h (g , a) = case g 0 of
+  λ {(inr t) → later record { force = h (unshift (g , a)) }
+    ;(inl r) → now r}
+
+case-0_return_of_ : ∀ {ℓ ℓ'} {A : Type ℓ} (x : ℕ → A) (B : A → Type ℓ') → (∀ x → B x) → B (x 0)
+case-0 x return P of f = f (x 0)
+
+postulate
+  htrr : ∀ {ℓ} {A : Set ℓ} {r : A} → inl r ≡ inr tt → ⊥
+
+{-# TERMINATING #-}
+eghtrkn :
+  ∀ {A} (x : Seq A) → (r : A) → (inl r ≡ fst x 0) →
+    (Σ (∀ n → inl r ≡ fst x n) λ p →
+      PathP (λ x₁ → ∀ n → (p n x₁ ≡ p (suc n) x₁) ⊎ ((p n x₁ ≡ inr tt) × (p (suc n) x₁ ≡ inr tt → ⊥)))
+        (λ n → inl (refl {x = inl r}))
+        (snd x))
+fst (eghtrkn (g , q) r p) 0 = p
+fst (eghtrkn (g , q) r p) (suc n) with q n
+... | (inl v) = fst (eghtrkn (g , q) r p) n ∙ v
+... | (inr (t , t')) = Cubical.Data.Empty.elim (htrr (fst (eghtrkn (g , q) r p) n ∙ t)) -- contradiction
+snd (eghtrkn (g , q) r p) = temp
+  where
+    postulate
+      temp : PathP
+        (λ x₁ →
+          (n : ℕ) →
+          (fst (eghtrkn (g , q) r p) n x₁ ≡
+            fst (eghtrkn (g , q) r p) (suc n) x₁)
+          ⊎
+          ((fst (eghtrkn (g , q) r p) n x₁ ≡ inr tt) ×
+            (fst (eghtrkn (g , q) r p) (suc n) x₁ ≡ inr tt → ⊥)))
+        (λ n → inl refl) q
+
+{-# TERMINATING #-}
+j-h : ∀ {A} (x : Seq A) → j (h x) ≡ x
+j-h (g , q) with g 0
+... | (inl r) =
+  let temp' = (eghtrkn (g , q) r temp) in
+  ΣPathP (funExt (temp' .fst) , temp' .snd) 
+  where
+    postulate
+      temp : inl r ≡ g 0
+... | (inr tt) =
+  ((shift' (j (h (unshift (g , q))))) ≡⟨ cong shift' (j-h (unshift (g , q))) ⟩ shift' (unshift (g , q)) ≡⟨ temp ⟩ shift (unshift (g , q)) (g 0 , q 0) ≡⟨ shift-unshift (g , q) ⟩ (g , q) ∎)
+  -- ΣPathP ((fst (shift' (j (h (unshift (g , q))))) ≡⟨ cong (fst ∘ shift') (j-h (unshift (g , q))) ⟩ fst (shift' (unshift (g , q))) ≡⟨ {!!} ⟩ g ∎) , {!!})
+  where
+    open ∞Delay
+    postulate
+      temp : shift' (unshift (g , q)) ≡ shift (unshift (g , q)) (g 0 , q 0) -- = (g 0 ≡ inr tt)
+  
+  -- ΣPathP (({!!} ≡⟨ {!!} ⟩ {!!} ∎) , {!!})
+  -- case g 0 return ? of {!!}
+  -- ΣPathP (((λ n → inl r) ≡⟨ funExt (eghtrkn ((λ {0 → inl r ; (suc n) → g (suc n)}) , {!!}) r refl) ⟩ (λ { 0 → inl r ; (suc n) → g (suc n) }) ≡⟨ {!!} ⟩ g ∎) , {!!})
+
+  -- transport {!!}
+  -- (case q 0 return (λ x → j (h (g , (λ {0 → x ; (suc n) → q (suc n)}))) ≡ {!!}) of {!!})
+  -- -- case g 0 return (λ x → j (h ((λ { 0 → {!!} ; (suc n) → g (suc n) }) , λ {0 → {!!} ; (suc n) → {!!}})) ≡ {!!}) of λ {(inl r) → {!!} ; (inr r) → {!!}}
+
+-- module _ where
+--   abstract
+--     mutual
+--       ∞j : ∀ {A} → P₀ {S = delay-S A} (delay A) → Seq {A}
+--       ∞j {A} (inl a , _) = (λ _ → inl a) , (λ _ → inl refl)
+--       ∞j {A} (inr tt , t) = shift' (j (t tt))
     
--- --       j : ∀ {A} → (delay A) → Seq {A}
--- --       j {A} = M-coinduction-const (Seq {A}) ∞j
+--       j : ∀ {A} → (delay A) → Seq {A}
+--       j {A} = M-coinduction-const (Seq {A}) ∞j
+
+--     h-lift-x : ∀ {A} → Seq {A} → (n : ℕ) → W (delay-S A) n
+--     h-lift-x s 0 = lift tt
+--     h-lift-x s (suc n) = fst s 0 , λ _ → h-lift-x (unshift s) n
     
--- --     h-lift-x : ∀ {A} → Seq {A} → (n : ℕ) → W (delay-S A) n
--- --     h-lift-x s 0 = lift tt
--- --     h-lift-x s (suc n) = fst s 0 , λ _ → h-lift-x (unshift s) n
-    
--- --     h-lift-π : ∀ {A} → (t : Seq {A}) → (n : ℕ) → πₙ (delay-S A) (h-lift-x t (suc n)) ≡ (h-lift-x t n)
--- --     h-lift-π s 0 = refl {x = lift tt}
--- --     h-lift-π s (suc n) i = fst s 0 , λ _ → h-lift-π (unshift s) n i
+--     h-lift-π : ∀ {A} → (t : Seq {A}) → (n : ℕ) → πₙ (delay-S A) (h-lift-x t (suc n)) ≡ (h-lift-x t n)
+--     h-lift-π s 0 = refl {x = lift tt}
+--     h-lift-π s (suc n) i = fst s 0 , λ _ → h-lift-π (unshift s) n i
   
--- --     h : ∀ {A} → Seq {A} → delay A
--- --     h s = (h-lift-x s) , (h-lift-π s)
+--     h : ∀ {A} → Seq {A} → delay A
+--     h s = (h-lift-x s) , (h-lift-π s)
   
--- --     ∞h-j : ∀ {R} (b : P₀ {S = delay-S R} (delay R)) → h (j (in-fun b)) ≡ (in-fun b)
--- --     ∞h-j (inl r , b) = {!!}
--- --     ∞h-j (inr tt , t) = {!!}
+--     ∞h-j : ∀ {R} (b : P₀ {S = delay-S R} (delay R)) → h (j (in-fun b)) ≡ (in-fun b)
+--     ∞h-j (inl r , b) = {!!}
+--     ∞h-j (inr tt , t) = {!!}
   
--- --     h-j : ∀ {R} (b : delay R) → h (j b) ≡ b
--- --     h-j = M-coinduction {!!} ∞h-j
+--     h-j : ∀ {R} (b : delay R) → h (j b) ≡ b
+--     h-j = M-coinduction {!!} ∞h-j
   
--- --     j-h : ∀ {R} (b : Seq {R}) → j (h b) ≡ b
--- --     j-h = ?
+--     j-h : ∀ {R} (b : Seq {R}) → j (h b) ≡ b
+--     j-h = ?
   
--- --   Delay-Seq-Iso : ∀ {A} → Iso (Delay A) (Seq {A})
--- --   Delay-Seq-Iso = (iso j h j-h h-j)
+--   Delay-Seq-Iso : ∀ {A} → Iso (Delay A) (Seq {A})
+--   Delay-Seq-Iso = (iso j h j-h h-j)
   
--- --   Delay≡Seq : ∀ {A} → Delay A ≡ Seq {A}
--- --   Delay≡Seq = isoToPath Delay-Seq-Iso
+--   Delay≡Seq : ∀ {A} → Delay A ≡ Seq {A}
+--   Delay≡Seq = isoToPath Delay-Seq-Iso
 
 -- -----------------------
 -- -- Sequence ordering --
 -- -----------------------
 
--- _↓seq_ : ∀ {A} → Seq {A} → A → Set
--- s ↓seq a = Σ ℕ λ n → fst s n ≡ inl a
+_↓seq_ : ∀ {A} → Seq A → A → Set
+s ↓seq a = Σ ℕ λ n → fst s n ≡ inl a
 
--- _⊑seq_ : ∀ {A} → ∀ (_ _ : Seq {A}) → Set
--- _⊑seq_ {A} s t = (a : A) → ∥ s ↓seq a ∥ → ∥ t ↓seq a ∥
+_⊑seq_ : ∀ {A} → ∀ (_ _ : Seq A) → Set
+_⊑seq_ {A} s t = (a : A) → ∥ s ↓seq a ∥ → ∥ t ↓seq a ∥
 
--- _∼seq_ : ∀ {A} → ∀ (_ _ : Seq {A}) → Set
--- s ∼seq t = s ⊑seq t × t ⊑seq s
+_∼seq_ : ∀ {A} → ∀ (_ _ : Seq A) → Set
+s ∼seq t = s ⊑seq t × t ⊑seq s
 
--- postulate -- TODO
---   delay-set-quotiented : ∀ R → (delay R) / (_≈_ {R}) ≡ (Seq {R}) / (_∼seq_ {R})
--- -- delay-set-quotiented R = {!!} -- equality by eq/
+_↓′_ : ∀ {A} → Seq A → A → Set _
+(f , _) ↓′ y = Σ[ m ∈ ℕ ] ((f m ≡ inl y) × (∀ n → (f n ≡ inr tt → ⊥) → m ≤ n))
+  where open import Cubical.Data.Nat.Order
 
--- ----------------------
--- -- Partiality monad --
--- ----------------------
+⇓′-propositional : ∀ {A} → isSet A → ∀ x {y : A} → isProp (x ↓′ y)
+⇓′-propositional A-set x@(f , _) {y} =
+  let temp : Σ[ m ∈ ℕ ] (isProp ((f m ≡ inl y) × (∀ n → (f n ≡ inr tt → ⊥) → m ≤ n)))
+      temp = {!!} , {!!}
+  in
+  λ x' y' → transport Σ-split ({!!} , {!!})
+  where open import Cubical.Data.Nat.Order
 
-record partiality-monad {ℓ} {ℓ'} {A : Set (ℓ-max ℓ ℓ')} : Set (ℓ-suc (ℓ-max ℓ ℓ')) where
-  field
-    A⊥ : Set ℓ'
-    _⊑_ : A⊥ → A⊥ → Set ℓ'
+⇓′→⇓ : ∀ {A} x {y : A} → x ↓′ y → x ↓seq y
+⇓′→⇓ = λ x x₁ → fst x₁ , proj₁ (snd x₁)
 
-    -- set-trunc : (x y : A⊥) (p q : x ≡ y) → p ≡ q
+⇓→⇓′ : ∀ {A} x {y : A} → x ↓seq y → x ↓′ y
+⇓→⇓′ x@(f , inc) = uncurry {!!} -- find-min
+  -- where
+  -- find-min : ∀ {y} m → f m ↓ y → x ⇓′ y
+  -- find-min     zero    f0↓y    = zero , f0↓y , λ _ _ → N.zero≤ _
+  -- find-min {y} (suc m) f-1+m↓y with inspect (f m)
+  -- ... | nothing , fm↑ = suc m , f-1+m↓y , 1+m-is-min
+  --   where
+  --   1+m-is-min : ∀ n → ¬ f n ↑ → m N.< n
+  --   1+m-is-min n ¬fn↑ with inspect (f n)
+  --   ... | nothing , fn↑ = ⊥-elim (¬fn↑ fn↑)
+  --   ... | just _  , fn↓ = ↑<↓ inc fm↑ fn↓
+  -- ... | just y′ , fm↓y′ =
+  --            $⟨ find-min m fm↓y′ ⟩
+  --   x ⇓′ y′  ↝⟨ Σ-map id (Σ-map with-other-value id) ⟩□
+  --   x ⇓′ y   □
+  --   where
+  --   with-other-value : ∀ {n} → f n ↓ y′ → f n ↓ y
+  --   with-other-value =
+  --     subst (_ ↓_)
+  --           (termination-value-unique x (_ , fm↓y′) (_ , f-1+m↓y))
+            
+↓⇔∥↓∥ : ∀ {A} → isSet A → ∀ x {y : A} → (x ↓seq y → ∥ x ↓seq y ∥) × (∥ x ↓seq y ∥ → x ↓seq y)
+↓⇔∥↓∥ A-set x {y} =
+  (∣_∣) ,
+  let temp = Cubical.HITs.PropositionalTruncation.rec (⇓′-propositional A-set x {y = y}) (⇓→⇓′ x) in
+  λ x₁ → let temp' = temp x₁ in ⇓′→⇓ x temp'
 
-    η : A → A⊥
-    ⊥ₐ : A⊥
-    ⊔ : (Σ (ℕ → A⊥) λ s → (n : ℕ) → s n ⊑ s (suc n)) → A⊥
+-- ⇓⇔∥⇓∥ : Is-set A → ∀ x {y : A} → x ⇓ y ⇔ x ∥⇓∥ y
+-- ⇓⇔∥⇓∥ A-set x {y} = record
+--   { to   = ∣_∣
+--   ; from = x ∥⇓∥ y  ↝⟨ Trunc.rec (⇓′-propositional A-set x) (⇓→⇓′ x) ⟩
+--            x ⇓′ y   ↝⟨ Σ-map id proj₁ ⟩□
+--            x ⇓ y    □
+--   }
+  
+----------------------
+-- Partiality monad --
+----------------------
 
-    ⊑-refl : ∀ (x : A⊥) → x ⊑ x
-    ⊑-trans : ∀ (x y z : A⊥) → x ⊑ y → y ⊑ z → x ⊑ z
-    ⊑-⊥ : ∀ (x) → ⊥ₐ ⊑ x
+-- Partiality monad
+-- Paper: Partiality, Revisited: The Partiality Monad as a Quotient Inductive-Inductive Type (https://arxiv.org/abs/1610.09254)
+-- Authors: Thorsten Altenkirch, Nils Anders Danielsson, Nicolai Kraus
+-- Formalization: http://www.cse.chalmers.se/~nad/listings/partiality-monad/Partiality-monad.Inductive.html
+mutual
+  infix 10 _⊥
+  infix 4  _⊑_
 
-    α : (x y : A⊥) → x ⊑ y → y ⊑ x → x ≡ y
+  abstract
+    -- The partiality monad.
 
-    ⊑-prop : isProp ({x y : A⊥} → x ⊑ y)
-    ⊑-0 : {(s , p) : Σ (ℕ → A⊥) λ s → (n : ℕ) → s n ⊑ s (suc n)} → (n : ℕ) → s n ⊑ ⊔ (s , p)
-    ⊑-1 : {(s , p) : (Σ (ℕ → A⊥) λ s → (n : ℕ) → s n ⊑ s (suc n))} → (x : A⊥) → (n : ℕ) → s n ⊑ x → ⊔ (s , p) ⊑ x
+    data <_>⊥ {ℓ} (A : Type ℓ) : Type ℓ where
+      never  : < A >⊥
+      η      : A → < A >⊥
+      ⊔      : Increasing-sequence A → < A >⊥
+      α      : ∀ {x y} → x ⊑ y → y ⊑ x → x ≡ y
+      ⊥-is-set : isSet (< A >⊥)
 
-open partiality-monad
+  -- Increasing sequences.
 
--- -- w : ∀ {A} → Seq {A} → partiality-monad {A}
--- -- w {A} (s , q) = record
--- --               { A⊥ = Σ ((x : ℕ) → A ⊎ Unit)
--- --                        (λ z →
--- --                           (x : ℕ) →
--- --                           (z x ≡ z (suc x)) ⊎
--- --                           ((z x ≡ inr tt) × ((x₁ : z (suc x) ≡ inr tt) → ⊥)))
--- --               ; _⊑_ = _⊑seq_ {A = A}
--- --               ; η = λ _ → s , q
--- --               ; ⊥ₐ = s , q
--- --               ; ⊔ = λ _ → s , q
--- --               ; ⊑-refl = λ x a z → z
--- --               ; ⊑-trans = λ x y z z₁ z₂ a z₃ → z₂ a (z₁ a z₃)
--- --               ; ⊑-⊥ = {!!}
--- --               ; α = {!!}
--- --               ; ⊑-prop = {!!}
--- --               ; ⊑-0 = {!!}
--- --               ; ⊑-1 = {!!}
--- --               }
+  Increasing-sequence : ∀ {ℓ} → Type ℓ → Type ℓ
+  Increasing-sequence A = Σ[ f ∈ (ℕ → < A >⊥) ] ((n : ℕ) → f n ⊑ f (suc n))
+
+  -- Upper bounds.
+
+  Is-upper-bound : ∀ {ℓ} → {A : Type ℓ} → Increasing-sequence A → < A >⊥ → Set ℓ
+  Is-upper-bound s x = ∀ n → (fst s n) ⊑ x
+
+  -- A projection function for Increasing-sequence.
+  
+  abstract
+    -- An ordering relation.
+
+    data _⊑_ {ℓ} {A : Set ℓ} : < A >⊥ → < A >⊥ → Set ℓ where
+      ⊑-refl            : ∀ x → x ⊑ x
+      ⊑-trans           : ∀ {x y z} → x ⊑ y → y ⊑ z → x ⊑ z
+      never⊑            : ∀ x → never ⊑ x
+      upper-bound       : ∀ s → Is-upper-bound s (⊔ s)
+      least-upper-bound : ∀ s ub → Is-upper-bound s ub → ⊔ s ⊑ ub
+      ⊑-propositional   : ∀ {x y} → isProp (x ⊑ y)
+
+abstract
+  Maybe→⊥ : ∀ {A : Type₀} → A ⊎ Unit → < A >⊥
+  Maybe→⊥ (inr tt)  = never
+  Maybe→⊥ (inl y) = η y
+
+  infix 4 _↑ _↓_
+
+  -- x ↓ y means that the computation x has the value y.
+
+  _↓_ : ∀ {A : Set} → A ⊎ Unit → A → Set
+  x ↓ y = x ≡ inl y
+
+  -- x ↑ means that the computation x does not have a value.
+
+  _↑ :  ∀ {A : Set} → A ⊎ Unit → Set
+  x ↑ = x ≡ inr tt
+
+  LE : ∀ {A : Set} → A ⊎ Unit → A ⊎ Unit → Set
+  LE x y = (x ≡ y) ⊎ ((x ↑) × (y ↑ → ⊥))
+
+  Maybe→⊥-mono : ∀ {A : Type₀} {x y : A ⊎ Unit} → LE x y → (Maybe→⊥ x) ⊑ (Maybe→⊥ y)
+  Maybe→⊥-mono {x = x} {y} (inl p) = subst (λ a → Maybe→⊥ x ⊑ Maybe→⊥ a) p (⊑-refl (Maybe→⊥ x))
+  Maybe→⊥-mono {x = x} {y} (inr p) = subst (λ a → Maybe→⊥ a ⊑ Maybe→⊥ y) (sym (proj₁ p)) (never⊑ (Maybe→⊥ y))
+
+  Seq→Inc-seq : ∀ {A} → Seq A → Increasing-sequence A
+  Seq→Inc-seq (f , inc) = Maybe→⊥ ∘ f , Maybe→⊥-mono ∘ inc
+
+  -- Turns increasing sequences of potential values into partial values.
+
+  Seq→⊥ : ∀ {A} → Seq A → < A >⊥
+  Seq→⊥ = ⊔ ∘ Seq→Inc-seq
+
+  -- If every element in one increasing sequence is bounded by some
+  -- element in another, then the least upper bound of the first
+  -- sequence is bounded by the least upper bound of the second one.
+  private
+    ⊑→⨆⊑⨆ : ∀ {A : Set} {s₁ s₂ : Increasing-sequence A} {f : ℕ → ℕ} →
+            (∀ n → fst s₁ n ⊑ fst s₂ (f n)) → ⊔ s₁ ⊑ ⊔ s₂
+    ⊑→⨆⊑⨆ {s₁} {s₂} {f} s₁⊑s₂ =
+      least-upper-bound _ _ λ n → ⊑-trans (s₁⊑s₂ n) (upper-bound _ _)
+
+  -- A variant of the previous lemma.
+
+  private
+    ∃⊑→⨆⊑⨆ : ∀ {A : Set} {s₁ s₂ : Increasing-sequence A} →
+             (∀ m → Σ[ n ∈ ℕ ] (fst s₁  m ⊑ fst s₂ n)) → ⊔ s₁ ⊑ ⊔ s₂
+    ∃⊑→⨆⊑⨆ s₁⊑s₂ = ⊑→⨆⊑⨆ (snd ∘ s₁⊑s₂)
+
+  Other-singleton : {a : Level} {A : Set a} → A → Set a
+  Other-singleton {A = A} x = Σ-syntax A λ y → x ≡ y
+
+  inspect : ∀ {A : Set} -> (x : A ⊎ Unit) → Other-singleton x
+  inspect (inl r) = (inl r) , refl
+  inspect (inr tt) = (inr tt) , refl
+  
+  Seq→⊥-mono : ∀ {A : Set} → isSet A → ∀ (x y : Seq A) → x ⊑seq y → Seq→⊥ x ⊑ Seq→⊥ y
+  Seq→⊥-mono A-set x@(f , _) y@(g , _) x⊑y =
+    ∃⊑→⨆⊑⨆ inc
+    where
+      inc : ∀ m → Σ[ n ∈ ℕ ] (Maybe→⊥ (f m) ⊑ Maybe→⊥ (g n))
+      inc m with inspect (f m)
+      ... | (inr tt , p) = 0 , subst (λ x₁ → Maybe→⊥ x₁ ⊑ Maybe→⊥ (g 0)) (sym p) (never⊑ (Maybe→⊥ (g 0))) -- never⊑ (Maybe→⊥ (g 0))
+      ... | (inl r , p) = fst y↓z , subst (λ a → Maybe→⊥ (f m) ⊑ Maybe→⊥ a) (sym (snd y↓z))
+                                    (subst (λ a → Maybe→⊥ a ⊑ η r) (sym p) (⊑-refl (η r)))
+        where
+          y↓z : y ↓seq r
+          y↓z = let temp = x⊑y r in let temp' = proj₂ (↓⇔∥↓∥ A-set y) ∘ temp in temp' ∣ m , p ∣
+    
+  Delay→⊥-≈→≡ : ∀ {A} → isSet A → ∀ (x y : Seq A) → x ∼seq y → Seq→⊥ x ≡ Seq→⊥ y
+  Delay→⊥-≈→≡ A-set x y (p , q) = α (Seq→⊥-mono A-set x y p) (Seq→⊥-mono A-set y x q)
+
+  recc :
+    ∀ {A B : Set} {R : A → A → Set} →
+    (f : A → B) →
+    (∀ {x y} → R x y → f x ≡ f y) →
+    isSet B →
+    A / R → B
+  recc f g s [ x ] = f x
+  recc f g s (eq/ _ _ r i) = g r i
+  recc f g s (squash/ x y p q i j) = s (recc f g s x) (recc f g s y) (cong (λ a → recc f g s a) p) (cong (λ a → recc f g s a) q) i j
+      
+  ⊥→⊥ : ∀ {A} → isSet A → (Seq A / _∼seq_) → < A >⊥
+  ⊥→⊥ {A} A-set = recc Seq→⊥ (λ {x y} → Delay→⊥-≈→≡ A-set x y) ⊥-is-set
+          
+postulate
+  never-terminate-does-not-terminate : ∀ {A} (x : A) → ∥ ((λ x₁ → inr tt) , (λ n → inl (λ _ → inr tt))) ↓seq x ∥ → ⊥
 
 -- never : ∀ {R} → delay R
 -- never = lift-to-M-general (λ _ → inr tt) (λ _ → refl {x = inr tt})
