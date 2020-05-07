@@ -18,11 +18,11 @@ open import Cubical.Foundations.Path
 open import Cubical.Functions.Embedding
 open import Cubical.Functions.FunExtEquiv
 
-open import helper
+open import Cubical.Codata.M.AsLimit.helper
 
-open import Coalg.Base
-open import Container
-open import M
+open import Cubical.Codata.M.AsLimit.Coalg.Base
+open import Cubical.Codata.M.AsLimit.Container
+open import Cubical.Codata.M.AsLimit.M
 
 module Coalg.Properties where
 
@@ -45,7 +45,6 @@ M-coalg {S = S} =
 PM-coalg : ∀ {ℓ} {S : Container {ℓ}} -> Coalg₀ {S = S}
 PM-coalg {S = S} =
   (P₀ (M S)) , P₁ out-fun
-  
 
 Final : ∀ {ℓ} {S : Container {ℓ}} -> Set (ℓ-suc ℓ)
 Final {S = S} = Σ (Coalg₀ {S = S}) λ X,ρ → ∀ (C,γ : Coalg₀ {S = S}) -> isContr (_⇒_ {S = S} (C,γ) (X,ρ))
