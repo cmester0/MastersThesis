@@ -202,11 +202,11 @@ tail-to-tl b = refl
 --   where
 --     open Iso
 
--- postulate
---   tl-to-tail : ∀ {A : Set} (b : Stream A) → tl (Stream-to-stream b) ≡ Stream-to-stream (tail b) -- should this be able to compute ??
+postulate
+  tl-to-tail : ∀ {A : Set} (b : Stream A) → tl (Stream-to-stream b) ≡ Stream-to-stream (tail b) -- should this be able to compute ??
 
-tl-to-tail : ∀ {A : Set} (b : Stream A) → tl (Stream-to-stream b) ≡ Stream-to-stream (tail b)
-tl-to-tail = {!!}
+-- tl-to-tail : ∀ {A : Set} (b : Stream A) → tl (Stream-to-stream b) ≡ Stream-to-stream (tail b)
+-- tl-to-tail = {!!}
 
 nth : ∀ {A : Set} → ℕ → (b : Stream A) → A
 nth 0 b = head b
@@ -275,8 +275,22 @@ Zeros : Stream ℕ
 head Zeros = 0
 tail Zeros = Zeros
 
+zeros : stream ℕ
+zeros = lift-direct-M zeros-x zeros-π
+  where
+    zeros-x : (n : ℕ) → W (stream-S ℕ) n
+    zeros-x 0 = lift tt
+    zeros-x (suc n) = 0 , (λ _ → zeros-x n)
+    
+    zeros-π : (n : ℕ) → π (sequence (stream-S ℕ)) (zeros-x (suc n)) ≡ zeros-x n
+    zeros-π 0 i = lift tt
+    zeros-π (suc n) i = 0 , (λ _ → zeros-π n i)
+
 zeros-transported : stream ℕ
 zeros-transported = transport (sym stream-equality) Zeros
+
+transport-Zeros-is-zeros : zeros-transported ≡ zeros
+transport-Zeros-is-zeros = {!!}
 
 -- It is now easy to show computation properties for the M-types:
 hd-zeros-transported : hd zeros-transported ≡ 0
