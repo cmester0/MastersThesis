@@ -1,4 +1,4 @@
-{-# OPTIONS --cubical --guardedness #-} --safe
+{-# OPTIONS --cubical #-} --safe
 
 open import Cubical.Foundations.Prelude
 open import Cubical.Foundations.Equiv using (_≃_)
@@ -16,8 +16,8 @@ open import Cubical.Foundations.Univalence
 open import Cubical.Foundations.Isomorphism
 open import Cubical.Foundations.Function
 
-open import helper
-open import Container
+open import Cubical.Codata.M.AsLimit.helper
+open import Cubical.Codata.M.AsLimit.Container
 
 module Container-M-type where
 
@@ -27,51 +27,21 @@ open Iso
 -- Properties of M-types --
 ---------------------------
 
-Container-product : ∀ {ℓ} (_ _ : Container {ℓ}) -> Container {ℓ}
+
+Container-product : ∀ {ℓ} (_ _ : Container ℓ) -> Container ℓ
 Container-product (A , B) (C , D) = (A × C , λ x → B (proj₁ x) × D (proj₂ x) )
-
--- P-product :
---   ∀ {ℓ} {A C : Set ℓ} {B : A -> Set ℓ} {D : C -> Set ℓ}
---   -> ((n : ℕ) -> W (A , B) n) × ((n : ℕ) -> W (C , D) n)
---   ------------------------
---   -> (n : ℕ) -> W (Container-product (A , B) (C , D)) n
--- P-product (x , y) 0 = lift tt
--- P-product (x , y) (suc n) = ((x (suc n) .fst) , (y (suc n) .fst)) , λ _ → P-product (x , y) n
-
--- P-product-inv₁ :
---   ∀ {ℓ} {A C : Set ℓ} {B : A -> Set ℓ} {D : C -> Set ℓ}
---   -> ((n : ℕ) -> W (Container-product (A , B) (C , D)) n)
---   ------------------------
---   -> (n : ℕ) -> W (A , B) n
--- P-product-inv₁ x 0 = lift tt
--- P-product-inv₁ {D = D} x (suc n) = (proj₁ (x (suc n) .fst)) , (λ _ → P-product-inv₁ {D = D} x n)
-
--- P-product-inv₂ :
---   ∀ {ℓ} {A C : Set ℓ} {B : A -> Set ℓ} {D : C -> Set ℓ}
---   -> ((n : ℕ) -> W (Container-product (A , B) (C , D)) n)
---   ------------------------
---   -> (n : ℕ) -> W (C , D) n
--- P-product-inv₂ x 0 = lift tt
--- P-product-inv₂ {B = B} x (suc n) = (proj₂ (x (suc n) .fst)) , (λ _ → P-product-inv₂ {B = B} x n)
-
--- P-product-inv :
---   ∀ {ℓ} {A C : Set ℓ} {B : A -> Set ℓ} {D : C -> Set ℓ}
---   -> ((n : ℕ) -> W (Container-product (A , B) (C , D)) n)
---   ------------------------
---   -> ((n : ℕ) -> W (A , B) n) × ((n : ℕ) -> W (C , D) n)
--- P-product-inv {B = B} {D = D} x = (P-product-inv₁ {D = D} x) , (P-product-inv₂ {B = B} x)
 
 Σ-prod-fun-Iso :
   ∀ {ℓ} {A C : Set ℓ} {B : A -> Set ℓ} {D : C -> Set ℓ}
   → (n : ℕ)
   → (x : A × C)
-  → Iso ((B (proj₁ x) → W (A , B) n) × (D (proj₂ x) → W (C , D) n))
-         (B (proj₁ x) × D (proj₂ x) → W (A , B) n × W (C , D) n)
+  → Iso ((B (proj₁ x) → Wₙ (A , B) n) × (D (proj₂ x) → Wₙ (C , D) n))
+         (B (proj₁ x) × D (proj₂ x) → Wₙ (A , B) n × Wₙ (C , D) n)
 fun (Σ-prod-fun-Iso n x) (bf , df) (b , d) = bf b , df d
 inv (Σ-prod-fun-Iso {A = A} {C} {B} {D} n x) = Σ-prod-fun₂
   where
     postulate
-      Σ-prod-fun₂ : (B (proj₁ x) × D (proj₂ x) → W (A , B) n × W (C , D) n) → (B (proj₁ x) → W (A , B) n) × (D (proj₂ x) → W (C , D) n)
+      Σ-prod-fun₂ : (B (proj₁ x) × D (proj₂ x) → Wₙ (A , B) n × Wₙ (C , D) n) → (B (proj₁ x) → Wₙ (A , B) n) × (D (proj₂ x) → Wₙ (C , D) n)
 rightInv (Σ-prod-fun-Iso n x) = Σ-prod-iso₁
   where
     postulate
@@ -85,20 +55,16 @@ leftInv (Σ-prod-fun-Iso n x) = Σ-prod-iso₂
   ∀ {ℓ} {A C : Set ℓ} {B : A -> Set ℓ} {D : C -> Set ℓ}
   → (n : ℕ)
   → (x : A × C)
-  → (B (proj₁ x) → W (A , B) n) × (D (proj₂ x) → W (C , D) n)
-  ≡ (B (proj₁ x) × D (proj₂ x) → W (A , B) n × W (C , D) n)
+  → (B (proj₁ x) → Wₙ (A , B) n) × (D (proj₂ x) → Wₙ (C , D) n)
+  ≡ (B (proj₁ x) × D (proj₂ x) → Wₙ (A , B) n × Wₙ (C , D) n)
 Σ-prod-fun {B = B} {D} n x = isoToPath (Σ-prod-fun-Iso n x)
-  -- isoToPath (iso (Σ-prod-fun₁ n (a , c))
-  --                (Σ-prod-fun₂ n (a , c))
-  --                (Σ-prod-iso₁ n (a , c))
-  --                (Σ-prod-iso₂ n (a , c)))
 
 P-equality-helper-Iso :
     ∀ {ℓ} {A C : Set ℓ} {B : A -> Set ℓ} {D : C -> Set ℓ}
     -> (n : ℕ)
     ------------------------
-    → Iso (Σ A (λ a → B a → W (A , B) n) × Σ C (λ c → D c → W (C , D) n))
-          (Σ (A × C) (λ x → (B (proj₁ x) → W (A , B) n) × (D (proj₂ x) → W (C , D) n)))
+    → Iso (Σ A (λ a → B a → Wₙ (A , B) n) × Σ C (λ c → D c → Wₙ (C , D) n))
+          (Σ (A × C) (λ x → (B (proj₁ x) → Wₙ (A , B) n) × (D (proj₂ x) → Wₙ (C , D) n)))
 P-equality-helper-Iso n =
   (iso (λ x → ((proj₁ x) .fst , (proj₂ x) .fst) , ((proj₁ x) .snd , (proj₂ x) .snd))
                    (λ x → (proj₁ (x .fst) , proj₁ (x .snd)) , ((proj₂ (x .fst)) , (proj₂ (x .snd))))
@@ -109,41 +75,41 @@ P-equality-helper :
     ∀ {ℓ} {A C : Set ℓ} {B : A -> Set ℓ} {D : C -> Set ℓ}
     -> (n : ℕ)
     ------------------------
-    -> Σ A (λ a → B a → W (A , B) n) × Σ C (λ c → D c → W (C , D) n)
-    ≡ Σ (A × C) (λ x → (B (proj₁ x) → W (A , B) n) × (D (proj₂ x) → W (C , D) n))
+    -> Σ A (λ a → B a → Wₙ (A , B) n) × Σ C (λ c → D c → Wₙ (C , D) n)
+    ≡ Σ (A × C) (λ x → (B (proj₁ x) → Wₙ (A , B) n) × (D (proj₂ x) → Wₙ (C , D) n))
 P-equality-helper n = isoToPath (P-equality-helper-Iso n)
 
 P-equality-Iso :
     ∀ {ℓ} {A C : Set ℓ} {B : A -> Set ℓ} {D : C -> Set ℓ}
     → (n : ℕ)
     ------------------------
-    → Iso (W (A , B) n × W (C , D) n)
-          (W (Container-product (A , B) (C , D)) n)
+    → Iso (Wₙ (A , B) n × Wₙ (C , D) n)
+          (Wₙ (Container-product (A , B) (C , D)) n)
 fun (P-equality-Iso 0) =  (λ _ → lift tt)
 inv (P-equality-Iso 0) = (λ _ → lift tt , lift tt)
 rightInv (P-equality-Iso 0) = (λ b i → lift tt)
 leftInv (P-equality-Iso 0) = (λ {(_ , _) i → (lift tt) , (lift tt)})
 P-equality-Iso {A = A} {C} {B} {D} (suc n) =
-  W (A , B) (suc n) × W (C , D) (suc n)
+  Wₙ (A , B) (suc n) × Wₙ (C , D) (suc n)
     Iso⟨ (P-equality-helper-Iso {A = A} {C} {B} {D} n) ⟩
-  Σ (A × C) (λ x → (B (proj₁ x) → W (A , B) n) × (D (proj₂ x) → W (C , D) n))
+  Σ (A × C) (λ x → (B (proj₁ x) → Wₙ (A , B) n) × (D (proj₂ x) → Wₙ (C , D) n))
     Iso⟨ (Σ-ap-iso₂ (Σ-prod-fun-Iso n)) ⟩
-  Σ (A × C) (λ x → B (proj₁ x) × D (proj₂ x) → W (A , (λ v → B v)) n × W (C , (λ v → D v)) n)
+  Σ (A × C) (λ x → B (proj₁ x) × D (proj₂ x) → Wₙ (A , (λ v → B v)) n × Wₙ (C , (λ v → D v)) n)
     Iso⟨ (Σ-ap-iso₂ λ x → pathToIso (cong (λ y → B (proj₁ x) × D (proj₂ x) → y) (isoToPath (P-equality-Iso n)))) ⟩
-  W (Container-product (A , B) (C , D)) (suc n) ∎Iso
+  Wₙ (Container-product (A , B) (C , D)) (suc n) ∎Iso
 
 P-equality :
     ∀ {ℓ} {A C : Set ℓ} {B : A -> Set ℓ} {D : C -> Set ℓ}
     -> (n : ℕ)
     ------------------------
-    -> (W (A , B) n × W (C , D) n)
-    ≡ (W (Container-product (A , B) (C , D)) n)
+    -> (Wₙ (A , B) n × Wₙ (C , D) n)
+    ≡ (Wₙ (Container-product (A , B) (C , D)) n)
 P-equality n = isoToPath (P-equality-Iso n)
 
 postulate
   π-equality :
     ∀ {ℓ} {A C : Set ℓ} {B : A -> Set ℓ} {D : C -> Set ℓ}
-    -> (x : (n : ℕ) -> W (Container-product (A , B) (C , D)) n)
+    -> (x : (n : ℕ) -> Wₙ (Container-product (A , B) (C , D)) n)
     -> (n : ℕ)
     ------------------------
     -> πₙ (Container-product (A , B) (C , D)) (x (suc n))
@@ -151,7 +117,7 @@ postulate
 
   π-equality-2₁ :
     ∀ {ℓ} {A C : Set ℓ} {B : A -> Set ℓ} {D : C -> Set ℓ}
-    -> (x : (n : ℕ) -> W (A , B) n × W (C , D) n)
+    -> (x : (n : ℕ) -> Wₙ (A , B) n × Wₙ (C , D) n)
     -> (n : ℕ)
     -----------------------
     -> πₙ (A , B) (proj₁ (x (suc n)))
@@ -159,7 +125,7 @@ postulate
 
   π-equality-2₂ :
     ∀ {ℓ} {A C : Set ℓ} {B : A -> Set ℓ} {D : C -> Set ℓ}
-    -> (x : (n : ℕ) -> W (A , B) n × W (C , D) n)
+    -> (x : (n : ℕ) -> Wₙ (A , B) n × Wₙ (C , D) n)
     -> (n : ℕ)
     -----------------------
     -> πₙ (C , D) (proj₂ (x (suc n)))
@@ -175,8 +141,8 @@ M-product-inv S T (x , y) = ((λ n → proj₁ (transport (sym (P-equality {B = 
                                 π-equality-2₂ {B = S .snd} {D = T .snd} (λ n → transport (λ i → P-equality {B = S .snd} {D = T .snd} n (~ i)) (x n))
 
 postulate
-  M-product-iso₁ : ∀ {ℓ} (S T : Container {ℓ}) b -> M-product S T (M-product-inv S T b) ≡ b
-  M-product-iso₂ : ∀ {ℓ} (S T : Container {ℓ}) a -> M-product-inv S T (M-product S T a) ≡ a
+  M-product-iso₁ : ∀ {ℓ} (S T : Container ℓ) b -> M-product S T (M-product-inv S T b) ≡ b
+  M-product-iso₂ : ∀ {ℓ} (S T : Container ℓ) a -> M-product-inv S T (M-product S T a) ≡ a
 
 M-product-equality : ∀ {ℓ} S T -> M {ℓ = ℓ} S × M T ≡ M (Container-product S T)
 M-product-equality S T = isoToPath (iso (M-product S T) (M-product-inv S T) (M-product-iso₁ S T) (M-product-iso₂ S T))

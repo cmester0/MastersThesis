@@ -449,13 +449,12 @@ abstract
   ⊥-⊥-Iso : ∀ {A} → isSet A → Iso (Seq A / _∼seq_) < A >⊥
   ⊥-⊥-Iso A-set = iso (seq/∼→⊥ A-set) (⊥→seq/∼ A-set) {!!} {!!}
 
-
 -------------------------------------------------------------------------
 -- Alternative definition of partiality monad using HITs and not HIITs --
 -------------------------------------------------------------------------
 
 -- Another Partiality monad (HIT)
--- Paper: Quotienting the Delay Monad by WeakBisimilarity (https://niccoloveltri.github.io/mscs_final.pdf)
+-- Paper: Quotienting the Delay Monad by Weak Bisimilarity (https://niccoloveltri.github.io/mscs_final.pdf)
 -- Authors: James Chapman, Tarmo Uustalu and Niccoló Veltri
 -- Formalization: http://cs.ioc.ee/~niccolo/delay/
 mutual
