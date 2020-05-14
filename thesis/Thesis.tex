@@ -74,6 +74,8 @@
 \newcommand*{\constant}[1]{\textcolor{orange!60!black}{\ensuremath{\mathtt{#1}}}}
 
 \newcommand*{\function}[1]{\textcolor{blue!60!black}{\ensuremath{\mathtt{#1}}}}
+\newcommand*{\constructor}[1]{\textcolor{purple!60!black}{\ensuremath{\mathtt{#1}}}}
+\newcommand*{\destructor}[1]{\textcolor{pink!60!black}{\ensuremath{\mathtt{#1}}}}
 \newcommand*{\typeformer}[1]{\ensuremath{\mathtt{#1}}}
 \newcommand*{\functor}[1]{\ensuremath{\mathbf{\mathtt{#1}}}}
 
@@ -155,6 +157,8 @@ We use the following notation / font:
 \item A type former or dependent type \(\typeformer{B} : \type{A} \rightarrow \universe{\mathcal{U}}\)
 \item A term \(\term{x} : \type{A}\) or for constants \(\constant{c} : \type{A}\)
 \item A function \(\function{f} : \type{A} \rightarrow \type{C}\)
+\item A constructor \(\constructor{f} : \type{A} \rightarrow \type{C}\) \todo{better description, not always a function}
+\item A destructor \(\destructor{f} : \type{A} \rightarrow \type{C}\) \todo{better description, not always a function}
 \item A path \(\pathterm{p} : \type{A} \equiv \type{C}\), heterogeneous paths are denotes \(\equiv_p\) or if the path is clear from context \(\equiv_*\).
 \item A relation \(\relation{R} : \type{A} \rightarrow \type{A} \rightarrow \universe{\mathcal{U}}\) with notation \(\term{x}~\relation{R}~\term{y}\).
 \item The unit type is \(\unit\) while the empty type is \(\empt\).
@@ -245,28 +249,28 @@ In this section we will introduce containers (also known as signatures), and sho
     \centering
     \begin{tikzcd}[row sep=large,column sep=large]
       \type{A} & \type{A} \times \typeformer{M}_{\containerpair{A}{\lambda\,\_,\unit}} \ar[l,"\pi_1"'] \ar[r,"\pi_2"] & \typeformer{M}_{\containerpair{A}{\lambda\,\_,\unit}} \\
-      & \typeformer{M}_{\containerpair{A}{\lambda\,\_,\unit}} \ar[ul,"\function{hd}"] \ar[u,"\function{out}"'] \ar[ur,"\function{tl}"']
+      & \typeformer{M}_{\containerpair{A}{\lambda\,\_,\unit}} \ar[ul,"\destructor{hd}"] \ar[u,"\function{out}"'] \ar[ur,"\destructor{tl}"']
     \end{tikzcd}
     \caption{\texttt{M}-types of streams}
     \label{fig:stream-M-type}
   \end{figure}
-  where \(\function{out}\) is an isomorphism (because of the finality of the coalgebra), with inverse \(\function{in} : \functor{P}_{\container{S}}(\typeformer{M}) \rightarrow \typeformer{M}\). We now have a semantic for the rules, we would expect for streams, if we let \(\function{cons} = \function{in}\) and \(\typeformer{stream}~\type{A} = \typeformer{M}_{\containerpair{\type{A}}{\lambda\,\_,\unit}}\),
+  where \(\function{out}\) is an isomorphism (because of the finality of the coalgebra), with inverse \(\function{in} : \functor{P}_{\container{S}}(\typeformer{M}) \rightarrow \typeformer{M}\). We now have a semantic for the rules, we would expect for streams, if we let \(\constructor{cons} = \function{in}\) and \(\typeformer{stream}~\type{A} = \typeformer{M}_{\containerpair{\type{A}}{\lambda\,\_,\unit}}\),
   \begin{equation}
-    \infer[\mathtt{E}_{\function{hd}}]{\function{hd}~\term{s} : \type{A}}{\type{A} : \universe{\mathcal{U}} & \term{s} : \typeformer{stream}~\type{A}}
+    \infer[\mathtt{E}_{\destructor{hd}}]{\destructor{hd}~\term{s} : \type{A}}{\type{A} : \universe{\mathcal{U}} & \term{s} : \typeformer{stream}~\type{A}}
   \end{equation}
   \begin{equation}
-    \infer[\mathtt{E}_{\function{tl}}]{\function{tl}~\term{s} : \typeformer{stream}~\type{A}}{\type{A} : \universe{\mathcal{U}} & \term{s} : \typeformer{stream}~\type{A}}
+    \infer[\mathtt{E}_{\destructor{tl}}]{\destructor{tl}~\term{s} : \typeformer{stream}~\type{A}}{\type{A} : \universe{\mathcal{U}} & \term{s} : \typeformer{stream}~\type{A}}
   \end{equation}
   \begin{equation}
-    \infer[\mathtt{I}_{\function{cons}}]{\term{\function{cons}}~\term{x}~\term{xs} : \typeformer{stream}~\type{A}}{\type{A} : \universe{\mathcal{U}} & \term{x} : \type{A} & \term{xs} : \typeformer{stream}~\type{A}}
+    \infer[\mathtt{I}_{\constructor{cons}}]{\term{\constructor{cons}}~\term{x}~\term{xs} : \typeformer{stream}~\type{A}}{\type{A} : \universe{\mathcal{U}} & \term{x} : \type{A} & \term{xs} : \typeformer{stream}~\type{A}}
   \end{equation}
-  or more precisely \(\function{hd} = \pi_1 \circ \function{out}\) and \(\function{tl} = \pi_2 \circ \function{out}\).
+  or more precisely \(\destructor{hd} = \pi_1 \circ \function{out}\) and \(\destructor{tl} = \pi_2 \circ \function{out}\).
 \end{exmp}
 \begin{defn}
   Chains are defined as ... \todo[inline]{define chains, \(\function{\pi}_{(n)}\) and \(\type{X}_n\)}
 \end{defn}
 \begin{lem}\label{lem:function-to-M-type-is-cone}
-  For all coalgebras \(\coalg{\type{C}}{\function{\gamma}}\) for the container \(\container{S}\), we get \(\type{C} \rightarrow \typeformer{M}_{\container{S}} \equiv \typeformer{Cone}_{\coalg{\type{C}}{\function{\gamma}}}\), where \(\typeformer{Cone} = \sum_{(\function{f} : \prod_{(n : \type{\mathbb{N}})} \type{C} \rightarrow \type{X}_n)} \prod_{(n : \type{\mathbb{N}})} \function{\pi}_{(n)} \circ (\function{f}_{(n+1)}) \equiv f_n\)
+  For all coalgebras \(\coalg{\type{C}}{\function{\gamma}}\) for the container \(\container{S}\), we get \(\type{C} \rightarrow \typeformer{M}_{\container{S}} \equiv \typeformer{Cone}_{\coalg{\type{C}}{\function{\gamma}}}\), where \(\typeformer{Cone} = \sum_{(\function{f} : \prod_{(n : \mathbb{N})} \type{C} \rightarrow \type{X}_n)} \prod_{(n : \mathbb{N})} \function{\pi}_{(n)} \circ (\function{f}_{(n+1)}) \equiv f_n\)
   \begin{proof}
       %lemma10-Iso : ∀ {ℓ} {S : Container {ℓ}} {C,γ : Coalg₀ {S = S}} -> Iso (C,γ .fst -> M S) (Cone C,γ)
   %fun (lemma10-Iso) f = (λ n z → projection n (f z)) , λ n i a → β n (f a) i
@@ -277,7 +281,7 @@ In this section we will introduce containers (also known as signatures), and sho
   \end{proof}
 \end{lem}
 \begin{lem}\label{lem:limit-collapse}
-  Given \(\function{\ell} : \prod_{(n : \type{\mathbb{N}})} (\type{X}_{n} \rightarrow \type{X}_{n+1})\) and \(\term{y} : \sum_{\left(\term{x} : \prod_{(n : \type{\mathbb{N}})} \type{X}_n\right)} \term{x}_{n + 1} \equiv \term{l}_n~\term{x}_n\) the chain collapses as the equality \(\type{\mathcal{L}} \equiv \type{X}_0\).
+  Given \(\function{\ell} : \prod_{(n : \mathbb{N})} (\type{X}_{n} \rightarrow \type{X}_{n+1})\) and \(\term{y} : \sum_{\left(\term{x} : \prod_{(n : \mathbb{N})} \type{X}_n\right)} \term{x}_{n + 1} \equiv \term{l}_n~\term{x}_n\) the chain collapses as the equality \(\type{\mathcal{L}} \equiv \type{X}_0\).
   \begin{proof}
     We define this collapse by the equivalence
     \begin{align}
@@ -285,7 +289,7 @@ In this section we will introduce containers (also known as signatures), and sho
       \function{inv}_{\mathcal{L}collapse}~\term{x}_0 &= (\lambda\,n,~\function{\ell}^n~\term{x}_0)~,~(\lambda\,n,~\mathtt{refl}_{(\function{\ell}^{(n+1)}\,\term{x}_0)}) \\
       \function{rinv}~\term{x}_0 &= \mathtt{refl}_{\term{x}_0}
     \end{align}
-    where \(\function{\ell}^n = \function{\ell}_n \circ \function{\ell}_{n-1} \circ \dots \circ \function{\ell}_1 \circ \function{\ell}_0\). To define \(\function{linv}~(\term{x} , \pathterm{r})\), we first define a fiber \((\type{X} , \term{z}, \function{\ell})\) over \(\type{\mathbb{N}}\) given some \(\term{z} : \type{X}_0\). Then any element of the type \(\sum_{\left(\term{x} : \prod_{(n : \type{\mathbb{N}})} \type{X}_n\right)} \term{x}_{n + 1} \equiv \function{\ell}_n~\term{x}_n\) is equal to a section over the fiber we defined. This means \(\term{y}\) is equal to a section. Since the sections are defined over \(\type{\mathbb{N}}\), which is an initial algebra for the functor \(\functor{G}\type{Y} = \unit + \type{Y}\), we get that sections are contractible, meaning \(\term{y} \equiv \function{inv}_{\mathcal{L}collapse} (\function{fun}_{\mathcal{L}collapse}~\term{y})\), since both are equal to sections over \(\type{\mathbb{N}}\).
+    where \(\function{\ell}^n = \function{\ell}_n \circ \function{\ell}_{n-1} \circ \dots \circ \function{\ell}_1 \circ \function{\ell}_0\). To define \(\function{linv}~(\term{x} , \pathterm{r})\), we first define a fiber \((\type{X} , \term{z}, \function{\ell})\) over \(\mathbb{N}\) given some \(\term{z} : \type{X}_0\). Then any element of the type \(\sum_{\left(\term{x} : \prod_{(n : \mathbb{N})} \type{X}_n\right)} \term{x}_{n + 1} \equiv \function{\ell}_n~\term{x}_n\) is equal to a section over the fiber we defined. This means \(\term{y}\) is equal to a section. Since the sections are defined over \(\mathbb{N}\), which is an initial algebra for the functor \(\functor{G}\type{Y} = \unit + \type{Y}\), we get that sections are contractible, meaning \(\term{y} \equiv \function{inv}_{\mathcal{L}collapse} (\function{fun}_{\mathcal{L}collapse}~\term{y})\), since both are equal to sections over \(\mathbb{N}\).
 \end{proof}
 \end{lem}
 \noindent We can now define the construction of \function{in} and \function{out}.
@@ -318,13 +322,13 @@ In this section we will introduce containers (also known as signatures), and sho
     \end{align}
     The definition of \(\pathterm{\alpha}\) is then, 
     \begin{align}
-      \type{\mathcal{L}}^{\functor{P}} &\equiv \sum_{(\term{x} : \prod_{(n : \type{\mathbb{N}})} \sum_{(\term{a} : \type{A})} \typeformer{B}\,\term{a} \rightarrow \type{X}_n)} \prod_{(n : \type{\mathbb{N}})} \function{\pi}_{(n+1)}~\term{x}_{n+1} \equiv \term{x}_{n} \\
-      &\equiv \sum_{(\term{x} : \sum_{(\term{a} : \prod_{(n : \type{\mathbb{N}})} \type{A})} \prod_{(n : \type{\mathbb{N}})} \term{a}_{n+1} \equiv \term{a}_n)} \sum_{(\function{u} : \prod_{(n : \type{\mathbb{N}})} \typeformer{B}\,{(\pi_1\,\term{x})}_n \rightarrow \type{X}_n)} \prod_{(n : \type{\mathbb{N}})} \function{\pi}_{(n)} \circ \function{u}_{n+1} \equiv_* \function{u}_n \label{eq:alpha-unfold} \\
-      &\equiv \sum_{(\term{a} : \type{A})} \sum_{(\function{u} : \prod_{(n : \type{\mathbb{N}})} \typeformer{B}\,a \rightarrow \type{X}_n)} \prod_{(n : \type{\mathbb{N}})} \function{\pi}_{(n)} \circ \function{u}_{n+1} \equiv \function{u}_n \label{eq:alpha-limit-collapse} \\
+      \type{\mathcal{L}}^{\functor{P}} &\equiv \sum_{(\term{x} : \prod_{(n : \mathbb{N})} \sum_{(\term{a} : \type{A})} \typeformer{B}\,\term{a} \rightarrow \type{X}_n)} \prod_{(n : \mathbb{N})} \function{\pi}_{(n+1)}~\term{x}_{n+1} \equiv \term{x}_{n} \\
+      &\equiv \sum_{(\term{x} : \sum_{(\term{a} : \prod_{(n : \mathbb{N})} \type{A})} \prod_{(n : \mathbb{N})} \term{a}_{n+1} \equiv \term{a}_n)} \sum_{(\function{u} : \prod_{(n : \mathbb{N})} \typeformer{B}\,{(\pi_1\,\term{x})}_n \rightarrow \type{X}_n)} \prod_{(n : \mathbb{N})} \function{\pi}_{(n)} \circ \function{u}_{n+1} \equiv_* \function{u}_n \label{eq:alpha-unfold} \\
+      &\equiv \sum_{(\term{a} : \type{A})} \sum_{(\function{u} : \prod_{(n : \mathbb{N})} \typeformer{B}\,a \rightarrow \type{X}_n)} \prod_{(n : \mathbb{N})} \function{\pi}_{(n)} \circ \function{u}_{n+1} \equiv \function{u}_n \label{eq:alpha-limit-collapse} \\
       &\equiv \sum_{\term{a} : \type{A}} \typeformer{B}~\term{a} \rightarrow \type{\mathcal{L}} \label{eq:alpha-cone}\\
       &\equiv \functor{P}\type{\mathcal{L}}
     \end{align}
-    To collapse \(\sum_{(\term{a} : \prod_{(n : \type{\mathbb{N}})} \type{A})} \prod_{(n : \type{\mathbb{N}})} \term{a}_{n+1} \equiv \term{a}_n\) to \(\type{A}\) between \eqref{eq:alpha-unfold} and \eqref{eq:alpha-limit-collapse} we use \lemref{limit-collapse} . We use \lemref{function-to-M-type-is-cone} for the equality between \eqref{eq:alpha-limit-collapse} and \eqref{eq:alpha-cone}. The rest of the equalities are given by a simple isomorphism or by definition. The definition of \(\pathterm{shift}\) is
+    To collapse \(\sum_{(\term{a} : \prod_{(n : \mathbb{N})} \type{A})} \prod_{(n : \mathbb{N})} \term{a}_{n+1} \equiv \term{a}_n\) to \(\type{A}\) between \eqref{eq:alpha-unfold} and \eqref{eq:alpha-limit-collapse} we use \lemref{limit-collapse} . We use \lemref{function-to-M-type-is-cone} for the equality between \eqref{eq:alpha-limit-collapse} and \eqref{eq:alpha-cone}. The rest of the equalities are given by a simple isomorphism or by definition. The definition of \(\pathterm{shift}\) is
     \begin{equation}
       \pathterm{shift} = \sym{\pathterm{\alpha}} \ct \pathterm{\mathcal{L}unique}.
     \end{equation}
@@ -379,202 +383,301 @@ Since we know that \texttt{M}-types preserves the H-level, we can use set-trunca
 
 A quotient inductive-inductive type (QIIT) is a type together with a relation defined on that type, and then quotiented by that relation.
 \todo[inline]{What is a QIIT concretely?}
-\subsubsection{Partiality monad}
-A simple example of a quotient inductive-inductive type is the partiality monad \((-)_\bot\) over a type \(\type{R}\), defined by the constructors
-\begin{equation}
-  \infer{\type{R}_\bot : \universe{\mathcal{U}}}{}
-\end{equation}
-\begin{equation}
-  \infer{\constant{\bot} : \type{R}_\bot}{}
-\end{equation}
-\begin{equation}
-  \infer{\function{\eta}~\term{a} : \type{R}_\bot}{\term{a} : \type{R}}
-\end{equation}
-together with a relation \((\cdot \sqsubseteq \cdot)\) (indexed twice over \(\type{R}_\bot\)) and properties
-\begin{equation}
-  \infer{\bigsqcup~(s,b) : \type{R}_\bot}{s : \mathbb{N} \rightarrow \type{R}_\bot & b : \prod_{(n : \mathbb{N})} s_n \sqsubseteq s_{n+1} }
-\end{equation}
-\begin{equation}
-  \infer{\alpha~p~q : x \equiv y}{x,y : \type{R}_\bot & p : x \sqsubseteq y & q : y \sqsubseteq x}
-\end{equation}
-\begin{equation}
-  \infer[\sqsubseteq_{refl}]{x \sqsubseteq x}{}
-\end{equation}
-\begin{equation}
-  \infer[\sqsubseteq_{trans}]{x \sqsubseteq z}{x \sqsubseteq y & y \sqsubseteq z}
-\end{equation}
-\begin{equation}
-  \infer[\sqsubseteq_{never}]{\bot \sqsubseteq x}{}
-\end{equation}
-\begin{equation}
-  \infer{\prod_{(n:\mathbb{N})} s_n \sqsubseteq \bigsqcup(s,p)}{}
-\end{equation}
-\begin{equation}
-  \infer{\bigsqcup(s,p) \sqsubseteq x}{\prod_{(n:\mathbb{N})} s_n \sqsubseteq x}
-\end{equation}
-and then set truncated
-\begin{equation}
-  \infer{p \equiv q}{p , q : x \sqsubseteq y}
-\end{equation}
+\begin{defn}[Partiality Monad]
+  A simple example of a quotient inductive-inductive type is the partiality monad \((-)_\bot\) over a type \(\type{R}\), defined by the constructors\\[-9mm]
+  \begin{center}
+    \begin{minipage}{0.25\linewidth}
+      \begin{equation}
+        \infer{\type{R}_\bot : \universe{\mathcal{U}}}{}
+      \end{equation}
+    \end{minipage}
+    \hfill
+    \begin{minipage}{0.25\linewidth}
+      \begin{equation}
+        \infer{\constructor{\bot} : \type{R}_\bot}{}
+      \end{equation}
+    \end{minipage}
+    \hfill
+    \begin{minipage}{0.25\linewidth}
+      \begin{equation}
+        \infer{\constructor{\eta}~\term{a} : \type{R}_\bot}{\term{a} : \type{R}}
+      \end{equation}
+    \end{minipage}
+  \end{center}
+  and a relation \((\cdot~\relation{\sqsubseteq_{\bot}}~\cdot)\) indexed twice over \(\type{R}_\bot\), with properties\\[-9mm] \todo{Should I define what it means to be an ordering relation separately, and just say the relation here is an instance of that? (Generalize?}
+  \begin{center}
+    \begin{minipage}{0.45\linewidth}
+      \begin{equation}
+        \infer{\constructor{\bigsqcup}~(\function{s},\function{b}) : \type{R}_\bot}{\function{s} : \mathbb{N} \rightarrow \type{R}_\bot & \function{b} : \prod_{(n : \mathbb{N})} \function{s}_n~\relation{\sqsubseteq_{\bot}}~\function{s}_{n+1} }
+      \end{equation}
+    \end{minipage}
+    \hfill
+    \begin{minipage}{0.45\linewidth}
+      \begin{equation}
+        \infer{\constructor{\alpha}~\term{p}~\term{q} : \term{x} \equiv \term{y}}{\term{x},\term{y} : \type{R}_\bot & \term{p} : \term{x}~\relation{\sqsubseteq_{\bot}}~\term{y} & \term{q} : \term{y}~\relation{\sqsubseteq_{\bot}}~\term{x}}
+      \end{equation}
+    \end{minipage}
+  \end{center}
+  \strut\\[-15mm]
+  \begin{center}
+    \begin{minipage}{0.25\linewidth}
+      \begin{equation}
+        \infer[\constructor{\sqsubseteq_{refl}}]{\term{x}~\relation{\sqsubseteq_{\bot}}~\term{x}}{\term{x} : \type{R}_\bot}
+      \end{equation}
+    \end{minipage}
+    \hfill
+    \begin{minipage}{0.35\linewidth}
+      \begin{equation}
+        \infer[\constructor{\sqsubseteq_{trans}}]{\term{x}~\relation{\sqsubseteq_{\bot}}~\term{z}}{\term{x}~\relation{\sqsubseteq_{\bot}}~\term{y} & \term{y}~\relation{\sqsubseteq_{\bot}}~\term{z}}
+      \end{equation}
+    \end{minipage}
+    \hfill
+    \begin{minipage}{0.25\linewidth}
+      \begin{equation}
+        \infer[\constructor{\sqsubseteq_{never}}]{\constructor{\bot}~\relation{\sqsubseteq_{\bot}}~\term{x}}{\term{x} : \type{R}_\bot}
+      \end{equation}
+    \end{minipage}
+  \end{center}
+  \strut\\[-15mm]
+  \begin{center}
+    \hfill
+    \begin{minipage}{0.50\linewidth}
+      \begin{equation}
+        \infer{\prod_{(n:\mathbb{N})} \function{s}_n~\realtion{\sqsubseteq_{\bot}}~\bigsqcup(\function{s},\function{b})}{\function{s} : \mathbb{N} \rightarrow \type{R}_\bot & \function{b} : \prod_{(n : \mathbb{N})} \function{s}_n~\relation{\sqsubseteq_{\bot}}~\function{s}_{n+1} }
+      \end{equation}
+    \end{minipage}
+    \hfill
+    \begin{minipage}{0.3\linewidth}
+      \begin{equation}
+        \infer{\bigsqcup(\function{s},\function{p})~\relation{\sqsubseteq_{\bot}}~\term{x}}{\prod_{(n:\mathbb{N})} \function{s}_n~\relation{\sqsubseteq_{\bot}}~\term{x}}
+      \end{equation}
+    \end{minipage}
+  \end{center}
+  and finally set truncated
+  \begin{equation}
+    \infer[\constructor{\bot\text{-}isSet}]{\term{p} \equiv \term{q}}{\term{p} , \term{q} : \term{x}~\relation{\sqsubseteq_{\bot}}~\term{y}}
+  \end{equation}
+\end{defn}
 
 \subsubsection{Delay monad to Sequences}
-We define
+\begin{defn}
+  We define
+  \begin{equation}
+    \typeformer{Seq}_{\type{R}} = \sum_{(\function{s} : \mathbb{N} \rightarrow \type{R} + \unit)} \function{isMon}~\function{s}
+  \end{equation}
+  where
+  \begin{equation}
+    \function{isMon}~\function{s} = \prod_{(n : \mathbb{N})} (\function{s}_n \equiv \function{s}_{n+1})  + ((\function{s}_n \equiv \mathtt{inr}~\constant{tt}) \times (\function{s}_{n+1} \not\equiv \mathtt{inr}~\constant{tt}))
+  \end{equation}
+  meaning a sequences is \(\mathtt{inr}~\constant{tt}\) until it reaches a point where it switches to \(\mathtt{inl}~\term{r}\) for some value \(\term{r}\). There are also the special cases of already terminated, meaning only \(\mathtt{inl}~\term{r}\) and never teminating meaning only \(\mathtt{inr}~\constant{tt}\).
+\end{defn}
+\noindent For each index in a sequence, the element at that index \(s_n\) is either not terminated \(s_n \equiv \mathtt{inr}~\constant{tt}\), which we denote as \(\function{s}_n \uparrow_{\type{R} + \unit}\), or it is terminated \(s_n \equiv \mathtt{inl}~\term{r}\) with some value \(r\), denoted by \(\function{s}_n \downarrow_{\type{R} + \unit} \term{r}\) or just \(\function{s}_n \downarrow_{\type{R} + \unit}\) to mean \(s_n \not\equiv \mathtt{inr}~\constant{tt}\). Thus we can write \(\function{isMon}\) as
 \begin{equation}
-  \typeformer{Seq}_{\type{A}} = \sum_{(\function{g} : \type{\mathbb{N}} \rightarrow \type{A} + \unit)} \function{isMon}~g
+  \function{isMon}~\function{s} = \prod_{(n : \mathbb{N})} (\function{s}_n \equiv \function{s}_{n+1})  + ((\function{s}_n \uparrow_{\type{R} + \unit}) \times (\function{s}_{n+1} \downarrow_{\type{R} + \unit}))
 \end{equation}
-where
+We also introduce notation for the two special cases of sequences given above
 \begin{equation}
-  \function{isMon}~g = \prod_{(n : \type{\mathbb{N}})} (\function{g}_n \equiv \function{g}_{n+1})  + ((\function{g}_n \equiv \mathtt{inr}~\constant{tt}) \times (\function{g}_{n+1} \not\equiv \mathtt{inr}~\constant{tt}))
+  \function{now}_{Seq}~\term{r} = (\lambda\,\_, \mathtt{inl}~\term{r}) , (\lambda\,\_, \mathtt{inl}~\mathtt{refl})
 \end{equation}
-that is sequences are \(\mathtt{inr}~\constant{tt}\) until they reach a point where it switches to \(\mathtt{inl}~\term{r}\) for some value \(\term{r}\). There are also the special cases of already terminated, meaning only \(\mathtt{inl}~\term{r}\) and never teminating meaning only \(\mathtt{inr}~\constant{tt}\). \todo[inline]{Some comment about decidable equivalence needed to show that \(\function{g}_{n+1} \not\equiv \mathtt{inr}~\constant{tt}\)} We define an operation to shift the sequence by inserting an element at \(n = 0\)
 \begin{equation}
-  \begin{aligned}
-    \function{shift} &: ((\function{g} , \function{q}) : \mathtt{Seq}_A) \rightarrow \sum_{(\term{z_g} : A + \unit)} \left(\function{isMon}~\left(\lambda\,n, \begin{cases} \term{z_g} & n = 0 \\ \function{g}_m & n = m + 1 \end{cases}\right) 0\right) \rightarrow \mathtt{Seq}_A \\
-    \function{shift}&~(\function{g} , \function{q})~(\term{z_g} , \term{z_q}) = \begin{cases} \term{z_g} & n = 0 \\ \function{g}_m & n = m + 1 \end{cases} , \begin{cases} \term{z_q} & n = 0\\ \function{q}_m & n = m + 1 \end{cases},
-  \end{aligned}
+  \constant{never}_{Seq} = (\lambda\,\_, \mathtt{inr}~\constant{tt}) , (\lambda\,\_, \mathtt{inl}~\mathtt{refl})
 \end{equation}
-and a function to remove the first element
+\todo[inline]{Some comment about decidable equivalence needed to show that \(\function{s}_{n+1} \not\equiv \mathtt{inr}~\constant{tt}\)}
+\begin{defn}
+  We can shift a sequence \((\function{s},\function{q})\) by inserting an element (and an equality) \((\term{z_s},\term{z_q})\) at \(n = 0\),
+  \begin{equation}
+    \function{shift}~(\function{s} , \function{q})~(\term{z_s} , \term{z_q}) = \begin{cases} \term{z_s} & n = 0 \\ \function{s}_m & n = m + 1 \end{cases} , \begin{cases} \term{z_q} & n = 0\\ \function{q}_m & n = m + 1 \end{cases},
+  \end{equation}
+\end{defn}
+\begin{defn}
+  We can unshift a sequence by removing the first element of the sequence
+  \begin{equation}
+    \begin{aligned}
+      \function{unshift}&~(\function{s} , \function{q}) = \function{s} \circ \mathtt{suc} , \function{q} \circ \mathtt{suc}.
+    \end{aligned}
+  \end{equation}
+\end{defn}
+\begin{lem}
+  The function
+  \begin{equation}
+    \function{shift\text{-}unshift}~(\function{s},\function{q}) = \function{shift}~(\function{unshift}~(\function{s},\function{q}))~(\function{s}_0,\function{q}_0)
+  \end{equation}
+  is equal to the identity function.
+  \begin{proof}
+    Unshifting a value followed by a shift, where we reintroduce the value we just remove, gives the sequence we started  with.
+  \end{proof}
+\end{lem}
+\begin{lem}
+  The function
+  \begin{equation}
+    \function{unshift\text{-}shift}~(\function{s},\function{q})=\function{unshift}~(\function{shift}~(\function{s},\function{q})~\_)
+  \end{equation}
+  is equal to the identity function.
+  \begin{proof}
+    If we shift followed by an unshift, we just introduce a value to instantly remove it, meaning the value does not matter.
+  \end{proof}
+\end{lem}
+\begin{thm}
+  \noindent We can now define an equivalence between \(\typeformer{delay}~\type{R}\) and \(\typeformer{Seq}_{\type{R}}\), where \(\constructor{later}\) are equivalent to shifts, and \(\constructor{now}~\term{r}\) is equivalent terminated sequence with value \(\term{r}\).
+  \begin{proof}
+    We start with the function from \(\typeformer{Delay}~\type{R}\) to \(\typeformer{Seq}_{\type{R}}\)
+    \begin{equation}
+      \begin{aligned}
+        \function{Delay{\rightarrow}Seq}&~(\constructor{now}~\term{r}) = \function{now}_{Seq}~\term{r} \\
+        \function{Delay{\rightarrow}Seq}&~(\constructor{later}~\term{x}) = \\[-3mm]
+        & \strut\hspace{-8mm}\function{shift}~(\function{Delay{\rightarrow}Seq}~\term{x})~\left(\mathtt{inr}~\constant{tt} , \begin{cases} \mathtt{inr}~(\mathtt{refl} , \constant{inl{\not\equiv}inr}) & \term{x} = \constructor{now}~\_ \\ \mathtt{inl}~\mathtt{refl} & \term{x} = \constructor{later}~\_ \end{cases}\right)
+      \end{aligned}
+    \end{equation}
+    \todo[inline]{describe \(inl{\not\equiv}inr\)}
+    now for the other direction
+    \begin{equation}
+      \begin{aligned}
+        \function{Seq{\rightarrow}Delay}&~(\function{g} , \function{q}) = \begin{cases} \constructor{now}~\term{r} & \function{g}_0 = \mathtt{inl}~\term{r} \\ \constructor{later}~(\function{Seq{\rightarrow}Delay}~(\function{unshift}~(\function{g} , \function{q}))) & \function{g}_0 = \mathtt{inr}~\constant{tt} \end{cases}
+      \end{aligned}
+    \end{equation}
+    with the right identity, saying that for any sequence \((\function{g},\function{q})\), we get \(\function{Delay{\rightarrow}Seq}~(\function{Seq{\rightarrow}Delay}~(\function{g},\function{q})) \equiv (\function{g},\function{q})\), defined as
+    \begin{equation}
+      \begin{aligned}
+        \function{Seq\text{-}Delay}&~(\function{g},\function{q}) = \begin{cases} \mathtt{refl}  & \function{g}_0 = \mathtt{inl}~\term{r} \\ \begin{aligned} &\mathtt{ap}~\function{shift}~(\function{Seq\text{-}Delay}~(\function{unshift}~(\function{g} , \function{q}))) \\&\quad\ct~\function{shift\text{-}unshift}~(\function{g} , \function{q}) \end{aligned} & \function{g}_0 = \mathtt{inr}~\constant{tt} \end{cases}
+      \end{aligned}
+    \end{equation}
+    and left identity, saying that for any delay monad \(t\) we get \(\function{Seq{\rightarrow}Delay}~(\function{Delay{\rightarrow}Seq}~\term{t}) \equiv \term{t}\), defined as
+    \begin{equation}
+      \begin{aligned}
+        \function{Delay\text{-}Seq}&~(\constructor{now}~\term{a}) = \mathtt{refl} \\
+        \function{Delay\text{-}Seq}&~(\constructor{later}~\term{x}) = \mathtt{ap}~(\function{later} \circ \function{Seq{\rightarrow}Delay})~(\function{unshift\text{-}shift}~(\function{Delay{\rightarrow}Seq}~\term{x})) \\ &\qquad\qquad\quad\ct~\mathtt{ap}~\function{later}~(\function{Delay{\rightarrow}Seq}~\term{x})
+      \end{aligned}
+    \end{equation}
+    The functions back and forth and the left and right identities together gives us an equivalence between the delay monad and sequences.
+  \end{proof}
+\end{thm}
+\subsubsection{Sequence to Partiality Monad}
+In this section we will show that assuming the "Axiom of Countable Choice", we get an equivalence between sequences and the partiality monad.
+\begin{defn}[Sequence Termination]
+  The following relations says that a sequence \((\function{s},\function{q}) : \typeformer{Seq}_{\type{R}}\) terminates with a given value \(\term{r} : \type{R}\),
+  \begin{equation}
+    (\function{s},\function{q})~\relation{\downarrow_{\mathtt{Seq}}}~\term{r} = \sum_{(n : \mathbb{N})} \function{s}_n \downarrow_{\type{R} + \unit} \term{r}.
+  \end{equation}
+\end{defn}
+\begin{defn}[Sequence Ordering]
 \begin{equation}
-  \begin{aligned}
-    \function{unshift} &: \mathtt{Seq}_A \rightarrow \mathtt{Seq}_A \\
-    \function{unshift}&~(\function{g} , \function{q}) = \function{g} \circ \mathtt{suc} , \function{q} \circ \mathtt{suc}.
-  \end{aligned}
+  (s,q)~\relation{\sqsubseteq_{\mathtt{Seq}}}~(t,p) = \prod_{(a : \type{R})} \left(\|s~\relation{\downarrow_{\mathtt{Seq}}}~a\| \rightarrow \| t~\relation{\downarrow_{\mathtt{Seq}}}~a\|\right)
 \end{equation}
-These two functions are inverse, since unshifting a value followed by a shift, where we reintroduce the value we just remove, does not change the value, said in another way the function
+where \(\| \cdot \|\) is propositional \todo{propositional or set truncation?} truncation.
+\end{defn}
+\begin{defn} There is a conversion from \(\type{R} + \unit\) to the partiality monad \(\type{R}_\bot\)
+  \begin{equation}
+    \begin{aligned}
+      &\function{Maybe{\rightarrow}\bot}~(\mathtt{inl}~\term{r}) = \constructor{\eta}~\term{r} \\
+      &\function{Maybe{\rightarrow}\bot}~(\mathtt{inr}~\constant{tt}) = \constructor{\bot}
+    \end{aligned}
+  \end{equation}
+\end{defn}
+\begin{defn}[Maybe Ordering] Given some \(x,y : \type{R} + \unit\), the odering relation is defined as
 \begin{equation}
-  \lambda\,(\function{g},\function{a}), \function{shift}~(\function{unshift}~(\function{g},\function{a}))~(\function{g}_0,\function{a}_0)
+  \term{x}~\relation{\sqsubseteq_{\type{R} + \unit}}~\term{y} = (\term{x} \equiv \term{y}) + ((\term{x}  \downarrow_{\type{R} + \unit}) \times (\term{y} \uparrow_{\type{R} + \unit}))
 \end{equation}
-is equal to the identity function. Similarly if we shift followed by an unshift, we just introduce a value to instantly remove it, meaning the value does not matter, again the function
+\end{defn}
+\noindent This ordering definition is basically \(\function{isMon}\) at a specific index, so we can again rewrite \(\function{isMon}\) as
 \begin{equation}
-  \lambda\,(\function{g},\function{a}),~\function{unshift}~(\function{shift}~(\function{g},\function{a})~\_)
+  \function{isMon}~\function{s} = \prod_{(n : \mathbb{N})} \function{s}_n~\realtion{\sqsubseteq_{\type{R} + \unit}}~\function{s}_{n+1}
 \end{equation}
-is equal to the identity function. We can now define an equivalence between \(\typeformer{delay}~\type{R}\) and \(\typeformer{Seq}_{\type{R}}\), where later are equivalent to shifts, and \(\function{now}~\term{r}\) is equivalent to the infinite sequence of \(\mathtt{inl}~\term{r}\). We define
-\begin{equation}
-  \begin{aligned}
-    \function{Delay{\rightarrow}Seq} &: \typeformer{Delay}~R \rightarrow \typeformer{Seq}_A \\
-    \function{Delay{\rightarrow}Seq}&~(\function{now}~\term{a}) = (\lambda\,\_,\mathtt{inl}~\term{a}) , (\lambda\,\_,\mathtt{inl}~\mathtt{refl}) \\
-    \function{Delay{\rightarrow}Seq}&~(\function{later}~\term{x}) = \function{shift}~(\function{Delay{\rightarrow}Seq}~\term{x})~\_
-  \end{aligned}
+This rewriting confirms that if \(\function{isMon}~\function{s}\), then \(\function{s}\) is monotone, and therefore a sequence of partial values\todo{there exists non-monotone sequences, it just follows our definition of a sequence.}.
+\begin{lem}
+  The function \(\function{Maybe{\rightarrow}\bot}\) is monotone, that is, if \(x~\relation{\sqsubseteq_{\type{A} + \unit}}~y\), for some \(x\) and \(y\), then \((\function{Maybe{\rightarrow}\bot}~x)~\relation{\sqsubseteq_{\bot}}~(\function{Maybe{\rightarrow}\bot}~y)\).
+  \begin{proof}
+    We do the proof by case.
+    \begin{equation}
+      \begin{aligned}
+        &\function{Maybe{\rightarrow}\bot\text{-}mono}~(\function{inl}~\pathterm{p}) = \\[-1mm]
+        &\qquad\qquad \mathtt{subst}~(\lambda\,a, \function{Maybe{\rightarrow}\bot}~x~\relation{\sqsubseteq_{\bot}}~\function{Maybe{\rightarrow}\bot}~a)~\pathterm{p}~(\constructor{\sqsubseteq_{refl}} (\function{Maybe{\rightarrow}\bot}~x)) \\[1mm]
+        &\function{Maybe{\rightarrow}\bot\text{-}mono}~(\function{inr}~(\pathterm{p}, \_)) = \\[-1mm]
+        &\qquad\qquad \mathtt{subst}~(\lambda\,a, \function{Maybe{\rightarrow}\bot}~a~\relation{\sqsubseteq_{\bot}}~\function{Maybe{\rightarrow}\bot}~y)~\sym{\pathterm{p}}~(\constructor{\sqsubseteq_{never}} (\function{Maybe{\rightarrow}\bot}~y))
+      \end{aligned}
+    \end{equation}
+\end{proof}
+\end{lem}
+\begin{defn}
+  There is a function taking a sequence to an increasing sequence
+  \begin{equation}
+    \begin{aligned}
+      &\function{Seq{\rightarrow}incSeq} \\
+      &\function{Seq{\rightarrow}incSeq}~(\function{g} , \function{q}) = \function{Maybe{\rightarrow}\bot} \circ \function{g} , \function{Maybe{\rightarrow}\bot\text{-}mono} \circ \function{q}
+    \end{aligned}
+  \end{equation}
+\end{defn}
+\begin{defn}
+  There is a function taking a sequence to the partiality monad
+  \begin{equation}
+    \begin{aligned}
+      &\function{Seq{\rightarrow}\bot} : \typeformer{Seq}_{\type{A}} \rightarrow \type{A}_{\bot} \\
+      &\function{Seq{\rightarrow}\bot}~(\function{g},\function{q}) = \bigsqcup \circ~\function{Seq{\rightarrow}incSeq}
+    \end{aligned}
+  \end{equation}
+\end{defn}
+\begin{lem}
+  This function is again monotone.
+  \begin{equation}
+    \function{Seq{\rightarrow}\bot\text{-}mono} : \typeformer{isSet} \type{A} \rightarrow (x~y : \typeformer{Seq}_{\type{A}}) \rightarrow x~\relation{\sqsubseteq_{seq}}~y \rightarrow \function{Seq{\rightarrow}\bot}~x~\relation{\sqsubseteq_{\bot}}~\function{Seq{\rightarrow}\bot}~y
 \end{equation}
-\todo[inline]{what should \_ be here?}
-\begin{equation}
-  \begin{aligned}
-    \function{Seq{\rightarrow}Delay} &: \typeformer{Seq}_A \rightarrow \typeformer{Delay}~R \\
-    \function{Seq{\rightarrow}Delay}&~(\function{g} , \function{q}) = \begin{cases} \function{now}~\term{r} & \function{g}_0 = \mathtt{inl}~\term{r} \\ \function{later}~(\function{Seq{\rightarrow}Delay}~(\function{unshift}~(\function{g} , \function{q}))) & \function{g}_0 = \mathtt{inr}~\constant{tt} \end{cases}
-  \end{aligned}
-\end{equation}
-with the right identity
-\begin{equation}
-  \begin{aligned}
-    \function{Seq\text{-}Delay} &: \forall\,(\function{g},\function{q}) \rightarrow \function{Delay{\rightarrow}Seq}~(\function{Seq{\rightarrow}Delay}~(\function{g},\function{q})) \equiv (\function{g},\function{q}) \\
-    \function{Seq\text{-}Delay}&~(\function{g},\function{q}) = \begin{cases} \mathtt{refl}  & \function{g}_0 = \mathtt{inl}~\term{r} \\ \mathtt{cong}~\function{shift}~(\function{Seq\text{-}Delay}~(\function{unshift}~(\function{g} , \function{q}))) \ct \function{shift\text{-}unshift}~(\function{g} , \function{q}) & \function{g}_0 = \mathtt{inr}~\constant{tt} \end{cases}
-  \end{aligned}
-\end{equation}
-and left identity
-\begin{equation}
-  \begin{aligned}
-    \function{Delay\text{-}Seq} &: \forall\,\term{t} \rightarrow \function{Seq{\rightarrow}Delay}~(\function{Delay{\rightarrow}Seq}~\term{t}) \equiv \term{t} \\
-    \function{Delay\text{-}Seq}&~(\function{now}~\term{a}) = \mathtt{refl} \\
-    \function{Delay\text{-}Seq}&~(\function{later}~\term{x}) = \mathtt{cong}~(\function{later} \circ \function{h})~\function{unshift\text{-}shift} \ct \mathtt{cong}~\function{later}~(\function{Delay\text{-}Seq}~\term{x})
-  \end{aligned}
-\end{equation}
-\subsubsection{Sequence to Partiality monad}
-We define a termination relation for sequences
-\begin{equation}
-  \begin{aligned}
-    \relation{\downarrow_{\mathtt{Seq}}} &: \typeformer{Seq}_{\type{A}} \rightarrow \type{A} \rightarrow \universe{\mathcal{U}} \\
-    (s,q)~\relation{\downarrow_{\mathtt{Seq}}}&~a = \sum_{(n : \mathbb{N})} s_n \equiv \mathtt{inl}~a
-  \end{aligned}
-\end{equation}
-We define an ordering relation on a sequence
-\begin{equation}
-  (s,q)~\relation{\sqsubseteq_{\mathtt{Seq}}}~(t,p) = \prod_{(a : \type{A})} \left(\|s~\relation{\downarrow_{\mathtt{Seq}}}~a\| \rightarrow \| t~\relation{\downarrow_{\mathtt{Seq}}}~a\|\right)
-\end{equation}
-the bottom element \(\constant{\bot}\) of the ordering is the never terminating sequence, where all values are \(\mathtt{inr}~\constant{tt}\). The unit \(\function{\eta}\) is defined, given some \(\term{r}\), as the terminated sequence of all \(\mathtt{inl}~\term{r}\).
-\todo[inline]{\(\alpha_{\mathtt{Seq}}\) and \(\bigsqcup_{\mathtt{Seq}}\)}
-We define a conversion from \(\type{A} + \unit\) to the partiality monad
-\begin{equation}
-  \begin{aligned}
-    &\function{Maybe{\rightarrow}\bot} : \type{A} + \unit \rightarrow \type{A}_\bot \\
-    &\function{Maybe{\rightarrow}\bot}~(\function{inl}~a) = \function{\eta}~a \\
-    &\function{Maybe{\rightarrow}\bot}~(\function{inr}~\constant{tt}) = \constant{\bot}
-  \end{aligned}
-\end{equation}
-we also define an ordering on \(\type{A} + \unit\)
-\begin{equation}
-  \begin{aligned}
-    &\relation{\sqsubseteq_{\type{A} + \unit}} : \type{A} + \unit \rightarrow \type{A} + \unit \rightarrow \universe{\mathcal{U}} \\
-    x~&\relation{\sqsubseteq_{\type{A} + \unit}}~y = (x \equiv y) + ((x \equiv \function{inr}~\constant{tt}) \times (y \not\equiv \function{inr}~\constant{tt}))
-  \end{aligned}
-\end{equation}
-the function \(\function{Maybe{\rightarrow}\bot}\) is monotone
-\begin{equation}
-  \begin{aligned}
-    &\function{Maybe{\rightarrow}\bot\text{-}mono} : x~\relation{\sqsubseteq_{\type{A} + \unit}}~y \rightarrow (\function{Maybe{\rightarrow}\bot}~x)~\relation{\sqsubseteq_\bot}~(\function{Maybe{\rightarrow}\bot}~y) \\[1mm]
-    &\function{Maybe{\rightarrow}\bot\text{-}mono}~(\function{inl}~\pathterm{p}) = \\[-1mm]
-    &\quad \mathtt{subst}~(\lambda\,a, \function{Maybe{\rightarrow}\bot}~x~\relation{\sqsubseteq_\bot}~\function{Maybe{\rightarrow}\bot}~a)~\pathterm{p}~(\function{\sqsubseteq_{refl}} (\function{Maybe{\rightarrow}\bot}~x)) \\[1mm]
-    &\function{Maybe{\rightarrow}\bot\text{-}mono}~(\function{inr}~(\pathterm{p}, \_)) = \\[-1mm]
-    &\quad \mathtt{subst}~(\lambda\,a, \function{Maybe{\rightarrow}\bot}~a~\relation{\sqsubseteq_\bot}~\function{Maybe{\rightarrow}\bot}~y)~\sym{\pathterm{p}}~(\function{\sqsubseteq_{never}} (\function{Maybe{\rightarrow}\bot}~y))
-  \end{aligned}
-\end{equation}
-we define a function taking a sequence to an increasing sequence
-\begin{equation}
-  \begin{aligned}
-    &\function{Seq{\rightarrow}incSeq} \\
-    &\function{Seq{\rightarrow}incSeq}~(\function{g} , \function{q}) = \function{Maybe{\rightarrow}\bot} \circ \function{g} , \function{Maybe{\rightarrow}\bot\text{-}mono} \circ \function{q}
-  \end{aligned}
-\end{equation}
-we can now define the function taking a sequence to the partiality monad
-\begin{equation}
-  \begin{aligned}
-    &\function{Seq{\rightarrow}\bot} : \typeformer{Seq}_{\type{A}} \rightarrow \type{A}_{\bot} \\
-    &\function{Seq{\rightarrow}\bot}~(\function{g},\function{q}) = \bigsqcup \circ~\function{Seq{\rightarrow}incSeq}
-  \end{aligned}
-\end{equation}
-this function is again monotone, if a sequence is smaller than another sequence, then the least upper bounds of each sequence respect the ordering, meaning we get the function \todo{should this be formalized entirely, or should there just be a comment about monotonicity? Does not seem relevant?}
-\begin{equation}
-    \function{Seq{\rightarrow}\bot\text{-}mono} : \typeformer{isSet} \type{A} \rightarrow (x~y : \typeformer{Seq}~\type{A}) \rightarrow x~\relation{\sqsubseteq_{seq}}~y \rightarrow \function{Seq{\rightarrow}\bot}~x~\relation{\sqsubseteq_\bot}~\function{Seq{\rightarrow}\bot}~y
-\end{equation}
-we define a function for weak extensionality \todo{is this weak extensionality for sequences? NO! it is the inverse of weak effective} for sequences. 
+  \begin{proof}
+    if a sequence is smaller than another sequence, then the least upper bounds of each sequence respect the ordering. \todo{should this be formalized entirely, or should there just be a comment about monotonicity? Does not seem relevant?}.
+  \end{proof}
+\end{lem}
+\begin{defn}
+  \todo[inline]{describe definition / more mathematical, less computer science}
 \begin{equation}
   \begin{aligned}
     &\function{Seq{\rightarrow}\bot\text{-}{\approx}{\rightarrow}{\equiv}} : \typeformer{isSet}~\type{A} \rightarrow (x~y : \typeformer{Seq}_{\type{A}}) \rightarrow x~\relation{\sim_{Seq}}~y \rightarrow \function{Seq{\rightarrow}\bot}~x \equiv \function{Seq{\rightarrow}\bot}~y \\
     &\function{Seq{\rightarrow}\bot\text{-}{\approx}{\rightarrow}{\equiv}}~A_{set}~\term{x}~\term{y}~(p , q)~= \function{\alpha_{\bot}}~(\function{Seq{\rightarrow}\bot\text{-}mono}~A_{set}~x~y~p)~(\function{Seq{\rightarrow}\bot\text{-}mono}~A_{set}~y~x~q)
   \end{aligned}
 \end{equation}
-we define a recursor (???) \todo{is this a recorsor, and for what? The quotient?}
-\begin{equation}
-  \begin{aligned}
-    &\function{rec}~: (\term{x}~\term{y} : \typeformer{Seq}~\type{A}) \rightarrow (\function{f} : \type{A} \rightarrow \type{B}) \rightarrow (\function{g} : \term{x}~\relation{R}~\term{y} \rightarrow \function{f}~\term{x} \equiv \function{f}~\term{y}) \\
-    &\quad~ \rightarrow (\term{B_{set}} : \typeformer{isSet}~\type{B}) \rightarrow (\type{A} / \relation{R} \rightarrow \type{B}) \\
-    &\function{rec}~\function{[}\,\term{z}\,\function{]} = \function{f}~\term{z} \\
-    &\function{rec}~(\function{eq/}~\_~\_~\term{r}~i) = \function{g}~\term{r}~i \\
-    &\function{rec}~(\function{squash/}~\term{a}~\term{b}~\pathterm{p}~\pathterm{q}~i~j) = \term{B_{set}}~(\function{rec}~\term{a})~(\function{rec}~\term{b})~(\mathtt{ap}~\function{rec}~\pathterm{p})~(\mathtt{ap}~\function{rec}~\pathterm{q})~i~j
-\end{aligned}
-\end{equation}
-we then need to lift this to the quotient
-\begin{equation}
-  \begin{aligned}
-    &\function{Seq/{\sim}{\rightarrow}\bot} : \typeformer{isSet}~\type{A} \rightarrow \typeformer{Seq}_{\type{A}} \rightarrow \type{A}_{\bot} \\
-    &\function{Seq/{\sim}{\rightarrow}\bot}~\term{A_{set}} = \function{rec}~\function{Seq{\rightarrow}\bot}~(\lambda\,\term{x}\,\term{y}, \function{Seq{\rightarrow}\bot\text{-}{\approx}{\rightarrow}{\equiv}}~\term{A_{set}}~\term{x}~\term{y})~\function{\bot\text{-}isSet}
-  \end{aligned}
-\end{equation}
-We can then show that this function makes an equivalence, by showing it is injective and surjective (since we are working in hSets). We start by showing that
-\begin{equation}
-  \begin{aligned}
-    &\function{Seq{\rightarrow}\bot\text{-}isInjective\text{-}helper} : \typeformer{isSet}~\type{A} \rightarrow (s~t : \typeformer{Seq}_{\type{A}}) \rightarrow \function{Seq{\rightarrow}\bot}~s \equiv \function{Seq{\rightarrow}\bot}~t \\
-    &\qquad\qquad\qquad\qquad\qquad\quad~~ \rightarrow (a : A) \rightarrow \| s~\relation{\downarrow_{seq}}~a \| \rightarrow \| t~\relation{\downarrow_{seq}}~a \| \\
-    &\function{Seq{\rightarrow}\bot\text{-}isInjective\text{-}helper}~A_{set}~s~t~p~a~k = ?
-  \end{aligned}
-\end{equation}
-
-\begin{equation}
-  \begin{aligned}
-    &\function{Seq{\rightarrow}\bot\text{-}isInjective} : \typeformer{isSet}~\type{A} \rightarrow (s~t : \typeformer{Seq}_{\type{A}}) \rightarrow \function{Seq{\rightarrow}\bot}~s \equiv \function{Seq{\rightarrow}\bot}~t \rightarrow s~\relation{\sim_{Seq}}~t \\
-    &\function{Seq{\rightarrow}\bot\text{-}isInjective}~A_{set}~s~t~ = ?
-  \end{aligned}
-\end{equation}
-
+\end{defn}
+\begin{defn}[Recursor for Quotient]
+  \todo{is this a recursor, and for what? The quotient?}
+  For all sequences \(\term{x}, \term{y} : \typeformer{Seq}_{\type{A}}\), functions \(\function{f} : \type{A} \rightarrow \type{B}\) and relations \(\function{g} : \term{x}~\relation{R}~\term{y} \rightarrow \function{f}~\term{x} \equiv \function{f}~\term{y}\), then if B is a set \(\term{B_{set}} : \typeformer{isSet}~\type{B}\), we get a function \(\function{rec} : \type{A} / \relation{R} \rightarrow \type{B}\), defined by case as
+  \begin{equation}
+    \begin{aligned}
+      &\function{rec}~\function{[}\,\term{z}\,\function{]} = \function{f}~\term{z} \\
+      &\function{rec}~(\function{eq/}~\_~\_~\term{r}~i) = \function{g}~\term{r}~i \\
+      &\function{rec}~(\function{squash/}~\term{a}~\term{b}~\pathterm{p}~\pathterm{q}~i~j) = \term{B_{set}}~(\function{rec}~\term{a})~(\function{rec}~\term{b})~(\mathtt{ap}~\function{rec}~\pathterm{p})~(\mathtt{ap}~\function{rec}~\pathterm{q})~i~j
+    \end{aligned}
+  \end{equation}
+\end{defn}
+This recursor allows us to lift the relation \(Seq{\rightarrow}\bot\) to the quotient
+\begin{defn}
+  \label{eq:QuotientedSeqToPartialityMonad}
+  We can define a function \(\function{Seq/{\sim}{\rightarrow}\bot}\) from \(\typeformer{isSet}~\type{A}\) to \(\typeformer{Seq}_{\type{A}} \rightarrow \type{A}_{\bot}\) as
+  \begin{equation}
+    \function{Seq/{\sim}{\rightarrow}\bot}~\term{A_{set}} = \function{rec}~\function{Seq{\rightarrow}\bot}~(\lambda\,\term{x}\,\term{y}, \function{Seq{\rightarrow}\bot\text{-}{\approx}{\rightarrow}{\equiv}}~\term{A_{set}}~\term{x}~\term{y})~\function{\bot\text{-}isSet}
+  \end{equation} 
+\end{defn}
+\begin{lem}
+  Given two sequences \(\term{s}\) and \(\term{t}\), if \(\function{Seq{\rightarrow}\bot}~\term{s} \equiv \function{Seq{\rightarrow}\bot}~\term{t}\), then \(s~\relation{\sim_{seq}}~t\).
+  \begin{proof}
+    We can reduce the burden of the proof, since
+    \begin{equation}
+      \term{s}~\relation{\sim_{seq}}~\term{t} = \left(\prod_{(\term{r} : \type{R})} \| \term{x}~\relation{\downarrow_{seq}}~\term{r} \| \rightarrow \| \term{y}~\relation{\downarrow_{seq}}~\term{r} \|\right) \times \left(\prod_{(\term{r} : \type{R})} \| \term{y}~\relation{\downarrow_{seq}}~\term{r} \| \rightarrow \| \term{x}~\relation{\downarrow_{seq}}~\term{r} \|\right)
+    \end{equation}
+    so we can just show one part and get the other by symmetry. We assume \(\| \term{x}~\relation{\downarrow_{seq}}~\term{r} \|\), to show \(\| \term{y}~\relation{\downarrow_{seq}}~\term{r} \|\). By the mapping property of propositional truncation, we reduce the proof to defining a function \(\term{x}~\relation{\downarrow_{seq}}~\term{r} \rightarrow \term{y}~\relation{\downarrow_{seq}}~\term{r}\). Since \(\term{x}~\relation{\downarrow_{seq}}~\term{r}\), then \(\constructor{\eta}~\term{r}~\relation{\sqsubseteq_{\bot}}~\function{Seq{\rightarrow}\bot}~\term{x}\), but we have assumed \(\function{Seq{\rightarrow}\bot}~\term{x} \equiv \function{Seq{\rightarrow}\bot}~\term{y}\), so we get \(\constructor{\eta}~\term{r}~\realtion{\sqsubseteq_{\bot}}~\function{Seq{\rightarrow}\bot}~\term{y}\), and thereby \(\term{y}~\relation{\downarrow_{seq}}~\term{r}\).
+  \end{proof}
+\end{lem}
+\begin{lem}
+  The function \(\function{Seq/{\sim}{\rightarrow}\bot}\) is injective.
+  \begin{proof}
+    \todo[inline]{Complete proof}
+  \end{proof}
+\end{lem}
+\begin{lem}
+  Assuming countable choice, the function \(\function{Seq/{\sim}{\rightarrow}\bot}\) is surjective
+  \todo[inline]{describe countable choice (and why it is needed!)}
+\end{lem}
+\begin{thm}
+  Assuming countable choice, we get an equivalence between sequences and the partiality monad.
+  \begin{proof}
+ The function \(\function{Seq/{\sim}{\rightarrow}\bot}\) is injective and surjective assuming countable choice, meaning we get an equivalence, since we are working in hSets.
+\end{proof}
+\end{thm}
 
 \subsubsection{Building the Partiality Monad as an M-type (Dialgebra?)}
 \todo[inline]{Is this possible?}
@@ -619,6 +722,9 @@ We can then show that this function makes an equivalence, by showing it is injec
 %   \caption{Partiality monad as M-type (3)}
 %   \label{fig:partiality-monad-M-type-3}
 % \end{figure}
+
+\subsection{QM-types}
+\todo{which other QM types can be expressed as QIITs}
 
 \subsubsection{Partiality from Delay monad}
 We want to define an ordering on the delay monad, we do this by counting the number of \texttt{later}s, letting the infinitely delayed element \texttt{never}, be the bottom element of the ordering. So we get
@@ -761,7 +867,7 @@ We start with containers and work up to \texttt{M}-types.
   \label{fig:container-products}
 \end{figure}
 \begin{thm}
-  For any \(n : \type{\mathbb{N}}\) the following is true
+  For any \(n : \mathbb{N}\) the following is true
   \begin{equation}
     {\functor{P}_{\containerpair{\type{A}}{\typeformer{B}}}}^n~\unit \times {\functor{P}_{\containerpair{\type{C}}{\typeformer{D}}}}^n~\unit \equiv {\functor{P}_{\containerpair{\type{A}}{\typeformer{B}} \times \containerpair{\type{C}}{\typeformer{D}}}}^n~\unit. \label{eq:polynomial-functor-product}
   \end{equation}
@@ -942,7 +1048,7 @@ We want the diagram in \figref{zip-computation-rules} to commute,
   \centering
   \begin{tikzcd}[row sep=huge,column sep=huge]
     & A \times B & \\
-    \typeformer{stream}~\type{A} \times \typeformer{stream}~\type{B} \ar[ur,"\function{hd} \times \function{hd}"'] \ar[rr,"\function{zip}"] \ar[d,"\function{tl} \times \function{tl}"] & & \typeformer{stream}~(\type{A} \times \type{B}) \ar[ul,"\function{hd}"] \ar[d,"\function{tl}"] \\
+    \typeformer{stream}~\type{A} \times \typeformer{stream}~\type{B} \ar[ur,"\destructor{hd} \times \destructor{hd}"'] \ar[rr,"\function{zip}"] \ar[d,"\destructor{tl} \times \destructor{tl}"] & & \typeformer{stream}~(\type{A} \times \type{B}) \ar[ul,"\destructor{hd}"] \ar[d,"\destructor{tl}"] \\
     \typeformer{stream}~\type{A} \times \typeformer{stream}~\type{B} \ar[rr,"\function{zip}"] & & \typeformer{stream}~(\type{A} \times \type{B})
   \end{tikzcd}
   \caption{TODO}
@@ -950,10 +1056,10 @@ We want the diagram in \figref{zip-computation-rules} to commute,
 \end{figure}
 meaning we get the computation rules
 \begin{equation}
-  (\function{hd} \times \function{hd}) \equiv \function{hd} \circ \function{zip}
+  (\destructor{hd} \times \destructor{hd}) \equiv \destructor{hd} \circ \function{zip}
 \end{equation}
 \begin{equation}
-  \function{zip} \circ (\function{tl} \times \function{tl}) \equiv \function{tl} \circ \function{zip}
+  \function{zip} \circ (\destructor{tl} \times \destructor{tl}) \equiv \destructor{tl} \circ \function{zip}
 \end{equation}
 we can define the zip function as we did in the end of the last section. Another way to define the zip function is more directly, using the following lifting property of \texttt{M}-types
 \begin{equation}
@@ -964,10 +1070,10 @@ we can define the zip function as we did in the end of the last section. Another
 \end{equation}
 To use this definition, we first define some helper functions
 \begin{equation}
-  \function{zip}_{X}~n~(x , y) = \begin{cases} \unit & \mathtt{if}~n = 0 \\ (\function{hd}~x , \function{hd}~y) , (\lambda\,\_, \function{zip}_{X}~m~(\function{tl}~x,\function{tl}~y)) , & \mathtt{if}~n = m + 1 \end{cases}
+  \function{zip}_{X}~n~(x , y) = \begin{cases} \unit & \mathtt{if}~n = 0 \\ (\destructor{hd}~x , \destructor{hd}~y) , (\lambda\,\_, \function{zip}_{X}~m~(\destructor{tl}~x,\destructor{tl}~y)) , & \mathtt{if}~n = m + 1 \end{cases}
 \end{equation}
 \begin{equation}
-  \function{zip}_{\pi}~n~(x , y) = \begin{cases} \function{refl} & \mathtt{if}~n = 0 \\ \lambda\,i,(\function{hd}~x , \function{hd}~y) , (\lambda\,\_, \function{zip}_{\pi}~m~(\function{tl}~x,\function{tl}~y)~i) , & \mathtt{if}~n = m + 1 \end{cases},
+  \function{zip}_{\pi}~n~(x , y) = \begin{cases} \function{refl} & \mathtt{if}~n = 0 \\ \lambda\,i,(\destructor{hd}~x , \destructor{hd}~y) , (\lambda\,\_, \function{zip}_{\pi}~m~(\destructor{tl}~x,\destructor{tl}~y)~i) , & \mathtt{if}~n = m + 1 \end{cases},
 \end{equation}
 we can then define
 \begin{equation}
@@ -986,9 +1092,9 @@ zero case \(X\)
 \end{equation}
 Successor case \(X\)
 \begin{align} 
-  \function{zip}_X~(m+1)~(x,y) &\equiv (\function{hd}~x, \function{hd}~y),(\lambda\,\_,\function{zip}_X~m~(\function{tl}~x,\function{tl}~y)) \\
-                               &\equiv (\function{hd}~x, \function{hd}~y),(\lambda\,\_, {?}~(\function{tl}~a)) \\
-                               &\equiv (\function{hd}~(\texttt{transport}_{?} a)),(\lambda\,\_, \texttt{transport}_{?} (\function{tl}~a)) \\
+  \function{zip}_X~(m+1)~(x,y) &\equiv (\destructor{hd}~x, \destructor{hd}~y),(\lambda\,\_,\function{zip}_X~m~(\destructor{tl}~x,\destructor{tl}~y)) \\
+                               &\equiv (\destructor{hd}~x, \destructor{hd}~y),(\lambda\,\_, {?}~(\destructor{tl}~a)) \\
+                               &\equiv (\destructor{hd}~(\texttt{transport}_{?} a)),(\lambda\,\_, \texttt{transport}_{?} (\destructor{tl}~a)) \\
                                &\equiv \mathtt{transport}_?~a \\
 \end{align}
 Zero case \(\pi\): \((\lambda\,i, \function{zip}_\pi~0~(x,y)~i \equiv refl)\).
@@ -999,7 +1105,7 @@ Zero case \(\pi\): \((\lambda\,i, \function{zip}_\pi~0~(x,y)~i \equiv refl)\).
 successor case
 \begin{align}
   &\equiv (\function{zip}_X~(m+1)~(x,y)) , (\lambda\,i, \function{zip}_\pi~(m+1)~(x,y)~i) \\
-  &\equiv ((\function{hd}~x, \function{hd}~y),(\lambda\,\_,\function{zip}_X~m~(\function{tl}~x,\function{tl}~y))) , (\lambda\,i, (\function{hd}~x, \function{hd}~y),(\lambda\,\_,\function{zip}_\pi~m~(\function{tl}~x,\function{tl}~y)~i))
+  &\equiv ((\destructor{hd}~x, \destructor{hd}~y),(\lambda\,\_,\function{zip}_X~m~(\destructor{tl}~x,\destructor{tl}~y))) , (\lambda\,i, (\destructor{hd}~x, \destructor{hd}~y),(\lambda\,\_,\function{zip}_\pi~m~(\destructor{tl}~x,\destructor{tl}~y)~i))
 \end{align}
 \todo[inline]{Complete this proof}
 
@@ -1007,10 +1113,10 @@ successor case
 \subsubsection{Zeros}
 Let us try to define the zero stream, we do this by lifting the functions
 \begin{equation}
-  \function{const_X}~(n : \type{\mathbb{N}})~(c : \type{\mathbb{N}})  := \begin{cases} \unit & n = 0 \\ (c , \lambda\,\_, \function{const_X}~m~c) & n = m + 1 \end{cases}
+  \function{const_X}~(n : \mathbb{N})~(c : \mathbb{N})  := \begin{cases} \unit & n = 0 \\ (c , \lambda\,\_, \function{const_X}~m~c) & n = m + 1 \end{cases}
 \end{equation}
 \begin{equation}
-  \function{const_\pi}~(n : \type{\mathbb{N}})~(c : \type{\mathbb{N}}) := \begin{cases} \mathtt{refl} & n = 0 \\ \lambda\,i,(c , \lambda\,\_, \function{const_\pi}~m~c~i) & n = m + 1 \end{cases}
+  \function{const_\pi}~(n : \mathbb{N})~(c : \mathbb{N}) := \begin{cases} \mathtt{refl} & n = 0 \\ \lambda\,i,(c , \lambda\,\_, \function{const_\pi}~m~c~i) & n = m + 1 \end{cases}
 \end{equation}
 to get the definition of zero stream
 \begin{equation}
@@ -1018,8 +1124,8 @@ to get the definition of zero stream
 \end{equation}
 We want to show that we get the expected properties, such as
 \begin{align}
-  \function{hd}~\mathtt{zeros} &\equiv 0 \\
-  \function{tl}~\mathtt{zeros} &\equiv \mathtt{zeros}
+  \destructor{hd}~\mathtt{zeros} &\equiv 0 \\
+  \destructor{tl}~\mathtt{zeros} &\equiv \mathtt{zeros}
 \end{align}
 
 \subsubsection{Spin}
@@ -1042,26 +1148,26 @@ As described earlier, given a type \(\type{A}\) we define the stream of that typ
 \end{equation}
 When taking the head of a stream, we get
 \begin{align}
-  \function{hd}~(\function{cons}~x~xs) &\equiv \pi_1~\function{out}~(\function{cons}~x~xs) \\
+  \destructor{hd}~(\constructor{cons}~x~xs) &\equiv \pi_1~\function{out}~(\constructor{cons}~x~xs) \\
                                        &\equiv \pi_1~\function{out}~(\function{in}~(x , \lambda\,\_,xs)) \\
                                        &\equiv \pi_1~(x , \lambda\,\_,xs) \\
                                        &\equiv x
 \end{align}
 and similarly for the tail of the stream
 \begin{align}
-  \function{tl}~(\function{cons}~x~xs) &\equiv \pi_2~\function{out}~(\function{cons}~x~xs) \\
+  \destructor{tl}~(\constructor{cons}~x~xs) &\equiv \pi_2~\function{out}~(\constructor{cons}~x~xs) \\
                                        &\equiv \pi_2~\function{out}~(\function{in}~(x , \lambda\,\_,xs)) \\
                                        &\equiv \pi_2~(x , \lambda\,\_,xs) \\
                                        &\equiv xs
 \end{align}
 and the other direction is also true
 \begin{align}
-  \function{cons}(\function{hd}~s , \function{tl}~s) &\equiv \function{in}~(\function{hd}~s , \function{tl}~s) \\
+  \constructor{cons}(\destructor{hd}~s , \destructor{tl}~s) &\equiv \function{in}~(\destructor{hd}~s , \destructor{tl}~s) \\
                                                      &\equiv \function{in}~(\pi_1~(\function{out}~s) , \pi_2~(\function{out}~s)) \\
                                                      &\equiv \function{in}~(\function{out}~s) \\
                                                      &\equiv s.
 \end{align}
-When forming elements of the \texttt{M}-type, we want to do it by lifting it though the definition of the \texttt{M}-type, meaning we want to define a function \(\function{cons'} : (\type{\mathbb{N}} \rightarrow \type{A}) \rightarrow \typeformer{stream}~\type{A}\) as
+When forming elements of the \texttt{M}-type, we want to do it by lifting it though the definition of the \texttt{M}-type, meaning we want to define a function \(\function{cons'} : (\mathbb{N} \rightarrow \type{A}) \rightarrow \typeformer{stream}~\type{A}\) as
 \begin{equation}
   \function{cons'} f = \function{lift_M}~(\lambda\,c\,n, f~c)
 \end{equation}
