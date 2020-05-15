@@ -183,6 +183,8 @@ Homotopy type theory
 \section{Cubical Agda}
 \todo[inline]{Axioms of cubical Agda}
 The theory of cubical Agda is a Cartesian closed category, meaning get exponentials.
+\\ \\
+\todo[inline]{Something about the interval type!!}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
 
@@ -368,6 +370,148 @@ We can now construct a coinduction principle given a bisimulation relation
   \end{equation}
 \end{defn}
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
+
+\chapter{Instantiation of M-types}
+\section{Stream Formalization using \texttt{M}-types}
+As described earlier, given a type \(\type{A}\) we define the stream of that type as
+\begin{equation}
+  \typeformer{stream}~\type{A} := \typeformer{M}_{\containerpair{\type{A}}{\lambda\,\_,\unit}}
+\end{equation}
+When taking the head of a stream, we get
+\begin{align}
+  \destructor{hd}~(\constructor{cons}~x~xs) &\equiv \pi_1~\function{out}~(\constructor{cons}~x~xs) \\
+                                       &\equiv \pi_1~\function{out}~(\function{in}~(x , \lambda\,\_,xs)) \\
+                                       &\equiv \pi_1~(x , \lambda\,\_,xs) \\
+                                       &\equiv x
+\end{align}
+and similarly for the tail of the stream
+\begin{align}
+  \destructor{tl}~(\constructor{cons}~x~xs) &\equiv \pi_2~\function{out}~(\constructor{cons}~x~xs) \\
+                                       &\equiv \pi_2~\function{out}~(\function{in}~(x , \lambda\,\_,xs)) \\
+                                       &\equiv \pi_2~(x , \lambda\,\_,xs) \\
+                                       &\equiv xs
+\end{align}
+and the other direction is also true
+\begin{align}
+  \constructor{cons}(\destructor{hd}~s , \destructor{tl}~s) &\equiv \function{in}~(\destructor{hd}~s , \destructor{tl}~s) \\
+                                                     &\equiv \function{in}~(\pi_1~(\function{out}~s) , \pi_2~(\function{out}~s)) \\
+                                                     &\equiv \function{in}~(\function{out}~s) \\
+                                                     &\equiv s.
+\end{align}
+When forming elements of the \texttt{M}-type, we want to do it by lifting it though the definition of the \texttt{M}-type, meaning we want to define a function \(\function{cons'} : (\mathbb{N} \rightarrow \type{A}) \rightarrow \typeformer{stream}~\type{A}\) as
+\begin{equation}
+  \function{cons'} f = \function{lift_M}~(\lambda\,c\,n, f~c)
+\end{equation}
+\begin{equation}
+  \function{cons'} f = \function{lift_M}~(\lambda\,c\,n, f~c)
+\end{equation}
+
+\section{ITrees as \texttt{M}-types}
+We want the following rules for ITrees
+\begin{equation}
+  \infer[\mathtt{I}_{\function{Ret}}]{\function{Ret}~\term{r} : \typeformer{itree}~\typeformer{E}~\type{R}}{r : \type{R}}
+\end{equation}
+\begin{equation}
+  \infer[\mathtt{I}_{\function{Vis}}]{\function{Vis}~\term{a}~\term{f} : \typeformer{itree}~\typeformer{E}~\type{R}}{\type{A} : \universe{\mathcal{U}} & \term{a} : \typeformer{E}~\type{A} & \term{f} : \type{A} \rightarrow \typeformer{itree}~\typeformer{E}~\type{R}}.
+\end{equation}
+Elimination rules
+\begin{equation}
+  \infer[\mathtt{E}_{\function{Tau}}]{\function{Tau}~\term{t} : \typeformer{itree}~\typeformer{E}~\type{R}}{\term{t} : \typeformer{itree}~\typeformer{E}~\type{R}}.
+\end{equation}
+
+\subsection{Delay Monad}
+We start by looking at itrees without the \(\function{Vis}\) constructor, this type is also know as the delay monad\todo[inline]{check this statement}. We construct this type by letting \(\container{S} = (\unit + \type{R},\lambda \{ \texttt{inl}~\_ \rightarrow \unit~;~\texttt{inr}~\_ \rightarrow \empt \})\), we then get the polynomial functor
+\begin{equation}
+  \functor{P}_{\container{S}}(\type{X}) = \sum_{\term{x} : \unit + \type{R}} \lambda \{ \texttt{inl}~\_ \rightarrow \unit ; \texttt{inr}~\_ \rightarrow \empt\}~\term{x} \rightarrow \type{X},
+\end{equation}
+which is equal to
+\begin{equation}
+  \functor{P}_{\container{S}}(\type{X}) = \type{X} + \type{R} \times (\empt \rightarrow \type{X}).
+\end{equation}
+We know that \(\empt \rightarrow \type{X} \equiv \unit\), so we can reduce further to
+\begin{equation}
+  \functor{P}_{\container{S}}(\type{X}) = \type{X} + \type{R}
+\end{equation}
+meaning we get the following diagram.
+
+\begin{figure}[h]
+  \centering
+  \begin{tikzcd}[row sep=large,column sep=large]
+    \type{R} \ar[dr,"\function{now}"'] \ar[r,"\texttt{inl}"] & \type{R} + \typeformer{M}  & \typeformer{M} \ar[l,"\texttt{inr}"'] \ar[dl,"\function{later}"] \\
+    & \typeformer{M} \ar[u,"\function{out}"']
+  \end{tikzcd}
+  \caption{Delay monad}
+\end{figure}
+\noindent Meaning we can define the operations \(\function{now}\) and \(\function{later}\) using \(\function{in} = \function{out}^{-1}\) together with the injections \(\mathtt{inl}\) and \(\mathtt{inr}\). \todo[inline]{(Later = Tau, Ret = Now)}
+
+\subsection{Tree}
+Now lets look at the example where we remove the \(\function{Tau}\) constructor. We let
+\begin{equation}
+  \container{S} = \left(\type{R} + \sum_{\type{A} : \universe{\mathcal{U}}} \typeformer{E}~\type{A}~,~\lambda \{ \texttt{inl}~\_ \rightarrow \empt ~;~ \texttt{inr}~(\type{A},\term{e}) \rightarrow \type{A} \} \right).
+\end{equation}
+This will give us the polynomial functor
+\begin{equation}
+  \functor{P}_{\container{S}}(\type{X}) = \sum_{\term{x} : \type{R} + \sum_{\type{A} : \universe{\mathcal{U}}} \typeformer{E}~\type{A}} \lambda \{ \texttt{inl}~\_ \rightarrow \empt ~;~ \texttt{inr}~(\type{A},\term{e}) \rightarrow \type{A} \}~\term{x} \rightarrow \type{X},
+\end{equation}
+which simplifies to
+\begin{equation}
+  \functor{P}_{\container{S}}(\type{X}) = (\type{R} \times (\empt \rightarrow \type{X})) + (\sum_{\type{A} : \universe{\mathcal{U}}} \typeformer{E}~\type{A} \times (\type{A} \rightarrow \type{X})),
+\end{equation}
+and further
+\begin{equation}
+  \functor{P}_{\container{S}}(\type{X}) = \type{R} + \sum_{\type{A} : \universe{\mathcal{U}}} \typeformer{E}~\type{A} \times (\type{A} \rightarrow \type{X}).
+\end{equation}
+We get the following diagram for the \(\functor{P}\)-coalgebra.
+
+\begin{figure}[h]
+  \centering
+  \begin{tikzcd}[row sep=large,column sep=large]
+    \type{R} \ar[dr,"\function{Ret}"'] \ar[r,"\texttt{inl}"] & \type{R} + \sum_{\type{A} : \universe{U}} \typeformer{E}~\type{A} \times (\type{A} \rightarrow \typeformer{M})  & \sum_{\type{A} : \universe{U}} \typeformer{E}~\type{A} \times (\type{A} \rightarrow \typeformer{M}) \ar[l,"\texttt{inr}"'] \ar[dl,"\function{Vis}"] \\
+    & \typeformer{M} \ar[u,"\function{out}"]
+  \end{tikzcd}
+  \caption{TODO}
+\end{figure}
+\noindent Again we can define \(\function{Ret}\) and \(\function{Vis}\) using the \(\function{in}\) function.
+
+\subsection{ITrees}
+\todo[inline]{Get the correct equivalence for ITrees (Part of project description?)}
+Now we should have all the knowledge needed to make ITrees using \texttt{M}-types. We define ITrees by the container
+\begin{equation}
+  \container{S} = \left( \unit+\type{R}+\sum_{\type{A}:\universe{\mathcal{U}}} (\typeformer{E}~\type{A}) ~~,~~ \lambda\left\{ \texttt{inl}~(\texttt{inl}~\_) \rightarrow \unit ~;~ \texttt{inl}~(\texttt{inr}~\_) \rightarrow \empt ~;~ \texttt{inr} (\type{A},\_)  \rightarrow \type{A} \right\} \right).
+\end{equation}
+Such that the (reduced) polynomial functor becomes
+\begin{equation}
+  \functor{P}_{\container{S}}(\type{X}) = \type{X} + \type{R} + \sum_{\type{A} : \universe{\mathcal{U}}} ((\typeformer{E}~\type{A}) \times (\type{A} \rightarrow \type{X}))
+\end{equation}
+Giving us the diagram
+\begin{figure}[h]
+  \centering
+  \begin{tikzcd}[row sep=large,column sep=large]
+    \type{R} \ar[ddrr,"\function{Ret}"'] \ar[r,"\texttt{inl}\,\circ\,\texttt{inr}"] & \typeformer{M} + \type{R} + \sum_{\type{A} : \universe{\mathcal{U}}} (\typeformer{E}~\type{A} \times (\type{A} \rightarrow \typeformer{M})) & & \sum_{\type{A} : \universe{U}} \typeformer{E}~\type{A} \times (\type{A} \rightarrow \typeformer{M}) \ar[ll,"\texttt{inr}"'] \ar[ddl,"\function{Vis}"] \\
+    & & \typeformer{M} \ar[ul,"\texttt{inl}\,\circ\,\texttt{inl}"'] \ar[d,"\function{Tau}"'] \\
+    & & \typeformer{M} \ar[uul,"\function{out}"]
+  \end{tikzcd}
+  \caption{TODO}
+\end{figure}
+
+\section{Automaton}
+An automaton is defined as a set of state \(\type{V}\) and an alphabet \(\type{\alpha}\) and a transition function \(\function{\delta} : \type{V} \rightarrow \type{\alpha} \rightarrow \type{V}\). This gives us the diagram in \figref{automaton}
+\begin{figure}[h]
+  \centering
+  \begin{tikzcd}[row sep=huge,column sep=huge]
+    \type{V} \times (\type{V} \rightarrow \type{\alpha} \rightarrow \type{V}) \ar[dr,"build"'] \ar[r] & M & M \ar[dl,"step"] \\
+    & M
+  \end{tikzcd}
+  \caption{automaton}
+  \label{fig:automaton}
+\end{figure}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
+
+\chapter{QM-types}
+\section{Quotienting and constructors}
+\todo[inline]{Describe set truncated quotients and their construction / elimination principles, and how it relates to quotienting M-types}
 \section{Quotient \texttt{M}-type}
 We want to construct a quotient \texttt{M}-type, and we know that \texttt{M}-types are an algebraic theory? Meaning we want to define quotient algebra...
 
@@ -414,7 +558,7 @@ A quotient inductive-inductive type (QIIT) is a type together with a relation de
     \hfill
     \begin{minipage}{0.45\linewidth}
       \begin{equation}
-        \infer{\constructor{\alpha}~\term{p}~\term{q} : \term{x} \equiv \term{y}}{\term{x},\term{y} : \type{R}_\bot & \term{p} : \term{x}~\relation{\sqsubseteq_{\bot}}~\term{y} & \term{q} : \term{y}~\relation{\sqsubseteq_{\bot}}~\term{x}}
+        \infer{\constructor{\alpha_{\bot}}~\term{p}~\term{q} : \term{x} \equiv \term{y}}{\term{x},\term{y} : \type{R}_\bot & \term{p} : \term{x}~\relation{\sqsubseteq_{\bot}}~\term{y} & \term{q} : \term{y}~\relation{\sqsubseteq_{\bot}}~\term{x}}
       \end{equation}
     \end{minipage}
   \end{center}
@@ -443,13 +587,13 @@ A quotient inductive-inductive type (QIIT) is a type together with a relation de
     \hfill
     \begin{minipage}{0.50\linewidth}
       \begin{equation}
-        \infer{\prod_{(n:\mathbb{N})} \function{s}_n~\realtion{\sqsubseteq_{\bot}}~\bigsqcup(\function{s},\function{b})}{\function{s} : \mathbb{N} \rightarrow \type{R}_\bot & \function{b} : \prod_{(n : \mathbb{N})} \function{s}_n~\relation{\sqsubseteq_{\bot}}~\function{s}_{n+1} }
+        \infer{\prod_{(n : \mathbb{N})} \function{s}_n~\relation{\sqsubseteq_{\bot}}~\bigsqcup(\function{s},\function{b})}{\function{s} : \mathbb{N} \rightarrow \type{R}_\bot & \function{b} : \prod_{(n : \mathbb{N})} \function{s}_n~\relation{\sqsubseteq_{\bot}}~\function{s}_{n+1} }
       \end{equation}
     \end{minipage}
     \hfill
     \begin{minipage}{0.3\linewidth}
       \begin{equation}
-        \infer{\bigsqcup(\function{s},\function{p})~\relation{\sqsubseteq_{\bot}}~\term{x}}{\prod_{(n:\mathbb{N})} \function{s}_n~\relation{\sqsubseteq_{\bot}}~\term{x}}
+        \infer{\bigsqcup(\function{s},\function{b})~\relation{\sqsubseteq_{\bot}}~\term{x}}{\prod_{(n:\mathbb{N})} \function{s}_n~\relation{\sqsubseteq_{\bot}}~\term{x}}
       \end{equation}
     \end{minipage}
   \end{center}
@@ -460,6 +604,7 @@ A quotient inductive-inductive type (QIIT) is a type together with a relation de
 \end{defn}
 
 \subsubsection{Delay monad to Sequences}
+\todo[inline]{Introduce the delay monad before this section!!}
 \begin{defn}
   We define
   \begin{equation}
@@ -471,7 +616,7 @@ A quotient inductive-inductive type (QIIT) is a type together with a relation de
   \end{equation}
   meaning a sequences is \(\mathtt{inr}~\constant{tt}\) until it reaches a point where it switches to \(\mathtt{inl}~\term{r}\) for some value \(\term{r}\). There are also the special cases of already terminated, meaning only \(\mathtt{inl}~\term{r}\) and never teminating meaning only \(\mathtt{inr}~\constant{tt}\).
 \end{defn}
-\noindent For each index in a sequence, the element at that index \(s_n\) is either not terminated \(s_n \equiv \mathtt{inr}~\constant{tt}\), which we denote as \(\function{s}_n \uparrow_{\type{R} + \unit}\), or it is terminated \(s_n \equiv \mathtt{inl}~\term{r}\) with some value \(r\), denoted by \(\function{s}_n \downarrow_{\type{R} + \unit} \term{r}\) or just \(\function{s}_n \downarrow_{\type{R} + \unit}\) to mean \(s_n \not\equiv \mathtt{inr}~\constant{tt}\). Thus we can write \(\function{isMon}\) as
+\noindent For each index in a sequence, the element at that index \(\function{s}_n\) is either not terminated \(\function{s}_n \equiv \mathtt{inr}~\constant{tt}\), which we denote as \(\function{s}_n \uparrow_{\type{R} + \unit}\), or it is terminated \(\function{s}_n \equiv \mathtt{inl}~\term{r}\) with some value \(r\), denoted by \(\function{s}_n \downarrow_{\type{R} + \unit} \term{r}\) or just \(\function{s}_n \downarrow_{\type{R} + \unit}\) to mean \(\function{s}_n \not\equiv \mathtt{inr}~\constant{tt}\). Thus we can write \(\function{isMon}\) as
 \begin{equation}
   \function{isMon}~\function{s} = \prod_{(n : \mathbb{N})} (\function{s}_n \equiv \function{s}_{n+1})  + ((\function{s}_n \uparrow_{\type{R} + \unit}) \times (\function{s}_{n+1} \downarrow_{\type{R} + \unit}))
 \end{equation}
@@ -528,8 +673,7 @@ We also introduce notation for the two special cases of sequences given above
         & \strut\hspace{-8mm}\function{shift}~(\function{Delay{\rightarrow}Seq}~\term{x})~\left(\mathtt{inr}~\constant{tt} , \begin{cases} \mathtt{inr}~(\mathtt{refl} , \constant{inl{\not\equiv}inr}) & \term{x} = \constructor{now}~\_ \\ \mathtt{inl}~\mathtt{refl} & \term{x} = \constructor{later}~\_ \end{cases}\right)
       \end{aligned}
     \end{equation}
-    \todo[inline]{describe \(inl{\not\equiv}inr\)}
-    now for the other direction
+    where \(\constant{inl{\not\equiv}inr}\) is the proof that if you can construct \(\mathtt{inl}~\_ \equiv \mathtt{inr}~\_\) then it gives a contradiction. Now for the other direction
     \begin{equation}
       \begin{aligned}
         \function{Seq{\rightarrow}Delay}&~(\function{g} , \function{q}) = \begin{cases} \constructor{now}~\term{r} & \function{g}_0 = \mathtt{inl}~\term{r} \\ \constructor{later}~(\function{Seq{\rightarrow}Delay}~(\function{unshift}~(\function{g} , \function{q}))) & \function{g}_0 = \mathtt{inr}~\constant{tt} \end{cases}
@@ -541,6 +685,7 @@ We also introduce notation for the two special cases of sequences given above
         \function{Seq\text{-}Delay}&~(\function{g},\function{q}) = \begin{cases} \mathtt{refl}  & \function{g}_0 = \mathtt{inl}~\term{r} \\ \begin{aligned} &\mathtt{ap}~\function{shift}~(\function{Seq\text{-}Delay}~(\function{unshift}~(\function{g} , \function{q}))) \\&\quad\ct~\function{shift\text{-}unshift}~(\function{g} , \function{q}) \end{aligned} & \function{g}_0 = \mathtt{inr}~\constant{tt} \end{cases}
       \end{aligned}
     \end{equation}
+    \todo[inline]{Shift takes two arguemnts, either clarify that its shift' that inserts inr tt or ...}
     and left identity, saying that for any delay monad \(t\) we get \(\function{Seq{\rightarrow}Delay}~(\function{Delay{\rightarrow}Seq}~\term{t}) \equiv \term{t}\), defined as
     \begin{equation}
       \begin{aligned}
@@ -573,32 +718,32 @@ where \(\| \cdot \|\) is propositional \todo{propositional or set truncation?} t
     \end{aligned}
   \end{equation}
 \end{defn}
-\begin{defn}[Maybe Ordering] Given some \(x,y : \type{R} + \unit\), the odering relation is defined as
+\begin{defn}[Maybe Ordering] Given some \(x,y : \type{R} + \unit\), the ordering relation is defined as
 \begin{equation}
   \term{x}~\relation{\sqsubseteq_{\type{R} + \unit}}~\term{y} = (\term{x} \equiv \term{y}) + ((\term{x}  \downarrow_{\type{R} + \unit}) \times (\term{y} \uparrow_{\type{R} + \unit}))
 \end{equation}
 \end{defn}
 \noindent This ordering definition is basically \(\function{isMon}\) at a specific index, so we can again rewrite \(\function{isMon}\) as
 \begin{equation}
-  \function{isMon}~\function{s} = \prod_{(n : \mathbb{N})} \function{s}_n~\realtion{\sqsubseteq_{\type{R} + \unit}}~\function{s}_{n+1}
+  \function{isMon}~\function{s} = \prod_{(n : \mathbb{N})} \function{s}_n~\relation{\sqsubseteq_{\type{R} + \unit}}~\function{s}_{n+1}
 \end{equation}
 This rewriting confirms that if \(\function{isMon}~\function{s}\), then \(\function{s}\) is monotone, and therefore a sequence of partial values\todo{there exists non-monotone sequences, it just follows our definition of a sequence.}.
 \begin{lem}
-  The function \(\function{Maybe{\rightarrow}\bot}\) is monotone, that is, if \(x~\relation{\sqsubseteq_{\type{A} + \unit}}~y\), for some \(x\) and \(y\), then \((\function{Maybe{\rightarrow}\bot}~x)~\relation{\sqsubseteq_{\bot}}~(\function{Maybe{\rightarrow}\bot}~y)\).
+  The function \(\function{Maybe{\rightarrow}\bot}\) is monotone, that is, if \(\term{x}~\relation{\sqsubseteq_{\type{A} + \unit}}~\term{y}\), for some \(\term{x}\) and \(\term{y}\), then \((\function{Maybe{\rightarrow}\bot}~\term{x})~\relation{\sqsubseteq_{\bot}}~(\function{Maybe{\rightarrow}\bot}~\term{y})\).
   \begin{proof}
     We do the proof by case.
     \begin{equation}
       \begin{aligned}
         &\function{Maybe{\rightarrow}\bot\text{-}mono}~(\function{inl}~\pathterm{p}) = \\[-1mm]
-        &\qquad\qquad \mathtt{subst}~(\lambda\,a, \function{Maybe{\rightarrow}\bot}~x~\relation{\sqsubseteq_{\bot}}~\function{Maybe{\rightarrow}\bot}~a)~\pathterm{p}~(\constructor{\sqsubseteq_{refl}} (\function{Maybe{\rightarrow}\bot}~x)) \\[1mm]
+        &\qquad\qquad \mathtt{subst}~(\lambda\,\term{a},~\function{Maybe{\rightarrow}\bot}~\term{x}~\relation{\sqsubseteq_{\bot}}~\function{Maybe{\rightarrow}\bot}~\term{a})~\pathterm{p}~(\constructor{\sqsubseteq_{refl}} (\function{Maybe{\rightarrow}\bot}~\term{x})) \\[1mm]
         &\function{Maybe{\rightarrow}\bot\text{-}mono}~(\function{inr}~(\pathterm{p}, \_)) = \\[-1mm]
-        &\qquad\qquad \mathtt{subst}~(\lambda\,a, \function{Maybe{\rightarrow}\bot}~a~\relation{\sqsubseteq_{\bot}}~\function{Maybe{\rightarrow}\bot}~y)~\sym{\pathterm{p}}~(\constructor{\sqsubseteq_{never}} (\function{Maybe{\rightarrow}\bot}~y))
+        &\qquad\qquad \mathtt{subst}~(\lambda\,\term{a},~\function{Maybe{\rightarrow}\bot}~\term{a}~\relation{\sqsubseteq_{\bot}}~\function{Maybe{\rightarrow}\bot}~\term{y})~\sym{\pathterm{p}}~(\constructor{\sqsubseteq_{never}} (\function{Maybe{\rightarrow}\bot}~\term{y}))
       \end{aligned}
     \end{equation}
-\end{proof}
+  \end{proof}
 \end{lem}
 \begin{defn}
-  There is a function taking a sequence to an increasing sequence
+  There is a function taking a sequence to an increasing sequence \todo{What is an increasing sequence ??, this is not defined anywhere!!}
   \begin{equation}
     \begin{aligned}
       &\function{Seq{\rightarrow}incSeq} \\
@@ -616,26 +761,23 @@ This rewriting confirms that if \(\function{isMon}~\function{s}\), then \(\funct
   \end{equation}
 \end{defn}
 \begin{lem}
-  This function is again monotone.
+  The function \(\function{Seq{\rightarrow}\bot}\) is monotone. 
   \begin{equation}
-    \function{Seq{\rightarrow}\bot\text{-}mono} : \typeformer{isSet} \type{A} \rightarrow (x~y : \typeformer{Seq}_{\type{A}}) \rightarrow x~\relation{\sqsubseteq_{seq}}~y \rightarrow \function{Seq{\rightarrow}\bot}~x~\relation{\sqsubseteq_{\bot}}~\function{Seq{\rightarrow}\bot}~y
+    \function{Seq{\rightarrow}\bot\text{-}mono} : \typeformer{isSet} \type{A} \rightarrow (\term{x}~\term{y} : \typeformer{Seq}_{\type{A}}) \rightarrow \term{x}~\relation{\sqsubseteq_{seq}}~\term{y} \rightarrow \function{Seq{\rightarrow}\bot}~\term{x}~\relation{\sqsubseteq_{\bot}}~\function{Seq{\rightarrow}\bot}~\term{y}
 \end{equation}
   \begin{proof}
-    if a sequence is smaller than another sequence, then the least upper bounds of each sequence respect the ordering. \todo{should this be formalized entirely, or should there just be a comment about monotonicity? Does not seem relevant?}.
+    Given two sequences, if one is smaller than the another, then the least upper bounds of each sequence respect the ordering. \todo{should this be formalized entirely, or should there just be a comment about monotonicity? Does not seem relevant? (There is alot of work here..)}
   \end{proof}
 \end{lem}
 \begin{defn}
-  \todo[inline]{describe definition / more mathematical, less computer science}
+  If two sequences \(\term{x},\term{y}\) are weakly bisimular, then \(\function{Seq{\rightarrow}\bot}~\term{x} \equiv \function{Seq{\rightarrow}\bot}~\term{y}\)
 \begin{equation}
-  \begin{aligned}
-    &\function{Seq{\rightarrow}\bot\text{-}{\approx}{\rightarrow}{\equiv}} : \typeformer{isSet}~\type{A} \rightarrow (x~y : \typeformer{Seq}_{\type{A}}) \rightarrow x~\relation{\sim_{Seq}}~y \rightarrow \function{Seq{\rightarrow}\bot}~x \equiv \function{Seq{\rightarrow}\bot}~y \\
-    &\function{Seq{\rightarrow}\bot\text{-}{\approx}{\rightarrow}{\equiv}}~A_{set}~\term{x}~\term{y}~(p , q)~= \function{\alpha_{\bot}}~(\function{Seq{\rightarrow}\bot\text{-}mono}~A_{set}~x~y~p)~(\function{Seq{\rightarrow}\bot\text{-}mono}~A_{set}~y~x~q)
-  \end{aligned}
+  \function{Seq{\rightarrow}\bot\text{-}{\approx}{\rightarrow}{\equiv}}~\term{A_{set}}~\term{x}~\term{y}~(\term{p} , \term{q}) = \constructor{\alpha_{\bot}}~(\function{Seq{\rightarrow}\bot\text{-}mono}~\term{A_{set}}~\term{x}~\term{y}~\term{p})~(\function{Seq{\rightarrow}\bot\text{-}mono}~\term{A_{set}}~\term{y}~\term{x}~\term{q})
 \end{equation}
 \end{defn}
 \begin{defn}[Recursor for Quotient]
   \todo{is this a recursor, and for what? The quotient?}
-  For all sequences \(\term{x}, \term{y} : \typeformer{Seq}_{\type{A}}\), functions \(\function{f} : \type{A} \rightarrow \type{B}\) and relations \(\function{g} : \term{x}~\relation{R}~\term{y} \rightarrow \function{f}~\term{x} \equiv \function{f}~\term{y}\), then if B is a set \(\term{B_{set}} : \typeformer{isSet}~\type{B}\), we get a function \(\function{rec} : \type{A} / \relation{R} \rightarrow \type{B}\), defined by case as
+  For all sequences \(\term{x}, \term{y} : \typeformer{Seq}_{\type{A}}\), functions \(\function{f} : \type{A} \rightarrow \type{B}\) and relations \(\function{g} : \term{x}~\relation{R}~\term{y} \rightarrow \function{f}~\term{x} \equiv \function{f}~\term{y}\), then if \(\type{B}\) is a set \(\term{B_{set}} : \typeformer{isSet}~\type{B}\), we get a function \(\function{rec} : \type{A} / \relation{R} \rightarrow \type{B}\), defined by case as
   \begin{equation}
     \begin{aligned}
       &\function{rec}~\function{[}\,\term{z}\,\function{]} = \function{f}~\term{z} \\
@@ -644,33 +786,67 @@ This rewriting confirms that if \(\function{isMon}~\function{s}\), then \(\funct
     \end{aligned}
   \end{equation}
 \end{defn}
-This recursor allows us to lift the relation \(Seq{\rightarrow}\bot\) to the quotient
+This recursor allows us to lift the function \(\function{Seq{\rightarrow}\bot}\) to the quotient
 \begin{defn}
   \label{eq:QuotientedSeqToPartialityMonad}
-  We can define a function \(\function{Seq/{\sim}{\rightarrow}\bot}\) from \(\typeformer{isSet}~\type{A}\) to \(\typeformer{Seq}_{\type{A}} \rightarrow \type{A}_{\bot}\) as
+  We can define a function \(\function{Seq/{\sim}{\rightarrow}\bot}\) from \(\typeformer{Seq}_{\type{A}}\) to \(\type{A}_{\bot}\), where \(\term{A_{set}} : \typeformer{isSet}~\type{A}\) as
   \begin{equation}
-    \function{Seq/{\sim}{\rightarrow}\bot}~\term{A_{set}} = \function{rec}~\function{Seq{\rightarrow}\bot}~(\lambda\,\term{x}\,\term{y}, \function{Seq{\rightarrow}\bot\text{-}{\approx}{\rightarrow}{\equiv}}~\term{A_{set}}~\term{x}~\term{y})~\function{\bot\text{-}isSet}
+    \function{Seq/{\sim}{\rightarrow}\bot} = \function{rec}~\function{Seq{\rightarrow}\bot}~(\lambda\,\term{x}\,\term{y}, \function{Seq{\rightarrow}\bot\text{-}{\approx}{\rightarrow}{\equiv}}~\term{A_{set}}~\term{x}~\term{y})~\function{\bot\text{-}isSet}
   \end{equation} 
 \end{defn}
 \begin{lem}
-  Given two sequences \(\term{s}\) and \(\term{t}\), if \(\function{Seq{\rightarrow}\bot}~\term{s} \equiv \function{Seq{\rightarrow}\bot}~\term{t}\), then \(s~\relation{\sim_{seq}}~t\).
+  \label{eq:injectivity-lemma}
+  Given two sequences \(\term{s}\) and \(\term{t}\), if \(\function{Seq{\rightarrow}\bot}~\term{s} \equiv \function{Seq{\rightarrow}\bot}~\term{t}\), then \(\term{s}~\relation{\sim_{seq}}~\term{t}\).
   \begin{proof}
     We can reduce the burden of the proof, since
     \begin{equation}
       \term{s}~\relation{\sim_{seq}}~\term{t} = \left(\prod_{(\term{r} : \type{R})} \| \term{x}~\relation{\downarrow_{seq}}~\term{r} \| \rightarrow \| \term{y}~\relation{\downarrow_{seq}}~\term{r} \|\right) \times \left(\prod_{(\term{r} : \type{R})} \| \term{y}~\relation{\downarrow_{seq}}~\term{r} \| \rightarrow \| \term{x}~\relation{\downarrow_{seq}}~\term{r} \|\right)
     \end{equation}
-    so we can just show one part and get the other by symmetry. We assume \(\| \term{x}~\relation{\downarrow_{seq}}~\term{r} \|\), to show \(\| \term{y}~\relation{\downarrow_{seq}}~\term{r} \|\). By the mapping property of propositional truncation, we reduce the proof to defining a function \(\term{x}~\relation{\downarrow_{seq}}~\term{r} \rightarrow \term{y}~\relation{\downarrow_{seq}}~\term{r}\). Since \(\term{x}~\relation{\downarrow_{seq}}~\term{r}\), then \(\constructor{\eta}~\term{r}~\relation{\sqsubseteq_{\bot}}~\function{Seq{\rightarrow}\bot}~\term{x}\), but we have assumed \(\function{Seq{\rightarrow}\bot}~\term{x} \equiv \function{Seq{\rightarrow}\bot}~\term{y}\), so we get \(\constructor{\eta}~\term{r}~\realtion{\sqsubseteq_{\bot}}~\function{Seq{\rightarrow}\bot}~\term{y}\), and thereby \(\term{y}~\relation{\downarrow_{seq}}~\term{r}\).
+    so we can just show one part and get the other by symmetry. We assume \(\| \term{x}~\relation{\downarrow_{seq}}~\term{r} \|\), to show \(\| \term{y}~\relation{\downarrow_{seq}}~\term{r} \|\). By the mapping property of propositional truncation, we reduce the proof to defining a function \(\term{x}~\relation{\downarrow_{seq}}~\term{r} \rightarrow \term{y}~\relation{\downarrow_{seq}}~\term{r}\). Since \(\term{x}~\relation{\downarrow_{seq}}~\term{r}\), then \(\constructor{\eta}~\term{r}~\relation{\sqsubseteq_{\bot}}~\function{Seq{\rightarrow}\bot}~\term{x}\), but we have assumed \(\function{Seq{\rightarrow}\bot}~\term{x} \equiv \function{Seq{\rightarrow}\bot}~\term{y}\), so we get \(\constructor{\eta}~\term{r}~\relation{\sqsubseteq_{\bot}}~\function{Seq{\rightarrow}\bot}~\term{y}\), and thereby \(\term{y}~\relation{\downarrow_{seq}}~\term{r}\).
   \end{proof}
 \end{lem}
 \begin{lem}
   The function \(\function{Seq/{\sim}{\rightarrow}\bot}\) is injective.
   \begin{proof}
-    \todo[inline]{Complete proof}
+    We use propositional elimination of quotients \todo{Should this be formalized?}
+    \begin{equation}
+      \begin{aligned}
+        \function{elimProp} :~& (\typeformer{B} :\typeformer{Seq}_{\type{R}} / \relation{\sim_{seq}} \rightarrow \universe{\mathcal{U}}) \rightarrow ((\term{x} : \typeformer{Seq}_{\type{R}} / \relation{\sim_{seq}}) \rightarrow \typeformer{isProp}~(\typeformer{B}~\term{x})) \\
+        \rightarrow~& (\function{f} : (\term{a} : \typeformer{Seq}_{\type{R}}) \rightarrow \typeformer{B}~\function{[}~a~\function{]}) \rightarrow (\term{x} : \typeformer{Seq}_{\type{R}} / \relation{\sim_{seq}}) \rightarrow \typeformer{B}~\term{x}\)
+      \end{aligned}
+    \end{equation}
+    to show the injectivity, meaning for all \(\term{x}~\term{y} : \typeformer{Seq}_{\type{R}} / \relation{\sim_{seq}}\) we get \(\function{Seq/{\sim}{\rightarrow}\bot}~\term{x} \equiv \function{Seq/{\sim}{\rightarrow}\bot}~\term{y} \rightarrow \term{x} \equiv \term{y}\). We start by eliminating \(\term{x}\), followed by elimination of \(y\), this gives us the proof term \todo{Convert to text, instead of a proof term!?}
+    \begin{equation}
+      \begin{aligned}
+        &\function{elimProp} \\
+        &\quad (\lambda\,\term{a},~\function{Seq/{\sim}{\rightarrow}\bot}~\term{a} \equiv \function{Seq/{\sim}{\rightarrow}\bot}~\term{y} \rightarrow \term{a} \equiv \term{y}) \\
+        &\quad (\lambda\,\term{a},~\function{isProp\Pi}~(\lambda\,\_, \constructor{squash/}~\term{a}~\term{y})) \\
+        &\quad (\lambda\,\term{a},~\function{elimProp} \\
+        &\qquad\qquad\quad (\lambda\,\term{b},~\function{Seq{\rightarrow}\bot}~\term{a} \equiv \function{Seq/{\sim}{\rightarrow}\bot}~\term{b} \rightarrow \function{[}~\term{a}~\function{]} \equiv \term{b}) \\
+        &\qquad\qquad\quad (\lambda\,\term{b},~\function{isProp\Pi}~(\lambda\,\_, \constructor{squash/}~\function{[}~\term{a}~\function{]}~\term{b})) \\
+        &\qquad\qquad\quad (\lambda\,\term{b},~(\constructor{eq/}~\term{a}~\term{b}) \circ (\function{Seq{\rightarrow}\bot\text{-}isInjective}~\term{a}~\term{b}))
+      \end{aligned}
+    \end{equation}
+    where \(\function{Seq{\rightarrow}\bot\text{-}isInjective}\) is \eqref{eq:injectivity-lemma}, 
+  \end{proof}
+\end{lem}
+\begin{lem}
+  \label{eq:constant-sequence-equality}
+  For all constant sequences \(\term{s}\), where all elements have the same value \(\term{v}\), we get \(\function{Seq{\rightarrow}\bot}~\term{s} \equiv \function{Maybe{\rightarrow}\bot}~\term{v}\).
+  \begin{proof}
+    The left side of the equality reduces to \(\function{Maybe{\rightarrow}\bot}\) applied on the least upper bound of the constant sequence, which is exactly the right hand side of the equality.
+  \end{proof}
+\end{lem}
+\begin{lem}
+  Assuming countable choice, the function \(\function{Seq{\rightarrow}\bot}\) is surjective
+  \todo[inline]{describe countable choice (and why it is needed!)}
+  \begin{proof}
+    We do the proof by case \todo{describe what it means to do the surjective proof by case!} on \(\type{R}_{\bot}\), if it is \(\constructor{\eta}~r\) or \(\constructor{never}\), we convert them to the sequences \(\function{now}_{seq}~\term{r}\) and \(\constant{never}_{seq}\) respectively, then we are done by \eqref{eq:constant-sequence-equality}. For the least upper bound \(\constructor{\bigsqcup} (\function{s},\function{b})\), we translate to the (increasing) sequence, defined by \((\function{s},\function{b})\) \todo{more precise description!}. \todo{Complete the rest of the proof!}
   \end{proof}
 \end{lem}
 \begin{lem}
   Assuming countable choice, the function \(\function{Seq/{\sim}{\rightarrow}\bot}\) is surjective
-  \todo[inline]{describe countable choice (and why it is needed!)}
+  
 \end{lem}
 \begin{thm}
   Assuming countable choice, we get an equivalence between sequences and the partiality monad.
@@ -726,52 +902,8 @@ This recursor allows us to lift the relation \(Seq{\rightarrow}\bot\) to the quo
 \subsection{QM-types}
 \todo{which other QM types can be expressed as QIITs}
 
-\subsubsection{Partiality from Delay monad}
-We want to define an ordering on the delay monad, we do this by counting the number of \texttt{later}s, letting the infinitely delayed element \texttt{never}, be the bottom element of the ordering. So we get
-\begin{equation}
-  \infer{\constant{never} \sqsubseteq \term{x}}{\term{x} : \typeformer{Delay}~\type{R}}
-\end{equation}
-\begin{equation}
-  \infer[\sqsubseteq_{\mathtt{now}}]{\term{x} \sqsubseteq \function{now}~\term{a}}{\term{x} : \typeformer{Delay}~\type{R} & \term{a} : \type{R} & \term{x} \downarrow \term{a}}
-\end{equation}
-\begin{equation}
-  \infer=[\sqsubseteq_{\mathtt{later}}]{\function{later}~\term{x} \sqsubseteq \function{later}~\term{y}}{\term{x} \sqsubseteq \term{y}}
-\end{equation}
-given these two rules, we want to show that we actually have an ordering. So first we want to show that we get reflexivity, we do the proof by structural induction.
-
-\begin{lem}
-  The bottom element of the relation \(\sqsubseteq\) is \(\constant{never}\), meaning for all \(\term{x}\) we get \(\constant{never} \sqsubseteq \term{x}\).
-  \begin{proof}
-    If \(\term{x} = \function{now}~\term{a}\) then we get \(???\)
-    \todo[inline]{is this true by assumption}
-  \end{proof}
-\end{lem}
-  
-\begin{lem}
-  The relation \(\sqsubseteq\) is reflexive.
-  \begin{proof}
-    If \(\term{x} = \function{now}~\term{a}\) then we know that \(\term{x} \downarrow \term{a}\) meaning by the rule \(\sqsubseteq_{\mathtt{now}}\), we have \(\function{now}~\term{a} \sqsubseteq \function{now}~\term{a}\). If we have \(\term{x} = \function{later}~\term{y}\) then by the rule \(\sqsubseteq_{\mathtt{later}}\) we just need to show \(\term{y} \sqsubseteq \term{y}\), which is true by the induction hypothesis.
-  \end{proof}
-\end{lem}
-
-\begin{lem}
-  For all \(\term{x} : \typeformer{Delay}~\type{R}\) we have \(\function{now}~\term{a} \sqsubseteq \term{x}\) implies that \(\term{x} = \function{now}~\term{a}\).
-  \begin{proof}
-    If \(\term{x} = \function{now}~\term{b}\), then \(\function{now}~\term{a} \downarrow \term{b}\), but this means that \(\term{a} \equiv \term{b}\). If  \(x = \function{later}~y\) we get a contradiction, since there is no constructor for \(\function{now}~a \sqsubseteq \function{later}~y\).
-  \end{proof}
-\end{lem}
-% \(x \sqsubseteq y\) and \(x \downarrow a\) implies that \(y \downarrow a\)
-\begin{lem}
-  The relation \(\sqsubseteq\) is transitive.
-  \begin{proof}
-    We do case analysis on \(y\), if \(y = \function{now}~a\) then \(z = \function{now}~a = y\), , meaning \(x \sqsubseteq z = x \sqsubseteq y\). If \(y = later~v\), then \(z = now~a\) or \(z = later~w\). If \(z = now~a\) then \(y \downarrow a\), .
-  \end{proof}
-\end{lem}
-
-
 % Sierpinski set
 % Rosolini’s dominance
-
 % non-termination monad -- Partiality monad - completely iterative monad (on 1 -> 1)
 
 \subsection{QM-types}
@@ -910,18 +1042,6 @@ as expected. Transporting along \eqref{eq:zip-equality} gives us a definition fo
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
 
 \chapter{Examples of \texttt{M}-types}
-
-\section{Automaton}
-An automaton is defined as a set of state \(\type{V}\) and an alphabet \(\type{\alpha}\) and a transition function \(\function{\delta} : \type{V} \rightarrow \type{\alpha} \rightarrow \type{V}\). This gives us the diagram in \figref{automaton}
-\begin{figure}[h]
-  \centering
-  \begin{tikzcd}[row sep=huge,column sep=huge]
-    \type{V} \times (\type{V} \rightarrow \type{\alpha} \rightarrow \type{V}) \ar[dr,"build"'] \ar[r] & M & M \ar[dl,"step"] \\
-    & M
-  \end{tikzcd}
-  \caption{automaton}
-  \label{fig:automaton}
-\end{figure}
 
 \section{The Partiality monad}
 To construct the partiality monad, we start with the delay monad, and the preorder
@@ -1141,126 +1261,6 @@ We want to define spin, as being the fixed point \(\mathtt{spin} = \mathtt{later
 \end{figure}
 \noindent Since it is final, it also must be unique, meaning that there is just one program that spins forever, without returning a value, meaning every other program must return a value. If we just
 
-\section{Stream Formalization using \texttt{M}-types}
-As described earlier, given a type \(\type{A}\) we define the stream of that type as
-\begin{equation}
-  \typeformer{stream}~\type{A} := \typeformer{M}_{\containerpair{\type{A}}{\lambda\,\_,\unit}}
-\end{equation}
-When taking the head of a stream, we get
-\begin{align}
-  \destructor{hd}~(\constructor{cons}~x~xs) &\equiv \pi_1~\function{out}~(\constructor{cons}~x~xs) \\
-                                       &\equiv \pi_1~\function{out}~(\function{in}~(x , \lambda\,\_,xs)) \\
-                                       &\equiv \pi_1~(x , \lambda\,\_,xs) \\
-                                       &\equiv x
-\end{align}
-and similarly for the tail of the stream
-\begin{align}
-  \destructor{tl}~(\constructor{cons}~x~xs) &\equiv \pi_2~\function{out}~(\constructor{cons}~x~xs) \\
-                                       &\equiv \pi_2~\function{out}~(\function{in}~(x , \lambda\,\_,xs)) \\
-                                       &\equiv \pi_2~(x , \lambda\,\_,xs) \\
-                                       &\equiv xs
-\end{align}
-and the other direction is also true
-\begin{align}
-  \constructor{cons}(\destructor{hd}~s , \destructor{tl}~s) &\equiv \function{in}~(\destructor{hd}~s , \destructor{tl}~s) \\
-                                                     &\equiv \function{in}~(\pi_1~(\function{out}~s) , \pi_2~(\function{out}~s)) \\
-                                                     &\equiv \function{in}~(\function{out}~s) \\
-                                                     &\equiv s.
-\end{align}
-When forming elements of the \texttt{M}-type, we want to do it by lifting it though the definition of the \texttt{M}-type, meaning we want to define a function \(\function{cons'} : (\mathbb{N} \rightarrow \type{A}) \rightarrow \typeformer{stream}~\type{A}\) as
-\begin{equation}
-  \function{cons'} f = \function{lift_M}~(\lambda\,c\,n, f~c)
-\end{equation}
-\begin{equation}
-  \function{cons'} f = \function{lift_M}~(\lambda\,c\,n, f~c)
-\end{equation}
-
-\section{ITrees as \texttt{M}-types}
-We want the following rules for ITrees
-\begin{equation}
-  \infer[\mathtt{I}_{\function{Ret}}]{\function{Ret}~\term{r} : \typeformer{itree}~\typeformer{E}~\type{R}}{r : \type{R}}
-\end{equation}
-\begin{equation}
-  \infer[\mathtt{I}_{\function{Vis}}]{\function{Vis}~\term{a}~\term{f} : \typeformer{itree}~\typeformer{E}~\type{R}}{\type{A} : \universe{\mathcal{U}} & \term{a} : \typeformer{E}~\type{A} & \term{f} : \type{A} \rightarrow \typeformer{itree}~\typeformer{E}~\type{R}}.
-\end{equation}
-Elimination rules
-\begin{equation}
-  \infer[\mathtt{E}_{\function{Tau}}]{\function{Tau}~\term{t} : \typeformer{itree}~\typeformer{E}~\type{R}}{\term{t} : \typeformer{itree}~\typeformer{E}~\type{R}}.
-\end{equation}
-
-\subsection{Delay Monad}
-We start by looking at itrees without the \(\function{Vis}\) constructor, this type is also know as the delay monad\todo[inline]{check this statement}. We construct this type by letting \(\container{S} = (\unit + \type{R},\lambda \{ \texttt{inl}~\_ \rightarrow \unit~;~\texttt{inr}~\_ \rightarrow \empt \})\), we then get the polynomial functor
-\begin{equation}
-  \functor{P}_{\container{S}}(\type{X}) = \sum_{\term{x} : \unit + \type{R}} \lambda \{ \texttt{inl}~\_ \rightarrow \unit ; \texttt{inr}~\_ \rightarrow \empt\}~\term{x} \rightarrow \type{X},
-\end{equation}
-which is equal to
-\begin{equation}
-  \functor{P}_{\container{S}}(\type{X}) = \type{X} + \type{R} \times (\empt \rightarrow \type{X}).
-\end{equation}
-We know that \(\empt \rightarrow \type{X} \equiv \unit\), so we can reduce further to
-\begin{equation}
-  \functor{P}_{\container{S}}(\type{X}) = \type{X} + \type{R}
-\end{equation}
-meaning we get the following diagram.
-
-\begin{figure}[h]
-  \centering
-  \begin{tikzcd}[row sep=large,column sep=large]
-    \type{R} \ar[dr,"\function{now}"'] \ar[r,"\texttt{inl}"] & \type{R} + \typeformer{M}  & \typeformer{M} \ar[l,"\texttt{inr}"'] \ar[dl,"\function{later}"] \\
-    & \typeformer{M} \ar[u,"\function{out}"']
-  \end{tikzcd}
-  \caption{Delay monad}
-\end{figure}
-\noindent Meaning we can define the operations \(\function{now}\) and \(\function{later}\) using \(\function{in} = \function{out}^{-1}\) together with the injections \(\mathtt{inl}\) and \(\mathtt{inr}\). \todo[inline]{(Later = Tau, Ret = Now)}
-
-\subsection{Tree}
-Now lets look at the example where we remove the \(\function{Tau}\) constructor. We let
-\begin{equation}
-  \container{S} = \left(\type{R} + \sum_{\type{A} : \universe{\mathcal{U}}} \typeformer{E}~\type{A}~,~\lambda \{ \texttt{inl}~\_ \rightarrow \empt ~;~ \texttt{inr}~(\type{A},\term{e}) \rightarrow \type{A} \} \right).
-\end{equation}
-This will give us the polynomial functor
-\begin{equation}
-  \functor{P}_{\container{S}}(\type{X}) = \sum_{\term{x} : \type{R} + \sum_{\type{A} : \universe{\mathcal{U}}} \typeformer{E}~\type{A}} \lambda \{ \texttt{inl}~\_ \rightarrow \empt ~;~ \texttt{inr}~(\type{A},\term{e}) \rightarrow \type{A} \}~\term{x} \rightarrow \type{X},
-\end{equation}
-which simplifies to
-\begin{equation}
-  \functor{P}_{\container{S}}(\type{X}) = (\type{R} \times (\empt \rightarrow \type{X})) + (\sum_{\type{A} : \universe{\mathcal{U}}} \typeformer{E}~\type{A} \times (\type{A} \rightarrow \type{X})),
-\end{equation}
-and further
-\begin{equation}
-  \functor{P}_{\container{S}}(\type{X}) = \type{R} + \sum_{\type{A} : \universe{\mathcal{U}}} \typeformer{E}~\type{A} \times (\type{A} \rightarrow \type{X}).
-\end{equation}
-We get the following diagram for the \(\functor{P}\)-coalgebra.
-
-\begin{figure}[h]
-  \centering
-  \begin{tikzcd}[row sep=large,column sep=large]
-    \type{R} \ar[dr,"\function{Ret}"'] \ar[r,"\texttt{inl}"] & \type{R} + \sum_{\type{A} : \universe{U}} \typeformer{E}~\type{A} \times (\type{A} \rightarrow \typeformer{M})  & \sum_{\type{A} : \universe{U}} \typeformer{E}~\type{A} \times (\type{A} \rightarrow \typeformer{M}) \ar[l,"\texttt{inr}"'] \ar[dl,"\function{Vis}"] \\
-    & \typeformer{M} \ar[u,"\function{out}"]
-  \end{tikzcd}
-  \caption{TODO}
-\end{figure}
-\noindent Again we can define \(\function{Ret}\) and \(\function{Vis}\) using the \(\function{in}\) function.
-
-\subsection{ITrees}
-Now we should have all the knowledge needed to make ITrees using \texttt{M}-types. We define ITrees by the container
-\begin{equation}
-  \container{S} = \left( \unit+\type{R}+\sum_{\type{A}:\universe{\mathcal{U}}} (\typeformer{E}~\type{A}) ~~,~~ \lambda\left\{ \texttt{inl}~(\texttt{inl}~\_) \rightarrow \unit ~;~ \texttt{inl}~(\texttt{inr}~\_) \rightarrow \empt ~;~ \texttt{inr} (\type{A},\_)  \rightarrow \type{A} \right\} \right).
-\end{equation}
-Such that the (reduced) polynomial functor becomes
-\begin{equation}
-  \functor{P}_{\container{S}}(\type{X}) = \type{X} + \type{R} + \sum_{\type{A} : \universe{\mathcal{U}}} ((\typeformer{E}~\type{A}) \times (\type{A} \rightarrow \type{X}))
-\end{equation}
-Giving us the diagram
-\begin{figure}[h]
-  \centering
-  \begin{tikzcd}[row sep=large,column sep=large]
-    \type{R} \ar[ddrr,"\function{Ret}"'] \ar[r,"\texttt{inl}\,\circ\,\texttt{inr}"] & \typeformer{M} + \type{R} + \sum_{\type{A} : \universe{\mathcal{U}}} (\typeformer{E}~\type{A} \times (\type{A} \rightarrow \typeformer{M})) & & \sum_{\type{A} : \universe{U}} \typeformer{E}~\type{A} \times (\type{A} \rightarrow \typeformer{M}) \ar[ll,"\texttt{inr}"'] \ar[ddl,"\function{Vis}"] \\
-    & & \typeformer{M} \ar[ul,"\texttt{inl}\,\circ\,\texttt{inl}"'] \ar[d,"\function{Tau}"'] \\
-    & & \typeformer{M} \ar[uul,"\function{out}"]
-  \end{tikzcd}
-  \caption{TODO}
-\end{figure}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
 
