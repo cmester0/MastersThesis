@@ -269,10 +269,24 @@ In this section we will introduce containers (also known as signatures), and sho
   or more precisely \(\destructor{hd} = \pi_1 \circ \function{out}\) and \(\destructor{tl} = \pi_2 \circ \function{out}\).
 \end{exmp}
 \begin{defn}
-  Chains are defined as ... \todo[inline]{define chains, \(\function{\pi}_{(n)}\) and \(\type{X}_n\)}
+  We define a chain as a familily of cones \(\function{\pi}_{(n)} : \type{X}_{n+1} \rightarrow \type{X}_{n}\), over a family of types \(\type{X}_{n}\). \todo{cocones?}.
+  \begin{figure}
+    \centering
+    \begin{tikzcd}[row sep=large,column sep=large]
+      \type{X}_0 & \type{X}_1 \ar[l,"\function{\pi}_{(0)}"] & \cdots \ar[l,"\function{\pi}_{(1)}"] & \type{X}_n \ar[l,"\function{\pi}_{(n-1)}"] & \type{X}_{n + 1} \ar[l,"\function{\pi}_{(n)}"] & \cdots \ar[l,"\function{\pi}_{(n+1)}"]
+    \end{tikzcd}
+  \end{figure}  
+  \todo[inline]{define chains, \(\function{\pi}_{(n)}\) and \(\type{X}_n\)}
 \end{defn}
 \begin{lem}\label{lem:function-to-M-type-is-cone}
   For all coalgebras \(\coalg{\type{C}}{\function{\gamma}}\) for the container \(\container{S}\), we get \(\type{C} \rightarrow \typeformer{M}_{\container{S}} \equiv \typeformer{Cone}_{\coalg{\type{C}}{\function{\gamma}}}\), where \(\typeformer{Cone} = \sum_{(\function{f} : \prod_{(n : \mathbb{N})} \type{C} \rightarrow \type{X}_n)} \prod_{(n : \mathbb{N})} \function{\pi}_{(n)} \circ (\function{f}_{(n+1)}) \equiv f_n\)
+  \begin{figure}
+    \centering
+    \begin{tikzcd}[row sep=large,column sep=large]
+      \type{X}_0 & \type{X}_1 \ar[l,"\function{\pi}_{(0)}"] & \cdots \ar[l,"\function{\pi}_{(1)}"] & \type{X}_n \ar[l,"\function{\pi}_{(n-1)}"] & \type{X}_{n + 1} \ar[l,"\function{\pi}_{(n)}"] & \cdots \ar[l,"\function{\pi}_{(n+1)}"] \\
+      & & \type{C} \ar[ull,"\function{f}_0"] \ar[ul,"\function{f}_1"'] \ar[u,draw=none,"\cdots" description] \ar[ur,"\function{f}_n"] \ar[urr,"\function{f}_{n+1}"'] \ar[urrr,draw=none,"\cdots"'] & 
+    \end{tikzcd}
+  \end{figure}  
   \begin{proof}
       %lemma10-Iso : ∀ {ℓ} {S : Container {ℓ}} {C,γ : Coalg₀ {S = S}} -> Iso (C,γ .fst -> M S) (Cone C,γ)
   %fun (lemma10-Iso) f = (λ n z → projection n (f z)) , λ n i a → β n (f a) i
@@ -421,7 +435,7 @@ Elimination rules
 \end{equation}
 
 \subsection{Delay Monad}
-We start by looking at itrees without the \(\function{Vis}\) constructor, this type is also know as the delay monad\todo[inline]{check this statement}. We construct this type by letting \(\container{S} = (\unit + \type{R},\lambda \{ \texttt{inl}~\_ \rightarrow \unit~;~\texttt{inr}~\_ \rightarrow \empt \})\), we then get the polynomial functor
+We start by looking at ITrees without the \(\constructor{Vis}\) constructor, this type is also know as the delay monad\todo[inline]{check this statement}. We construct this type by letting \(\container{S} = (\unit + \type{R},\lambda \{ \texttt{inl}~\_ \rightarrow \unit~;~\texttt{inr}~\_ \rightarrow \empt \})\), we then get the polynomial functor
 \begin{equation}
   \functor{P}_{\container{S}}(\type{X}) = \sum_{\term{x} : \unit + \type{R}} \lambda \{ \texttt{inl}~\_ \rightarrow \unit ; \texttt{inr}~\_ \rightarrow \empt\}~\term{x} \rightarrow \type{X},
 \end{equation}
@@ -520,13 +534,16 @@ We want to construct a quotiented M type, which is given as a final bisimulation
 Since we know that \texttt{M}-types preserves the H-level, we can use set-truncated quotients, to define quotient \texttt{M}-types, for examples we can define weak bisimulation of the delay monad ...
 \todo[inline]{Quotients of the delay monad}
 
-\subsection{Quotient inductive-inductive types (QIITs)}
+\section{Quotient inductive-inductive types (QIITs)}
 "A quotient inductive-inductive type (QIIT) can be seen as a multi-sorted algebraic theory where sorts can be indexed over each other" - "Constructing Quotient Inductive-Inductive Types"
 
 "W-types can be seen informally as the free algebras for signatures with operations of possibly infinite arity, but no equations." -- \url{https://arxiv.org/pdf/1201.3898.pdf}
 
 A quotient inductive-inductive type (QIIT) is a type together with a relation defined on that type, and then quotiented by that relation.
 \todo[inline]{What is a QIIT concretely?}
+
+\section{Partiality monad}
+In this section we will define the partiality monad (see below) and show that (assuming the axiom of countable choice) the delay monad quotiented by weak bisimularity.
 \begin{defn}[Partiality Monad]
   A simple example of a quotient inductive-inductive type is the partiality monad \((-)_\bot\) over a type \(\type{R}\), defined by the constructors\\[-9mm]
   \begin{center}
@@ -548,7 +565,7 @@ A quotient inductive-inductive type (QIIT) is a type together with a relation de
       \end{equation}
     \end{minipage}
   \end{center}
-  and a relation \((\cdot~\relation{\sqsubseteq_{\bot}}~\cdot)\) indexed twice over \(\type{R}_\bot\), with properties\\[-9mm] \todo{Should I define what it means to be an ordering relation separately, and just say the relation here is an instance of that? (Generalize?}
+  and a relation \((\cdot~\relation{\sqsubseteq_{\bot}}~\cdot)\) indexed twice over \(\type{R}_\bot\), with properties\\[-9mm] \todo{Should I define what it means to be an ordering relation separately, and just say the relation here is an instance of that? (Generalize?)}
   \begin{center}
     \begin{minipage}{0.45\linewidth}
       \begin{equation}
@@ -603,7 +620,7 @@ A quotient inductive-inductive type (QIIT) is a type together with a relation de
   \end{equation}
 \end{defn}
 
-\subsubsection{Delay monad to Sequences}
+\subsection{Delay monad to Sequences}
 \todo[inline]{Introduce the delay monad before this section!!}
 \begin{defn}
   We define
@@ -696,7 +713,7 @@ We also introduce notation for the two special cases of sequences given above
     The functions back and forth and the left and right identities together gives us an equivalence between the delay monad and sequences.
   \end{proof}
 \end{thm}
-\subsubsection{Sequence to Partiality Monad}
+\subsection{Sequence to Partiality Monad}
 In this section we will show that assuming the "Axiom of Countable Choice", we get an equivalence between sequences and the partiality monad.
 \begin{defn}[Sequence Termination]
   The following relations says that a sequence \((\function{s},\function{q}) : \typeformer{Seq}_{\type{R}}\) terminates with a given value \(\term{r} : \type{R}\),
@@ -713,8 +730,8 @@ where \(\| \cdot \|\) is propositional \todo{propositional or set truncation?} t
 \begin{defn} There is a conversion from \(\type{R} + \unit\) to the partiality monad \(\type{R}_\bot\)
   \begin{equation}
     \begin{aligned}
-      &\function{Maybe{\rightarrow}\bot}~(\mathtt{inl}~\term{r}) = \constructor{\eta}~\term{r} \\
-      &\function{Maybe{\rightarrow}\bot}~(\mathtt{inr}~\constant{tt}) = \constructor{\bot}
+      &\function{Maybe{\rightarrow}(-)_\bot}~(\mathtt{inl}~\term{r}) = \constructor{\eta}~\term{r} \\
+      &\function{Maybe{\rightarrow}(-)_\bot}~(\mathtt{inr}~\constant{tt}) = \constructor{\bot}
     \end{aligned}
   \end{equation}
 \end{defn}
@@ -729,15 +746,15 @@ where \(\| \cdot \|\) is propositional \todo{propositional or set truncation?} t
 \end{equation}
 This rewriting confirms that if \(\function{isMon}~\function{s}\), then \(\function{s}\) is monotone, and therefore a sequence of partial values\todo{there exists non-monotone sequences, it just follows our definition of a sequence.}.
 \begin{lem}
-  The function \(\function{Maybe{\rightarrow}\bot}\) is monotone, that is, if \(\term{x}~\relation{\sqsubseteq_{\type{A} + \unit}}~\term{y}\), for some \(\term{x}\) and \(\term{y}\), then \((\function{Maybe{\rightarrow}\bot}~\term{x})~\relation{\sqsubseteq_{\bot}}~(\function{Maybe{\rightarrow}\bot}~\term{y})\).
+  The function \(\function{Maybe{\rightarrow}(-)_\bot}\) is monotone, that is, if \(\term{x}~\relation{\sqsubseteq_{\type{A} + \unit}}~\term{y}\), for some \(\term{x}\) and \(\term{y}\), then \((\function{Maybe{\rightarrow}(-)_\bot}~\term{x})~\relation{\sqsubseteq_{\bot}}~(\function{Maybe{\rightarrow}(-)_\bot}~\term{y})\).
   \begin{proof}
     We do the proof by case.
     \begin{equation}
       \begin{aligned}
-        &\function{Maybe{\rightarrow}\bot\text{-}mono}~(\function{inl}~\pathterm{p}) = \\[-1mm]
-        &\qquad\qquad \mathtt{subst}~(\lambda\,\term{a},~\function{Maybe{\rightarrow}\bot}~\term{x}~\relation{\sqsubseteq_{\bot}}~\function{Maybe{\rightarrow}\bot}~\term{a})~\pathterm{p}~(\constructor{\sqsubseteq_{refl}} (\function{Maybe{\rightarrow}\bot}~\term{x})) \\[1mm]
-        &\function{Maybe{\rightarrow}\bot\text{-}mono}~(\function{inr}~(\pathterm{p}, \_)) = \\[-1mm]
-        &\qquad\qquad \mathtt{subst}~(\lambda\,\term{a},~\function{Maybe{\rightarrow}\bot}~\term{a}~\relation{\sqsubseteq_{\bot}}~\function{Maybe{\rightarrow}\bot}~\term{y})~\sym{\pathterm{p}}~(\constructor{\sqsubseteq_{never}} (\function{Maybe{\rightarrow}\bot}~\term{y}))
+        &\function{Maybe{\rightarrow}(-)_\bot\text{-}mono}~(\function{inl}~\pathterm{p}) = \\[-1mm]
+        &\qquad\qquad \mathtt{subst}~(\lambda\,\term{a},~\function{Maybe{\rightarrow}(-)_\bot}~\term{x}~\relation{\sqsubseteq_{\bot}}~\function{Maybe{\rightarrow}(-)_\bot}~\term{a})~\pathterm{p}~(\constructor{\sqsubseteq_{refl}} (\function{Maybe{\rightarrow}(-)_\bot}~\term{x})) \\[1mm]
+        &\function{Maybe{\rightarrow}(-)_\bot\text{-}mono}~(\function{inr}~(\pathterm{p}, \_)) = \\[-1mm]
+        &\qquad\qquad \mathtt{subst}~(\lambda\,\term{a},~\function{Maybe{\rightarrow}(-)_\bot}~\term{a}~\relation{\sqsubseteq_{\bot}}~\function{Maybe{\rightarrow}(-)_\bot}~\term{y})~\sym{\pathterm{p}}~(\constructor{\sqsubseteq_{never}} (\function{Maybe{\rightarrow}(-)_\bot}~\term{y}))
       \end{aligned}
     \end{equation}
   \end{proof}
@@ -747,7 +764,7 @@ This rewriting confirms that if \(\function{isMon}~\function{s}\), then \(\funct
   \begin{equation}
     \begin{aligned}
       &\function{Seq{\rightarrow}incSeq} \\
-      &\function{Seq{\rightarrow}incSeq}~(\function{g} , \function{q}) = \function{Maybe{\rightarrow}\bot} \circ \function{g} , \function{Maybe{\rightarrow}\bot\text{-}mono} \circ \function{q}
+      &\function{Seq{\rightarrow}incSeq}~(\function{g} , \function{q}) = \function{Maybe{\rightarrow}(-)_\bot} \circ \function{g} , \function{Maybe{\rightarrow}(-)_\bot\text{-}mono} \circ \function{q}
     \end{aligned}
   \end{equation}
 \end{defn}
@@ -755,24 +772,24 @@ This rewriting confirms that if \(\function{isMon}~\function{s}\), then \(\funct
   There is a function taking a sequence to the partiality monad
   \begin{equation}
     \begin{aligned}
-      &\function{Seq{\rightarrow}\bot} : \typeformer{Seq}_{\type{A}} \rightarrow \type{A}_{\bot} \\
-      &\function{Seq{\rightarrow}\bot}~(\function{g},\function{q}) = \bigsqcup \circ~\function{Seq{\rightarrow}incSeq}
+      &\function{Seq{\rightarrow}(-)_\bot} : \typeformer{Seq}_{\type{A}} \rightarrow \type{A}_{\bot} \\
+      &\function{Seq{\rightarrow}(-)_\bot}~(\function{g},\function{q}) = \bigsqcup \circ~\function{Seq{\rightarrow}incSeq}
     \end{aligned}
   \end{equation}
 \end{defn}
 \begin{lem}
-  The function \(\function{Seq{\rightarrow}\bot}\) is monotone. 
+  The function \(\function{Seq{\rightarrow}(-)_\bot}\) is monotone. 
   \begin{equation}
-    \function{Seq{\rightarrow}\bot\text{-}mono} : \typeformer{isSet} \type{A} \rightarrow (\term{x}~\term{y} : \typeformer{Seq}_{\type{A}}) \rightarrow \term{x}~\relation{\sqsubseteq_{seq}}~\term{y} \rightarrow \function{Seq{\rightarrow}\bot}~\term{x}~\relation{\sqsubseteq_{\bot}}~\function{Seq{\rightarrow}\bot}~\term{y}
+    \function{Seq{\rightarrow}(-)_\bot\text{-}mono} : \typeformer{isSet} \type{A} \rightarrow (\term{x}~\term{y} : \typeformer{Seq}_{\type{A}}) \rightarrow \term{x}~\relation{\sqsubseteq_{seq}}~\term{y} \rightarrow \function{Seq{\rightarrow}(-)_\bot}~\term{x}~\relation{\sqsubseteq_{\bot}}~\function{Seq{\rightarrow}(-)_\bot}~\term{y}
 \end{equation}
   \begin{proof}
     Given two sequences, if one is smaller than the another, then the least upper bounds of each sequence respect the ordering. \todo{should this be formalized entirely, or should there just be a comment about monotonicity? Does not seem relevant? (There is alot of work here..)}
   \end{proof}
 \end{lem}
 \begin{defn}
-  If two sequences \(\term{x},\term{y}\) are weakly bisimular, then \(\function{Seq{\rightarrow}\bot}~\term{x} \equiv \function{Seq{\rightarrow}\bot}~\term{y}\)
+  If two sequences \(\term{x},\term{y}\) are weakly bisimular, then \(\function{Seq{\rightarrow}(-)_\bot}~\term{x} \equiv \function{Seq{\rightarrow}(-)_\bot}~\term{y}\)
 \begin{equation}
-  \function{Seq{\rightarrow}\bot\text{-}{\approx}{\rightarrow}{\equiv}}~\term{A_{set}}~\term{x}~\term{y}~(\term{p} , \term{q}) = \constructor{\alpha_{\bot}}~(\function{Seq{\rightarrow}\bot\text{-}mono}~\term{A_{set}}~\term{x}~\term{y}~\term{p})~(\function{Seq{\rightarrow}\bot\text{-}mono}~\term{A_{set}}~\term{y}~\term{x}~\term{q})
+  \function{Seq{\rightarrow}(-)_\bot\text{-}{\approx}{\rightarrow}{\equiv}}~\term{A_{set}}~\term{x}~\term{y}~(\term{p} , \term{q}) = \constructor{\alpha_{\bot}}~(\function{Seq{\rightarrow}(-)_\bot\text{-}mono}~\term{A_{set}}~\term{x}~\term{y}~\term{p})~(\function{Seq{\rightarrow}(-)_\bot\text{-}mono}~\term{A_{set}}~\term{y}~\term{x}~\term{q})
 \end{equation}
 \end{defn}
 \begin{defn}[Recursor for Quotient]
@@ -786,72 +803,72 @@ This rewriting confirms that if \(\function{isMon}~\function{s}\), then \(\funct
     \end{aligned}
   \end{equation}
 \end{defn}
-This recursor allows us to lift the function \(\function{Seq{\rightarrow}\bot}\) to the quotient
+This recursor allows us to lift the function \(\function{Seq{\rightarrow}(-)_\bot}\) to the quotient
 \begin{defn}
   \label{eq:QuotientedSeqToPartialityMonad}
-  We can define a function \(\function{Seq/{\sim}{\rightarrow}\bot}\) from \(\typeformer{Seq}_{\type{A}}\) to \(\type{A}_{\bot}\), where \(\term{A_{set}} : \typeformer{isSet}~\type{A}\) as
+  We can define a function \(\function{Seq/{\sim}{\rightarrow}(-)_\bot}\) from \(\typeformer{Seq}_{\type{A}}\) to \(\type{A}_{\bot}\), where \(\term{A_{set}} : \typeformer{isSet}~\type{A}\) as
   \begin{equation}
-    \function{Seq/{\sim}{\rightarrow}\bot} = \function{rec}~\function{Seq{\rightarrow}\bot}~(\lambda\,\term{x}\,\term{y}, \function{Seq{\rightarrow}\bot\text{-}{\approx}{\rightarrow}{\equiv}}~\term{A_{set}}~\term{x}~\term{y})~\function{\bot\text{-}isSet}
+    \function{Seq/{\sim}{\rightarrow}(-)_\bot} = \function{rec}~\function{Seq{\rightarrow}(-)_\bot}~(\lambda\,\term{x}\,\term{y}, \function{Seq{\rightarrow}(-)_\bot\text{-}{\approx}{\rightarrow}{\equiv}}~\term{A_{set}}~\term{x}~\term{y})~\function{(-)_\bot\text{-}isSet}
   \end{equation} 
 \end{defn}
 \begin{lem}
   \label{eq:injectivity-lemma}
-  Given two sequences \(\term{s}\) and \(\term{t}\), if \(\function{Seq{\rightarrow}\bot}~\term{s} \equiv \function{Seq{\rightarrow}\bot}~\term{t}\), then \(\term{s}~\relation{\sim_{seq}}~\term{t}\).
+  Given two sequences \(\term{s}\) and \(\term{t}\), if \(\function{Seq{\rightarrow}(-)_\bot}~\term{s} \equiv \function{Seq{\rightarrow}(-)_\bot}~\term{t}\), then \(\term{s}~\relation{\sim_{seq}}~\term{t}\).
   \begin{proof}
     We can reduce the burden of the proof, since
     \begin{equation}
       \term{s}~\relation{\sim_{seq}}~\term{t} = \left(\prod_{(\term{r} : \type{R})} \| \term{x}~\relation{\downarrow_{seq}}~\term{r} \| \rightarrow \| \term{y}~\relation{\downarrow_{seq}}~\term{r} \|\right) \times \left(\prod_{(\term{r} : \type{R})} \| \term{y}~\relation{\downarrow_{seq}}~\term{r} \| \rightarrow \| \term{x}~\relation{\downarrow_{seq}}~\term{r} \|\right)
     \end{equation}
-    so we can just show one part and get the other by symmetry. We assume \(\| \term{x}~\relation{\downarrow_{seq}}~\term{r} \|\), to show \(\| \term{y}~\relation{\downarrow_{seq}}~\term{r} \|\). By the mapping property of propositional truncation, we reduce the proof to defining a function \(\term{x}~\relation{\downarrow_{seq}}~\term{r} \rightarrow \term{y}~\relation{\downarrow_{seq}}~\term{r}\). Since \(\term{x}~\relation{\downarrow_{seq}}~\term{r}\), then \(\constructor{\eta}~\term{r}~\relation{\sqsubseteq_{\bot}}~\function{Seq{\rightarrow}\bot}~\term{x}\), but we have assumed \(\function{Seq{\rightarrow}\bot}~\term{x} \equiv \function{Seq{\rightarrow}\bot}~\term{y}\), so we get \(\constructor{\eta}~\term{r}~\relation{\sqsubseteq_{\bot}}~\function{Seq{\rightarrow}\bot}~\term{y}\), and thereby \(\term{y}~\relation{\downarrow_{seq}}~\term{r}\).
+    so we can just show one part and get the other by symmetry. We assume \(\| \term{x}~\relation{\downarrow_{seq}}~\term{r} \|\), to show \(\| \term{y}~\relation{\downarrow_{seq}}~\term{r} \|\). By the mapping property of propositional truncation, we reduce the proof to defining a function \(\term{x}~\relation{\downarrow_{seq}}~\term{r} \rightarrow \term{y}~\relation{\downarrow_{seq}}~\term{r}\). Since \(\term{x}~\relation{\downarrow_{seq}}~\term{r}\), then \(\constructor{\eta}~\term{r}~\relation{\sqsubseteq_{\bot}}~\function{Seq{\rightarrow}(-)_\bot}~\term{x}\), but we have assumed \(\function{Seq{\rightarrow}(-)_\bot}~\term{x} \equiv \function{Seq{\rightarrow}(-)_\bot}~\term{y}\), so we get \(\constructor{\eta}~\term{r}~\relation{\sqsubseteq_{\bot}}~\function{Seq{\rightarrow}(-)_\bot}~\term{y}\), and thereby \(\term{y}~\relation{\downarrow_{seq}}~\term{r}\).
   \end{proof}
 \end{lem}
 \begin{lem}
-  The function \(\function{Seq/{\sim}{\rightarrow}\bot}\) is injective.
+  The function \(\function{Seq/{\sim}{\rightarrow}(-)_\bot}\) is injective.
   \begin{proof}
     We use propositional elimination of quotients \todo{Should this be formalized?}
     \begin{equation}
       \begin{aligned}
         \function{elimProp} :~& (\typeformer{B} :\typeformer{Seq}_{\type{R}} / \relation{\sim_{seq}} \rightarrow \universe{\mathcal{U}}) \rightarrow ((\term{x} : \typeformer{Seq}_{\type{R}} / \relation{\sim_{seq}}) \rightarrow \typeformer{isProp}~(\typeformer{B}~\term{x})) \\
-        \rightarrow~& (\function{f} : (\term{a} : \typeformer{Seq}_{\type{R}}) \rightarrow \typeformer{B}~\function{[}~a~\function{]}) \rightarrow (\term{x} : \typeformer{Seq}_{\type{R}} / \relation{\sim_{seq}}) \rightarrow \typeformer{B}~\term{x}\)
+        \rightarrow~& (\function{f} : (\term{a} : \typeformer{Seq}_{\type{R}}) \rightarrow \typeformer{B}~\function{[}~a~\function{]}) \rightarrow (\term{x} : \typeformer{Seq}_{\type{R}} / \relation{\sim_{seq}}) \rightarrow \typeformer{B}~\term{x}
       \end{aligned}
     \end{equation}
-    to show the injectivity, meaning for all \(\term{x}~\term{y} : \typeformer{Seq}_{\type{R}} / \relation{\sim_{seq}}\) we get \(\function{Seq/{\sim}{\rightarrow}\bot}~\term{x} \equiv \function{Seq/{\sim}{\rightarrow}\bot}~\term{y} \rightarrow \term{x} \equiv \term{y}\). We start by eliminating \(\term{x}\), followed by elimination of \(y\), this gives us the proof term \todo{Convert to text, instead of a proof term!?}
+    to show the injectivity, meaning for all \(\term{x}~\term{y} : \typeformer{Seq}_{\type{R}} / \relation{\sim_{seq}}\) we get \(\function{Seq/{\sim}{\rightarrow}(-)_\bot}~\term{x} \equiv \function{Seq/{\sim}{\rightarrow}(-)_\bot}~\term{y} \rightarrow \term{x} \equiv \term{y}\). We start by eliminating \(\term{x}\), followed by elimination of \(y\), this gives us the proof term \todo{Convert to text, instead of a proof term!?}
     \begin{equation}
       \begin{aligned}
         &\function{elimProp} \\
-        &\quad (\lambda\,\term{a},~\function{Seq/{\sim}{\rightarrow}\bot}~\term{a} \equiv \function{Seq/{\sim}{\rightarrow}\bot}~\term{y} \rightarrow \term{a} \equiv \term{y}) \\
+        &\quad (\lambda\,\term{a},~\function{Seq/{\sim}{\rightarrow}(-)_\bot}~\term{a} \equiv \function{Seq/{\sim}{\rightarrow}(-)_\bot}~\term{y} \rightarrow \term{a} \equiv \term{y}) \\
         &\quad (\lambda\,\term{a},~\function{isProp\Pi}~(\lambda\,\_, \constructor{squash/}~\term{a}~\term{y})) \\
         &\quad (\lambda\,\term{a},~\function{elimProp} \\
-        &\qquad\qquad\quad (\lambda\,\term{b},~\function{Seq{\rightarrow}\bot}~\term{a} \equiv \function{Seq/{\sim}{\rightarrow}\bot}~\term{b} \rightarrow \function{[}~\term{a}~\function{]} \equiv \term{b}) \\
+        &\qquad\qquad\quad (\lambda\,\term{b},~\function{Seq{\rightarrow}(-)_\bot}~\term{a} \equiv \function{Seq/{\sim}{\rightarrow}(-)_\bot}~\term{b} \rightarrow \function{[}~\term{a}~\function{]} \equiv \term{b}) \\
         &\qquad\qquad\quad (\lambda\,\term{b},~\function{isProp\Pi}~(\lambda\,\_, \constructor{squash/}~\function{[}~\term{a}~\function{]}~\term{b})) \\
-        &\qquad\qquad\quad (\lambda\,\term{b},~(\constructor{eq/}~\term{a}~\term{b}) \circ (\function{Seq{\rightarrow}\bot\text{-}isInjective}~\term{a}~\term{b}))
+        &\qquad\qquad\quad (\lambda\,\term{b},~(\constructor{eq/}~\term{a}~\term{b}) \circ (\function{Seq{\rightarrow}(-)_\bot\text{-}isInjective}~\term{a}~\term{b})))
       \end{aligned}
     \end{equation}
-    where \(\function{Seq{\rightarrow}\bot\text{-}isInjective}\) is \eqref{eq:injectivity-lemma}, 
+    where \(\function{Seq{\rightarrow}(-)_\bot\text{-}isInjective}\) is \eqref{eq:injectivity-lemma}, 
   \end{proof}
 \end{lem}
 \begin{lem}
   \label{eq:constant-sequence-equality}
-  For all constant sequences \(\term{s}\), where all elements have the same value \(\term{v}\), we get \(\function{Seq{\rightarrow}\bot}~\term{s} \equiv \function{Maybe{\rightarrow}\bot}~\term{v}\).
+  For all constant sequences \(\term{s}\), where all elements have the same value \(\term{v}\), we get \(\function{Seq{\rightarrow}(-)_\bot}~\term{s} \equiv \function{Maybe{\rightarrow}(-)_\bot}~\term{v}\).
   \begin{proof}
-    The left side of the equality reduces to \(\function{Maybe{\rightarrow}\bot}\) applied on the least upper bound of the constant sequence, which is exactly the right hand side of the equality.
+    The left side of the equality reduces to \(\function{Maybe{\rightarrow}(-)_\bot}\) applied on the least upper bound of the constant sequence, which is exactly the right hand side of the equality.
   \end{proof}
 \end{lem}
 \begin{lem}
-  Assuming countable choice, the function \(\function{Seq{\rightarrow}\bot}\) is surjective
+  Assuming countable choice, the function \(\function{Seq{\rightarrow}(-)_\bot}\) is surjective
   \todo[inline]{describe countable choice (and why it is needed!)}
   \begin{proof}
     We do the proof by case \todo{describe what it means to do the surjective proof by case!} on \(\type{R}_{\bot}\), if it is \(\constructor{\eta}~r\) or \(\constructor{never}\), we convert them to the sequences \(\function{now}_{seq}~\term{r}\) and \(\constant{never}_{seq}\) respectively, then we are done by \eqref{eq:constant-sequence-equality}. For the least upper bound \(\constructor{\bigsqcup} (\function{s},\function{b})\), we translate to the (increasing) sequence, defined by \((\function{s},\function{b})\) \todo{more precise description!}. \todo{Complete the rest of the proof!}
   \end{proof}
 \end{lem}
 \begin{lem}
-  Assuming countable choice, the function \(\function{Seq/{\sim}{\rightarrow}\bot}\) is surjective
+  Assuming countable choice, the function \(\function{Seq/{\sim}{\rightarrow}(-)_\bot}\) is surjective
   
 \end{lem}
 \begin{thm}
   Assuming countable choice, we get an equivalence between sequences and the partiality monad.
   \begin{proof}
- The function \(\function{Seq/{\sim}{\rightarrow}\bot}\) is injective and surjective assuming countable choice, meaning we get an equivalence, since we are working in hSets.
+ The function \(\function{Seq/{\sim}{\rightarrow}(-)_\bot}\) is injective and surjective assuming countable choice, meaning we get an equivalence, since we are working in hSets.
 \end{proof}
 \end{thm}
 
@@ -1265,11 +1282,9 @@ We want to define spin, as being the fixed point \(\mathtt{spin} = \mathtt{later
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
 
 \chapter{Additions to the Cubical Agda Library}
-\section{\(\function{\Sigma ap}\)}
-\begin{equation}
-  \function{\Sigma ap} : \left(\sum_{x : X} Y x \equiv \sum_{x' : X'} Y' x' \right) ~ \equiv ~ \left( \sum_{p : X \equiv X'} Y \equiv_p Y' \right)
-\end{equation}
-\todo[inline]{Describe the proof of this? / Is this relevant / Should it be in the appendix?}
+% Should be in the appendix ...
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
 
 \chapter{Conclusion}
 \label{ch:conclusion}
@@ -1292,4 +1307,3 @@ We want to define spin, as being the fixed point \(\mathtt{spin} = \mathtt{later
 \todo[inline]{\dots}
 
 \end{document}
-
