@@ -81,6 +81,8 @@
 
 \newcommand*{\ssfrac}[2]{ {\LARGE \text{\sfrac{\ensuremath{#1}}{\ensuremath{#2}}}}}
 
+\newcommand*{\natcases}[2]{\ensuremath{\mathbb{[\hspace{-.5mm}\rangle}~\ensuremath{#1}~,~\ensuremath{#2}~\mathbb{\langle\hspace{-.5mm}]}}}
+
 % Concatenation of paths taken from HoTT book
 \newcommand{\ct}{%
   \mathchoice{\mathbin{\raisebox{0.5ex}{$\displaystyle\centerdot$}}}%
@@ -331,7 +333,7 @@ In this section we will introduce containers (also known as signatures), and sho
     \end{equation}
     We define \(\pathterm{\mathcal{L}unique}\) by the equivalence
     \begin{align}
-      \function{fun}_{\pathterm{\mathcal{L}unique}}~(\function{a} , \function{b}) &= \left( \lambda\,n, \begin{cases} \constant{tt} & n = 0 \\ \function{a}~m & n = m + 1 \end{cases}\right) , \left(\lambda\,n \begin{cases} \mathtt{refl}_{\constant{tt}} & n = 0 \\ \function{b}~m & n = m + 1 \end{cases}\right) \\
+      \function{fun}_{\pathterm{\mathcal{L}unique}}~(\function{a} , \function{b}) &= \natcases{\constant{tt}}{\function{a}} , \natcases{\mathtt{refl}_{\constant{tt}}}{\function{b}} \\
     \function{inv}_{\pathterm{\mathcal{L}unique}}~(\function{a} , \function{b}) &= \function{a} \circ \function{incr}~,~b \circ \function{incr} \\
     \function{rinv}_{\pathterm{\mathcal{L}unique}}~(\function{a} , \function{b}) &= \mathtt{refl}_{(\function{a},\function{b})} \\
     \function{linv}_{\pathterm{\mathcal{L}unique}}~(\function{a} , \function{b}) &= \mathtt{refl}_{(\function{a},\function{b})}
@@ -443,7 +445,7 @@ which is equal to
 \begin{equation}
   \functor{P}_{\container{S}}(\type{X}) = \type{X} + \type{R} \times (\empt \rightarrow \type{X}).
 \end{equation}
-We know that \(\empt \rightarrow \type{X} \equiv \unit\), so we can reduce further to
+We know that \((\empt \rightarrow \type{X}) \equiv \unit\), so we can reduce further to
 \begin{equation}
   \functor{P}_{\container{S}}(\type{X}) = \type{X} + \type{R}
 \end{equation}
@@ -452,12 +454,12 @@ meaning we get the following diagram.
 \begin{figure}[h]
   \centering
   \begin{tikzcd}[row sep=large,column sep=large]
-    \type{R} \ar[dr,"\function{now}"'] \ar[r,"\texttt{inl}"] & \type{R} + \typeformer{M}  & \typeformer{M} \ar[l,"\texttt{inr}"'] \ar[dl,"\function{later}"] \\
+    \type{R} \ar[dr,"\constructor{now}"'] \ar[r,"\texttt{inl}"] & \type{R} + \typeformer{M}  & \typeformer{M} \ar[l,"\texttt{inr}"'] \ar[dl,"\constructor{later}"] \\
     & \typeformer{M} \ar[u,"\function{out}"']
   \end{tikzcd}
   \caption{Delay monad}
 \end{figure}
-\noindent Meaning we can define the operations \(\function{now}\) and \(\function{later}\) using \(\function{in} = \function{out}^{-1}\) together with the injections \(\mathtt{inl}\) and \(\mathtt{inr}\). \todo[inline]{(Later = Tau, Ret = Now)}
+\noindent Meaning we can define the operations \(\constructor{now}\) and \(\constructor{later}\) using \(\function{in} = \function{out}^{-1}\) together with the injections \(\mathtt{inl}\) and \(\mathtt{inr}\). \todo[inline]{(Later = Tau, Ret = Now)}
 
 \subsection{Tree}
 Now lets look at the example where we remove the \(\function{Tau}\) constructor. We let
@@ -616,7 +618,7 @@ In this section we will define the partiality monad (see below) and show that (a
   \end{center}
   and finally set truncated
   \begin{equation}
-    \infer[\constructor{\bot\text{-}isSet}]{\term{p} \equiv \term{q}}{\term{p} , \term{q} : \term{x}~\relation{\sqsubseteq_{\bot}}~\term{y}}
+    \infer[\constructor{(-)_\bot\text{-}isSet}]{\term{p} \equiv \term{q}}{\term{p} , \term{q} : \term{x}~\relation{\sqsubseteq_{\bot}}~\term{y}}
   \end{equation}
 \end{defn}
 
@@ -735,10 +737,12 @@ where \(\| \cdot \|\) is propositional \todo{propositional or set truncation?} t
     \end{aligned}
   \end{equation}
 \end{defn}
-\begin{defn}[Maybe Ordering] Given some \(x,y : \type{R} + \unit\), the ordering relation is defined as
-\begin{equation}
-  \term{x}~\relation{\sqsubseteq_{\type{R} + \unit}}~\term{y} = (\term{x} \equiv \term{y}) + ((\term{x}  \downarrow_{\type{R} + \unit}) \times (\term{y} \uparrow_{\type{R} + \unit}))
-\end{equation}
+\begin{defn}[Maybe Ordering]
+  \label{eq:maybe-order}
+  Given some \(x,y : \type{R} + \unit\), the ordering relation is defined as
+  \begin{equation}
+    \term{x}~\relation{\sqsubseteq_{\type{R} + \unit}}~\term{y} = (\term{x} \equiv \term{y}) + ((\term{x}  \downarrow_{\type{R} + \unit}) \times (\term{y} \uparrow_{\type{R} + \unit}))
+  \end{equation}
 \end{defn}
 \noindent This ordering definition is basically \(\function{isMon}\) at a specific index, so we can again rewrite \(\function{isMon}\) as
 \begin{equation}
@@ -796,6 +800,7 @@ This rewriting confirms that if \(\function{isMon}~\function{s}\), then \(\funct
   \todo{is this a recursor, and for what? The quotient?}
   For all sequences \(\term{x}, \term{y} : \typeformer{Seq}_{\type{A}}\), functions \(\function{f} : \type{A} \rightarrow \type{B}\) and relations \(\function{g} : \term{x}~\relation{R}~\term{y} \rightarrow \function{f}~\term{x} \equiv \function{f}~\term{y}\), then if \(\type{B}\) is a set \(\term{B_{set}} : \typeformer{isSet}~\type{B}\), we get a function \(\function{rec} : \type{A} / \relation{R} \rightarrow \type{B}\), defined by case as
   \begin{equation}
+    \label{eq:quotient-recursor}
     \begin{aligned}
       &\function{rec}~\function{[}\,\term{z}\,\function{]} = \function{f}~\term{z} \\
       &\function{rec}~(\function{eq/}~\_~\_~\term{r}~i) = \function{g}~\term{r}~i \\
@@ -808,7 +813,7 @@ This recursor allows us to lift the function \(\function{Seq{\rightarrow}(-)_\bo
   \label{eq:QuotientedSeqToPartialityMonad}
   We can define a function \(\function{Seq/{\sim}{\rightarrow}(-)_\bot}\) from \(\typeformer{Seq}_{\type{A}}\) to \(\type{A}_{\bot}\), where \(\term{A_{set}} : \typeformer{isSet}~\type{A}\) as
   \begin{equation}
-    \function{Seq/{\sim}{\rightarrow}(-)_\bot} = \function{rec}~\function{Seq{\rightarrow}(-)_\bot}~(\lambda\,\term{x}\,\term{y}, \function{Seq{\rightarrow}(-)_\bot\text{-}{\approx}{\rightarrow}{\equiv}}~\term{A_{set}}~\term{x}~\term{y})~\function{(-)_\bot\text{-}isSet}
+    \function{Seq/{\sim}{\rightarrow}(-)_\bot} = \function{rec}~\function{Seq{\rightarrow}(-)_\bot}~(\function{Seq{\rightarrow}(-)_\bot\text{-}{\approx}{\rightarrow}{\equiv}}~\term{A_{set}})~\constructor{(-)_\bot\text{-}isSet}
   \end{equation} 
 \end{defn}
 \begin{lem}
@@ -874,56 +879,168 @@ This recursor allows us to lift the function \(\function{Seq{\rightarrow}(-)_\bo
 
 \subsubsection{Building the Partiality Monad as an M-type (Dialgebra?)}
 \todo[inline]{Is this possible?}
-% We want an object \(\constant{\bot} : \type{A}_{\bot}\), which can be seen as a function \(\unit \rightarrow \type{A}_{\bot}\), as defined in \figref{partiality-monad-M-type-0}
-% \begin{figure}[h]
-%   \centering
-%   \begin{tikzcd}[row sep=huge,column sep=huge]
-%     \unit \ar[r] \ar[dr,"\bot"'] & A_{\bot} + \unit \ar[d,shift left,"\function{in}"] \\
-%     & \type{A}_{\bot} \ar[u,shift left,"\function{out}"]
-%   \end{tikzcd}
-%   \caption{Partiality monad as M-type (0)}
-%   \label{fig:partiality-monad-M-type-0}
-% \end{figure}
-% we then want to add the unit of the monad \(\eta : \type{A} \rightarrow \type{A}_\bot\), this is done in \figref{partiality-monad-M-type-1}
-% \begin{figure}[h]
-%   \centering
-%   \begin{tikzcd}[row sep=huge,column sep=huge]
-%     \unit \ar[r] \ar[dr,"\bot"'] & A_{\bot} + \unit + A \ar[d,shift left,"\function{in}"] & A \ar[l] \ar[ld,"\eta"] \\
-%     & \type{A}_{\bot} \ar[u,shift left,"\function{out}"]
-%   \end{tikzcd}
-%   \caption{Partiality monad as M-type (1)}
-%   \label{fig:partiality-monad-M-type-1}
-% \end{figure}
-% we now want to define an ordering on \(A\) as in \figref{partiality-monad-M-type-2}
-% \begin{figure}[h]
-%   \centering
-%   \begin{tikzcd}[row sep=huge,column sep=huge]
-%     \unit \ar[r] \ar[dr,"\bot"'] & \type{A}_{\bot} + \unit + \type{A} \ar[d,shift left,"\function{in}"] & \type{A} \ar[l] \ar[ld,"\eta"] \\
-%     & \type{A}_{\bot} \ar[u,shift left,"\function{out}"] \\
-%     & \unit + \type{A} \ar[u,shift left,bend left=60,""'{name=lear}] \ar[u, shift right,bend right=60, ""{name=riar}] \ar[Rightarrow,to path=(lear)--(riar)\tikztonodes,"\sqsubseteq"]
-%   \end{tikzcd}
-%   \caption{Partiality monad as M-type (2)}
-%   \label{fig:partiality-monad-M-type-2}
-% \end{figure}
-% \begin{figure}[h]
-%   \centering
-%   \begin{tikzcd}[row sep=huge,column sep=huge]
-%     \unit \ar[r] \ar[dr,"\bot"'] & \type{A}_{\bot} + \unit + \type{A} \ar[d,shift left,"\function{in}"] & \type{A} \ar[l] \ar[ld,"\eta"] \\
-%     & \type{A}_{\bot} \ar[u,shift left,"\function{out}"] \ar[d,shift left] \ar[d,shift right] \\
-%     & \type{A}_{\bot} \times \type{A}_{\bot} \ar[r,"\sqsubseteq"] & \universe{\mathcal{U}}
-%   \end{tikzcd}
-%   \caption{Partiality monad as M-type (3)}
-%   \label{fig:partiality-monad-M-type-3}
-% \end{figure}
+
+\subsection{Silhouette Trees}
+We start by defining an \(\type{R}\) valued \(\type{E}\) branching tree, as the \texttt{M}-type given by the following container
+\begin{equation}
+  \left(\type{R} + \unit , \begin{cases} \bot & \mathtt{inl}~\term{a} \\ \type{E} & \mathtt{inr}~\constant{tt} \end{cases}\right)
+\end{equation}
+We get the constructors
+\begin{equation}
+  \infer{\constructor{leaf}~\term{a} : \typeformer{tree}~\type{R}~\type{E}}{\term{a} : \type{R}}
+\end{equation}
+\begin{equation}
+  \infer{\constructor{node}~\function{k} : \typeformer{tree}~\type{R}~\type{E}}{\function{k} : \type{E} \rightarrow \typeformer{tree}~\type{R}~\type{E}}
+\end{equation}
+Then we define the weak bisimularity relation \(\relation{\sim_{tree}}\)
+\begin{equation}
+  \infer[\constructor{\sim_{leaf}}]{\constructor{leaf}~x~\relation{\sim_{tree}}~\constructor{leaf}~y}{}
+\end{equation}
+\begin{equation}
+  \infer[\constructor{\sim_{node}}]{\constructor{node}~\function{k_1}~\relation{\sim_{tree}}~\constructor{node}~\function{k_2}}{\prod_{(v : \type{E})}~\function{k_1}~\term{v}~\relation{\sim_{tree}}~\function{k_2}~\term{v}}
+\end{equation}
+This is enough to define, what we call, silhouette trees, which are trees quotiented by this notion of weak bisimularity, namely \(\typeformer{tree} / \relation{\sim_{tree}}\). We can also construct this type directly as a QIIT, with type constructors \todo{add all needed constructors}
+\begin{equation}
+  \infer{\constructor{leaf}_{\typeformer{sTree}} : \typeformer{sTree}~\type{E}}{}
+\end{equation}
+\begin{equation}
+  \infer{\constructor{node}_{\typeformer{sTree}}~\function{k} : \typeformer{sTree}~\type{E}}{\function{k} : \type{E} \rightarrow \typeformer{sTree}~\type{E}}
+\end{equation}
+And the ordering relation \((\cdot~\relation{\sqsubseteq_{sTree}}~\cdot)\) of how "defined" the trees are by the constructors \todo{add all needed constructors}
+\\ \\
+We now want to show the equivalence between these two constructions, to do this we define an intermediate construction \(\typeformer{Seq}_{tree}\), where we get an ordering on the "definedness" of trees.
+\begin{defn}
+  We define monotone increasing sequences of trees as \todo{ordering is container ordering not maybe?}, all breanches are monotone increasing \todo{specify branches increasing?}.
+  \begin{equation}
+    \typeformer{Seq}_{tree} = \prod_{(\function{e} : \mathbb{N} \rightarrow \type{E})} \sum_{(\function{s} : \mathbb{N} \rightarrow \type{R} + \unit)} \prod_{(n : \mathbb{N})} \function{s}_n~\relation{\sqsubseteq_{\type{R}+\unit}}~\function{s}_{n+1}
+  \end{equation}
+  where \(\relation{\sqsubseteq_{\type{R}+\unit}}\) is similar to the relation defined at \eqref{eq:maybe-order} \todo{how does it differ? Constructors are equal type is different (trees instead of delay)}.
+\end{defn}
+\begin{defn}
+  We define a function to shift a \(\typeformer{Seq}_{tree}\), it takes \(\function{f} : \type{E} \rightarrow \typeformer{Seq}_{tree}\) as an argument. We let \(\function{s'} = \function{f}~\function{e}_0~(\function{e} \circ \function{suc})\), then the definition is given as
+  \begin{equation}
+    \begin{aligned}
+      &\function{shift\text{-}seq}~\function{f} = \\[-5mm]
+      &\qquad \lambda\,\function{e}, \natcases{\mathtt{inr}~\constant{tt}}{\pi_1~\function{s'}} , \left(\lambda\,n, \begin{cases} \mathtt{inr}~(\mathtt{refl} , \constant{inl{\not\equiv}inr}) & n = 0 \land \pi_1~\function{s'}~0 = \mathtt{inl}~r \\ \mathtt{inl}~\mathtt{refl} & n = 0 \land \pi_1~\function{s'}~0 = \mathtt{inr}~\constant{tt} \\ \pi_2~\function{s'}~m & n = m + 1 \end{cases}\right)
+    \end{aligned}
+  \end{equation}
+\end{defn}
+\begin{defn}
+  We define notation for
+  \begin{equation}
+    \natcases{x}{f} = \lambda\,n, \begin{cases} x & n = 0 \\ f m & n = m + 1 \end{cases}
+  \end{equation}
+\end{defn}
+\begin{defn}
+  We define a function to unshift a \(Seq_{tree}\)
+  \begin{equation}
+    \begin{aligned}
+      &\function{unshift\text{-}seq}~\function{s}~\term{v} = \lambda\,\function{e},~(\pi_1~(\function{s}~(\natcases{\term{v}}{\function{e}})) \circ \function{suc}) , (\pi_2~(\function{s}~(\natcases{v}{\function{e}})) \circ \function{suc})
+    \end{aligned}
+  \end{equation}
+\end{defn}
+\begin{lem}
+  Shift and unshift er inverse to each other
+  \begin{proof}
+    The same reasoning as for \todo{shift - unshift}
+  \end{proof}
+\end{lem}
+\begin{defn}
+  We get a function from trees to monotone sequences
+  \begin{equation}
+    \begin{aligned}
+      &\function{tree{\rightarrow}Seq}~(\constructor{leaf}~\term{r}) = \lambda\,\_, (\lambda\,\_, \mathtt{inl}~\term{r}) , (\lambda\,\_, \mathtt{inl}~\mathtt{refl}) \\
+      &\function{tree{\rightarrow}Seq}~(\constructor{node}~\function{k}) = \function{shift}~(\function{tree{\rightarrow}Seq} \circ \function{k})
+    \end{aligned}
+  \end{equation}
+\end{defn}
+\begin{defn}
+  We get a function from monotone sequences to trees
+  \begin{equation}
+    \begin{aligned}
+      &\function{Seq{\rightarrow}tree}~\function{s} = \begin{cases} \constructor{leaf}~\term{r} & \prod_{(\function{e} : \mathbb{N} \rightarrow \type{E})} \pi_1~(\function{s}~\function{e})~0 = \mathtt{inl}~\term{r} \\ \constructor{node}~(\function{Seq{\rightarrow}tree} \circ \function{unshift}~\function{s}) & o.w.  \end{cases}
+    \end{aligned}
+  \end{equation}
+\end{defn}
+\begin{lem}
+  \label{eq:seq-first-is-leaf}
+  If the first element in the sequence is terminated / a leaf, then the rest of the elements will also be terminated.
+  \begin{equation}
+    \left(\prod_{e : \mathbb{N} \rightarrow \type{E}} \pi_1~(\function{s}~\function{e})~0 = \mathtt{inl}~\term{r}\right) \Leftrightarrow \left(\function{s} \equiv \lambda\,\_,(\lambda\,\_,\mathtt{inl}~\term{r}),(\lambda\,\_,\mathtt{inl}~\mathtt{refl})\right)
+  \end{equation}
+\end{lem}
+\begin{lem}
+  The types \(\typeformer{tree}\) and \(\typeformer{Seq}_{tree}\) are equal
+  \begin{proof}
+    We construct an isomorphism by the functions \(\function{tree{\rightarrow}Seq}\) and \(\function{Seq{\rightarrow}tree}\), with right inverse given by two cases, one where the first element in the sequence is \(\mathtt{inl}~\term{r}\), meaning representing a leaf with value \(r\), then we need to show that \(\function{s} \equiv \lambda\,\_,(\lambda\,\_,\mathtt{inl}~\term{r}),(\lambda\,\_,\mathtt{inl}~\mathtt{refl})\) which follows from \eqref{eq:seq-first-is-leaf}. Otherwise we need to show that
+    \begin{equation}
+      \function{shift}~(\function{tree{\rightarrow}Seq} \circ \function{Seq{\rightarrow}tree} \circ \function{unshift}~\function{s}) \equiv \function{s}
+    \end{equation}
+    By induction we get
+    \begin{equation}
+      \function{tree{\rightarrow}Seq} \circ \function{Seq{\rightarrow}tree} \circ \function{unshift}~\function{s} \equiv \function{unshift}~\function{s}
+    \end{equation}
+    \begin{equation}
+      \begin{aligned}
+        &\function{tree\text{-}Seq}~\function{s} = \begin{cases} \lambda\,\_,(\lambda\,\_,\mathtt{inl}~\term{r}),(\lambda\,\_,\mathtt{inl}~\mathtt{refl}) & \prod_{e : \mathbb{N} \rightarrow \type{E}} \pi_1~(\function{s}~\function{e})~0 = \mathtt{inl}~\term{r} \\ \function{shift}~(\function{tree{\rightarrow}Seq} \circ \function{Seq{\rightarrow}tree} \circ \function{unshift}~\function{s}) & o.w. \end{cases} \\
+        &\function{tree\text{-}Seq}~\function{s} = \mathtt{refl} \\
+        &\function{tree\text{-}Seq}~\function{s} = \mathtt{ap}~\function{shift}~(\function{tree\text{-}Seq}~(\function{unshift}~\function{s})) \ct \function{shift\text{-}unshift}
+      \end{aligned}
+    \end{equation}
+    and left inverse
+    \begin{equation}
+      \begin{aligned}
+        &\function{tree\text{-}Seq}~(\constructor{leaf}~\term{r}) = \mathtt{refl} \\
+        &\function{tree\text{-}Seq}~(\constructor{node}~\term{k}) = \function{unshift\text{-}shift}~(\function{tree{\rightarrow}Seq} \circ \function{k}) \ct \function{tree\text{-}Seq}~k
+      \end{aligned}
+    \end{equation}
+  \end{proof}
+\end{lem}
+\begin{defn}
+  The relation \((\cdot~\relation{\sqsubseteq_{tree}}~\cdot)\) is defined as
+  \begin{equation}
+    \infer{\constructor{leaf}~\relation{\sqsubseteq_{tree}}~x}{x : tree}
+  \end{equation}
+  \begin{equation}
+    \infer{\constructor{leaf}~\relation{\sqsubseteq_{tree}}~x}{}
+  \end{equation}
+  \begin{equation}
+    x~\relation{\sqsubseteq_{tree}}~x
+  \end{equation}
+\end{defn}
+
+\begin{defn}
+  There is a function from \(\typeformer{tree}~\type{A}~\type{E}\) to \(\typeformer{sTree}~\type{E}\)
+  \begin{equation}
+    \begin{aligned}
+      &\function{tree{\rightarrow}sTree}~(\constructor{leaf}~\_) = \constructor{leaf}_{\typeformer{sTree}}\\
+      &\function{tree{\rightarrow}sTree}~(\constructor{node}~\function{k}) = \constructor{node}_{\typeformer{sTree}}~(\function{tree{\rightarrow}sTree} \circ \function{k})
+    \end{aligned}
+  \end{equation}
+\end{defn}
+We then show this definition is monotone, such that it can be lifted to a function from the quotient
+\begin{lem}
+  The function \(\function{tree{\rightarrow}sTree}\) is monotone, meaning if \(\term{x}~\relation{\sqsubseteq_{tree}}~\term{y}\), then we have \(\function{tree{\rightarrow}sTree}~\term{x}~\relation{\sqsubseteq_{sTree}}~\function{tree{\rightarrow}sTree}~\term{y}\).
+  \begin{proof}
+    By case
+    \begin{equation}
+      \function{tree{\rightarrow}sTree\text{-}mono}~(\constructor{leaf})~\_ = 
+    \end{equation}
+  \end{proof}
+\end{lem}
+We then want to lift this definition to the quotient using the recursor for quotients \eqref{eq:quotient-recursor},
+\begin{defn}
+  There is a function from \(\typeformer{tree}~\type{A}~\type{E} / \relation{\sim_{tree}}\) to \(\typeformer{sTree}~\type{E}\)
+  \begin{equation}
+    \function{tree/{\sim}{\rightarrow}sTree} = \function{rec}~\function{tree{\rightarrow}sTree}~\function{tree→sTree-{\approx}{\rightarrow}{\equiv}}~\constructor{sTree\text{-}isSet}
+  \end{equation}
+\end{defn}
 
 \subsection{QM-types}
 \todo{which other QM types can be expressed as QIITs}
-
 % Sierpinski set
 % Rosolini’s dominance
 % non-termination monad -- Partiality monad - completely iterative monad (on 1 -> 1)
-
-\subsection{QM-types}
 A QM-type is a quotiented M-type, we try to define this as a quotient on containers. We define container quotients as
 \begin{equation}
   ...
