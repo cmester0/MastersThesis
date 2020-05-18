@@ -681,24 +681,39 @@ We also introduce notation for the two special cases of sequences given above
     If we shift followed by an unshift, we just introduce a value to instantly remove it, meaning the value does not matter.
   \end{proof}
 \end{lem}
-\begin{thm}
-  \noindent We can now define an equivalence between \(\typeformer{delay}~\type{R}\) and \(\typeformer{Seq}_{\type{R}}\), where \(\constructor{later}\) are equivalent to shifts, and \(\constructor{now}~\term{r}\) is equivalent terminated sequence with value \(\term{r}\).
+\noindent We now define an equivalence between \(\typeformer{delay}~\type{R}\) and \(\typeformer{Seq}_{\type{R}}\), where \(\constructor{later}\) are equivalent to shifts, and \(\constructor{now}~\term{r}\) is equivalent terminated sequence with value \(\term{r}\). We do this by defining equivalence functions, and the left and right identities.
+\begin{lem}[\(\constant{inl{\not\equiv}inr}\)]
+  For any two elements \(\term{x} = \mathtt{inl}~\term{a}\) and \(\term{y} = \mathtt{inr}~\term{b}\) then \(\term{x} \not\equiv \term{y}\).
   \begin{proof}
-    We start with the function from \(\typeformer{Delay}~\type{R}\) to \(\typeformer{Seq}_{\type{R}}\)
-    \begin{equation}
-      \begin{aligned}
-        \function{Delay{\rightarrow}Seq}&~(\constructor{now}~\term{r}) = \function{now}_{Seq}~\term{r} \\
-        \function{Delay{\rightarrow}Seq}&~(\constructor{later}~\term{x}) = \\[-3mm]
-        & \strut\hspace{-8mm}\function{shift}~(\function{Delay{\rightarrow}Seq}~\term{x})~\left(\mathtt{inr}~\constant{tt} , \begin{cases} \mathtt{inr}~(\mathtt{refl} , \constant{inl{\not\equiv}inr}) & \term{x} = \constructor{now}~\_ \\ \mathtt{inl}~\mathtt{refl} & \term{x} = \constructor{later}~\_ \end{cases}\right)
-      \end{aligned}
-    \end{equation}
-    where \(\constant{inl{\not\equiv}inr}\) is the proof that if you can construct \(\mathtt{inl}~\_ \equiv \mathtt{inr}~\_\) then it gives a contradiction. Now for the other direction
+    The constructors are disjoint, so there is not a path between them \todo{better formualted proof}.
+  \end{proof}
+\end{lem}
+\begin{defn}
+  We define function from \(\typeformer{Delay}~\type{R}\) to \(\typeformer{Seq}_{\type{R}}\)
+  \begin{equation}
+    \begin{aligned}
+      \function{Delay{\rightarrow}Seq}&~(\constructor{now}~\term{r}) = \function{now}_{Seq}~\term{r} \\
+      \function{Delay{\rightarrow}Seq}&~(\constructor{later}~\term{x}) = \\[-3mm]
+      & \strut\hspace{-8mm}\function{shift}~(\function{Delay{\rightarrow}Seq}~\term{x})~\left(\mathtt{inr}~\constant{tt} , \begin{cases} \mathtt{inr}~(\mathtt{refl} , \constant{inl{\not\equiv}inr}) & \term{x} = \constructor{now}~\_ \\ \mathtt{inl}~\mathtt{refl} & \term{x} = \constructor{later}~\_ \end{cases}\right)
+    \end{aligned}
+  \end{equation}
+\end{defn}
+\begin{defn}
+  We define function from \(\typeformer{Seq}_{\type{R}}\) to \(\typeformer{Delay}~\type{R}\)
     \begin{equation}
       \begin{aligned}
         \function{Seq{\rightarrow}Delay}&~(\function{g} , \function{q}) = \begin{cases} \constructor{now}~\term{r} & \function{g}_0 = \mathtt{inl}~\term{r} \\ \constructor{later}~(\function{Seq{\rightarrow}Delay}~(\function{unshift}~(\function{g} , \function{q}))) & \function{g}_0 = \mathtt{inr}~\constant{tt} \end{cases}
       \end{aligned}
     \end{equation}
-    with the right identity, saying that for any sequence \((\function{g},\function{q})\), we get \(\function{Delay{\rightarrow}Seq}~(\function{Seq{\rightarrow}Delay}~(\function{g},\function{q})) \equiv (\function{g},\function{q})\), defined as
+\end{defn}
+\begin{thm}
+  The type \(\typeformer{Seq}_{\type{R}}\) is equal to \(\typeformer{Delay}~\type{R}\)
+  \begin{proof}  
+    We define right and left identity, saying that for any sequence \((\function{g},\function{q})\), we get
+    \begin{equation}
+      \function{Delay{\rightarrow}Seq}~(\function{Seq{\rightarrow}Delay}~(\function{g},\function{q})) \equiv (\function{g},\function{q})
+    \end{equation}
+    defined as
     \begin{equation}
       \begin{aligned}
         \function{Seq\text{-}Delay}&~(\function{g},\function{q}) = \begin{cases} \mathtt{refl}  & \function{g}_0 = \mathtt{inl}~\term{r} \\ \begin{aligned} &\mathtt{ap}~\function{shift}~(\function{Seq\text{-}Delay}~(\function{unshift}~(\function{g} , \function{q}))) \\&\quad\ct~\function{shift\text{-}unshift}~(\function{g} , \function{q}) \end{aligned} & \function{g}_0 = \mathtt{inr}~\constant{tt} \end{cases}
@@ -712,9 +727,15 @@ We also introduce notation for the two special cases of sequences given above
         \function{Delay\text{-}Seq}&~(\constructor{later}~\term{x}) = \mathtt{ap}~(\function{later} \circ \function{Seq{\rightarrow}Delay})~(\function{unshift\text{-}shift}~(\function{Delay{\rightarrow}Seq}~\term{x})) \\ &\qquad\qquad\quad\ct~\mathtt{ap}~\function{later}~(\function{Delay{\rightarrow}Seq}~\term{x})
       \end{aligned}
     \end{equation}
-    The functions back and forth and the left and right identities together gives us an equivalence between the delay monad and sequences.
   \end{proof}
 \end{thm}
+\begin{cor}
+  The types \(\typeformer{Delay}/\sim\) and \(\typeformer{Seq}/\sim\) are equal.
+  \begin{proof}
+    
+  \end{proof}
+\end{cor}
+
 \subsection{Sequence to Partiality Monad}
 In this section we will show that assuming the "Axiom of Countable Choice", we get an equivalence between sequences and the partiality monad.
 \begin{defn}[Sequence Termination]
@@ -963,16 +984,19 @@ We now want to show the equivalence between these two constructions, to do this 
   \end{equation}
 \end{defn}
 \begin{lem}
-  \label{eq:seq-first-is-leaf}
+  \label{lem:seq-first-is-leaf}
   If the first element in the sequence is terminated / a leaf, then the rest of the elements will also be terminated.
   \begin{equation}
     \left(\prod_{e : \mathbb{N} \rightarrow \type{E}} \pi_1~(\function{s}~\function{e})~0 = \mathtt{inl}~\term{r}\right) \Leftrightarrow \left(\function{s} \equiv \lambda\,\_,(\lambda\,\_,\mathtt{inl}~\term{r}),(\lambda\,\_,\mathtt{inl}~\mathtt{refl})\right)
   \end{equation}
+  \begin{proof}
+    Since the sequence is monotone, and \(\mathtt{inl}~\term{r}\) is the top element of the order, if the first element is \(\mathtt{inl}~\term{r}\), then the sequence must be \(\lambda\,\_,(\lambda\,\_,\mathtt{inl}~\term{r}),(\lambda\,\_,\mathtt{inl}~\mathtt{refl})\). The other direction is trivial.
+  \end{proof}
 \end{lem}
-\begin{lem}
+\begin{thm}
   The types \(\typeformer{tree}\) and \(\typeformer{Seq}_{tree}\) are equal
   \begin{proof}
-    We construct an isomorphism by the functions \(\function{tree{\rightarrow}Seq}\) and \(\function{Seq{\rightarrow}tree}\), with right inverse given by two cases, one where the first element in the sequence is \(\mathtt{inl}~\term{r}\), meaning representing a leaf with value \(r\), then we need to show that \(\function{s} \equiv \lambda\,\_,(\lambda\,\_,\mathtt{inl}~\term{r}),(\lambda\,\_,\mathtt{inl}~\mathtt{refl})\) which follows from \eqref{eq:seq-first-is-leaf}. Otherwise we need to show that
+    We construct an isomorphism by the functions \(\function{tree{\rightarrow}Seq}\) and \(\function{Seq{\rightarrow}tree}\), with right inverse given by two cases, one where the first element in the sequence is \(\mathtt{inl}~\term{r}\), meaning representing a leaf with value \(r\), then we need to show that \(\function{s} \equiv \lambda\,\_,(\lambda\,\_,\mathtt{inl}~\term{r}),(\lambda\,\_,\mathtt{inl}~\mathtt{refl})\) which follows from \lemref{seq-first-is-leaf}. Otherwise we need to show that
     \begin{equation}
       \function{shift}~(\function{tree{\rightarrow}Seq} \circ \function{Seq{\rightarrow}tree} \circ \function{unshift}~\function{s}) \equiv \function{s}
     \end{equation}
@@ -980,14 +1004,7 @@ We now want to show the equivalence between these two constructions, to do this 
     \begin{equation}
       \function{tree{\rightarrow}Seq} \circ \function{Seq{\rightarrow}tree} \circ \function{unshift}~\function{s} \equiv \function{unshift}~\function{s}
     \end{equation}
-    \begin{equation}
-      \begin{aligned}
-        &\function{tree\text{-}Seq}~\function{s} = \begin{cases} \lambda\,\_,(\lambda\,\_,\mathtt{inl}~\term{r}),(\lambda\,\_,\mathtt{inl}~\mathtt{refl}) & \prod_{e : \mathbb{N} \rightarrow \type{E}} \pi_1~(\function{s}~\function{e})~0 = \mathtt{inl}~\term{r} \\ \function{shift}~(\function{tree{\rightarrow}Seq} \circ \function{Seq{\rightarrow}tree} \circ \function{unshift}~\function{s}) & o.w. \end{cases} \\
-        &\function{tree\text{-}Seq}~\function{s} = \mathtt{refl} \\
-        &\function{tree\text{-}Seq}~\function{s} = \mathtt{ap}~\function{shift}~(\function{tree\text{-}Seq}~(\function{unshift}~\function{s})) \ct \function{shift\text{-}unshift}
-      \end{aligned}
-    \end{equation}
-    and left inverse
+    then by the right inverse of the equality between shift and unshift, we are done. For the left inverse we do case analysis, using induction and the left inverse of the equality between shift and unshift
     \begin{equation}
       \begin{aligned}
         &\function{tree\text{-}Seq}~(\constructor{leaf}~\term{r}) = \mathtt{refl} \\
@@ -995,7 +1012,14 @@ We now want to show the equivalence between these two constructions, to do this 
       \end{aligned}
     \end{equation}
   \end{proof}
-\end{lem}
+\end{thm}
+\begin{cor}
+  The types \(\typeformer{tree}/\relation{\sim_{tree}}\) and \(\typeformer{Seq}_{tree} / \relation{\sim_{\typeformer{Seq}_{tree}}}\) are equal.
+  \begin{proof}
+    
+  \end{proof}
+\end{cor}
+To complete the equality between \(\typeformer{tree}/{\sim}\) and \(\typeformer{sTree}\)
 \begin{defn}
   The relation \((\cdot~\relation{\sqsubseteq_{tree}}~\cdot)\) is defined as
   \begin{equation}
