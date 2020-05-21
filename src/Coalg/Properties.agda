@@ -20,7 +20,7 @@ open import Cubical.Functions.FunExtEquiv
 
 open import Cubical.Codata.M.AsLimit.helper
 
-open import Cubical.Codata.M.AsLimit.Coalg.Base
+open import Coalg.Base
 open import Cubical.Codata.M.AsLimit.Container
 open import Cubical.Codata.M.AsLimit.M
 
@@ -47,7 +47,7 @@ PM-coalg {S = S} =
   (P₀ (M S)) , P₁ out-fun
 
 Final : ∀ {ℓ} {S : Container {ℓ}} -> Set (ℓ-suc ℓ)
-Final {S = S} = Σ (Coalg₀ {S = S}) λ X,ρ → ∀ (C,γ : Coalg₀ {S = S}) -> isContr (_⇒_ {S = S} (C,γ) (X,ρ))
+Final {S = S} = Σ (Coalg₀ {S = S}) λ X,ρ → ∀ (C,γ : Coalg₀ {S = S}) -> isContr (Coalg₁ {S = S} (C,γ) (X,ρ))
 
 --------------------------------------------------------
 -- Properties of Bisimulations and (Final) Coalgebras --
@@ -66,7 +66,7 @@ step {C,γ = C,γ} {Y = Y} f = P₁ f  ∘ C,γ .snd
 Ψ {S = S} {C,γ = C,γ} f =
   in-fun ∘ step {C,γ = C,γ} f
 
-ϕ₀ : ∀ {ℓ} {S : Container {ℓ}} {C,γ : Coalg₀ {S = S}} (u : (n : ℕ) → C,γ .fst → X (sequence S) n) -> (n : ℕ) -> C,γ .fst -> W S n
+ϕ₀ : ∀ {ℓ} {S : Container {ℓ}} {C,γ : Coalg₀ {S = S}} (u : (n : ℕ) → C,γ .fst → X (sequence S) n) -> (n : ℕ) -> C,γ .fst -> Wₙ S n
 ϕ₀ u 0 = λ x -> lift tt
 ϕ₀ {C,γ = C,γ} u (suc n) = step {C,γ = C,γ} (u n)
 
@@ -74,7 +74,7 @@ step {C,γ = C,γ} {Y = Y} f = P₁ f  ∘ C,γ .snd
            (u : (n : ℕ) → C,γ .fst → X (sequence S) n) ->
            (g : (n : ℕ) → π (sequence S) ∘ u (suc n) ≡ u n) ->
            (n : ℕ) → π (sequence S) ∘ (ϕ₀ {C,γ = C,γ} u (suc n)) ≡ ϕ₀ {C,γ = C,γ} u n
-ϕ₁ u g 0 i = !
+ϕ₁ u g 0 i = ?
 ϕ₁ {S = S} {C,γ = C,γ'} u g (suc n) = λ i a → step {C,γ = C,γ'} (λ x → g n i x) a
 
 Φ : ∀ {ℓ} {S : Container {ℓ}} {C,γ : Coalg₀ {S = S}} -> Cone C,γ -> Cone C,γ

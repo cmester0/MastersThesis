@@ -79,6 +79,8 @@
 \newcommand*{\typeformer}[1]{\ensuremath{\mathtt{#1}}}
 \newcommand*{\functor}[1]{\ensuremath{\mathbf{\mathtt{#1}}}}
 
+\newcommand*{\unitelem}{\constant{\star}} % \constant{tt}
+
 \newcommand*{\ssfrac}[2]{ {\LARGE \text{\sfrac{\ensuremath{#1}}{\ensuremath{#2}}}}}
 
 \newcommand*{\natcases}[2]{\ensuremath{\mathbb{[\hspace{-.5mm}\rangle}~\ensuremath{#1}~,~\ensuremath{#2}~\mathbb{\langle\hspace{-.5mm}]}}}
@@ -170,23 +172,97 @@ We use the following notation / font:
 \item We denote the function giving the first and second projection of a dependent pair by \(\pi_1\) and \(\pi_2\).
 \end{itemize}
 
+Furthermore we define some useful notation
+\begin{defn}
+  \begin{equation}
+    \natcases{\term{x}}{\function{f}} = \lambda\,n, \begin{cases} \term{x} & n = 0 \\ \function{f}~m & n = m + 1 \end{cases}
+  \end{equation}
+\end{defn}
+
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
 
 \chapter{Background Theory}
-\section{Coinduction}
-Coinduction is the dual concept (in a categorical manner) of induction. The induction principle is an equivalence principle for congruent elements in an initial algebra.
+We start by giving some background theory summarizing important concepts used in the rest of this thesis.
+\section{Proof assistants}
+\section{Set Theory}
+\todo{Should this be included}
 
-\section{Homotopy Type Theory (HoTT)}
-Homotopy type theory 
+\section{Type Theory}
+Type theory is the computational angle on a basis for mathematics. In type theory every term \(\term{x}\) is an element of some type \(\type{A}\), written \(\term{x} : \type{A}\). The idea in type theory is that propositions are types, so proofs boils down to showing that there exists an element of some type representing a proposition. Specifically proofs of equality becomes construction of an element of an equality type.
+
+\subsection{Martin L\"of Type Theory / Intuitionistic type Theory (MLTT/ITT)}
+Per Matin-L\"of designed the type theory on the principles of mathmatical constructivism, where any existance proof must contain a witness. Meaning a proof that there exists an element, such that something is true, can be converted into an algorithm that finds that element. The type theory is built from the three finite types \(\empt\), \(\unit\) and \(\type{\mathbf{2}}\), and type constructors \(\Sigma\), \(\pi\) and \(=\). There is only a single way to make terms of \(=\)-type, and that is \(\mathtt{refl} : \prod_{a : A} (a = a)\). \todo{inductive types, universes and judgements} \todo{extensional vs intensional} \todo{find citation, currently \url{https://en.wikipedia.org/wiki/Intuitionistic_type_theory}}.
+\subsubsection{Intensional Type Theory}
+\todo{\url{https://ncatlab.org/nlab/show/intensional+type+theory}}
+
+\section{The Univalence Axiom}
+The map
+\begin{equation}
+  \typeformer{id}_{\universe{\mathcal{U}}}~\type{A}~\type{B} \rightarrow \typeformer{Equiv}~\type{A}~\type{B}
+\end{equation}
+is an equivalence, simplifying a bit, identity is equivalent to equivalence
+\begin{equation}
+  (\type{A} = \type{B}) \simeq (\type{A} \simeq \type{B})
+\end{equation}
+Or said in another way equivalent types are identical.
+
+\section{Homotopy Type Theory (HoTT) / Univalent Foundations (UF)}
+Homotopy type theory is an intensional dependent type theory (built on MLTT) with the univalence axiom and higher inductive types. Homotopy type theory is constructive by default, but can be made classical.
+
+is a type theory where the idenitity types form path spaces, so proofs of identity are not just \texttt{refl}, as for MLTT. Types are seen as "spaces" or (higher groupoids), and we think of \(\term{a} : \type{A}\) as \(\term{a}\) being a point in the space \(\type{A}\), similarly functions are regarded as continuous maps from one space to another. \cite{nlab:homotopy_type_theory}
+
+\subsection{Judgmental Equality / Definitional Equality}
+This means equal by definition, denoted \(a \equiv b\). It does not make sense to assume definitional equality (inside the theory). The equality is algorithmically decidable (meta-theoretic algorithm, not internal). 
+
+\subsection{Propositional Equality}
+If the equality \(a =_{A} b\) is inhabited, then we get propositional equality.
+
+\subsection{External (of theory)}
+\subsection{Internal (of theory)}
+
+\subsection{Constructivity}
+From every proof we can extract an algorithm, that produces an element of the proposition.
+
+\subsubsection{Proof relevant mathematics}
+
+\subsection{Homotopy \(n\)-types}
+The 0-types are the hSets, (-1)-types are mere propositions or hProp. So all elements of a type that is an hProp, will be equal. All equalities between elements of types that are hSets, are equal. For 1-types (1-groupoids) we get equalities of equalities are equal, and then so on for homotopy \(n\)-types.
+
 \subsection{The HoTT Book}
 
-\section{Cubical Type Theory}
+\section{Higher order inductive types (HITs)}
+\subsection{Propositional truncation and Set Truncated Quotients}
 
-\section{Cubical Agda}
+\section{Cubical Type Theory (CTT)}
+Cubical type theory is a version of homotopy type theory where univalence actually computes, meaning it is not just an axiom, but can actually be proven. \cite{nlab:cubical_type_theory}
+
+\subsection{UIP}
+\subsection{Cubical Agda}
+Cubical Agda is an implementation of a cubical type theory by extending the proof assistant Agda. One of the main additions is the interval and path types. The interval can be thought of as elements in \([0,1]\). When working with the interval, we can only access the left and right endpoint \(\constant{i0}\) and \(\constant{i1}\) or some unspecified point in the middle \(i\), modeling the intuition of a continuous interval. Cubical agda also generalizes transporting, given a type line \(\typeformer{A} : \mathbb{I} \rightarrow \universe{\mathcal{U}}\), and the endpoint \(\typeformer{A}~\constant{i0}\) you get a line from \(\typeformer{A}~\constant{i0}\) to \(\typeformer{A}~\constant{i1}\) \cite{cubicalagda}
+
 \todo[inline]{Axioms of cubical Agda}
 The theory of cubical Agda is a Cartesian closed category, meaning get exponentials.
 \\ \\
 \todo[inline]{Something about the interval type!!}
+
+\subsubsection{Path type}
+We add a type \(\mathbb{I}\), which is defined to be a free de Morgan algebra on a discrete infinite set of names \todo{cite: https://arxiv.org/pdf/1611.02108.pdf}. The elements of \(\mathbb{I}\) can be described by the grammar
+\begin{equation}
+  r,s ::= 0 \mid 1 \mid i \mid 1 - r \mid r \land s \mid r \lor s
+\end{equation}
+The set \(\mathbb{I}\) has decidable equality. The elements in \(\mathbb{I}\) can be thought as formal representations of elements in the unit interval \([0,1]\). There is a special substitution with \(\constant{i0}\) and \(\constant{i1}\) being the endpoints of \([0,1]\).
+
+
+\section{Coinduction}
+Coinduction is the dual concept (in a categorical manner) of induction. The induction principle is an equivalence principle for congruent elements in an initial algebra.
+
+\section{W-types}
+
+\section{Problems with / Getting around using AC and LEM}
+These axioms does not have a computational interpretation, so to maintain the computational aspects of HoTT and CTT, we try to not use these axioms. \cite[Introduction]{hottbook}
+
+\section{Universes ??}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
 
@@ -271,14 +347,15 @@ In this section we will introduce containers (also known as signatures), and sho
   or more precisely \(\destructor{hd} = \pi_1 \circ \function{out}\) and \(\destructor{tl} = \pi_2 \circ \function{out}\).
 \end{exmp}
 \begin{defn}
-  We define a chain as a familily of cones \(\function{\pi}_{(n)} : \type{X}_{n+1} \rightarrow \type{X}_{n}\), over a family of types \(\type{X}_{n}\). \todo{cocones?}.
+  We define a chain as a family of morphisms \(\function{\pi}_{(n)} : \type{X}_{n+1} \rightarrow \type{X}_{n}\), over a family of types \(\type{X}_{n}\). See \figref{x-chain}.
   \begin{figure}
+    \label{fig:x-chain}
     \centering
     \begin{tikzcd}[row sep=large,column sep=large]
       \type{X}_0 & \type{X}_1 \ar[l,"\function{\pi}_{(0)}"] & \cdots \ar[l,"\function{\pi}_{(1)}"] & \type{X}_n \ar[l,"\function{\pi}_{(n-1)}"] & \type{X}_{n + 1} \ar[l,"\function{\pi}_{(n)}"] & \cdots \ar[l,"\function{\pi}_{(n+1)}"]
     \end{tikzcd}
+    \caption{Chain of TODO}
   \end{figure}  
-  \todo[inline]{define chains, \(\function{\pi}_{(n)}\) and \(\type{X}_n\)}
 \end{defn}
 \begin{lem}\label{lem:function-to-M-type-is-cone}
   For all coalgebras \(\coalg{\type{C}}{\function{\gamma}}\) for the container \(\container{S}\), we get \(\type{C} \rightarrow \typeformer{M}_{\container{S}} \equiv \typeformer{Cone}_{\coalg{\type{C}}{\function{\gamma}}}\), where \(\typeformer{Cone} = \sum_{(\function{f} : \prod_{(n : \mathbb{N})} \type{C} \rightarrow \type{X}_n)} \prod_{(n : \mathbb{N})} \function{\pi}_{(n)} \circ (\function{f}_{(n+1)}) \equiv f_n\)
@@ -288,20 +365,22 @@ In this section we will introduce containers (also known as signatures), and sho
       \type{X}_0 & \type{X}_1 \ar[l,"\function{\pi}_{(0)}"] & \cdots \ar[l,"\function{\pi}_{(1)}"] & \type{X}_n \ar[l,"\function{\pi}_{(n-1)}"] & \type{X}_{n + 1} \ar[l,"\function{\pi}_{(n)}"] & \cdots \ar[l,"\function{\pi}_{(n+1)}"] \\
       & & \type{C} \ar[ull,"\function{f}_0"] \ar[ul,"\function{f}_1"'] \ar[u,draw=none,"\cdots" description] \ar[ur,"\function{f}_n"] \ar[urr,"\function{f}_{n+1}"'] \ar[urrr,draw=none,"\cdots"'] & 
     \end{tikzcd}
+    \caption{Cone}
   \end{figure}  
   \begin{proof}
-      %lemma10-Iso : ∀ {ℓ} {S : Container {ℓ}} {C,γ : Coalg₀ {S = S}} -> Iso (C,γ .fst -> M S) (Cone C,γ)
-  %fun (lemma10-Iso) f = (λ n z → projection n (f z)) , λ n i a → β n (f a) i
-  %inv (lemma10-Iso) (u , q) z = (λ n → u n z) , (λ n → funExt⁻ (q n) z)
-  %rightInv (lemma10-Iso) = refl-fun
-  %leftInv (lemma10-Iso) = refl-fun
-    \todo[inline]{Complete proof}
+    We define an isomorphism from \(\type{C} \rightarrow \typeformer{M}_{\container{S}}\) to \(\typeformer{Cone}_{\coalg{\type{C}}{\function{\gamma}}}\)
+    \begin{align}
+      &\function{fun}_{\pathterm{collapse}}~\function{f} = (\lambda\,n\,\term{z},\pi_1~(\function{f}~\term{z})~n),(\lambda\,n~i~\term{a},~\pi_2~(\function{f}~\term{a})~n~i) \\
+      &\function{inv}_{\pathterm{collapse}}~(\function{u},\function{q})~\term{z} = (\lambda\,n,~\function{u}~n~\term{z}),(\lambda\,n\,i,~\function{q}~n~i~\term{z}) \\
+      &\function{rinv}_{\pathterm{collapse}}~(\function{u},\function{q}) = \mathtt{refl}_{(\function{u},\function{q})} \\
+      &\function{linv}_{\pathterm{collapse}}~\function{f} = \mathtt{refl}_{\function{f}}
+    \end{align}
   \end{proof}
 \end{lem}
 \begin{lem}\label{lem:limit-collapse}
   Given \(\function{\ell} : \prod_{(n : \mathbb{N})} (\type{X}_{n} \rightarrow \type{X}_{n+1})\) and \(\term{y} : \sum_{\left(\term{x} : \prod_{(n : \mathbb{N})} \type{X}_n\right)} \term{x}_{n + 1} \equiv \term{l}_n~\term{x}_n\) the chain collapses as the equality \(\type{\mathcal{L}} \equiv \type{X}_0\).
   \begin{proof}
-    We define this collapse by the equivalence
+    We define this collapse by the isomorphism
     \begin{align}
       \function{fun}_{\mathcal{L}collapse}~(\term{x} , \pathterm{r}) &= \term{x}_0 \\
       \function{inv}_{\mathcal{L}collapse}~\term{x}_0 &= (\lambda\,n,~\function{\ell}^n~\term{x}_0)~,~(\lambda\,n,~\mathtt{refl}_{(\function{\ell}^{(n+1)}\,\term{x}_0)}) \\
@@ -331,10 +410,10 @@ In this section we will introduce containers (also known as signatures), and sho
     \begin{equation}
       \pathterm{\mathcal{L}unique} : \type{\mathcal{L}} \equiv \type{\mathcal{L}}^{\functor{P}}
     \end{equation}
-    We define \(\pathterm{\mathcal{L}unique}\) by the equivalence
+    We define \(\pathterm{\mathcal{L}unique}\) by the ismorphism
     \begin{align}
-      \function{fun}_{\pathterm{\mathcal{L}unique}}~(\function{a} , \function{b}) &= \natcases{\constant{tt}}{\function{a}} , \natcases{\mathtt{refl}_{\constant{tt}}}{\function{b}} \\
-    \function{inv}_{\pathterm{\mathcal{L}unique}}~(\function{a} , \function{b}) &= \function{a} \circ \function{incr}~,~b \circ \function{incr} \\
+      \function{fun}_{\pathterm{\mathcal{L}unique}}~(\function{a} , \function{b}) &= \natcases{\unitelem}{\function{a}} , \natcases{\mathtt{refl}_{\unitelem}}{\function{b}} \\
+    \function{inv}_{\pathterm{\mathcal{L}unique}}~(\function{a} , \function{b}) &= \function{a} \circ \constructor{succ}~,~\function{b} \circ \constructor{succ} \\
     \function{rinv}_{\pathterm{\mathcal{L}unique}}~(\function{a} , \function{b}) &= \mathtt{refl}_{(\function{a},\function{b})} \\
     \function{linv}_{\pathterm{\mathcal{L}unique}}~(\function{a} , \function{b}) &= \mathtt{refl}_{(\function{a},\function{b})}
     \end{align}
@@ -394,46 +473,19 @@ As described earlier, given a type \(\type{A}\) we define the stream of that typ
 \begin{equation}
   \typeformer{stream}~\type{A} := \typeformer{M}_{\containerpair{\type{A}}{\lambda\,\_,\unit}}
 \end{equation}
-When taking the head of a stream, we get
-\begin{align}
-  \destructor{hd}~(\constructor{cons}~x~xs) &\equiv \pi_1~\function{out}~(\constructor{cons}~x~xs) \\
-                                       &\equiv \pi_1~\function{out}~(\function{in}~(x , \lambda\,\_,xs)) \\
-                                       &\equiv \pi_1~(x , \lambda\,\_,xs) \\
-                                       &\equiv x
-\end{align}
-and similarly for the tail of the stream
-\begin{align}
-  \destructor{tl}~(\constructor{cons}~x~xs) &\equiv \pi_2~\function{out}~(\constructor{cons}~x~xs) \\
-                                       &\equiv \pi_2~\function{out}~(\function{in}~(x , \lambda\,\_,xs)) \\
-                                       &\equiv \pi_2~(x , \lambda\,\_,xs) \\
-                                       &\equiv xs
-\end{align}
-and the other direction is also true
-\begin{align}
-  \constructor{cons}(\destructor{hd}~s , \destructor{tl}~s) &\equiv \function{in}~(\destructor{hd}~s , \destructor{tl}~s) \\
-                                                     &\equiv \function{in}~(\pi_1~(\function{out}~s) , \pi_2~(\function{out}~s)) \\
-                                                     &\equiv \function{in}~(\function{out}~s) \\
-                                                     &\equiv s.
-\end{align}
-When forming elements of the \texttt{M}-type, we want to do it by lifting it though the definition of the \texttt{M}-type, meaning we want to define a function \(\function{cons'} : (\mathbb{N} \rightarrow \type{A}) \rightarrow \typeformer{stream}~\type{A}\) as
-\begin{equation}
-  \function{cons'} f = \function{lift_M}~(\lambda\,c\,n, f~c)
-\end{equation}
-\begin{equation}
-  \function{cons'} f = \function{lift_M}~(\lambda\,c\,n, f~c)
-\end{equation}
+this is equal to an alternative definition of streams \todo{...}
 
 \section{ITrees as \texttt{M}-types}
 We want the following rules for ITrees
 \begin{equation}
-  \infer[\mathtt{I}_{\function{Ret}}]{\function{Ret}~\term{r} : \typeformer{itree}~\typeformer{E}~\type{R}}{r : \type{R}}
+  \infer[\mathtt{I}_{\constructor{Ret}}]{\constructor{Ret}~\term{r} : \typeformer{itree}~\typeformer{E}~\type{R}}{r : \type{R}}
 \end{equation}
 \begin{equation}
-  \infer[\mathtt{I}_{\function{Vis}}]{\function{Vis}~\term{a}~\term{f} : \typeformer{itree}~\typeformer{E}~\type{R}}{\type{A} : \universe{\mathcal{U}} & \term{a} : \typeformer{E}~\type{A} & \term{f} : \type{A} \rightarrow \typeformer{itree}~\typeformer{E}~\type{R}}.
+  \infer[\mathtt{I}_{\constructor{Vis}}]{\constructor{Vis}~\term{a}~\term{f} : \typeformer{itree}~\typeformer{E}~\type{R}}{\type{A} : \universe{\mathcal{U}} & \term{a} : \typeformer{E}~\type{A} & \term{f} : \type{A} \rightarrow \typeformer{itree}~\typeformer{E}~\type{R}}.
 \end{equation}
 Elimination rules
 \begin{equation}
-  \infer[\mathtt{E}_{\function{Tau}}]{\function{Tau}~\term{t} : \typeformer{itree}~\typeformer{E}~\type{R}}{\term{t} : \typeformer{itree}~\typeformer{E}~\type{R}}.
+  \infer[\mathtt{E}_{\constructor{Tau}}]{\constructor{Tau}~\term{t} : \typeformer{itree}~\typeformer{E}~\type{R}}{\term{t} : \typeformer{itree}~\typeformer{E}~\type{R}}.
 \end{equation}
 
 \subsection{Delay Monad}
@@ -462,7 +514,7 @@ meaning we get the following diagram.
 \noindent Meaning we can define the operations \(\constructor{now}\) and \(\constructor{later}\) using \(\function{in} = \function{out}^{-1}\) together with the injections \(\mathtt{inl}\) and \(\mathtt{inr}\). \todo[inline]{(Later = Tau, Ret = Now)}
 
 \subsection{Tree}
-Now lets look at the example where we remove the \(\function{Tau}\) constructor. We let
+Now lets look at the example where we remove the \(\constructor{Tau}\) constructor. We let
 \begin{equation}
   \container{S} = \left(\type{R} + \sum_{\type{A} : \universe{\mathcal{U}}} \typeformer{E}~\type{A}~,~\lambda \{ \texttt{inl}~\_ \rightarrow \empt ~;~ \texttt{inr}~(\type{A},\term{e}) \rightarrow \type{A} \} \right).
 \end{equation}
@@ -631,11 +683,11 @@ In this section we will define the partiality monad (see below) and show that (a
   \end{equation}
   where
   \begin{equation}
-    \function{isMon}~\function{s} = \prod_{(n : \mathbb{N})} (\function{s}_n \equiv \function{s}_{n+1})  + ((\function{s}_n \equiv \mathtt{inr}~\constant{tt}) \times (\function{s}_{n+1} \not\equiv \mathtt{inr}~\constant{tt}))
+    \function{isMon}~\function{s} = \prod_{(n : \mathbb{N})} (\function{s}_n \equiv \function{s}_{n+1})  + ((\function{s}_n \equiv \mathtt{inr}~\unitelem) \times (\function{s}_{n+1} \not\equiv \mathtt{inr}~\unitelem))
   \end{equation}
-  meaning a sequences is \(\mathtt{inr}~\constant{tt}\) until it reaches a point where it switches to \(\mathtt{inl}~\term{r}\) for some value \(\term{r}\). There are also the special cases of already terminated, meaning only \(\mathtt{inl}~\term{r}\) and never teminating meaning only \(\mathtt{inr}~\constant{tt}\).
+  meaning a sequences is \(\mathtt{inr}~\unitelem\) until it reaches a point where it switches to \(\mathtt{inl}~\term{r}\) for some value \(\term{r}\). There are also the special cases of already terminated, meaning only \(\mathtt{inl}~\term{r}\) and never teminating meaning only \(\mathtt{inr}~\unitelem\).
 \end{defn}
-\noindent For each index in a sequence, the element at that index \(\function{s}_n\) is either not terminated \(\function{s}_n \equiv \mathtt{inr}~\constant{tt}\), which we denote as \(\function{s}_n \uparrow_{\type{R} + \unit}\), or it is terminated \(\function{s}_n \equiv \mathtt{inl}~\term{r}\) with some value \(r\), denoted by \(\function{s}_n \downarrow_{\type{R} + \unit} \term{r}\) or just \(\function{s}_n \downarrow_{\type{R} + \unit}\) to mean \(\function{s}_n \not\equiv \mathtt{inr}~\constant{tt}\). Thus we can write \(\function{isMon}\) as
+\noindent For each index in a sequence, the element at that index \(\function{s}_n\) is either not terminated \(\function{s}_n \equiv \mathtt{inr}~\unitelem\), which we denote as \(\function{s}_n \uparrow_{\type{R} + \unit}\), or it is terminated \(\function{s}_n \equiv \mathtt{inl}~\term{r}\) with some value \(r\), denoted by \(\function{s}_n \downarrow_{\type{R} + \unit} \term{r}\) or just \(\function{s}_n \downarrow_{\type{R} + \unit}\) to mean \(\function{s}_n \not\equiv \mathtt{inr}~\unitelem\). Thus we can write \(\function{isMon}\) as
 \begin{equation}
   \function{isMon}~\function{s} = \prod_{(n : \mathbb{N})} (\function{s}_n \equiv \function{s}_{n+1})  + ((\function{s}_n \uparrow_{\type{R} + \unit}) \times (\function{s}_{n+1} \downarrow_{\type{R} + \unit}))
 \end{equation}
@@ -644,9 +696,9 @@ We also introduce notation for the two special cases of sequences given above
   \function{now}_{Seq}~\term{r} = (\lambda\,\_, \mathtt{inl}~\term{r}) , (\lambda\,\_, \mathtt{inl}~\mathtt{refl})
 \end{equation}
 \begin{equation}
-  \constant{never}_{Seq} = (\lambda\,\_, \mathtt{inr}~\constant{tt}) , (\lambda\,\_, \mathtt{inl}~\mathtt{refl})
+  \constant{never}_{Seq} = (\lambda\,\_, \mathtt{inr}~\unitelem) , (\lambda\,\_, \mathtt{inl}~\mathtt{refl})
 \end{equation}
-\todo[inline]{Some comment about decidable equivalence needed to show that \(\function{s}_{n+1} \not\equiv \mathtt{inr}~\constant{tt}\)}
+\todo[inline]{Some comment about decidable equivalence needed to show that \(\function{s}_{n+1} \not\equiv \mathtt{inr}~\unitelem\)}
 \begin{defn}
   We can shift a sequence \((\function{s},\function{q})\) by inserting an element (and an equality) \((\term{z_s},\term{z_q})\) at \(n = 0\),
   \begin{equation}
@@ -657,7 +709,7 @@ We also introduce notation for the two special cases of sequences given above
   We can unshift a sequence by removing the first element of the sequence
   \begin{equation}
     \begin{aligned}
-      \function{unshift}&~(\function{s} , \function{q}) = \function{s} \circ \mathtt{suc} , \function{q} \circ \mathtt{suc}.
+      \function{unshift}&~(\function{s} , \function{q}) = \function{s} \circ \constructor{succ} , \function{q} \circ \constructor{succ}.
     \end{aligned}
   \end{equation}
 \end{defn}
@@ -694,7 +746,7 @@ We also introduce notation for the two special cases of sequences given above
     \begin{aligned}
       \function{Delay{\rightarrow}Seq}&~(\constructor{now}~\term{r}) = \function{now}_{Seq}~\term{r} \\
       \function{Delay{\rightarrow}Seq}&~(\constructor{later}~\term{x}) = \\[-3mm]
-      & \strut\hspace{-8mm}\function{shift}~(\function{Delay{\rightarrow}Seq}~\term{x})~\left(\mathtt{inr}~\constant{tt} , \begin{cases} \mathtt{inr}~(\mathtt{refl} , \constant{inl{\not\equiv}inr}) & \term{x} = \constructor{now}~\_ \\ \mathtt{inl}~\mathtt{refl} & \term{x} = \constructor{later}~\_ \end{cases}\right)
+      & \strut\hspace{-8mm}\function{shift}~(\function{Delay{\rightarrow}Seq}~\term{x})~\left(\mathtt{inr}~\unitelem , \begin{cases} \mathtt{inr}~(\mathtt{refl} , \constant{inl{\not\equiv}inr}) & \term{x} = \constructor{now}~\_ \\ \mathtt{inl}~\mathtt{refl} & \term{x} = \constructor{later}~\_ \end{cases}\right)
     \end{aligned}
   \end{equation}
 \end{defn}
@@ -702,37 +754,48 @@ We also introduce notation for the two special cases of sequences given above
   We define function from \(\typeformer{Seq}_{\type{R}}\) to \(\typeformer{Delay}~\type{R}\)
     \begin{equation}
       \begin{aligned}
-        \function{Seq{\rightarrow}Delay}&~(\function{g} , \function{q}) = \begin{cases} \constructor{now}~\term{r} & \function{g}_0 = \mathtt{inl}~\term{r} \\ \constructor{later}~(\function{Seq{\rightarrow}Delay}~(\function{unshift}~(\function{g} , \function{q}))) & \function{g}_0 = \mathtt{inr}~\constant{tt} \end{cases}
+        \function{Seq{\rightarrow}Delay}&~(\function{s} , \function{q}) = \begin{cases} \constructor{now}~\term{r} & \function{s}_0 = \mathtt{inl}~\term{r} \\ \constructor{later}~(\function{Seq{\rightarrow}Delay}~(\function{unshift}~(\function{s} , \function{q}))) & \function{s}_0 = \mathtt{inr}~\unitelem \end{cases}
       \end{aligned}
     \end{equation}
 \end{defn}
 \begin{thm}
   The type \(\typeformer{Seq}_{\type{R}}\) is equal to \(\typeformer{Delay}~\type{R}\)
   \begin{proof}  
-    We define right and left identity, saying that for any sequence \((\function{g},\function{q})\), we get
+    We define right and left identity, saying that for any sequence \((\function{s},\function{q})\), we get
     \begin{equation}
-      \function{Delay{\rightarrow}Seq}~(\function{Seq{\rightarrow}Delay}~(\function{g},\function{q})) \equiv (\function{g},\function{q})
+      \function{Delay{\rightarrow}Seq}~(\function{Seq{\rightarrow}Delay}~(\function{s},\function{q})) \equiv (\function{s},\function{q})
     \end{equation}
-    defined as
+    defined by cases analysis on \(\function{s}_0\), if \(\function{s}_0 = \mathtt{inl}~\term{r}\) then we need to show
     \begin{equation}
-      \begin{aligned}
-        \function{Seq\text{-}Delay}&~(\function{g},\function{q}) = \begin{cases} \mathtt{refl}  & \function{g}_0 = \mathtt{inl}~\term{r} \\ \begin{aligned} &\mathtt{ap}~\function{shift}~(\function{Seq\text{-}Delay}~(\function{unshift}~(\function{g} , \function{q}))) \\&\quad\ct~\function{shift\text{-}unshift}~(\function{g} , \function{q}) \end{aligned} & \function{g}_0 = \mathtt{inr}~\constant{tt} \end{cases}
-      \end{aligned}
+      \function{now}_{Seq}~\term{r} \equiv (\function{s},\function{q})
     \end{equation}
+    This is true, since \((\function{s},\function{q})\) is a monotone sequence and \(\mathtt{inl}~\term{r}\) is the top element of the order, then all elements of the sequence are \(\mathtt{inl}~\term{r}\). If \(\function{s}_0 = \mathtt{inr}~\unitelem\) then, we need to show
+    \begin{equation}
+      \function{shift}~(\function{Delay{\rightarrow}Seq}~(\function{Seq{\rightarrow}Delay}~(\function{unshift}~(\function{s},\function{q}))))~(\mathtt{inr}~\unitelem,\_) \equiv (\function{s},\function{q})
+    \end{equation}
+    by the induction hypothesis we get
+    \begin{equation}
+      \function{Delay{\rightarrow}Seq}~(\function{Seq{\rightarrow}Delay}~(\function{unshift}~(\function{s},\function{q}))) \equiv \function{unshift}~(\function{s},\function{q})
+    \end{equation}
+    since shift and unshift are inverse, we get the needed equality.
     \todo[inline]{Shift takes two arguemnts, either clarify that its shift' that inserts inr tt or ...}
-    and left identity, saying that for any delay monad \(t\) we get \(\function{Seq{\rightarrow}Delay}~(\function{Delay{\rightarrow}Seq}~\term{t}) \equiv \term{t}\), defined as
+    For the left identity, we need to show that for any delay monad \(\term{t}\) we get
     \begin{equation}
-      \begin{aligned}
-        \function{Delay\text{-}Seq}&~(\constructor{now}~\term{a}) = \mathtt{refl} \\
-        \function{Delay\text{-}Seq}&~(\constructor{later}~\term{x}) = \mathtt{ap}~(\function{later} \circ \function{Seq{\rightarrow}Delay})~(\function{unshift\text{-}shift}~(\function{Delay{\rightarrow}Seq}~\term{x})) \\ &\qquad\qquad\quad\ct~\mathtt{ap}~\function{later}~(\function{Delay{\rightarrow}Seq}~\term{x})
-      \end{aligned}
+      \function{Seq{\rightarrow}Delay}~(\function{Delay{\rightarrow}Seq}~\term{t}) \equiv \term{t}
     \end{equation}
+    defined by case analysis on \(\term{t}\), if \(\term{t} = \constructor{now}~a\) then the equality is \(\mathtt{refl}\). If \(\term{t} = \constructor{later}~\term{x}\) then we need to show
+    \begin{equation}
+      \constructor{later}~(\function{Seq{\rightarrow}Delay}~(\function{unshift}~(\function{shift}~(\function{Delay{\rightarrow}Seq}~x))) \equiv \constructor{later}~x
+    \end{equation}
+    By unshift and shift being inverse, and the induction hypothesis we get the wanted equality. Since we are able to define a left and right identity function, we get the wanted equality.
   \end{proof}
 \end{thm}
 \begin{cor}
   The types \(\typeformer{Delay}/\sim\) and \(\typeformer{Seq}/\sim\) are equal.
   \begin{proof}
-    
+    We show that if \(a~\relation{\sim_{delay}}~b\) then \(\function{Delay{\rightarrow}Seq}~a~\relation{\sim_{Seq}}~\function{Delay{\rightarrow}Seq}~b\), \todo{Show this}
+    \\ \\
+    and we show if \(x~\relation{\sim_{Seq}}~y\) then \(\function{Seq{\rightarrow}Delay}~x~\relation{\sim_{Seq}}~\function{Seq{\rightarrow}Delay}~y\), \todo{Show this}
   \end{proof}
 \end{cor}
 
@@ -745,16 +808,16 @@ In this section we will show that assuming the "Axiom of Countable Choice", we g
   \end{equation}
 \end{defn}
 \begin{defn}[Sequence Ordering]
-\begin{equation}
-  (s,q)~\relation{\sqsubseteq_{\mathtt{Seq}}}~(t,p) = \prod_{(a : \type{R})} \left(\|s~\relation{\downarrow_{\mathtt{Seq}}}~a\| \rightarrow \| t~\relation{\downarrow_{\mathtt{Seq}}}~a\|\right)
-\end{equation}
-where \(\| \cdot \|\) is propositional \todo{propositional or set truncation?} truncation.
+  \begin{equation}
+    (\function{s},\function{q})~\relation{\sqsubseteq_{\mathtt{Seq}}}~(\function{t},\function{p}) = \prod_{(\term{a} : \type{R})} \left(\|\function{s}~\relation{\downarrow_{\mathtt{Seq}}}~\term{a}\| \rightarrow \| \function{t}~\relation{\downarrow_{\mathtt{Seq}}}~\term{a}\|\right)
+  \end{equation}
+  where \(\| \cdot \|\) is propositional \todo{propositional or set truncation?} truncation.
 \end{defn}
 \begin{defn} There is a conversion from \(\type{R} + \unit\) to the partiality monad \(\type{R}_\bot\)
   \begin{equation}
     \begin{aligned}
       &\function{Maybe{\rightarrow}(-)_\bot}~(\mathtt{inl}~\term{r}) = \constructor{\eta}~\term{r} \\
-      &\function{Maybe{\rightarrow}(-)_\bot}~(\mathtt{inr}~\constant{tt}) = \constructor{\bot}
+      &\function{Maybe{\rightarrow}(-)_\bot}~(\mathtt{inr}~\unitelem) = \constructor{\bot}
     \end{aligned}
   \end{equation}
 \end{defn}
@@ -777,9 +840,9 @@ This rewriting confirms that if \(\function{isMon}~\function{s}\), then \(\funct
     \begin{equation}
       \begin{aligned}
         &\function{Maybe{\rightarrow}(-)_\bot\text{-}mono}~(\function{inl}~\pathterm{p}) = \\[-1mm]
-        &\qquad\qquad \mathtt{subst}~(\lambda\,\term{a},~\function{Maybe{\rightarrow}(-)_\bot}~\term{x}~\relation{\sqsubseteq_{\bot}}~\function{Maybe{\rightarrow}(-)_\bot}~\term{a})~\pathterm{p}~(\constructor{\sqsubseteq_{refl}} (\function{Maybe{\rightarrow}(-)_\bot}~\term{x})) \\[1mm]
+        &\qquad\qquad \mathtt{subst}~(\lambda\,\term{a},~\function{Maybe{\rightarrow}(-)_\bot}~\term{x}~\relation{\sqsubseteq_{\bot}}~\function{Maybe{\rightarrow}(-)_\bot}~\term{a})~\pathterm{p}~(\constructor{\sqsubseteq_{refl}}~(\function{Maybe{\rightarrow}(-)_\bot}~\term{x})) \\[1mm]
         &\function{Maybe{\rightarrow}(-)_\bot\text{-}mono}~(\function{inr}~(\pathterm{p}, \_)) = \\[-1mm]
-        &\qquad\qquad \mathtt{subst}~(\lambda\,\term{a},~\function{Maybe{\rightarrow}(-)_\bot}~\term{a}~\relation{\sqsubseteq_{\bot}}~\function{Maybe{\rightarrow}(-)_\bot}~\term{y})~\sym{\pathterm{p}}~(\constructor{\sqsubseteq_{never}} (\function{Maybe{\rightarrow}(-)_\bot}~\term{y}))
+        &\qquad\qquad \mathtt{subst}~(\lambda\,\term{a},~\function{Maybe{\rightarrow}(-)_\bot}~\term{a}~\relation{\sqsubseteq_{\bot}}~\function{Maybe{\rightarrow}(-)_\bot}~\term{y})~\sym{\pathterm{p}}~(\constructor{\sqsubseteq_{never}}~(\function{Maybe{\rightarrow}(-)_\bot}~\term{y}))
       \end{aligned}
     \end{equation}
   \end{proof}
@@ -904,7 +967,7 @@ This recursor allows us to lift the function \(\function{Seq{\rightarrow}(-)_\bo
 \subsection{Silhouette Trees}
 We start by defining an \(\type{R}\) valued \(\type{E}\) branching tree, as the \texttt{M}-type given by the following container
 \begin{equation}
-  \left(\type{R} + \unit , \begin{cases} \bot & \mathtt{inl}~\term{a} \\ \type{E} & \mathtt{inr}~\constant{tt} \end{cases}\right)
+  \left(\type{R} + \unit , \begin{cases} \bot & \mathtt{inl}~\term{a} \\ \type{E} & \mathtt{inr}~\unitelem \end{cases}\right)
 \end{equation}
 We get the constructors
 \begin{equation}
@@ -928,7 +991,14 @@ This is enough to define, what we call, silhouette trees, which are trees quotie
   \infer{\constructor{node}_{\typeformer{sTree}}~\function{k} : \typeformer{sTree}~\type{E}}{\function{k} : \type{E} \rightarrow \typeformer{sTree}~\type{E}}
 \end{equation}
 And the ordering relation \((\cdot~\relation{\sqsubseteq_{sTree}}~\cdot)\) of how "defined" the trees are by the constructors \todo{add all needed constructors}
-\\ \\
+\begin{equation}
+  \infer{\constructor{\alpha}_{\typeformer{sTree}}~\term{x}~\term{y} : \typeformer{sTree}~\type{E}}{\term{x}~\relation{\sqsubseteq_{sTree}}~\term{y} & \term{y}~\relation{\sqsubseteq_{sTree}}~\term{x}}
+\end{equation}
+\begin{equation}
+  \infer{\mathop{\constructor{\bigsqcup}}_{(\function{e} : \mathbb{N} \rightarrow \type{E})}~(\function{s}~\function{e})}{\function{s} : (\mathbb{N} \rightarrow \type{E}) \rightarrow \typeformer{sTree}~\type{E}}
+\end{equation}
+
+\subsubsection{From \(\typeformer{tree}\) to \(\typeformer{Seq}_{tree}\)}
 We now want to show the equivalence between these two constructions, to do this we define an intermediate construction \(\typeformer{Seq}_{tree}\), where we get an ordering on the "definedness" of trees.
 \begin{defn}
   We define monotone increasing sequences of trees as \todo{ordering is container ordering not maybe?}, all breanches are monotone increasing \todo{specify branches increasing?}.
@@ -938,25 +1008,19 @@ We now want to show the equivalence between these two constructions, to do this 
   where \(\relation{\sqsubseteq_{\type{R}+\unit}}\) is similar to the relation defined at \eqref{eq:maybe-order} \todo{how does it differ? Constructors are equal type is different (trees instead of delay)}.
 \end{defn}
 \begin{defn}
-  We define a function to shift a \(\typeformer{Seq}_{tree}\), it takes \(\function{f} : \type{E} \rightarrow \typeformer{Seq}_{tree}\) as an argument. We let \(\function{s'} = \function{f}~\function{e}_0~(\function{e} \circ \function{suc})\), then the definition is given as
+  We define a function to shift a \(\typeformer{Seq}_{tree}\), it takes \(\function{f} : \type{E} \rightarrow \typeformer{Seq}_{tree}\) as an argument. We let \(\function{s'} = \function{f}~\function{e}_0~(\function{e} \circ \constructor{succ})\), then the definition is given as
   \begin{equation}
     \begin{aligned}
       &\function{shift\text{-}seq}~\function{f} = \\[-5mm]
-      &\qquad \lambda\,\function{e}, \natcases{\mathtt{inr}~\constant{tt}}{\pi_1~\function{s'}} , \left(\lambda\,n, \begin{cases} \mathtt{inr}~(\mathtt{refl} , \constant{inl{\not\equiv}inr}) & n = 0 \land \pi_1~\function{s'}~0 = \mathtt{inl}~r \\ \mathtt{inl}~\mathtt{refl} & n = 0 \land \pi_1~\function{s'}~0 = \mathtt{inr}~\constant{tt} \\ \pi_2~\function{s'}~m & n = m + 1 \end{cases}\right)
+      &\qquad \lambda\,\function{e}, \natcases{\mathtt{inr}~\unitelem}{\pi_1~\function{s'}} , \left(\lambda\,n, \begin{cases} \mathtt{inr}~(\mathtt{refl} , \constant{inl{\not\equiv}inr}) & n = 0 \land \pi_1~\function{s'}~0 = \mathtt{inl}~r \\ \mathtt{inl}~\mathtt{refl} & n = 0 \land \pi_1~\function{s'}~0 = \mathtt{inr}~\unitelem \\ \pi_2~\function{s'}~m & n = m + 1 \end{cases}\right)
     \end{aligned}
-  \end{equation}
-\end{defn}
-\begin{defn}
-  We define notation for
-  \begin{equation}
-    \natcases{x}{f} = \lambda\,n, \begin{cases} x & n = 0 \\ f m & n = m + 1 \end{cases}
   \end{equation}
 \end{defn}
 \begin{defn}
   We define a function to unshift a \(Seq_{tree}\)
   \begin{equation}
     \begin{aligned}
-      &\function{unshift\text{-}seq}~\function{s}~\term{v} = \lambda\,\function{e},~(\pi_1~(\function{s}~(\natcases{\term{v}}{\function{e}})) \circ \function{suc}) , (\pi_2~(\function{s}~(\natcases{v}{\function{e}})) \circ \function{suc})
+      &\function{unshift\text{-}seq}~\function{s}~\term{v} = \lambda\,\function{e},~(\pi_1~(\function{s}~(\natcases{\term{v}}{\function{e}})) \circ \constructor{succ}) , (\pi_2~(\function{s}~(\natcases{v}{\function{e}})) \circ \constructor{succ})
     \end{aligned}
   \end{equation}
 \end{defn}
@@ -1013,36 +1077,75 @@ We now want to show the equivalence between these two constructions, to do this 
     \end{equation}
   \end{proof}
 \end{thm}
+\noindent We start by defining some ordering relation on \(\typeformer{Seq}_{tree}\)
+\begin{defn}[Sequence Termination]
+  The following relations says that a branche \(\function{e} : \mathbb{N} \rightarrow \type{E}\) of a sequence \(\function{s} : \typeformer{Seq}_{tree}\) terminates with some value \(\term{r} : \type{R}\),
+  \begin{equation}
+    (\function{s}~\function{e})~\relation{\downarrow_{\typeformer{Seq}_{tree}}}~\term{r} = \sum_{(n : \mathbb{N})} (\function{s}~\function{e}~n) \downarrow_{\type{R} + \unit} \term{r}.
+  \end{equation}
+\end{defn}
+\begin{defn}[Sequence Ordering]
+  \begin{equation}
+    \function{s}~\relation{\sqsubseteq_{\typeformer{Seq}_{tree}}}~\function{t} = \prod_{(e : \type{E})} \prod_{(\term{a} : \type{R})} \left(\|(\function{s}~\function{e})~\relation{\downarrow_{\mathtt{Seq}}}~\term{a}\| \rightarrow \| (\function{t}~\function{e})~\relation{\downarrow_{\mathtt{Seq}}}~\term{a}\|\right)
+  \end{equation}
+  where \(\| \cdot \|\) is propositional \todo{propositional or set truncation?} truncation.
+\end{defn}
+\begin{defn}
+  We define weak bisimularity relation for sequences \todo{Is this defined for partiality monad?}
+  \begin{equation}
+    \function{s}~\relation{\sim_{\typeformer{Seq}_{tree}}}~\function{t} = \function{s}~\relation{\sqsubseteq_{\typeformer{Seq}_{tree}}}~\function{t} \times \function{t}~\relation{\sqsubseteq_{\typeformer{Seq}_{tree}}}~\function{s}
+  \end{equation}
+\end{defn}
 \begin{cor}
   The types \(\typeformer{tree}/\relation{\sim_{tree}}\) and \(\typeformer{Seq}_{tree} / \relation{\sim_{\typeformer{Seq}_{tree}}}\) are equal.
   \begin{proof}
-    
+    We follow the same strategy as for \(\typeformer{Delay}/{\sim}\) and \(\typeformer{Seq}/{\sim}\)
   \end{proof}
 \end{cor}
-To complete the equality between \(\typeformer{tree}/{\sim}\) and \(\typeformer{sTree}\)
+
+\subsubsection{\(\typeformer{Seq}_{tree}\) to \(\typeformer{sTree}\)}
+\todo{Introduction to Seq to tree}
 \begin{defn}
-  The relation \((\cdot~\relation{\sqsubseteq_{tree}}~\cdot)\) is defined as
+  We define a function converting a sequence on trees to a monotone sequence on \typeformer{sTree}'s
   \begin{equation}
-    \infer{\constructor{leaf}~\relation{\sqsubseteq_{tree}}~x}{x : tree}
-  \end{equation}
-  \begin{equation}
-    \infer{\constructor{leaf}~\relation{\sqsubseteq_{tree}}~x}{}
-  \end{equation}
-  \begin{equation}
-    x~\relation{\sqsubseteq_{tree}}~x
+    \function{Seq{\rightarrow}incSeq}
   \end{equation}
 \end{defn}
-
 \begin{defn}
-  There is a function from \(\typeformer{tree}~\type{A}~\type{E}\) to \(\typeformer{sTree}~\type{E}\)
+  There is a function from \(\typeformer{Seq}_{tree}\) to \(\typeformer{sTree}\)
   \begin{equation}
     \begin{aligned}
-      &\function{tree{\rightarrow}sTree}~(\constructor{leaf}~\_) = \constructor{leaf}_{\typeformer{sTree}}\\
-      &\function{tree{\rightarrow}sTree}~(\constructor{node}~\function{k}) = \constructor{node}_{\typeformer{sTree}}~(\function{tree{\rightarrow}sTree} \circ \function{k})
+      &\function{Seq{\rightarrow}sTree}~\function{s} = \mathop{\constructor{\bigsqcup}}_{(\function{e} : \mathbb{N} \rightarrow \type{E})}~(\function{Seq{\rightarrow}incSeq}~\function{s}~\function{e})
     \end{aligned}
   \end{equation}
 \end{defn}
-We then show this definition is monotone, such that it can be lifted to a function from the quotient
+\begin{lem}
+  Given \(a~\relation{\sqsubseteq_{\typeformer{Seq}_{tree}}}~b\), then \(\function{Seq{\rightarrow}sTree}~a~\relation{\sqsubseteq_{sTree}}~\function{Seq{\rightarrow}sTree}~b\).
+  \begin{proof}
+    \todo{Complete proof}.
+  \end{proof}
+\end{lem}
+\noindent Since this definition is monotone, it can be lifted to the quotiented sequences.
+\begin{lem}
+  If two elements are weakly bisimilar, then they are equal as \function{sTrees} \todo{describe better}
+  \begin{equation}
+    \begin{aligned}
+      &\function{Seq{\rightarrow}sTree\text{-}{\approx}{\rightarrow}{\equiv}}~\term{x}~\term{y}~(\function{p},\function{q}) = \\
+      &\qquad\constructor{\alpha_{sTree}}~(\function{Seq{\rightarrow}sTree\text{-}mono}~\term{x}~\term{y}~\function{p})~(\function{Seq{\rightarrow}sTree\text{-}mono}~\term{y}~\term{x}~\function{q})
+    \end{aligned}
+  \end{equation}
+\end{lem}
+\noindent We then get the definition
+\begin{defn}
+  TODO! \todo{TODO}
+\end{defn}
+~\\ \\
+\begin{equation}
+  \begin{aligned}
+    &\function{Seq{\rightarrow}sTree}~\function{s} = \mathop{\constructor{\bigsqcup}}_{(\function{e} : \mathbb{N} \rightarrow \type{E})}~(\function{s}~\function{e})
+  \end{aligned}
+\end{equation}
+\noindent We then show this definition is monotone, such that it can be lifted to a function from the quotient
 \begin{lem}
   The function \(\function{tree{\rightarrow}sTree}\) is monotone, meaning if \(\term{x}~\relation{\sqsubseteq_{tree}}~\term{y}\), then we have \(\function{tree{\rightarrow}sTree}~\term{x}~\relation{\sqsubseteq_{sTree}}~\function{tree{\rightarrow}sTree}~\term{y}\).
   \begin{proof}
@@ -1052,7 +1155,7 @@ We then show this definition is monotone, such that it can be lifted to a functi
     \end{equation}
   \end{proof}
 \end{lem}
-We then want to lift this definition to the quotient using the recursor for quotients \eqref{eq:quotient-recursor},
+\noindent We then want to lift this definition to the quotient using the recursor for quotients \eqref{eq:quotient-recursor},
 \begin{defn}
   There is a function from \(\typeformer{tree}~\type{A}~\type{E} / \relation{\sim_{tree}}\) to \(\typeformer{sTree}~\type{E}\)
   \begin{equation}
@@ -1061,6 +1164,11 @@ We then want to lift this definition to the quotient using the recursor for quot
 \end{defn}
 
 \subsection{QM-types}
+We want to define sequences based on \texttt{M}-types
+\begin{equation}
+  \typeformer{Seq}_{\typeformer{M}_{\containerpair{\type{A}}{\typeformer{B}}}} = \prod_{(a : \mathbb{N} \rightarrow \typeformer{B}~?)} \sum_{a : \mathbb{N} \rightarrow \type{A}} \prod_{(n : \mathbb{N})} \function{s}_n~\relation{\sqsubseteq_{?}}~\function{s}_{n+1}
+\end{equation}
+\\ \\
 \todo{which other QM types can be expressed as QIITs}
 % Sierpinski set
 % Rosolini’s dominance
@@ -1287,13 +1395,13 @@ We want to define a strong bisimulation relation \(\relation{\sim_{delay}}\) for
       \begin{aligned}
         \function{\alpha}_{\relation{\sim_{delay}}} &: \type{\overline{\sim_{delay}}} \rightarrow \functor{P} (\type{\overline{\sim_{delay}}}) \\
         \function{\alpha}_{\relation{\sim_{delay}}}~(\term{a} , \term{b} , \mathtt{now}{\sim}~\term{r}) &:= (\mathtt{inr}~\term{r} , \lambda\,(\,)) \\
-        \function{\alpha}_{\relation{\sim_{delay}}}~(\term{a} , \term{b} , \mathtt{later}{\sim}~\term{x}~\term{y}~\term{q}) &:= (\mathtt{inl}~\constant{tt} , \lambda\,\_, (\term{x} , \term{y} , \term{q}))
+        \function{\alpha}_{\relation{\sim_{delay}}}~(\term{a} , \term{b} , \mathtt{later}{\sim}~\term{x}~\term{y}~\term{q}) &:= (\mathtt{inl}~\unitelem , \lambda\,\_, (\term{x} , \term{y} , \term{q}))
       \end{aligned}
     \end{equation}
     then we define the projections
       \begin{align}
-        \pi_1^{\type{\overline{\sim_{delay}}}} &= \left( \pi_1 ~~ , ~~ \texttt{funExt}~\lambda\,(\term{a},\term{b},p), \begin{cases} (\mathtt{inr}~\term{r} , \lambda\,(\,)) & p = \mathtt{now}{\sim}~\term{r} \\ (\mathtt{inl}~\constant{tt} , \lambda\,\_, x) & p = \mathtt{later}{\sim}~\term{x}~\term{y}~\term{q}\end{cases} \right) \\
-        \pi_2^{\type{\overline{\sim_{delay}}}} &= \left( \pi_2 ~~ , ~~ \texttt{funExt}~\lambda\,(\term{a},\term{b},p), \begin{cases} (\mathtt{inr}~\term{r} , \lambda\,(\,)) & p = \mathtt{now}{\sim}~\term{r} \\ (\mathtt{inl}~\constant{tt} , \lambda\,\_, y) & p = \mathtt{later}{\sim}~\term{x}~\term{y}~\term{q}\end{cases} \right) \\
+        \pi_1^{\type{\overline{\sim_{delay}}}} &= \left( \pi_1 ~~ , ~~ \texttt{funExt}~\lambda\,(\term{a},\term{b},p), \begin{cases} (\mathtt{inr}~\term{r} , \lambda\,(\,)) & p = \mathtt{now}{\sim}~\term{r} \\ (\mathtt{inl}~\unitelem , \lambda\,\_, x) & p = \mathtt{later}{\sim}~\term{x}~\term{y}~\term{q}\end{cases} \right) \\
+        \pi_2^{\type{\overline{\sim_{delay}}}} &= \left( \pi_2 ~~ , ~~ \texttt{funExt}~\lambda\,(\term{a},\term{b},p), \begin{cases} (\mathtt{inr}~\term{r} , \lambda\,(\,)) & p = \mathtt{now}{\sim}~\term{r} \\ (\mathtt{inl}~\unitelem , \lambda\,\_, y) & p = \mathtt{later}{\sim}~\term{x}~\term{y}~\term{q}\end{cases} \right) \\
       \end{align}
       This defines the bisimulation, given by the diagram in \figref{delay-strong-bisim}.
       \begin{figure}[h]
@@ -1422,11 +1530,6 @@ We want to define spin, as being the fixed point \(\mathtt{spin} = \mathtt{later
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
 
-\chapter{Additions to the Cubical Agda Library}
-% Should be in the appendix ...
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
-
 \chapter{Conclusion}
 \label{ch:conclusion}
 
@@ -1443,6 +1546,12 @@ We want to define spin, as being the fixed point \(\mathtt{spin} = \mathtt{later
 
 \cleardoublepage
 \appendix
+
+\chapter{Additions to the Cubical Agda Library}
+% Should be in the appendix ...
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
+
 \chapter{The Technical Details}
 
 \todo[inline]{\dots}
