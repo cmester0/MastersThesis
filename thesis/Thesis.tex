@@ -581,20 +581,10 @@ An automaton is defined as a set of state \(\type{V}\) and an alphabet \(\type{\
 \section{Quotienting and constructors}
 \todo[inline]{Describe set truncated quotients and their construction / elimination principles, and how it relates to quotienting M-types}
 \section{Quotient \texttt{M}-type}
-We want to construct a quotient \texttt{M}-type, and we know that \texttt{M}-types are an algebraic theory? Meaning we want to define quotient algebra...
-
-We want to construct a quotiented M type, which is given as a final bisimulation and a final coalgebra, and relations between them. This is a special case for a cofree coalgebra, namely starting at \(X = \unit\).
-\\ \\
-Since we know that \texttt{M}-types preserves the H-level, we can use set-truncated quotients, to define quotient \texttt{M}-types, for examples we can define weak bisimulation of the delay monad ...
-\todo[inline]{Quotients of the delay monad}
+Since we know that \texttt{M}-types preserves the H-level, we can use set-truncated quotients, to define quotient \texttt{M}-types, though we run into the problem of \todo{problem of direct quotients}, as a solution we use QIIT to define the relation and type at the same type.
 
 \section{Quotient inductive-inductive types (QIITs)}
-"A quotient inductive-inductive type (QIIT) can be seen as a multi-sorted algebraic theory where sorts can be indexed over each other" - "Constructing Quotient Inductive-Inductive Types"
-
-"W-types can be seen informally as the free algebras for signatures with operations of possibly infinite arity, but no equations." -- \url{https://arxiv.org/pdf/1201.3898.pdf}
-
-A quotient inductive-inductive type (QIIT) is a type together with a relation defined on that type, and then quotiented by that relation.
-\todo[inline]{What is a QIIT concretely?}
+A quotient inductive-inductive type (QIIT) is a type together with a relation defined on that type. QIITs are HIITs that are set truncated.
 
 \section{Partiality monad}
 In this section we will define the partiality monad (see below) and show that (assuming the axiom of countable choice) the delay monad quotiented by weak bisimularity.
@@ -675,7 +665,6 @@ In this section we will define the partiality monad (see below) and show that (a
 \end{defn}
 
 \subsection{Delay monad to Sequences}
-\todo[inline]{Introduce the delay monad before this section!!}
 \begin{defn}
   We define
   \begin{equation}
@@ -737,9 +726,9 @@ We also introduce notation for the two special cases of sequences given above
 \begin{lem}[\(\constant{inl{\not\equiv}inr}\)]
   For any two elements \(\term{x} = \mathtt{inl}~\term{a}\) and \(\term{y} = \mathtt{inr}~\term{b}\) then \(\term{x} \not\equiv \term{y}\).
   \begin{proof}
-    The constructors are disjoint, so there is not a path between them \todo{better formualted proof}.
+    The constructors are disjoint, so there is not a path between them \todo{better formulated proof}.
   \end{proof}
-\end{lem}
+f\end{lem}
 \begin{defn}
   We define function from \(\typeformer{Delay}~\type{R}\) to \(\typeformer{Seq}_{\type{R}}\)
   \begin{equation}
@@ -811,7 +800,7 @@ In this section we will show that assuming the "Axiom of Countable Choice", we g
   \begin{equation}
     (\function{s},\function{q})~\relation{\sqsubseteq_{\mathtt{Seq}}}~(\function{t},\function{p}) = \prod_{(\term{a} : \type{R})} \left(\|\function{s}~\relation{\downarrow_{\mathtt{Seq}}}~\term{a}\| \rightarrow \| \function{t}~\relation{\downarrow_{\mathtt{Seq}}}~\term{a}\|\right)
   \end{equation}
-  where \(\| \cdot \|\) is propositional \todo{propositional or set truncation?} truncation.
+  where \(\| \cdot \|\) is propositional truncation.
 \end{defn}
 \begin{defn} There is a conversion from \(\type{R} + \unit\) to the partiality monad \(\type{R}_\bot\)
   \begin{equation}
@@ -961,7 +950,7 @@ This recursor allows us to lift the function \(\function{Seq{\rightarrow}(-)_\bo
 \end{proof}
 \end{thm}
 
-\subsubsection{Building the Partiality Monad as an M-type (Dialgebra?)}
+\subsubsection{Building the Partiality Monad as a limit (Dialgebra?)}
 \todo[inline]{Is this possible?}
 
 \subsection{Silhouette Trees}
@@ -1086,9 +1075,9 @@ We now want to show the equivalence between these two constructions, to do this 
 \end{defn}
 \begin{defn}[Sequence Ordering]
   \begin{equation}
-    \function{s}~\relation{\sqsubseteq_{\typeformer{Seq}_{tree}}}~\function{t} = \prod_{(e : \type{E})} \prod_{(\term{a} : \type{R})} \left(\|(\function{s}~\function{e})~\relation{\downarrow_{\mathtt{Seq}}}~\term{a}\| \rightarrow \| (\function{t}~\function{e})~\relation{\downarrow_{\mathtt{Seq}}}~\term{a}\|\right)
+    \function{s}~\relation{\sqsubseteq_{\typeformer{Seq}_{tree}}}~\function{t} = \prod_{(e : \type{E})} \prod_{(\term{a} : \type{R})} \left(\|(\function{s}~\function{e})~\relation{\downarrow_{\mathtt{Seq}}}~\term{a}\| \rightarrow \| (\function{t}~\function{e})~\relation{\downarrow_{\mathtt{Seq}}}~\term{a}\|\right) 
   \end{equation}
-  where \(\| \cdot \|\) is propositional \todo{propositional or set truncation?} truncation.
+  where \(\| \cdot \|\) is propositional truncation.
 \end{defn}
 \begin{defn}
   We define weak bisimularity relation for sequences \todo{Is this defined for partiality monad?}
@@ -1135,91 +1124,43 @@ We now want to show the equivalence between these two constructions, to do this 
     \end{aligned}
   \end{equation}
 \end{lem}
-\noindent We then get the definition
 \begin{defn}
-  TODO! \todo{TODO}
-\end{defn}
-~\\ \\
-\begin{equation}
-  \begin{aligned}
-    &\function{Seq{\rightarrow}sTree}~\function{s} = \mathop{\constructor{\bigsqcup}}_{(\function{e} : \mathbb{N} \rightarrow \type{E})}~(\function{s}~\function{e})
-  \end{aligned}
-\end{equation}
-\noindent We then show this definition is monotone, such that it can be lifted to a function from the quotient
-\begin{lem}
-  The function \(\function{tree{\rightarrow}sTree}\) is monotone, meaning if \(\term{x}~\relation{\sqsubseteq_{tree}}~\term{y}\), then we have \(\function{tree{\rightarrow}sTree}~\term{x}~\relation{\sqsubseteq_{sTree}}~\function{tree{\rightarrow}sTree}~\term{y}\).
-  \begin{proof}
-    By case
-    \begin{equation}
-      \function{tree{\rightarrow}sTree\text{-}mono}~(\constructor{leaf})~\_ = 
-    \end{equation}
-  \end{proof}
-\end{lem}
-\noindent We then want to lift this definition to the quotient using the recursor for quotients \eqref{eq:quotient-recursor},
-\begin{defn}
-  There is a function from \(\typeformer{tree}~\type{A}~\type{E} / \relation{\sim_{tree}}\) to \(\typeformer{sTree}~\type{E}\)
+  Function from \(Seq/{\sim}\) to \(sTree\)
   \begin{equation}
-    \function{tree/{\sim}{\rightarrow}sTree} = \function{rec}~\function{tree{\rightarrow}sTree}~\function{tree→sTree-{\approx}{\rightarrow}{\equiv}}~\constructor{sTree\text{-}isSet}
+    \function{Seq/{\sim}{\rightarrow}sTree} = \function{rec}~\function{Seq{\rightarrow}sTree}~\function{Seq{\rightarrow}sTree\text{-}{\approx}{\rightarrow}{\equiv}}~\constructor{sTree\text{-}isSet}
   \end{equation}
 \end{defn}
+\begin{lem}
+  \(\function{Seq/{\sim}{\rightarrow}sTree}\) is injective
+  \todo{TODO}
+\end{lem}
+\begin{lem}
+  \(\function{Seq/{\sim}{\rightarrow}sTree}\) is surjective
+  \todo{TODO}
+\end{lem}
+\begin{thm}
+  \(\function{Seq/{\sim}{\rightarrow}sTree}\) is an equivalence.
+  \todo{TODO}
+\end{thm}
 
 \subsection{QM-types}
-We want to define sequences based on \texttt{M}-types
-\begin{equation}
-  \typeformer{Seq}_{\typeformer{M}_{\containerpair{\type{A}}{\typeformer{B}}}} = \prod_{(a : \mathbb{N} \rightarrow \typeformer{B}~?)} \sum_{a : \mathbb{N} \rightarrow \type{A}} \prod_{(n : \mathbb{N})} \function{s}_n~\relation{\sqsubseteq_{?}}~\function{s}_{n+1}
-\end{equation}
-\\ \\
+We want to define sequences based on \texttt{M}-types, here are some examples
+\begin{align}
+  \typeformer{Seq}_{\typeformer{M}_{\containerpair{\type{A}}{\empt}}} &= \type{A} \\
+  \typeformer{Seq}_{\typeformer{M}_{\containerpair{\type{A} + \unit}{[\empt,\unit]}}} &= \sum_{(\function{s} : \mathbb{N} \rightarrow \type{A} + \unit)} \prod_{(n : \mathbb{N})} \function{s}_n \sqsubseteq \function{s}_{n+1} \\
+  \typeformer{Seq}_{\typeformer{M}_{\containerpair{\type{A} + \unit}{[\empt,\type{E}]}}} &= \prod_{(\function{e} : \mathbb{N} \rightarrow \type{E})}\sum_{(\function{s} : \mathbb{N} \rightarrow \type{A} + \unit)} \prod_{(n : \mathbb{N})} \function{s}_n \sqsubseteq \function{s}_{n+1} \\
+  \typeformer{Seq}_{\typeformer{M}_{\containerpair{\type{A} + \type{B}}{[\empt,\type{E}]}}} &= \prod_{(\function{e} : \mathbb{N} \rightarrow \type{E})}\sum_{(\function{s} : \mathbb{N} \rightarrow \type{A} + \type{B})} \prod_{(n : \mathbb{N})} \function{s}_n \sqsubseteq \function{s}_{n+1} \\
+  \typeformer{Seq}_{\typeformer{M}_{\containerpair{\unit}{\unit + \unit}}} &=~\prod_{(\function{e} : \mathbb{N} \rightarrow \unit + \unit)}\sum_{(\function{s} : \mathbb{N} \rightarrow \type{1})}\prod_{(n : \mathbb{N})} \function{s}_n \sqsubseteq \function{s}_{n+1} \\
+  \typeformer{Seq}_{\typeformer{M}_{\containerpair{\type{A}}{\unit + \unit}}} &=~\prod_{(\function{e} : \mathbb{N} \rightarrow \unit + \unit)}\sum_{(\function{s} : \mathbb{N} \rightarrow \type{A})}\prod_{(n : \mathbb{N})} \function{s}_n \sqsubseteq \function{s}_{n+1} \\
+  \typeformer{Seq}_{\typeformer{M}_{\containerpair{\type{A}}{\typeformer{B}}}} &=~\prod_{(\function{e} : (n : \mathbb{N}) \rightarrow \typeformer{B}\,\function{s}_{n-1})}\sum_{(\function{s} : \mathbb{N} \rightarrow \type{A})}\prod_{(n : \mathbb{N})} \function{s}_n \sqsubseteq \function{s}_{n+1} \\
+  \typeformer{Seq}_{\typeformer{M}_{\containerpair{\type{A} + \type{B}}{[\type{X} , \type{Y}]}}} &=~\prod_{\left(\function{e} : (n : \mathbb{N}) \rightarrow {\begin{cases}  {\scriptstyle  X~a} & {\scriptstyle  \function{s}_{n-1} = \mathtt{inl}~a} \\[-2mm] {\scriptstyle  Y~b} & {\scriptstyle  \function{s}_{n-1} = \mathtt{inr}~b} \end{cases}}\right)}\sum_{(\function{s} : \mathbb{N} \rightarrow \type{A})}\prod_{(n : \mathbb{N})} \function{s}_n \sqsubseteq \function{s}_{n+1} \\
+\end{align}
 \todo{which other QM types can be expressed as QIITs}
-% Sierpinski set
-% Rosolini’s dominance
-% non-termination monad -- Partiality monad - completely iterative monad (on 1 -> 1)
 A QM-type is a quotiented M-type, we try to define this as a quotient on containers. We define container quotients as
-\begin{equation}
-  ...
-\end{equation}
-\\ \\
-We want to define QM-types as the final coalgebra satisfying a set of equations. The construction takes inspiration from \cite{Infinitary-QIITs}
-\subsubsection{Cofree Coalgebra}
-We want to define a cofree coalgebra over a container \(\containerpair{A}{\lambda\,\_, \empt}\).
-\\ \\
-This is defined as the left adjoint to the forgetful functor \(\function{U} : \coalg{\type{C}}{\term{\gamma}} \rightarrow \type{C}\) as \(\function{F} : \type{C} \rightarrow \coalg{\type{C}}{\term{\gamma}}\).
 
-\begin{figure}[h]
-  \centering
-  \begin{tikzcd}[row sep=huge,column sep=huge]
-    \functor{P} \type{A} \ar[d] \ar[d,"\epsilon"] \\
-    \type{A} & \type{M} \ar[l,"\alpha"] \ar[ul,"\alpha^\sharp"']
-  \end{tikzcd}
-  \caption{Cofree Coalgebra}
-  \label{fig:cofree-coalgebra}
-\end{figure}
+\section{Cofree Coalgebra / Dialgebra}
 
-A coalgebra PA is cofree on A iff for all coalgebras M and mappings \(\alpha : UM \rightarrow C\) there is a unique morphism \(\alpha^\sharp : M \rightarrow TC\) such that the diagram \figref{cofree-coalgebra} commutes
-
-\subsubsection{Equation system}
-We start by defining a equation system called a covariety \cite{Hughes} of a coalgebra (dual of variety of an algebra).
-\\ \\
-Complete covarities are closed under bisimulation.
-
-\section{Strongly Extensional (Coalgebra)}
-
-% https://en.wikipedia.org/wiki/Variety_(universal_algebra)
-% Hughes
-% Alexander Kurz
-
-\begin{defn}
-  A equation system is given by
-  \begin{equation}
-    EqSys : \sum_{(E : \universe{\mathcal{U}})} \sum_{(V : \type{E} \rightarrow \universe{\mathcal{U}})} ((e : E) \rightarrow T (V e)) \times ((e : E) \rightarrow T (V e))
-  \end{equation}
-  where \(\type{E}\) representing the equations, and variables for the given equations, given by the type \(\typeformer{V}\), and \(T\) is the free coalgebra.
-\end{defn}
-
-\subsection{in progress}
-Let \(\functor{G}\) be functors and \(v : \functor{P} \rightarrow \functor{G}\) a natural transformation. Suppose that for any type \(\type{V}\), the functor \((\lambda\,\_ \rightarrow \type{V}) \times\functor{F}\) has a final coalgebra. Then there exists for any G-coalgebra \(\coalg{\type{C}}{\function{\gamma}}\) an \(P\)-coalgebra \(\coalg{S_C}{\alpha}\) and a \(\functor{G}\)-homomorphism \(\varepsilon:\coalg{S_C}{v_{S_C} \circ \alpha} \Rightarrow \coalg{C}{\gamma}\), satisfying the universal property: for any \(P\)-coalg \(\coalg{U}{\alpha_U}\) and any G-homomorphism \(f : \coalg{U}{v_U \circ \alpha_U} \Rightarrow \coalg{C}{\gamma}\) there exists a unique \(P\)-homomorphism \(\tilde{f} : \coalg{U}{\alpha_u} \Rightarrow \coalg{S_C}{\alpha}\) such that \(\varepsilon \circ \tilde{f} = f\). The \(P\)-coalg \(\coalg{S_c}{\alpha}\) (and \(\varepsilon\)) is called cofree on the G-coalgebra \(\coalg{C}{\gamma}\). \cite[theorem 17.1]{UniversalCoalgebra}.
-\\ \\
-The coalgebra generated by the polynomial functor over the container \(\containerpair{A}{B}\) is a cofree coalgebra. We can now define a quotient, by defining a equation system at the same time, as we define the \texttt{M}-type type. The equation systems is defined on a type \(E : \mathcal{U}\) with variables of type \(V : E \rightarrow \mathcal{U}\), each equation is given by functions \(l,r : C \rightarrow A\) for some type \(C\). A coalgebra satisfies the equation system iff \((t : B (l c) \rightarrow MQ) \rightarrow (s : B (r c) \rightarrow MQ) \rightarrow l c \equiv r c\) is inhabited.
-
+\newpage
 \section{TODO}
 \begin{itemize}
 \item Resumption Monad transformer
@@ -1227,10 +1168,14 @@ The coalgebra generated by the polynomial functor over the container \(\containe
 \item bisim \(\Rightarrow\) eq
 \item copattern matching
 \item cubical Agda. Relation between \texttt{M}-types defined by coinduction/copattern matching and constructed from W-types
-\item   In Agda, co-inductive types are defined using Record types, which are Sigma-types. 
-\item   In cubical Agda, 3.2.2 the issue of productivity is discussed. This can probably be made precise using guarded types.
+  \begin{itemize}
+  \item In Agda, co-inductive types are defined using Record types, which are Sigma-types.
+  \item In cubical Agda, 3.2.2 the issue of productivity is discussed. This can probably be made precise using guarded types.
+\end{itemize}
 \item streams defined by guarded recursion vs coinduction in guarded cubical Agda. 
-\item    p3 of the guarded cubical Agda paper describes how semantic productivity improves over syntactic productivity
+  \begin{itemize}
+  \item p3 of the guarded cubical Agda paper describes how semantic productivity improves over syntactic productivity
+\end{itemize}
 \item Reduction of co-inductive types in Coq/Agda to (indexed) \texttt{M}-types. Like reduction of strictly positive inductive types to W-types. https://ncatlab.org/nlab/show/W-type
 \item QIITs have been formalized in Agda using private types. Can this also be done in cubical Agda (ie without cheating).
 \item   Show that this is the final (quotiented) coalgebra. Does this generalize to Q\texttt{M}-types, and what are those constructively ??
