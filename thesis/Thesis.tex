@@ -28,7 +28,9 @@
 \setlength\marginparwidth{0.7in}
 
 \usepackage{todonotes} % \todo command
+
 \usepackage{proof} % \infer command
+
 \usepackage{tikz-cd}
 \usepackage{xfrac} % \sfrac - sideways fraction
 
@@ -65,14 +67,14 @@
 \newcommand*{\type}[1]{\textcolor{magenta!90!black}{#1}}
 % \newcommand*{\dependenttype}[1]{\textcolor{magenta!70!black}{#1}}
 \newcommand*{\container}[1]{\textcolor{red}{#1}}
-\newcommand*{\containerpair}[2]{\textcolor{red}{(}#1\,\textcolor{red}{,}\,#2\textcolor{red}{)}}
-\newcommand*{\containerpairsimple}[2]{\textcolor{red}{(}#1\,\textcolor{red}{,}\,\lambda\,\_, #2\textcolor{red}{)}}
+\newcommand*{\containerpair}[2]{\ensuremath{\colorlet{savedleftcolor}{.}\color{red}\left(\color{savedleftcolor}#1\,\textcolor{red}{\mathbf{,}}\,#2\color{red}\right)\color{savedleftcolor}}}
+\newcommand*{\containerpairsimple}[2]{\containerpair{#1}{\lambda\,\_,\,#2}}
 \newcommand*{\universe}[1]{\textcolor{orange!80!black}{#1}}
 \newcommand*{\unit}{\type{\textbf{1}}}
 \newcommand*{\empt}{\type{\textbf{0}}}
 \newcommand*{\coalg}[2]{#1\texttt{-}#2}
 
-\newcommand*{\relation}[1]{\textcolor{gray}{\ensuremath{\mathtt{#1}}}}
+\newcommand*{\relation}[1]{\textcolor{gray!75!black}{\ensuremath{\mathtt{#1}}}}
 \newcommand*{\constant}[1]{\textcolor{orange!60!black}{\ensuremath{\mathtt{#1}}}}
 
 \newcommand*{\function}[1]{\textcolor{blue!60!black}{\ensuremath{\mathtt{#1}}}}
@@ -146,12 +148,79 @@ c\begin{flushright}
 
 \chapter{Introduction} % Everyone interested should be able to read this!
 \label{ch:intro}
+when \todo{...}... a constructor for a type \(\type{A}\) is a function, that takes some arguments, and returns an element \(a : \type{A}\), dually a destructor of \(\type{A}\) will return something given an element \(a : \type{A}\). \todo{...}... from a set of constructors, for example the natural numbers \(\mathbb{N}\) which are defined by the two constructors
+\begin{center}
+  \strut
+  \hfill
+  \begin{minipage}{0.15\linewidth}
+    \begin{equation}
+      \vcenter{\infer{0 : \mathbb{N}}{\strut}}
+    \end{equation}
+  \end{minipage}
+  \hfill
+  \begin{minipage}{0.20\linewidth}
+    \begin{equation}
+      \vcenter{\infer{\constructor{succ}~n : \mathbb{N}}{n : \mathbb{N}}}
+    \end{equation}
+  \end{minipage}
+  \hfill
+  \strut
+\end{center}
+with an equivalence relation \(\relation{\sim_{\mathbb{N}}}\) defined inductively, meaning we follow the structure of defined by the constructors
+\begin{center}
+  \strut
+  \hfill
+  \begin{minipage}{0.20\linewidth}
+    \begin{equation}
+      \vcenter{\infer[\constructor{\sim_{0}}]{0 = 0}{\strut}}
+    \end{equation}
+  \end{minipage}
+  \hfill
+  \begin{minipage}{0.35\linewidth}
+    \begin{equation}
+      \vcenter{\infer[\constructor{\sim_{succ}}]{\constructor{succ}~n~\relation{\sim_{\mathbb{N}}}~\constructor{succ}~m}{n~\relation{\sim_{\mathbb{N}}}~m}}
+    \end{equation}
+  \end{minipage}
+  \hfill
+  \strut
+\end{center}
+This relation gives equality, so if \(a~\relation{\sim_{\mathbb{N}}}~b\) then \(a \equiv b\). Likewise there is coinductive construction, where the focus is on the destructors instead of the constructors, an example is streams, representing an infinite sequence of elements, that can be defined from the two destructors head (\(\destructor{hd}\)) and tail (\(\destructor{tl}\)), where head represents the first element, and tail represents the rest of the sequence. The inference rules are given as
+\begin{center}
+  \strut
+  \hfill
+  \begin{minipage}{0.225\linewidth}
+    \begin{equation}
+      \vcenter{\infer{\destructor{hd}~\term{s} : \type{A}}{\term{s} : \typeformer{stream}~\type{A}}}
+    \end{equation}
+  \end{minipage}
+  \hfill
+  \begin{minipage}{0.25\linewidth}
+    \begin{equation}
+      \vcenter{\infer{\destructor{tl}~\term{s}: \typeformer{stream}~\type{A}}{\term{s} : \typeformer{stream}~\type{A}}}
+    \end{equation}
+  \end{minipage}
+  \hfill
+  \strut
+\end{center}
+we can again define an equivalence relation \(\relation{\sim_{stream}}\), but this time coinductively, focusing on the structure of the destructors instead
+\begin{equation}
+  \vcenter{\infer{\term{s}~\relation{\sim_{stream}}~\term{t}}{\destructor{hd}~\term{s} = \destructor{hd}~\term{t} & \destructor{tl}~\term{s}~\relation{\sim_{stream}}~\destructor{tl}~\term{t}}}
+\end{equation}
+This relation does not give an equality in MLTT, we just get bisimilarity meaning elements "behave" the same, but they are not equivalent. However one of the advantages of using homotopy type theory is that bisimilarity becomes equality. We will use this advantage to get the "correct" for of equality for some example of coinductive types. \todo{...}... An algebra is an operator \(\functor{F}\) with some closure relation \todo{cite something}. \todo{...}... inductive types are given as the initial algebra for some functor, this can be formalized as \texttt{W}-types, dually the coinductive types that we are interested in, can be formalized as the final coalgebra \todo{final coalgebra is scary words, find something more "noob" friendly} for some functor. We will be looking at how to define some coinductive types, as \texttt{M}-types, and define some bisimilarity relations for these types, showing we get equality when using homotopy type theory. We will then introduce weaker notion of bisimilarity, that does not yield equality, but can be used to construct a new type, by quotienting with the relation, giving us a type where the relation gives equality\todo{describe quotienting and its usefullness by a couple examples}. \todo{...}... When working with quotiented coinductive types. \todo{What is a monad?} \todo{...}... We define the quotiented delay monad \(\typeformer{Delay}/\relation{\sim_{weak}}\), and want to show that we can construct a partiality monad from this construction. A problem with the partiality operation \(D(-)/{\sim}_D\) is that countable choice is needed to show that it is a monad, however using QIIT types we can get around this problem, furthermore we can show that assuming countable choice, these two constructions are equal.
+
+~\\ \\ \\ \\
+When working in Martin L\"of / Intensional Type Theory reasoning about equality of objects...
+
+% The goal of this work is to formalize coinduction, build as coalgebras. 
+% In this thesis we will present a construction of non-wellfounded sets as a limits
+% \\ \\
 In the second chapter we introduce/summarize some background theory. In the third chapter we construct \texttt{M}-types from containers, and define a coinduction principle for the M-types. In the fourth chapter we introduce quotiented \texttt{M}-types (QM-types), and show equalities between these and quotient inductive inductive types (QIITs). We then go through various applications of the theory developed in the first couple chapters. Finally we conclude by discussion future research and improvements.
 
 \todo[inline]{motivate and explain the problem to be addressed}
 \todo[inline]{get your bibtex entries from \url{https://dblp.org/}}
 
-Most of the work is formalized in the Cubical Agda proof assistant. We end this introduction, with a description of the notation used throughout this thesis. We use the following notation / font:
+\section{Notation}
+Most of the work is formalized in the Cubical Agda proof assistant. The following is the notation / fonts used to denote specific definitions / concepts
 \begin{itemize}
 \item Universe \(\universe{\mathcal{U}}_i\) or \(\universe{\mathcal{U}}\)
 \item Type \(\type{A} : \universe{\mathcal{U}}\)
@@ -168,32 +237,30 @@ Most of the work is formalized in the Cubical Agda proof assistant. We end this 
 \item A coalgebra \(\coalg{\type{C}}{\function{\gamma}}\)
 \item We denote the function giving the first and second projection of a dependent pair by \(\pi_1\) and \(\pi_2\).
 \end{itemize}
-
-Furthermore we define some useful notation
+Furthermore we define some useful notation for casing on natural numbers.
 \begin{defn}
   \begin{equation}
     \natcases{\term{x}}{\function{f}} = \lambda\,n, \begin{cases} \term{x} & n = 0 \\ \function{f}~m & n = m + 1 \end{cases}
   \end{equation}
 \end{defn}
 
+\section{Background Theory}
+We start by giving some background theory / history on cubical type theory and summarize important concepts used in the rest of this thesis.
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
+\subsection{Interactive Proof Assistants}
 
-\chapter{Background Theory}
-We start by giving some background theory summarizing important concepts used in the rest of this thesis.
-\section{Proof assistants}
-\section{Set Theory}
+\subsection{Set Theory}
 \todo{Should this be included}
 
-\section{Type Theory}
+\subsection{Type Theory}
 Type theory is the computational angle on a basis for mathematics. In type theory every term \(\term{x}\) is an element of some type \(\type{A}\), written \(\term{x} : \type{A}\). The idea in type theory is that propositions are types, so proofs boils down to showing that there exists an element of some type representing a proposition. Specifically proofs of equality becomes construction of an element of an equality type.
 
-\subsection{Martin L\"of Type Theory / Intuitionistic type Theory (MLTT/ITT)}
+\subsubsection{Martin L\"of Type Theory / Intuitionistic type Theory (MLTT/ITT)}
 Per Matin-L\"of designed the type theory on the principles of mathmatical constructivism, where any existance proof must contain a witness. Meaning a proof that there exists an element, such that something is true, can be converted into an algorithm that finds that element. The type theory is built from the three finite types \(\empt\), \(\unit\) and \(\type{\mathbf{2}}\), and type constructors \(\Sigma\), \(\pi\) and \(=\). There is only a single way to make terms of \(=\)-type, and that is \(\mathtt{refl} : \prod_{a : A} (a = a)\). \todo{inductive types, universes and judgements} \todo{extensional vs intensional} \todo{find citation, currently \url{https://en.wikipedia.org/wiki/Intuitionistic_type_theory}}.
-\subsubsection{Intensional Type Theory}
+\paragraph{Intensional Type Theory}
 \todo{\url{https://ncatlab.org/nlab/show/intensional+type+theory}}
 
-\section{The Univalence Axiom}
+\subsection{The Univalence Axiom}
 The map
 \begin{equation}
   \typeformer{id}_{\universe{\mathcal{U}}}~\type{A}~\type{B} \rightarrow \typeformer{Equiv}~\type{A}~\type{B}
@@ -204,38 +271,38 @@ is an equivalence, simplifying a bit, identity is equivalent to equivalence
 \end{equation}
 Or said in another way equivalent types are identical.
 
-\section{Homotopy Type Theory (HoTT) / Univalent Foundations (UF)}
+\subsection{Homotopy Type Theory (HoTT) / Univalent Foundations (UF)}
 Homotopy type theory is an intensional dependent type theory (built on MLTT) with the univalence axiom and higher inductive types. Homotopy type theory is constructive by default, but can be made classical.
 
 is a type theory where the idenitity types form path spaces, so proofs of identity are not just \texttt{refl}, as for MLTT. Types are seen as "spaces" or (higher groupoids), and we think of \(\term{a} : \type{A}\) as \(\term{a}\) being a point in the space \(\type{A}\), similarly functions are regarded as continuous maps from one space to another. \cite{nlab:homotopy_type_theory}
 
-\subsection{Judgmental Equality / Definitional Equality}
+\subsubsection{Judgmental Equality / Definitional Equality}
 This means equal by definition, denoted \(a \equiv b\). It does not make sense to assume definitional equality (inside the theory). The equality is algorithmically decidable (meta-theoretic algorithm, not internal). 
 
-\subsection{Propositional Equality}
+\subsubsection{Propositional Equality}
 If the equality \(a =_{A} b\) is inhabited, then we get propositional equality.
 
-\subsection{External (of theory)}
-\subsection{Internal (of theory)}
+\subsubsection{External (of theory)}
+\subsubsection{Internal (of theory)}
 
-\subsection{Constructivity}
+\subsubsection{Constructivity}
 From every proof we can extract an algorithm, that produces an element of the proposition.
 
-\subsubsection{Proof relevant mathematics}
+\paragraph{Proof relevant mathematics}
 
-\subsection{Homotopy \(n\)-types}
+\subsubsection{Homotopy \(n\)-types}
 The 0-types are the hSets, (-1)-types are mere propositions or hProp. So all elements of a type that is an hProp, will be equal. All equalities between elements of types that are hSets, are equal. For 1-types (1-groupoids) we get equalities of equalities are equal, and then so on for homotopy \(n\)-types.
 
-\subsection{The HoTT Book}
+\subsubsection{The HoTT Book}
 
-\section{Higher order inductive types (HITs)}
-\subsection{Propositional truncation and Set Truncated Quotients}
+\subsection{Higher order inductive types (HITs)}
+\subsubsection{Propositional truncation and Set Truncated Quotients}
 
-\section{Cubical Type Theory (CTT)}
+\subsection{Cubical Type Theory (CTT)}
 Cubical type theory is a version of homotopy type theory where univalence actually computes, meaning it is not just an axiom, but can actually be proven. \cite{nlab:cubical_type_theory}
 
-\subsection{UIP}
-\subsection{Cubical Agda}
+\subsubsection{UIP}
+\subsubsection{Cubical Agda}
 Cubical Agda is an implementation of a cubical type theory by extending the proof assistant Agda. One of the main additions is the interval and path types. The interval can be thought of as elements in \([0,1]\). When working with the interval, we can only access the left and right endpoint \(\constant{i0}\) and \(\constant{i1}\) or some unspecified point in the middle \(i\), modeling the intuition of a continuous interval. Cubical agda also generalizes transporting, given a type line \(\typeformer{A} : \mathbb{I} \rightarrow \universe{\mathcal{U}}\), and the endpoint \(\typeformer{A}~\constant{i0}\) you get a line from \(\typeformer{A}~\constant{i0}\) to \(\typeformer{A}~\constant{i1}\) \cite{cubicalagda}
 
 \todo[inline]{Axioms of cubical Agda}
@@ -243,7 +310,7 @@ The theory of cubical Agda is a Cartesian closed category, meaning get exponenti
 \\ \\
 \todo[inline]{Something about the interval type!!}
 
-\subsubsection{Path type}
+\paragraph{Path type}
 We add a type \(\mathbb{I}\), which is defined to be a free de Morgan algebra on a discrete infinite set of names \todo{cite: https://arxiv.org/pdf/1611.02108.pdf}. The elements of \(\mathbb{I}\) can be described by the grammar
 \begin{equation}
   r,s ::= 0 \mid 1 \mid i \mid 1 - r \mid r \land s \mid r \lor s
@@ -251,15 +318,15 @@ We add a type \(\mathbb{I}\), which is defined to be a free de Morgan algebra on
 The set \(\mathbb{I}\) has decidable equality. The elements in \(\mathbb{I}\) can be thought as formal representations of elements in the unit interval \([0,1]\). There is a special substitution with \(\constant{i0}\) and \(\constant{i1}\) being the endpoints of \([0,1]\).
 
 
-\section{Coinduction}
+\subsection{Coinduction}
 Coinduction is the dual concept (in a categorical manner) of induction. The induction principle is an equivalence principle for congruent elements in an initial algebra.
 
-\section{W-types}
+\subsection{W-types}
 
-\section{Problems with / Getting around using AC and LEM}
+\subsection{Problems with / Getting around using AC and LEM}
 These axioms does not have a computational interpretation, so to maintain the computational aspects of HoTT and CTT, we try to not use these axioms. \cite[Introduction]{hottbook}
 
-\section{Universes ??}
+\subsection{Universes ??}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
 
@@ -333,13 +400,13 @@ In this chapter we will introduce containers (aka. signatures), and use them to 
   \end{figure}
   We will that \(\function{out}\) is an isomorphism with inverse \(\function{in} : \functor{P}_{\container{S}}(\typeformer{M}) \rightarrow \typeformer{M}\) later in this section. We now have a semantic for the rules, we would expect for streams, if we let \(\constructor{cons} = \function{in}\) and \(\typeformer{stream}~\type{A} = \typeformer{M}_{\containerpair{\type{A}}{\lambda\,\_,\unit}}\),
   \begin{equation}
-    \infer[\mathtt{E}_{\destructor{hd}}]{\destructor{hd}~\term{s} : \type{A}}{\type{A} : \universe{\mathcal{U}} & \term{s} : \typeformer{stream}~\type{A}}
+    \vcenter{\infer[\mathtt{E}_{\destructor{hd}}]{\destructor{hd}~\term{s} : \type{A}}{\type{A} : \universe{\mathcal{U}} & \term{s} : \typeformer{stream}~\type{A}}}
   \end{equation}
   \begin{equation}
-    \infer[\mathtt{E}_{\destructor{tl}}]{\destructor{tl}~\term{s} : \typeformer{stream}~\type{A}}{\type{A} : \universe{\mathcal{U}} & \term{s} : \typeformer{stream}~\type{A}}
+    \vcenter{\infer[\mathtt{E}_{\destructor{tl}}]{\destructor{tl}~\term{s} : \typeformer{stream}~\type{A}}{\type{A} : \universe{\mathcal{U}} & \term{s} : \typeformer{stream}~\type{A}}}
   \end{equation}
   \begin{equation}
-    \infer[\mathtt{I}_{\constructor{cons}}]{\term{\constructor{cons}}~\term{x}~\term{xs} : \typeformer{stream}~\type{A}}{\type{A} : \universe{\mathcal{U}} & \term{x} : \type{A} & \term{xs} : \typeformer{stream}~\type{A}}
+    \vcenter{\infer[\mathtt{I}_{\constructor{cons}}]{\term{\constructor{cons}}~\term{x}~\term{xs} : \typeformer{stream}~\type{A}}{\type{A} : \universe{\mathcal{U}} & \term{x} : \type{A} & \term{xs} : \typeformer{stream}~\type{A}}}
   \end{equation}
   or more precisely \(\destructor{hd} = \pi_1 \circ \function{out}\) and \(\destructor{tl} = \pi_2 \circ \function{out}\).
 \end{exmp}
@@ -465,7 +532,10 @@ We can now construct a coinduction principle given a bisimulation relation.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
 
 \chapter{Instantiation of M-types}
-In this section we show some examples of types that can be constructed as \(M\)-types, and show how their constructors can be defined. \todo{Is there anything else that is show for each M-type?}
+In this section we show some examples of types that can be constructed as \(M\)-types, and show how their constructors can be defined. We then conclude the chapter with some general observation, and define some rules for how to construct \texttt{M}-types. \todo{Is there anything else that is show for each M-type?}
+
+\todo{complete this section}
+
 \section{Stream Formalization using \texttt{M}-types}
 As described earlier, given a type \(\type{A}\) we define the stream of that type as
 \begin{equation}
@@ -476,14 +546,14 @@ this is equal to an alternative definition of streams \todo{...}
 \section{ITrees as \texttt{M}-types}
 We want the following rules for ITrees
 \begin{equation}
-  \infer[\mathtt{I}_{\constructor{Ret}}]{\constructor{Ret}~\term{r} : \typeformer{itree}~\typeformer{E}~\type{R}}{r : \type{R}}
+  \vcenter{\infer[\mathtt{I}_{\constructor{Ret}}]{\constructor{Ret}~\term{r} : \typeformer{itree}~\typeformer{E}~\type{R}}{r : \type{R}}}
 \end{equation}
 \begin{equation}
-  \infer[\mathtt{I}_{\constructor{Vis}}]{\constructor{Vis}~\term{a}~\term{f} : \typeformer{itree}~\typeformer{E}~\type{R}}{\type{A} : \universe{\mathcal{U}} & \term{a} : \typeformer{E}~\type{A} & \term{f} : \type{A} \rightarrow \typeformer{itree}~\typeformer{E}~\type{R}}.
+  \vcenter{\infer[\mathtt{I}_{\constructor{Vis}}]{\constructor{Vis}~\term{a}~\term{f} : \typeformer{itree}~\typeformer{E}~\type{R}}{\type{A} : \universe{\mathcal{U}} & \term{a} : \typeformer{E}~\type{A} & \term{f} : \type{A} \rightarrow \typeformer{itree}~\typeformer{E}~\type{R}}}.
 \end{equation}
 Elimination rules
 \begin{equation}
-  \infer[\mathtt{E}_{\constructor{Tau}}]{\constructor{Tau}~\term{t} : \typeformer{itree}~\typeformer{E}~\type{R}}{\term{t} : \typeformer{itree}~\typeformer{E}~\type{R}}.
+  \vcenter{\infer[\mathtt{E}_{\constructor{Tau}}]{\constructor{Tau}~\term{t} : \typeformer{itree}~\typeformer{E}~\type{R}}{\term{t} : \typeformer{itree}~\typeformer{E}~\type{R}}}.
 \end{equation}
 
 \subsection{Delay Monad}
@@ -566,12 +636,81 @@ An automaton is defined as a set of state \(\type{V}\) and an alphabet \(\type{\
 \begin{figure}[h]
   \centering
   \begin{tikzcd}[row sep=huge,column sep=huge]
-    \type{V} \times (\type{V} \rightarrow \type{\alpha} \rightarrow \type{V}) \ar[dr,"build"'] \ar[r] & M & M \ar[dl,"step"] \\
-    & M
+    \type{V} \times (\type{V} \rightarrow \type{\alpha} \rightarrow \type{V}) \ar[dr,"build"'] \ar[r] & M & M \ar[dl,"step"] \ar[l] \\
+    & M \ar[u]
   \end{tikzcd}
   \caption{automaton}
   \label{fig:automaton}
 \end{figure}
+
+\section{General rules for constructing \texttt{M}-types}
+We want to create a calculus for defining coinductive types as \texttt{M}-types. We would like to be able to define a type that has a given set of constructor / destructors rules. If we for example is given the rule
+\begin{equation}
+  \vcenter{\infer{\constructor{ret}~a : \type{T}}{\term{a} : \type{A}}}
+\end{equation}
+we get that it corresponds to the M-type for the container \(\containerpairsimple{\type{A}}{\empt}\), while if we have something that produces an element of it self as
+\begin{equation}
+  \vcenter{\infer{\destructor{tl}~\term{a} : \type{T}}{\term{a} : \type{T}}}
+\end{equation}
+the container is \(\containerpairsimple{\unit}{\unit}\) \todo{why gives some arguements or illustations showing these reasonings}. If we want a type with both these rules, then we just take the disjoint union of the two containers
+\begin{equation}
+  \containerpair{\type{A} + \unit}{\begin{cases} \empt & \mathtt{inl}~\term{a} \\ \unit & \mathtt{inr}~\unitelem \end{cases}}
+\end{equation}
+which is the delay type. We can also define some more involved constructors, that build on the type itself
+\begin{equation}
+  \vcenter{\infer{\constructor{node}~\term{a} : \type{T}}{\term{a} : \type{A} \rightarrow \type{T}}}
+\end{equation}
+has container \(\containerpair{\unit}{\type{A}}\). We can types with a given destructor
+\begin{equation}
+  \vcenter{\infer{\destructor{hd}~\term{a} : \type{A}}{\term{a} : \type{T}}}
+\end{equation}
+has container \(\containerpairsimple{A}{\empt}\), but this is the same as for \(\constructor{ret}\), and we do not always want both. The difference is how they are added to other constructors / destructors. Destructors are easily added together, take for example \(\destructor{hd}\) and \(\destructor{tl}\), \(\containerpairsimple{A}{\unit}\). In general adding containers \(\containerpair{\type{A}}{\typeformer{B}}\) and \(\containerpair{\type{C}}{\typeformer{D}}\) for two constructors together is done by
+\begin{equation}
+  \containerpair{\type{A} + \type{C}}{ \begin{cases} \typeformer{B}~\term{a} & \mathtt{inl}~\term{a} \\ \typeformer{D}~\term{c} & \mathtt{inr}~\term{c} \end{cases}}
+\end{equation}
+whereas adding containers for two destructors is done by \todo{Is this correct? Seems correct..}
+\begin{equation}
+  \containerpairsimple{\type{A} \times \type{C}}{\lambda\,(\term{a},\term{c}),~\typeformer{B}~\term{a} + \typeformer{D}~\term{c}}  
+\end{equation}
+however combining destructors and constructors is not as simple. Anything type \(\type{T}\) that is defined using a record (except higher inductive types), will also be definable as an \texttt{M}-type. Given a record, which is a list of fields \(\term{f}_1 : \type{F}_1,\term{f}_2 : \type{F}_2,\dots,\term{f}_n : \type{F}_n\), we can construct the \texttt{M}-types by the container
+\begin{equation}
+  \containerpairsimple{\type{F}_1 \times \type{F}_2 \times \dots \times \type{F}_n}{\empt}
+\end{equation}
+where each destructor \(\destructor{d_n} : \type{T} \rightarrow \type{F_n}\) for the field \(\term{f}_n\) will be defined as \(\destructor{d_n}~\term{t} = \pi_n~(\function{out}~\term{t})\). However fields in a coinductive container may depend on previous defined fields, as given by the general list of fields \(\term{f}_1 : \type{F}_1,\term{f}_2 : \typeformer{F}_2,\cdots,\term{f}_n : \typeformer{F}_n\), where each field depends on all the previous once, this can be defined by the container
+\begin{equation}
+  \containerpairsimple{\sum_{(\term{f}_1 : \type{F}_1)} \sum_{(\term{f_2} : \typeformer{F}_2)} \cdots \sum_{(\term{f}_{n-1} : \typeformer{F}_{n-1})}\typeformer{F}_n}{\empt}
+\end{equation}
+however, if any of the destructors/fields are non dependent, then the can be added as a product (\(\times\)) instead of a dependent product (\(\Sigma\)). Furthermore the fields may construct an element of the type of the record \(\type{T}\), however anything after that field cannot on it, since it will break the strictness requirements of the record / coinductive type. As an example let \(\type{f}_1\) be a type and \(\function{f_2}\) be the function with type \(\typeformer{F}_2 = \type{f}_1 \rightarrow (\type{f}_1 \rightarrow \type{A}) \rightarrow \mathtt{M}\), which by currying is equal to \(\type{f}_1 \times (\type{f}_1 \rightarrow \type{A}) \rightarrow \mathtt{M}\), we can then define by the container
+\begin{equation}
+  \containerpair{\sum_{(\type{f}_1 : \universe{\mathcal{U}})} \left(\unit \times \sum_{(\term{f}_3 : \typeformer{F}_3)} \cdots \sum_{(\term{f}_{n-1} : \typeformer{F}_{n-1})}\typeformer{F}_n\right)}{\lambda\,(\type{f}_1,\unitelem,\term{f}_3,\dots),\typeformer{F}_2}
+\end{equation}
+where \(\typeformer{F}_2\) have been moved to the last part of the container, we can even leave out the "\(\unit \times\)" from the container. The types of the field can also be dependent \(\typeformer{F_2} = (\term{x} : \type{f}_1) \rightarrow \typeformer{B}~\term{x} \rightarrow \mathtt{M}\), but again by currying we can get \(\typeformer{F_2} : \sum_{(\term{x} : \type{f}_1)} \typeformer{B}~\term{x} \rightarrow \mathtt{M}\) which is defined by the container
+\begin{equation}
+  \containerpair{\sum_{(\type{f}_1 : \universe{\mathcal{U}})} \sum_{(\term{f}_3 : \typeformer{F_3})} \cdots \sum_{(\term{f}_{n-1} : \typeformer{F_{n-1}})}\typeformer{F_n}}{\lambda\,(\type{f}_1,\term{f}_3,\dots),\sum_{\term{x} : \type{f}_1} (\typeformer{B}~\term{x})}
+\end{equation}
+so we would also expect that a type defined as a (coinductive) record is equal to the version defined as a \texttt{M}-type. \todo{which is the case, proof needed!}
+\\ \\
+But we run into problems if ... \todo{Problem cases} \todo{What differes from W and M types for closure of constructors / destructors?}
+
+\section{Wacky \texttt{M}-type}
+We end this chapter by showing of some wacky \texttt{M}-type, that utilizes the definition of the \texttt{M}-type to the fullest
+\begin{equation}
+  \containerpair{\mathbb{N} + \mathbb{N}}{\begin{cases} \mathbb{N} & \mathtt{inl}~0 \\ \empt & \mathtt{inl}~\term{x} \land \term{x}~\text{is odd} \\ \empt & \mathtt{inr}~\term{x} \land \term{x}~\text{is even} \\ \unit & o.w. \end{cases}}
+\end{equation}
+this container gives the \texttt{M}-type and constructors / destructors shown in \figref{wacky-m-type}
+\begin{figure}[h]
+  \centering
+  \begin{tikzcd}[row sep=huge,column sep=huge]
+    \mathbb{N} \ar[dr,"\constructor{odd}"',very near start] \ar[r,"\mathtt{inl} (2n+1)"] & M & \mathbb{N} \times M \ar[dl,"\destructor{step}",very near start] \ar[l,"o.w."] \\
+    \mathbb{N} \ar[r,"\constructor{even}"'] \ar[ur,"\mathtt{inr}(2n)",very near start] & M \ar[u] & (\mathbb{N} \rightarrow M) \ar[l,"\constructor{inl\text{-}zero}"] \ar[ul,"\mathtt{inl}~0 \times f"',very near start]
+  \end{tikzcd}
+  \caption{wacky \texttt{M}-type}
+  \label{fig:wacky-m-type}
+\end{figure}
+This is a stream of coproducts of natural numbers, that terminates whenever it is the left injection and even, or the right injection and odd, and whenever the left injection is zero, it splits in a branches indexed by the natural numbers.
+
+\todo{define a wacky M-type showing some of the use of M-types / complexity}
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
 
@@ -587,25 +726,25 @@ Since we know that \texttt{M}-types preserves the H-level, we can use set-trunca
 A quotient inductive-inductive type (QIIT) is a type together with a relation defined on that type. QIITs are HIITs that are set truncated.
 
 \section{Partiality monad}
-In this section we will define the partiality monad (see below) and show that (assuming the axiom of countable choice) the delay monad quotiented by weak bisimularity.
+In this section we will define the partiality monad (see below) and show that (assuming the axiom of countable choice) the delay monad quotiented by weak bisimilarity.
 \begin{defn}[Partiality Monad]
   A simple example of a quotient inductive-inductive type is the partiality monad \((-)_\bot\) over a type \(\type{R}\), defined by the constructors\\[-9mm]
   \begin{center}
     \begin{minipage}{0.25\linewidth}
       \begin{equation}
-        \infer{\type{R}_\bot : \universe{\mathcal{U}}}{}
+        \vcenter{\infer{\type{R}_\bot : \universe{\mathcal{U}}}{\strut}}
       \end{equation}
     \end{minipage}
     \hfill
     \begin{minipage}{0.25\linewidth}
       \begin{equation}
-        \infer{\constructor{\bot} : \type{R}_\bot}{}
+        \vcenter{\infer{\constructor{\bot} : \type{R}_\bot}{\strut}}
       \end{equation}
     \end{minipage}
     \hfill
     \begin{minipage}{0.25\linewidth}
       \begin{equation}
-        \infer{\constructor{\eta}~\term{a} : \type{R}_\bot}{\term{a} : \type{R}}
+        \vcenter{\infer{\constructor{\eta}~\term{a} : \type{R}_\bot}{\term{a} : \type{R}}}
       \end{equation}
     \end{minipage}
   \end{center}
@@ -613,13 +752,13 @@ In this section we will define the partiality monad (see below) and show that (a
   \begin{center}
     \begin{minipage}{0.45\linewidth}
       \begin{equation}
-        \infer{\constructor{\bigsqcup}~(\function{s},\function{b}) : \type{R}_\bot}{\function{s} : \mathbb{N} \rightarrow \type{R}_\bot & \function{b} : \prod_{(n : \mathbb{N})} \function{s}_n~\relation{\sqsubseteq_{\bot}}~\function{s}_{n+1} }
+        \vcenter{\infer{\constructor{\bigsqcup}~(\function{s},\function{b}) : \type{R}_\bot}{\function{s} : \mathbb{N} \rightarrow \type{R}_\bot & \function{b} : \prod_{(n : \mathbb{N})} \function{s}_n~\relation{\sqsubseteq_{\bot}}~\function{s}_{n+1} }}
       \end{equation}
     \end{minipage}
     \hfill
     \begin{minipage}{0.45\linewidth}
       \begin{equation}
-        \infer{\constructor{\alpha_{\bot}}~\term{p}~\term{q} : \term{x} \equiv \term{y}}{\term{x},\term{y} : \type{R}_\bot & \term{p} : \term{x}~\relation{\sqsubseteq_{\bot}}~\term{y} & \term{q} : \term{y}~\relation{\sqsubseteq_{\bot}}~\term{x}}
+        \vcenter{\infer{\constructor{\alpha_{\bot}}~\term{p}~\term{q} : \term{x} \equiv \term{y}}{\term{x},\term{y} : \type{R}_\bot & \term{p} : \term{x}~\relation{\sqsubseteq_{\bot}}~\term{y} & \term{q} : \term{y}~\relation{\sqsubseteq_{\bot}}~\term{x}}}
       \end{equation}
     \end{minipage}
   \end{center}
@@ -627,19 +766,19 @@ In this section we will define the partiality monad (see below) and show that (a
   \begin{center}
     \begin{minipage}{0.25\linewidth}
       \begin{equation}
-        \infer[\constructor{\sqsubseteq_{refl}}]{\term{x}~\relation{\sqsubseteq_{\bot}}~\term{x}}{\term{x} : \type{R}_\bot}
+        \vcenter{\infer[\constructor{\sqsubseteq_{refl}}]{\term{x}~\relation{\sqsubseteq_{\bot}}~\term{x}}{\term{x} : \type{R}_\bot}}
       \end{equation}
     \end{minipage}
     \hfill
     \begin{minipage}{0.35\linewidth}
       \begin{equation}
-        \infer[\constructor{\sqsubseteq_{trans}}]{\term{x}~\relation{\sqsubseteq_{\bot}}~\term{z}}{\term{x}~\relation{\sqsubseteq_{\bot}}~\term{y} & \term{y}~\relation{\sqsubseteq_{\bot}}~\term{z}}
+        \vcenter{\infer[\constructor{\sqsubseteq_{trans}}]{\term{x}~\relation{\sqsubseteq_{\bot}}~\term{z}}{\term{x}~\relation{\sqsubseteq_{\bot}}~\term{y} & \term{y}~\relation{\sqsubseteq_{\bot}}~\term{z}}}
       \end{equation}
     \end{minipage}
     \hfill
     \begin{minipage}{0.25\linewidth}
       \begin{equation}
-        \infer[\constructor{\sqsubseteq_{never}}]{\constructor{\bot}~\relation{\sqsubseteq_{\bot}}~\term{x}}{\term{x} : \type{R}_\bot}
+        \vcenter{\infer[\constructor{\sqsubseteq_{never}}]{\constructor{\bot}~\relation{\sqsubseteq_{\bot}}~\term{x}}{\term{x} : \type{R}_\bot}}
       \end{equation}
     \end{minipage}
   \end{center}
@@ -648,19 +787,19 @@ In this section we will define the partiality monad (see below) and show that (a
     \hfill
     \begin{minipage}{0.50\linewidth}
       \begin{equation}
-        \infer{\prod_{(n : \mathbb{N})} \function{s}_n~\relation{\sqsubseteq_{\bot}}~\bigsqcup(\function{s},\function{b})}{\function{s} : \mathbb{N} \rightarrow \type{R}_\bot & \function{b} : \prod_{(n : \mathbb{N})} \function{s}_n~\relation{\sqsubseteq_{\bot}}~\function{s}_{n+1} }
+        \vcenter{\infer{\prod_{(n : \mathbb{N})} \function{s}_n~\relation{\sqsubseteq_{\bot}}~\bigsqcup(\function{s},\function{b})}{\function{s} : \mathbb{N} \rightarrow \type{R}_\bot & \function{b} : \prod_{(n : \mathbb{N})} \function{s}_n~\relation{\sqsubseteq_{\bot}}~\function{s}_{n+1} }}
       \end{equation}
     \end{minipage}
     \hfill
     \begin{minipage}{0.3\linewidth}
       \begin{equation}
-        \infer{\bigsqcup(\function{s},\function{b})~\relation{\sqsubseteq_{\bot}}~\term{x}}{\prod_{(n:\mathbb{N})} \function{s}_n~\relation{\sqsubseteq_{\bot}}~\term{x}}
+        \vcenter{\infer{\bigsqcup(\function{s},\function{b})~\relation{\sqsubseteq_{\bot}}~\term{x}}{\prod_{(n:\mathbb{N})} \function{s}_n~\relation{\sqsubseteq_{\bot}}~\term{x}}}
       \end{equation}
     \end{minipage}
   \end{center}
   and finally set truncated
   \begin{equation}
-    \infer[\constructor{(-)_\bot\text{-}isSet}]{\term{p} \equiv \term{q}}{\term{p} , \term{q} : \term{x}~\relation{\sqsubseteq_{\bot}}~\term{y}}
+    \vcenter{\infer[\constructor{(-)_\bot\text{-}isSet}]{\term{p} \equiv \term{q}}{\term{p} , \term{q} : \term{x}~\relation{\sqsubseteq_{\bot}}~\term{y}}}
   \end{equation}
 \end{defn}
 
@@ -953,38 +1092,74 @@ This recursor allows us to lift the function \(\function{Seq{\rightarrow}(-)_\bo
 \subsubsection{Building the Partiality Monad as a limit (Dialgebra?)}
 \todo[inline]{Is this possible?}
 
+\subsection{Permutation Trees}
+\subsubsection{Binary Trees}
+We define binary trees \(\type{bT}\) as the \texttt{M}-type over
+\begin{equation}
+  \left(\unit+\unit, \begin{cases} \empt & \mathtt{inl}~\unitelem\\ \unit + \unit & \mathtt{inr}~\unitelem \end{cases}\right)
+\end{equation}
+We get constructors
+\begin{equation}
+  \vcenter{\infer{\constructor{leaf} : \type{bT}}{\strut}}
+\end{equation}
+\begin{equation}
+  \vcenter{\infer{\constructor{node}~\function{f} : \type{bT}}{\function{f} : \unit + \unit \rightarrow \type{bT}}}
+\end{equation}
+We want to define trees where the permutation does not matter \(\type{bTp}\)
+\begin{equation}
+  \vcenter{\infer[\constructor{mix}]{\constructor{node}~\function{f} \equiv \constructor{node}~(\function{f} \circ \function{g})}{\function{f} : \unit + \unit \rightarrow \type{bT} & \function{g} : \unit + \unit \rightarrow \unit + \unit & \mathtt{isIso}~\function{g}}}
+\end{equation}
+We can either define this as a quotient \(\type{bT} / \relation{\sim}\), meaning \(\relation{\sim} = \constructor{mix}\) or as a QIIT type where \(\constructor{mix}\) and \(\constructor{bTp\text{-}isSet}\) are additional constructors. These two definitions are equal
+\begin{thm}
+  \(\type{bT}/\relation{\sim} \equiv \type{bTp}\)
+  \begin{proof}
+    \begin{equation}
+      \begin{aligned}
+        &\function{bT{\rightarrow}bTp}~\constructor{leaf}_{\type{bT}} = \constructor{leaf}_{\type{bTp}} \\
+        &\function{bT{\rightarrow}bTp}~(\constructor{node}_{\type{bT}}~\function{f}) = \constructor{node}_{\type{bTp}}~(\function{bT{\rightarrow}bTp} \circ \function{f})
+      \end{aligned}
+    \end{equation}
+    Then we lift the definition to the quotient
+    \begin{equation}
+      \begin{aligned}
+        &\function{bT/{\sim}{\rightarrow}bTp} = \function{rec}~\function{bT{\rightarrow}bTp}~(\function{Seq{\rightarrow}(-)_\bot\text{-}{\approx}{\rightarrow}{\equiv}}~\term{A_{set}})~\constructor{bTp\text{-}isSet}
+      \end{aligned}
+    \end{equation}
+  \end{proof}
+\end{thm}
+
 \subsection{Silhouette Trees}
 We start by defining an \(\type{R}\) valued \(\type{E}\) branching tree, as the \texttt{M}-type given by the following container
 \begin{equation}
-  \left(\type{R} + \unit , \begin{cases} \bot & \mathtt{inl}~\term{a} \\ \type{E} & \mathtt{inr}~\unitelem \end{cases}\right)
+  \left(\type{R} + \unit , \begin{cases} \empt & \mathtt{inl}~\term{a} \\ \type{E} & \mathtt{inr}~\unitelem \end{cases}\right)
 \end{equation}
 We get the constructors
 \begin{equation}
-  \infer{\constructor{leaf}~\term{a} : \typeformer{tree}~\type{R}~\type{E}}{\term{a} : \type{R}}
+  \vcenter{\infer{\constructor{leaf}~\term{a} : \typeformer{tree}~\type{R}~\type{E}}{\term{a} : \type{R}}}
 \end{equation}
 \begin{equation}
-  \infer{\constructor{node}~\function{k} : \typeformer{tree}~\type{R}~\type{E}}{\function{k} : \type{E} \rightarrow \typeformer{tree}~\type{R}~\type{E}}
+  \vcenter{\infer{\constructor{node}~\function{k} : \typeformer{tree}~\type{R}~\type{E}}{\function{k} : \type{E} \rightarrow \typeformer{tree}~\type{R}~\type{E}}}
 \end{equation}
-Then we define the weak bisimularity relation \(\relation{\sim_{tree}}\)
+Then we define the weak bisimilarity relation \(\relation{\sim_{tree}}\)
 \begin{equation}
-  \infer[\constructor{\sim_{leaf}}]{\constructor{leaf}~x~\relation{\sim_{tree}}~\constructor{leaf}~y}{}
-\end{equation}
-\begin{equation}
-  \infer[\constructor{\sim_{node}}]{\constructor{node}~\function{k_1}~\relation{\sim_{tree}}~\constructor{node}~\function{k_2}}{\prod_{(v : \type{E})}~\function{k_1}~\term{v}~\relation{\sim_{tree}}~\function{k_2}~\term{v}}
-\end{equation}
-This is enough to define, what we call, silhouette trees, which are trees quotiented by this notion of weak bisimularity, namely \(\typeformer{tree} / \relation{\sim_{tree}}\). We can also construct this type directly as a QIIT, with type constructors \todo{add all needed constructors}
-\begin{equation}
-  \infer{\constructor{leaf}_{\typeformer{sTree}} : \typeformer{sTree}~\type{E}}{}
+  \vcenter{\infer[\constructor{\sim_{leaf}}]{\constructor{leaf}~x~\relation{\sim_{tree}}~\constructor{leaf}~y}{\strut}}
 \end{equation}
 \begin{equation}
-  \infer{\constructor{node}_{\typeformer{sTree}}~\function{k} : \typeformer{sTree}~\type{E}}{\function{k} : \type{E} \rightarrow \typeformer{sTree}~\type{E}}
+  \vcenter{\infer[\constructor{\sim_{node}}]{\constructor{node}~\function{k_1}~\relation{\sim_{tree}}~\constructor{node}~\function{k_2}}{\prod_{(v : \type{E})}~\function{k_1}~\term{v}~\relation{\sim_{tree}}~\function{k_2}~\term{v}}}
+\end{equation}
+This is enough to define, what we call, silhouette trees, which are trees quotiented by this notion of weak bisimilarity, namely \(\typeformer{tree} / \relation{\sim_{tree}}\). We can also construct this type directly as a QIIT, with type constructors \todo{add all needed constructors}
+\begin{equation}
+  \vcenter{\infer{\constructor{leaf}_{\typeformer{sTree}} : \typeformer{sTree}~\type{E}}{\strut}}
+\end{equation}
+\begin{equation}
+  \vcenter{\infer{\constructor{node}_{\typeformer{sTree}}~\function{k} : \typeformer{sTree}~\type{E}}{\function{k} : \type{E} \rightarrow \typeformer{sTree}~\type{E}}}
 \end{equation}
 And the ordering relation \((\cdot~\relation{\sqsubseteq_{sTree}}~\cdot)\) of how "defined" the trees are by the constructors \todo{add all needed constructors}
 \begin{equation}
-  \infer{\constructor{\alpha}_{\typeformer{sTree}}~\term{x}~\term{y} : \typeformer{sTree}~\type{E}}{\term{x}~\relation{\sqsubseteq_{sTree}}~\term{y} & \term{y}~\relation{\sqsubseteq_{sTree}}~\term{x}}
+  \vcenter{\infer{\constructor{\alpha}_{\typeformer{sTree}}~\term{x}~\term{y} : \typeformer{sTree}~\type{E}}{\term{x}~\relation{\sqsubseteq_{sTree}}~\term{y} & \term{y}~\relation{\sqsubseteq_{sTree}}~\term{x}}}
 \end{equation}
 \begin{equation}
-  \infer{\mathop{\constructor{\bigsqcup}}_{(\function{e} : \mathbb{N} \rightarrow \type{E})}~(\function{s}~\function{e})}{\function{s} : (\mathbb{N} \rightarrow \type{E}) \rightarrow \typeformer{sTree}~\type{E}}
+  \vcenter{\infer{\mathop{\constructor{\bigsqcup}}_{(\function{e} : \mathbb{N} \rightarrow \type{E})}~(\function{s}~\function{e})}{\function{s} : (\mathbb{N} \rightarrow \type{E}) \rightarrow \typeformer{sTree}~\type{E}}}
 \end{equation}
 
 \subsubsection{From \(\typeformer{tree}\) to \(\typeformer{Seq}_{tree}\)}
@@ -1068,22 +1243,17 @@ We now want to show the equivalence between these two constructions, to do this 
 \end{thm}
 \noindent We start by defining some ordering relation on \(\typeformer{Seq}_{tree}\)
 \begin{defn}[Sequence Termination]
-  The following relations says that a branche \(\function{e} : \mathbb{N} \rightarrow \type{E}\) of a sequence \(\function{s} : \typeformer{Seq}_{tree}\) terminates with some value \(\term{r} : \type{R}\),
+  The following relations says that a branche \(\function{e} : \mathbb{N} \rightarrow \type{E}\) of a sequence \(\function{s} : \typeformer{Seq}_{tree}\) terminates at depth \(n\),
   \begin{equation}
-    (\function{s}~\function{e})~\relation{\downarrow_{\typeformer{Seq}_{tree}}}~\term{r} = \sum_{(n : \mathbb{N})} (\function{s}~\function{e}~n) \downarrow_{\type{R} + \unit} \term{r}.
+    (\function{s}~\function{e})~\relation{\downarrow_{\typeformer{Seq}_{tree}}}~n = (\function{s}~\function{e}~n) \downarrow_{\type{R} + \unit}.
   \end{equation}
 \end{defn}
-\begin{defn}[Sequence Ordering]
+We define weak bisimilarity relation for sequences \todo{Is this defined for partiality monad?}
+\begin{defn}
   \begin{equation}
-    \function{s}~\relation{\sqsubseteq_{\typeformer{Seq}_{tree}}}~\function{t} = \prod_{(e : \type{E})} \prod_{(\term{a} : \type{R})} \left(\|(\function{s}~\function{e})~\relation{\downarrow_{\mathtt{Seq}}}~\term{a}\| \rightarrow \| (\function{t}~\function{e})~\relation{\downarrow_{\mathtt{Seq}}}~\term{a}\|\right) 
+    \function{s}~\relation{\sim_{\typeformer{Seq}_{tree}}}~\function{t} = \prod_{(e : \type{E})} \prod_{(n : \mathbb{N})} \left(\|(\function{s}~\function{e})~\relation{\downarrow_{\mathtt{Seq}}}~\term{n}\| \longleftrightarrow \| (\function{t}~\function{e})~\relation{\downarrow_{\mathtt{Seq}}}~\term{n}\|\right)
   \end{equation}
   where \(\| \cdot \|\) is propositional truncation.
-\end{defn}
-\begin{defn}
-  We define weak bisimularity relation for sequences \todo{Is this defined for partiality monad?}
-  \begin{equation}
-    \function{s}~\relation{\sim_{\typeformer{Seq}_{tree}}}~\function{t} = \function{s}~\relation{\sqsubseteq_{\typeformer{Seq}_{tree}}}~\function{t} \times \function{t}~\relation{\sqsubseteq_{\typeformer{Seq}_{tree}}}~\function{s}
-  \end{equation}
 \end{defn}
 \begin{cor}
   The types \(\typeformer{tree}/\relation{\sim_{tree}}\) and \(\typeformer{Seq}_{tree} / \relation{\sim_{\typeformer{Seq}_{tree}}}\) are equal.
@@ -1158,7 +1328,7 @@ We want to define sequences based on \texttt{M}-types, here are some examples
   \typeformer{Seq}_{\typeformer{M}_{\containerpair{\type{A} + \type{B}}{[\type{X} , \type{Y}]}}} &=~\prod_{\left(\function{e} : (n : \mathbb{N}) \rightarrow {\begin{cases}  {\scriptstyle  X~a} & {\scriptstyle  \function{s}_{n-1} = \mathtt{inl}~a} \\[-2mm] {\scriptstyle  Y~b} & {\scriptstyle  \function{s}_{n-1} = \mathtt{inr}~b} \end{cases}}\right)}\sum_{(\function{s} : \mathbb{N} \rightarrow \type{A})}\prod_{(n : \mathbb{N})} \function{s}_n \sqsubseteq \function{s}_{n+1}
 \end{align}
 \begin{equation}
-  \typeformer{Seq}_{\typeformer{M}_{\containerpair{\type{A}}{\type{B}}}} &= \sum_{(\term{s'} : \typeformer{M}_{\containerpair{\type{A}}{\typeformer{B}}})}  \sum_{(\function{s} : \mathbb{N} \rightarrow \sum_{(\term{a} : \type{A})} \typeformer{B}\,\term{a} \rightarrow \typeformer{M}_{\containerpair{\type{A}}{\typeformer{B}}})} \left(\prod_{\term{p} : \sum_{\term{a} : \type{A}} \typeformer{B}\,\term{a}} \term{s'} \sqsubseteq (\function{s}_0~\term{p})\right) \times \left( \prod_{(n : \mathbb{N})} \prod_{(p : \sum_{(a : A)} B\,a)} (s_n~p) \sqsubseteq (s_{n+1}~p) \right)
+  \typeformer{Seq}_{\typeformer{M}_{\containerpair{\type{A}}{\type{B}}}} = \sum_{(\term{s'} : \typeformer{M}_{\containerpair{\type{A}}{\typeformer{B}}})}  \sum_{(\function{s} : \mathbb{N} \rightarrow \sum_{(\term{a} : \type{A})} \typeformer{B}\,\term{a} \rightarrow \typeformer{M}_{\containerpair{\type{A}}{\typeformer{B}}})} \left(\prod_{\term{p} : \sum_{\term{a} : \type{A}} \typeformer{B}\,\term{a}} \term{s'} \sqsubseteq (\function{s}_0~\term{p})\right) \times \left( \prod_{(n : \mathbb{N})} \prod_{(p : \sum_{(a : A)} B\,a)} (s_n~p) \sqsubseteq (s_{n+1}~p) \right)
 \end{equation}
 \todo{which other QM types can be expressed as QIITs}
 A QM-type is a quotiented M-type, we try to define this as a quotient on containers. We define container quotients as
@@ -1331,10 +1501,10 @@ We want to define a strong bisimulation relation \(\relation{\sim_{delay}}\) for
 \begin{defn}
   The relation \(\relation{\sim_{delay}}\) is defined by the following rules
   \begin{equation}
-    \infer[\mathtt{now}{\sim}]{\function{now}~\term{r}~\relation{\sim_{delay}}~\function{now}~\term{r} : \universe{\mathcal{U}}}{\type{R} : \universe{U} & \term{r} : \type{R}}
+    \vcenter{\infer[\mathtt{now}{\sim}]{\function{now}~\term{r}~\relation{\sim_{delay}}~\function{now}~\term{r} : \universe{\mathcal{U}}}{\type{R} : \universe{U} & \term{r} : \type{R}}}
   \end{equation}
   \begin{equation}
-    \infer[\mathtt{later}{\sim}]{\function{later}~\term{t}~\relation{\sim_{delay}}~\function{later}~\term{u} : \universe{\mathcal{U}}}{\type{R} : \universe{\mathcal{U}} & \term{t} : \typeformer{delay}~\type{R} & \term{u} : \typeformer{delay}~\type{R} & \term{t}~\relation{\sim_{delay}}~\term{u} : \universe{\mathcal{U}}}
+    \vcenter{\infer[\mathtt{later}{\sim}]{\function{later}~\term{t}~\relation{\sim_{delay}}~\function{later}~\term{u} : \universe{\mathcal{U}}}{\type{R} : \universe{\mathcal{U}} & \term{t} : \typeformer{delay}~\type{R} & \term{u} : \typeformer{delay}~\type{R} & \term{t}~\relation{\sim_{delay}}~\term{u} : \universe{\mathcal{U}}}}
   \end{equation}
 \end{defn}
 \begin{thm}
@@ -1368,13 +1538,13 @@ We want to define a strong bisimulation relation \(\relation{\sim_{delay}}\) for
 \subsection{Bisimulation of ITrees}
 We define our bisimulation coalgebra from the strong bisimulation relation \(\mathcal{R}\), defined by the following rules.
 \begin{equation}
-  \infer[\mathtt{EqRet}]{\mathtt{Ret}~\term{a} \cong \mathtt{Ret}~\term{b}}{\term{a},\term{b} : \type{R} & \term{a} \equiv_{\type{R}} \term{b}}
+  \vcenter{\infer[\mathtt{EqRet}]{\mathtt{Ret}~\term{a} \cong \mathtt{Ret}~\term{b}}{\term{a},\term{b} : \type{R} & \term{a} \equiv_{\type{R}} \term{b}}}
 \end{equation}
 \begin{equation}
-  \infer[\mathtt{EqTau}]{\mathtt{Tau}~\term{t} \cong \mathtt{Tau}~\term{u}}{\term{t},\term{u} : \mathtt{itree}~\typeformer{E}~\type{R} & \term{t} \cong \term{u}}
+  \vcenter{\infer[\mathtt{EqTau}]{\mathtt{Tau}~\term{t} \cong \mathtt{Tau}~\term{u}}{\term{t},\term{u} : \mathtt{itree}~\typeformer{E}~\type{R} & \term{t} \cong \term{u}}}
 \end{equation}
 \begin{equation}
-  \infer[\mathtt{EqVis}]{\mathtt{Vis}~\term{e}~\term{k_1} \cong \mathtt{Tau}~\term{e}~\term{k_2}}{\type{A} : \universe{\mathcal{U}} & \term{e} : \typeformer{E}~\type{A} & \term{k_1},\term{k_2} : \type{A} \rightarrow \mathtt{itree}~\typeformer{E}~\type{R} & \term{t} \cong \term{u}}
+  \vcenter{\infer[\mathtt{EqVis}]{\mathtt{Vis}~\term{e}~\term{k_1} \cong \mathtt{Tau}~\term{e}~\term{k_2}}{\type{A} : \universe{\mathcal{U}} & \term{e} : \typeformer{E}~\type{A} & \term{k_1},\term{k_2} : \type{A} \rightarrow \mathtt{itree}~\typeformer{E}~\type{R} & \term{t} \cong \term{u}}}
 \end{equation}
 Now we just need to define \(\term{\alpha}_{\relation{\mathcal{R}}}\) \todo[inline]{define the \(\alpha_{\relation{R}}\) function}. Now we have a bisimulation relation, which is equivalent to equality, using what we showed in the previous section.
 
