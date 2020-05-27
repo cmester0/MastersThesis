@@ -108,7 +108,7 @@
 \pagestyle{empty} 
 \pagenumbering{roman} 
 \vspace*{\fill}\noindent{\rule{\linewidth}{1mm}\\[4ex]
-  {\Huge\sf \texttt{M}-types and Coinduction in HoTT and Cubical Type Theory}\\[2ex]
+  {\Huge\sf (Q)\texttt{M}-types and Coinduction in HoTT / CTT}\\[2ex]
   {\huge\sf Lasse Letager Hansen, 201912345}\\[2ex]
   \noindent\rule{\linewidth}{1mm}\\[4ex]
   \noindent{\Large\sf Master's Thesis, Computer Science\\[1ex] 
@@ -121,7 +121,7 @@
 \chapter*{Abstract}
 \addcontentsline{toc}{chapter}{Abstract}
 
-\todo[inline]{in English\dots}
+We present a construction of \texttt{M}-types from containers in a cubical type theory (CTT), We show how the containers construct a coalgebra, for which we can define a coinduction principle, making strong bisimulation imply equality. We then show constructions of \texttt{M}-types, and how they can be quotiented to construct what we call \texttt{QM}-types. The problem with \texttt{QM}-types is \todo{... problem with quotients ...}, but this is solved by defining the quotienting relation and the type at the same time as a quotient inductive-inductive type (QIIT), which assuming the axiom of (countable) choice, is equal to the \texttt{QM}-type. We conclude with some examples of how to use \texttt{M}-types and some properties. All work is formalized in Cubical Agda, and the work on defining \texttt{M}-types has been accepted to the Cubical Agda github repository.
 
 \chapter*{Resum\'e}
 \addcontentsline{toc}{chapter}{Resum\'e}
@@ -130,11 +130,9 @@
 
 \chapter*{Acknowledgments}
 \addcontentsline{toc}{chapter}{Acknowledgments}
-
-\todo[inline]{\dots}
-
+I would like to thank my supervisor Bas Spitters for some enlightening discussions and for taking the time to do weekly meetings about this masters thesis. I would also like to thank my fellow students, who made this time less lonely even through the Corona pandemic.
 \vspace{2ex}
-c\begin{flushright}
+\begin{flushright}
   \emph{Lasse Letager Hansen,}\\
   \emph{Aarhus, \today.}
 \end{flushright}
@@ -219,6 +217,48 @@ In the second chapter we introduce/summarize some background theory. In the thir
 \todo[inline]{motivate and explain the problem to be addressed}
 \todo[inline]{get your bibtex entries from \url{https://dblp.org/}}
 
+\section{Background Theory}
+We start by giving some background theory / history on cubical type theory and summarize important concepts used in the rest of this thesis. \todo{Should a description of Set Theory be included}
+\\ \\
+We will be using \textbf{type theory} as the basis for mathematics. In type theory every term \(\term{x}\) is an element of some type \(\type{A}\), written \(\term{x} : \type{A}\). The idea in type theory is that propositions are types, so proofs boils down to showing that there exists an element of some type representing a proposition. Specifically proofs of equality becomes construction of an element of an equality type. The type theory we are working in is inspired by \textbf{Martin L\"of Type Theory (MLTT)} / Intuitionistic type Theory (ITT), which is designed on the principles of mathematical constructivism, where any existence proof must contain a witness. Meaning a proof of existence, can be converted into an algorithm that finds the element making the statement true. MLTT is built from the three finite types \(\empt\), \(\unit\) and \(\type{\mathbf{2}}\), and type constructors \(\Sigma\), \(\pi\) and \(=\). There is only a single way to make terms of \(=\)-type, and that is \(\mathtt{refl} : \prod_{a : A} (a = a)\). \todo{inductive types, universes and judgements} \todo{extensional vs intensional \url{https://ncatlab.org/nlab/show/intensional+type+theory}} \todo{find citation, currently \url{https://en.wikipedia.org/wiki/Intuitionistic_type_theory}}. We will be working in a cubical type theory, where the univalence axiom holds. The \textbf{univalence axiom} says that equality is equivalent to equivalence
+\begin{equation}
+  (\type{A} = \type{B}) \simeq (\type{A} \simeq \type{B})
+\end{equation}
+meaning if two objects are equivalent, then there is an equality between them, such that we can replace one by the other.
+\\ \\
+The type theory we will be working in is called \textbf{homotopy type theory (HoTT)} \cite{hottbook}, which is an intensional dependent type theory (built on MLTT) with the univalence axiom and higher inductive types. In HoTT the idenitity types form path spaces, so proofs of identity are not just \texttt{refl}, as for MLTT. Types are seen as "spaces", and we think of \(\term{a} : \type{A}\) as \(\term{a}\) being a point in the space \(\type{A}\), similarly functions are regarded as continuous maps from one space to another \cite{nlab:homotopy_type_theory}. The use of a type theory with the univalence axiom as a foundations for mathematics, is called \textbf{Univalent Foundations (UF)}\todo{should this be left out?}, which HoTT is. We will be working in a \textbf{cubical type theory (CTT)} \cite{DBLP:CTT} where the univalence axiom, is not just an axiom, but a statement that can actually be proven, meaning we can reduce the use of the univalence axiom, making it easier to do proofs involving the univalence axiom \cite{nlab:cubical_type_theory}. \todo{example of what computational "axioms" mean} The reason for the name cubical type theory, is because composition is defined by square, that is given three sides of a square we get the last one, see \figref{cubical-composition-square}.
+\begin{figure}[h]
+  \centering
+  \begin{tikzcd}
+    A \ar[r,"p \ct q \ct r",dashed] & B \\
+    C \ar[u,"p^{-1}"] \ar[r,"q"'] & D \ar[u,"r"']
+  \end{tikzcd}
+  \caption{Composition square}
+  \label{fig:cubical-composition-square}
+\end{figure}
+Most of the work in this thesis has been formalized in the proof assistant / programming languge Cubical Agda. A proof assistant helps with verifying proofs, while making the process of making proofs interactive. \textbf{Cubical Agda} is an implementation of a cubical type theory done by extending the proof assistant Agda. One of the main additions is the interval and path types. The interval can be thought of as elements in \([0,1]\). When working with the interval, we can only access the left and right endpoint \(\constant{i0}\) and \(\constant{i1}\) or some unspecified point in the middle \(i\), modeling the intuition of a continuous interval. Cubical agda also generalizes transporting, given a type line \(\typeformer{A} : \mathbb{I} \rightarrow \universe{\mathcal{U}}\), and the endpoint \(\typeformer{A}~\constant{i0}\) you get a line from \(\typeformer{A}~\constant{i0}\) to \(\typeformer{A}~\constant{i1}\) \cite{cubicalagda}. \todo{Axioms of cubical Agda} \todo{Some better (intuitive) description of the interval type!!}
+\\ \\
+Homotopy type theory is proof relevant, which means that a there might be multiple proofs of one statement, and these proofs might not be interchangeable (equal). The reason is that types in HoTT have a H-level, describing how equality behaves. We start from (-2) with contractiable types, meaning there is an element which all other element are equal to. Then there is (-1)-types which are mere propositions or hProp, where all elements of the type are equal, but there might not be any. If the type is inhabited, then we say the proposition is true. The 0-types are the hSets, where all equalities between two elements \(x,y\) are equal. For 1-types (1-groupoids) we get equalities of equalities are equal, and then so on for homotopy \(n\)-types. Any \(n\)-type is also a \(n+1\)-type, but with trivial equalities at the \(n+1\) level. If we don't want to do proof relevant mathematics we can do propositional truncation, converting types to \(-1\)-type, meaning we ignore the difference in proofs by just look at whether a type is inhabited or not. However doing this we loose some of the reasoning power of HoTT. One of the tools we get using the full power of HoTT is \textbf{Higher order inductive types (HITs)}, where we define types with point constructors and equality constructors, an example is the propositional truncation we just described\todo{write up constructors for propositional truncation}, another useful example is set truncated quotients\todo{write up constructors for set truncated quotients}.
+\\ \\
+\todo[inline]{W-types, Induction , M-types, Coinduction..., see introduction?}
+Coinduction is the dual concept (in a categorical manner) of induction. The induction principle is an equivalence principle for congruent elements in an initial algebra.
+\\ \\
+Cubical Agda has a hierarchy of universes
+\todo[inline]{Universes}
+
+\subsubsection{UIP}
+\paragraph{Path type}
+We add a type \(\mathbb{I}\), which is defined to be a free de Morgan algebra on a discrete infinite set of names \todo{cite: https://arxiv.org/pdf/1611.02108.pdf}. The elements of \(\mathbb{I}\) can be described by the grammar
+\begin{equation}
+  r,s ::= 0 \mid 1 \mid i \mid 1 - r \mid r \land s \mid r \lor s
+\end{equation}
+The set \(\mathbb{I}\) has decidable equality. The elements in \(\mathbb{I}\) can be thought as formal representations of elements in the unit interval \([0,1]\). There is a special substitution with \(\constant{i0}\) and \(\constant{i1}\) being the endpoints of \([0,1]\).
+
+\subsection{Problems with / Getting around using AC and LEM}
+These axioms does not have a computational interpretation, so to maintain the computational aspects of HoTT and CTT, we try to not use these axioms. \cite[Introduction]{hottbook}
+
+\subsection{Universes ??}
+
 \section{Notation}
 Most of the work is formalized in the Cubical Agda proof assistant. The following is the notation / fonts used to denote specific definitions / concepts
 \begin{itemize}
@@ -243,90 +283,6 @@ Furthermore we define some useful notation for casing on natural numbers.
     \natcases{\term{x}}{\function{f}} = \lambda\,n, \begin{cases} \term{x} & n = 0 \\ \function{f}~m & n = m + 1 \end{cases}
   \end{equation}
 \end{defn}
-
-\section{Background Theory}
-We start by giving some background theory / history on cubical type theory and summarize important concepts used in the rest of this thesis.
-
-\subsection{Interactive Proof Assistants}
-
-\subsection{Set Theory}
-\todo{Should this be included}
-
-\subsection{Type Theory}
-Type theory is the computational angle on a basis for mathematics. In type theory every term \(\term{x}\) is an element of some type \(\type{A}\), written \(\term{x} : \type{A}\). The idea in type theory is that propositions are types, so proofs boils down to showing that there exists an element of some type representing a proposition. Specifically proofs of equality becomes construction of an element of an equality type.
-
-\subsubsection{Martin L\"of Type Theory / Intuitionistic type Theory (MLTT/ITT)}
-Per Matin-L\"of designed the type theory on the principles of mathmatical constructivism, where any existance proof must contain a witness. Meaning a proof that there exists an element, such that something is true, can be converted into an algorithm that finds that element. The type theory is built from the three finite types \(\empt\), \(\unit\) and \(\type{\mathbf{2}}\), and type constructors \(\Sigma\), \(\pi\) and \(=\). There is only a single way to make terms of \(=\)-type, and that is \(\mathtt{refl} : \prod_{a : A} (a = a)\). \todo{inductive types, universes and judgements} \todo{extensional vs intensional} \todo{find citation, currently \url{https://en.wikipedia.org/wiki/Intuitionistic_type_theory}}.
-\paragraph{Intensional Type Theory}
-\todo{\url{https://ncatlab.org/nlab/show/intensional+type+theory}}
-
-\subsection{The Univalence Axiom}
-The map
-\begin{equation}
-  \typeformer{id}_{\universe{\mathcal{U}}}~\type{A}~\type{B} \rightarrow \typeformer{Equiv}~\type{A}~\type{B}
-\end{equation}
-is an equivalence, simplifying a bit, identity is equivalent to equivalence
-\begin{equation}
-  (\type{A} = \type{B}) \simeq (\type{A} \simeq \type{B})
-\end{equation}
-Or said in another way equivalent types are identical.
-
-\subsection{Homotopy Type Theory (HoTT) / Univalent Foundations (UF)}
-Homotopy type theory is an intensional dependent type theory (built on MLTT) with the univalence axiom and higher inductive types. Homotopy type theory is constructive by default, but can be made classical.
-
-is a type theory where the idenitity types form path spaces, so proofs of identity are not just \texttt{refl}, as for MLTT. Types are seen as "spaces" or (higher groupoids), and we think of \(\term{a} : \type{A}\) as \(\term{a}\) being a point in the space \(\type{A}\), similarly functions are regarded as continuous maps from one space to another. \cite{nlab:homotopy_type_theory}
-
-\subsubsection{Judgmental Equality / Definitional Equality}
-This means equal by definition, denoted \(a \equiv b\). It does not make sense to assume definitional equality (inside the theory). The equality is algorithmically decidable (meta-theoretic algorithm, not internal). 
-
-\subsubsection{Propositional Equality}
-If the equality \(a =_{A} b\) is inhabited, then we get propositional equality.
-
-\subsubsection{External (of theory)}
-\subsubsection{Internal (of theory)}
-
-\subsubsection{Constructivity}
-From every proof we can extract an algorithm, that produces an element of the proposition.
-
-\paragraph{Proof relevant mathematics}
-
-\subsubsection{Homotopy \(n\)-types}
-The 0-types are the hSets, (-1)-types are mere propositions or hProp. So all elements of a type that is an hProp, will be equal. All equalities between elements of types that are hSets, are equal. For 1-types (1-groupoids) we get equalities of equalities are equal, and then so on for homotopy \(n\)-types.
-
-\subsubsection{The HoTT Book}
-
-\subsection{Higher order inductive types (HITs)}
-\subsubsection{Propositional truncation and Set Truncated Quotients}
-
-\subsection{Cubical Type Theory (CTT)}
-Cubical type theory is a version of homotopy type theory where univalence actually computes, meaning it is not just an axiom, but can actually be proven. \cite{nlab:cubical_type_theory}
-
-\subsubsection{UIP}
-\subsubsection{Cubical Agda}
-Cubical Agda is an implementation of a cubical type theory by extending the proof assistant Agda. One of the main additions is the interval and path types. The interval can be thought of as elements in \([0,1]\). When working with the interval, we can only access the left and right endpoint \(\constant{i0}\) and \(\constant{i1}\) or some unspecified point in the middle \(i\), modeling the intuition of a continuous interval. Cubical agda also generalizes transporting, given a type line \(\typeformer{A} : \mathbb{I} \rightarrow \universe{\mathcal{U}}\), and the endpoint \(\typeformer{A}~\constant{i0}\) you get a line from \(\typeformer{A}~\constant{i0}\) to \(\typeformer{A}~\constant{i1}\) \cite{cubicalagda}
-
-\todo[inline]{Axioms of cubical Agda}
-The theory of cubical Agda is a Cartesian closed category, meaning get exponentials.
-\\ \\
-\todo[inline]{Something about the interval type!!}
-
-\paragraph{Path type}
-We add a type \(\mathbb{I}\), which is defined to be a free de Morgan algebra on a discrete infinite set of names \todo{cite: https://arxiv.org/pdf/1611.02108.pdf}. The elements of \(\mathbb{I}\) can be described by the grammar
-\begin{equation}
-  r,s ::= 0 \mid 1 \mid i \mid 1 - r \mid r \land s \mid r \lor s
-\end{equation}
-The set \(\mathbb{I}\) has decidable equality. The elements in \(\mathbb{I}\) can be thought as formal representations of elements in the unit interval \([0,1]\). There is a special substitution with \(\constant{i0}\) and \(\constant{i1}\) being the endpoints of \([0,1]\).
-
-
-\subsection{Coinduction}
-Coinduction is the dual concept (in a categorical manner) of induction. The induction principle is an equivalence principle for congruent elements in an initial algebra.
-
-\subsection{W-types}
-
-\subsection{Problems with / Getting around using AC and LEM}
-These axioms does not have a computational interpretation, so to maintain the computational aspects of HoTT and CTT, we try to not use these axioms. \cite[Introduction]{hottbook}
-
-\subsection{Universes ??}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
 
@@ -412,25 +368,25 @@ In this chapter we will introduce containers (aka. signatures), and use them to 
 \end{exmp}
 \begin{defn}
   We define a chain as a family of morphisms \(\function{\pi}_{(n)} : \type{X}_{n+1} \rightarrow \type{X}_{n}\), over a family of types \(\type{X}_{n}\). See \figref{x-chain}.
-  \begin{figure}
-    \label{fig:x-chain}
+  \begin{figure}[h]
     \centering
     \begin{tikzcd}[row sep=large,column sep=large]
       \type{X}_0 & \type{X}_1 \ar[l,"\function{\pi}_{(0)}"] & \cdots \ar[l,"\function{\pi}_{(1)}"] & \type{X}_n \ar[l,"\function{\pi}_{(n-1)}"] & \type{X}_{n + 1} \ar[l,"\function{\pi}_{(n)}"] & \cdots \ar[l,"\function{\pi}_{(n+1)}"]
     \end{tikzcd}
     \caption{Chain of types / functions}
+    \label{fig:x-chain}
   \end{figure}  
 \end{defn}
 \begin{lem}\label{lem:function-to-M-type-is-cone}
   For all coalgebras \(\coalg{\type{C}}{\function{\gamma}}\) for the container \(\container{S}\), we get \(\type{C} \rightarrow \typeformer{M}_{\container{S}} \equiv \typeformer{Cone}_{\coalg{\type{C}}{\function{\gamma}}}\), where \(\typeformer{Cone} = \sum_{(\function{f} : \prod_{(n : \mathbb{N})} \type{C} \rightarrow \type{X}_n)} \prod_{(n : \mathbb{N})} \function{\pi}_{(n)} \circ (\function{f}_{(n+1)}) \equiv f_n\) illustrated in \figref{M-seq-cone}.
-  \begin{figure}
-    \label{fig:M-seq-cone}
+  \begin{figure}[h]
     \centering
     \begin{tikzcd}[row sep=large,column sep=large]
       \type{X}_0 & \type{X}_1 \ar[l,"\function{\pi}_{(0)}"] & \cdots \ar[l,"\function{\pi}_{(1)}"] & \type{X}_n \ar[l,"\function{\pi}_{(n-1)}"] & \type{X}_{n + 1} \ar[l,"\function{\pi}_{(n)}"] & \cdots \ar[l,"\function{\pi}_{(n+1)}"] \\
       & & \type{C} \ar[ull,"\function{f}_0"] \ar[ul,"\function{f}_1"'] \ar[u,draw=none,"\cdots" description] \ar[ur,"\function{f}_n"] \ar[urr,"\function{f}_{n+1}"'] \ar[urrr,draw=none,"\cdots"'] & 
     \end{tikzcd}
     \caption{Cone}
+    \label{fig:M-seq-cone}
   \end{figure}  
   \begin{proof}
     We define an isomorphism from \(\type{C} \rightarrow \typeformer{M}_{\container{S}}\) to \(\typeformer{Cone}_{\coalg{\type{C}}{\function{\gamma}}}\)
@@ -1334,27 +1290,7 @@ We want to define sequences based on \texttt{M}-types, here are some examples
 A QM-type is a quotiented M-type, we try to define this as a quotient on containers. We define container quotients as
 
 \section{Cofree Coalgebra / Dialgebra}
-
-\newpage
-\section{TODO}
-\begin{itemize}
-\item Resumption Monad transformer
-\item coinduction in Coq is broken
-\item bisim \(\Rightarrow\) eq
-\item copattern matching
-\item cubical Agda. Relation between \texttt{M}-types defined by coinduction/copattern matching and constructed from W-types
-  \begin{itemize}
-  \item In Agda, co-inductive types are defined using Record types, which are Sigma-types.
-  \item In cubical Agda, 3.2.2 the issue of productivity is discussed. This can probably be made precise using guarded types.
-\end{itemize}
-\item streams defined by guarded recursion vs coinduction in guarded cubical Agda. 
-  \begin{itemize}
-  \item p3 of the guarded cubical Agda paper describes how semantic productivity improves over syntactic productivity
-\end{itemize}
-\item Reduction of co-inductive types in Coq/Agda to (indexed) \texttt{M}-types. Like reduction of strictly positive inductive types to W-types. https://ncatlab.org/nlab/show/W-type
-\item QIITs have been formalized in Agda using private types. Can this also be done in cubical Agda (ie without cheating).
-\item   Show that this is the final (quotiented) coalgebra. Does this generalize to Q\texttt{M}-types, and what are those constructively ??
-\end{itemize}
+\todo[inline]{Is this relevant?}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
 
