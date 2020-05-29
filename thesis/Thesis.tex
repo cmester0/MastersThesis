@@ -60,6 +60,7 @@
 \newcommand*{\thmref}[1]{\hyperref[thm:#1]{Theorem~\ref*{thm:#1}}} % Theorem~\ref
 \newcommand*{\lemref}[1]{\hyperref[lem:#1]{Lemma~\ref*{lem:#1}}}
 \newcommand*{\figref}[1]{\hyperref[fig:#1]{Figure~\ref*{fig:#1}}}
+\newcommand*{\chapterref}[1]{\hyperref[ch:#1]{Chapter~\ref*{ch:#1}}}
 
 \newcommand*{\set}[1]{\left\{#1\right\}}
 \newcommand*{\term}[1]{\textcolor{green!30!black}{#1}} % \textcolor{green!70!black} \textcolor{blue!80!black}
@@ -121,7 +122,7 @@
 \chapter*{Abstract}
 \addcontentsline{toc}{chapter}{Abstract}
 
-We present a construction of \texttt{M}-types from containers in a cubical type theory (CTT), We show how the containers construct a coalgebra, for which we can define a coinduction principle, making strong bisimulation imply equality. We then show constructions of \texttt{M}-types, and how they can be quotiented to construct what we call \texttt{QM}-types. The problem with \texttt{QM}-types is that in general assuming that we can lift function types of equivalence classes is equivalent to the axiom of choice \cite{DBLP:tt-in-tt}, but this can be solved by defining the quotienting relation and the type at the same time as a quotient inductive-inductive type (QIIT), which assuming the axiom of (countable) choice, is equal to the \texttt{QM}-type. We conclude with some examples of how to use \texttt{M}-types and some properties. All work is formalized in Cubical Agda, and the work on defining \texttt{M}-types has been accepted to the Cubical Agda github repository.
+We present a construction of \texttt{M}-types from containers in a cubical type theory (CTT), We show how the containers construct a coalgebra, for which we can define a coinduction principle, making strong bisimulation imply equality. We then show constructions of \texttt{M}-types, and how they can be quotiented to construct what we call Q\texttt{M}-types. The problem with Q\texttt{M}-types is that in general assuming that we can lift function types of equivalence classes is equivalent to the axiom of choice \cite{DBLP:tt-in-tt}, but this can be solved by defining the quotienting relation and the type at the same time as a quotient inductive-inductive type (QIIT), which assuming the axiom of (countable) choice, is equal to the Q\texttt{M}-type. We conclude with some examples of how to use \texttt{M}-types and some properties. All work is formalized in Cubical Agda, and the work on defining \texttt{M}-types has been accepted to the Cubical Agda github repository.
 
 \chapter*{Resum\'e}
 \addcontentsline{toc}{chapter}{Resum\'e}
@@ -147,10 +148,17 @@ I would like to thank my supervisor Bas Spitters for some enlightening discussio
 \chapter{Introduction} % Everyone interested should be able to read this!
 \label{ch:intro}
 
-\todo[inline]{motivate and explain the problem to be addressed}
-\todo[inline]{get your bibtex entries from \url{https://dblp.org/}}
+\section{Overview}
+There has been done a lot of work on understanding and formalizing inductive types in homotopy type theory (HoTT) / cubical type theory. One such body of work is W-types, which have been shown equal to inductive types. However there has not been much work on the dual concept, namely coinductive types defined using M-types. The goal of this thesis is to get an understanding of M-types. We also want to construct examples and show properties of M-types, since we want to make the theory of M-types more accessible. A useful technique used alot in constructive mathematics is quotienting free objects, as such we will also look into what it means to quotient M-types in the setting of cubical type theory, and the problems the obvious approach encounters.
+\\ \\
+In the rest of this chapter we will introduce some of the background theory and notation used in the rest of the thesis. In the second chapter we construct \texttt{M}-types from containers, and define a coinduction principle for the \texttt{M}-types. In the third chapter we give some example constructions of \texttt{M}-types. In the fourth chapter we introduce quotiented \texttt{M}-types (Q\texttt{M}-types), and show equalities between these and quotient inductive-inductive types (QIITs), we show the construction of the partiality monad as an example. In the fifth and sixth chapter we go through various applications of the theory developed in the first couple chapters. Finally we conclude with a discussion of future research and improvements.
 
-when \todo{...}... a constructor for a type \(\type{A}\) is a function, that takes some arguments, and returns an element \(a : \type{A}\), dually a destructor of \(\type{A}\) will return something given an element \(a : \type{A}\). \todo{...}... we can define a type inductively from a set of constructors, for example the natural numbers \(\mathbb{N}\), which are defined by the two constructors
+\section{Background Theory}
+We start by giving some background theory / history on cubical type theory and summarize important concepts used in the rest of this thesis. \todo{Should a description of Set Theory be included}
+\\ \\
+We will be using \textbf{type theory} as the basis for mathematics. In type theory every term \(\term{x}\) is an element of some type \(\type{A}\), written \(\term{x} : \type{A}\). The idea in type theory is that propositions are types, so proofs boils down to showing that there exists an element of some type representing a proposition. Specifically proofs of equality becomes construction of an element of an equality type. The type theory we are working in is inspired by \textbf{Martin L\"of Type Theory (MLTT)} / Intuitionistic type Theory (ITT), which is designed on the principles of mathematical constructivism, where any existence proof must contain a witness. Meaning a proof of existence, can be converted into an algorithm that finds the element making the statement true. MLTT is built from the three finite types \(\empt\), \(\unit\) and \(\type{\mathbf{2}}\), and type constructors \(\Sigma\), \(\pi\) and \(=\). There is only a single way to make terms of \(=\)-type, and that is \(\mathtt{refl} : \prod_{a : A} (a = a)\). \todo{inductive types, universes and judgements} \todo{extensional vs intensional \url{https://ncatlab.org/nlab/show/intensional+type+theory}} \todo{find citation, currently \url{https://en.wikipedia.org/wiki/Intuitionistic_type_theory}}.
+\\ \\
+A constructor for a type \(\type{A}\) is a function, that takes some arguments, and returns an element \(\term{a} : \type{A}\), dually a destructor of \(\type{A}\) will return something given an element \(\term{a} : \type{A}\). Types can be defined from a set of constructors (or destructors). We can define a type \textbf{inductively} from a set of constructors, for example the natural numbers \(\mathbb{N}\), which can be defined as \(0\) or a natural number \(n\) plus one \\[-10mm]
 \begin{center}
   \strut
   \hfill
@@ -168,7 +176,7 @@ when \todo{...}... a constructor for a type \(\type{A}\) is a function, that tak
   \hfill
   \strut
 \end{center}
-with an equivalence relation \(\relation{\sim_{\mathbb{N}}}\) defined inductively, meaning we follow the structure of defined by the constructors
+with an equivalence relation \(\relation{\sim_{\mathbb{N}}}\) defined inductively, meaning we follow the structure defined by the constructors \\[-10mm]
 \begin{center}
   \strut
   \hfill
@@ -186,7 +194,7 @@ with an equivalence relation \(\relation{\sim_{\mathbb{N}}}\) defined inductivel
   \hfill
   \strut
 \end{center}
-This relation gives equality, so if \(a~\relation{\sim_{\mathbb{N}}}~b\) then \(a \equiv b\). Likewise there is coinductive construction, where the focus is on the destructors instead of the constructors, an example is streams, representing an infinite sequence of elements, that can be defined from the two destructors head (\(\destructor{hd}\)) and tail (\(\destructor{tl}\)), where head represents the first element, and tail represents the rest of the sequence. The inference rules are given as
+This relation implies equality, so if \(a~\relation{\sim_{\mathbb{N}}}~b\) then \(a = b\). Likewise there is a \textbf{coinductive} construction, where the focus is on the destructors instead of the constructors, an example is streams, which represents an infinite sequence of elements. Streams can be defined from the two destructors head (\(\destructor{hd}\)) and tail (\(\destructor{tl}\)), where head represents the first element, and tail represents the rest of the sequence. The inference rules are given as
 \begin{center}
   \strut
   \hfill
@@ -208,21 +216,11 @@ we can again define an equivalence relation \(\relation{\sim_{stream}}\), but th
 \begin{equation}
   \vcenter{\infer{\term{s}~\relation{\sim_{stream}}~\term{t}}{\destructor{hd}~\term{s} = \destructor{hd}~\term{t} & \destructor{tl}~\term{s}~\relation{\sim_{stream}}~\destructor{tl}~\term{t}}}
 \end{equation}
-This relation does not give an equality in MLTT, we just get bisimilarity meaning elements "behave" the same, but they are not equivalent. However one of the advantages of using homotopy type theory is that bisimilarity becomes equality. We will use this advantage to get the "correct" for of equality for some example of coinductive types. \todo{...}... An algebra is an operator \(\functor{F}\) with some closure relation \todo{cite something}. \todo{...}... inductive types are given as the initial algebra for some functor, this can be formalized as \texttt{W}-types, dually the coinductive types that we are interested in, can be formalized as the final coalgebra \todo{final coalgebra is scary words, find something more "noob" friendly} for some functor. We will be looking at how to define some coinductive types, as \texttt{M}-types, and define some bisimilarity relations for these types, showing we get equality when using homotopy type theory. We will then introduce weaker notion of bisimilarity, that does not yield equality, but can be used to construct a new type, by quotienting with the relation, giving us a type where the relation gives equality\todo{describe quotienting and its usefullness by a couple examples}. \todo{...}... When working with quotiented coinductive types. \todo{What is a monad?} \todo{...}... We define the quotiented delay monad \(\typeformer{Delay}/\relation{\sim_{weak}}\), and want to show that we can construct a partiality monad from this construction. A problem with the partiality operation \(D(-)/{\sim}_D\) is that countable choice is needed to show that it is a monad, however using QIIT types we can get around this problem, furthermore we can show that assuming countable choice, these two constructions are equal.
-
-\subsection{A Brief Overview of the Thesis}
-The rest of this chapter will introduce the some background theory and notation used in the rest of the thesis. In the second chapter we construct \texttt{M}-types from containers, and define a coinduction principle for the M-types. In the third chapter we give some example constructions of \texttt{M}-types. In the fourth chapter we introduce quotiented \texttt{M}-types (QM-types), and show equalities between these and quotient inductive-inductive types (QIITs), we show the construction of the partiality monad as an example. In the fifth and sixth chapter we go through various applications of the theory developed in the first couple chapters. Finally we conclude by discussion future research and improvements.
-
-\section{Background Theory}
-We start by giving some background theory / history on cubical type theory and summarize important concepts used in the rest of this thesis. \todo{Should a description of Set Theory be included}
-\\ \\
-We will be using \textbf{type theory} as the basis for mathematics. In type theory every term \(\term{x}\) is an element of some type \(\type{A}\), written \(\term{x} : \type{A}\). The idea in type theory is that propositions are types, so proofs boils down to showing that there exists an element of some type representing a proposition. Specifically proofs of equality becomes construction of an element of an equality type. The type theory we are working in is inspired by \textbf{Martin L\"of Type Theory (MLTT)} / Intuitionistic type Theory (ITT), which is designed on the principles of mathematical constructivism, where any existence proof must contain a witness. Meaning a proof of existence, can be converted into an algorithm that finds the element making the statement true. MLTT is built from the three finite types \(\empt\), \(\unit\) and \(\type{\mathbf{2}}\), and type constructors \(\Sigma\), \(\pi\) and \(=\). There is only a single way to make terms of \(=\)-type, and that is \(\mathtt{refl} : \prod_{a : A} (a = a)\). \todo{inductive types, universes and judgements} \todo{extensional vs intensional \url{https://ncatlab.org/nlab/show/intensional+type+theory}} \todo{find citation, currently \url{https://en.wikipedia.org/wiki/Intuitionistic_type_theory}}. We will be working in a cubical type theory, where the univalence axiom holds. The \textbf{univalence axiom} says that equality is equivalent to equivalence
+This relation does not give an equality in MLTT, we just get bisimilarity meaning elements "behave" the same, but they are not equivalent. \todo{Inductive vs Coinductive definition for a set of constructors} To remedy this constraint, we will work in a type theory where the univalence axiom is holds, using such a type theory as the foundation for mathematics is called \textbf{Univalent Foundations (UF)}. The \textbf{univalence axiom} says that equality is equivalent to equivalence
 \begin{equation}
   (\type{A} = \type{B}) \simeq (\type{A} \simeq \type{B})
 \end{equation}
-meaning if two objects are equivalent, then there is an equality between them, such that we can replace one by the other.
-\\ \\
-The type theory we will be working in is called \textbf{homotopy type theory (HoTT)} \cite{hottbook}, which is an intensional dependent type theory (built on MLTT) with the univalence axiom and higher inductive types. In HoTT the idenitity types form path spaces, so proofs of identity are not just \texttt{refl}, as for MLTT. Types are seen as "spaces", and we think of \(\term{a} : \type{A}\) as \(\term{a}\) being a point in the space \(\type{A}\), similarly functions are regarded as continuous maps from one space to another \cite{nlab:homotopy_type_theory}. The use of a type theory with the univalence axiom as a foundations for mathematics, is called \textbf{Univalent Foundations (UF)}\todo{should this be left out?}, which HoTT is. We will be working in a \textbf{cubical type theory (CTT)} \cite{DBLP:CTT} where the univalence axiom, is not just an axiom, but a statement that can actually be proven, meaning we can reduce the use of the univalence axiom, making it easier to do proofs involving the univalence axiom \cite{nlab:cubical_type_theory}. \todo{example of what computational "axioms" mean} The reason for the name cubical type theory, is because composition is defined by square, that is given three sides of a square we get the last one, see \figref{cubical-composition-square}.
+meaning if two objects are equivalent, then there is an equality between them, such that we can replace one by the other. This makes (strong) bisimilarity imply equality. The univalent foundations we will be using is \textbf{Homotopy type theory (HoTT)} \cite{hottbook}. HoTT is an intensional dependent type theory (built on MLTT) with the univalence axiom and higher inductive types. In HoTT the idenitity types form path spaces, so proofs of identity are not just \texttt{refl} as is the case in MLTT. Types are seen as "spaces", and we think of \(\term{a} : \type{A}\) as \(\term{a}\) being a point in the space \(\type{A}\), similarly functions are regarded as continuous maps from one space to another \cite{nlab:homotopy_type_theory}. One of the problems with "plain" HoTT is that the univalence axiom is not constructive, since it is an axiom. To remedy this we will be working in a \todo{.. be working implementation of hott namely ctt} \textbf{cubical type theory (CTT)} \cite{DBLP:CTT}, where the univalence axiom is not an axiom, but a statement that can actually be proven, meaning we can reduce the use of the univalence axiom, making it easier to do proofs involving the univalence axiom \cite{nlab:cubical_type_theory}. \todo{example of what computational "axioms" mean} The reason for the name cubical type theory, is because composition is defined by square, that is given three sides of a square we get the last one, see \figref{cubical-composition-square}.
 \begin{figure}[h]
   \centering
   \begin{tikzcd}
@@ -232,30 +230,15 @@ The type theory we will be working in is called \textbf{homotopy type theory (Ho
   \caption{Composition square}
   \label{fig:cubical-composition-square}
 \end{figure}
-Most of the work in this thesis has been formalized in the proof assistant / programming languge Cubical Agda. A proof assistant helps with verifying proofs, while making the process of making proofs interactive. \textbf{Cubical Agda} is an implementation of a cubical type theory done by extending the proof assistant Agda. One of the main additions is the interval and path types. The interval can be thought of as elements in \([0,1]\). When working with the interval, we can only access the left and right endpoint \(\constant{i0}\) and \(\constant{i1}\) or some unspecified point in the middle \(i\), modeling the intuition of a continuous interval. Cubical agda also generalizes transporting, given a type line \(\typeformer{A} : \mathbb{I} \rightarrow \universe{\mathcal{U}}\), and the endpoint \(\typeformer{A}~\constant{i0}\) you get a line from \(\typeformer{A}~\constant{i0}\) to \(\typeformer{A}~\constant{i1}\) \cite{cubicalagda}. \todo{Axioms of cubical Agda} \todo{Some better (intuitive) description of the interval type!!}
+~\\ \\
+Inductively defined data types are initial algebras, meaning that they are the smallest type, with a given set of constructors / destructors. \todo{...}... An algebra is an operator \(\functor{F}\) with some closure relation \todo{cite something}. \todo{...}... inductive types are given as the initial algebra for some functor, this can be formalized as \texttt{W}-types, dually the coinductive types that we are interested in, can be formalized as the final coalgebra \todo{final coalgebra is scary words, find something more "noob" friendly} for some functor. We will be looking at how to define some coinductive types, as \texttt{M}-types \todo{W-types, Induction , M-types, Coinduction...}, and define some bisimilarity relations for these types, showing we get equality when using homotopy type theory. We will then introduce weaker notion of bisimilarity, that does not yield equality, but can be used to construct a new type, by quotienting with the relation, giving us a type where the relation gives equality\todo{describe quotienting and its usefullness by a couple examples}. \todo{...}... When working with quotiented coinductive types. \todo{What is a monad?} \todo{...}... We define the quotiented delay monad \(\typeformer{Delay}/\relation{\sim_{weak}}\), and want to show that we can construct a partiality monad from this construction. A problem with the partiality operation \(D(-)/{\sim}_D\) is that countable choice is needed to show that it is a monad, however using QIIT types we can get around this problem, furthermore we can show that assuming countable choice, these two constructions are equal. Using the axiom of choice (AC) and the law of excluded middle (LEM), has problematic side effects, when using a constructive type theory, since AC and LEM does not have a constructive interpretation, so to maintain the computational aspects of HoTT and CTT, we try to not use these axioms \cite[Introduction]{hottbook}.
 \\ \\
-Homotopy type theory is proof relevant, which means that a there might be multiple proofs of one statement, and these proofs might not be interchangeable (equal). The reason is that types in HoTT have a H-level, describing how equality behaves. We start from (-2) with contractiable types, meaning there is an element which all other element are equal to. Then there is (-1)-types which are mere propositions or hProp, where all elements of the type are equal, but there might not be any. If the type is inhabited, then we say the proposition is true. The 0-types are the hSets, where all equalities between two elements \(x,y\) are equal. For 1-types (1-groupoids) we get equalities of equalities are equal, and then so on for homotopy \(n\)-types. Any \(n\)-type is also a \(n+1\)-type, but with trivial equalities at the \(n+1\) level. If we don't want to do proof relevant mathematics we can do propositional truncation, converting types to \(-1\)-type, meaning we ignore the difference in proofs by just look at whether a type is inhabited or not. However doing this we loose some of the reasoning power of HoTT. One of the tools we get using the full power of HoTT is \textbf{Higher order inductive types (HITs)}, where we define types with point constructors and equality constructors, an example is the propositional truncation we just described\todo{write up constructors for propositional truncation}, another useful example is set truncated quotients\todo{write up constructors for set truncated quotients}.
+If you are used to working in set theory, then working in HoTT will take some getting used to. Homotopy type theory is proof relevant, which means that a there might be multiple proofs of one statement, and these proofs might not be interchangeable (equal). The reason is that types in HoTT have a H-level, describing how equality behaves. We start from (-2) with contractiable types, meaning there is an element which all other element are equal to. Then there is (-1)-types which are mere propositions or hProp, where all elements of the type are equal, but there might not be any. If the type is inhabited, then we say the proposition is true. The 0-types are the hSets, where all equalities between two elements \(x,y\) are equal. For 1-types (1-groupoids) we get equalities of equalities are equal, and then so on for homotopy \(n\)-types. Any \(n\)-type is also a \(n+1\)-type, but with trivial equalities at the \(n+1\) level. If we don't want to do proof relevant mathematics we can do propositional truncation, converting types to \(-1\)-type, meaning we ignore the difference in proofs by just look at whether a type is inhabited or not. However doing this we loose some of the reasoning power of HoTT. One of the tools we get using the full power of HoTT is \textbf{Higher order inductive types (HITs)}, where we define types with point constructors and equality constructors, an example is the propositional truncation we just described\todo{write up constructors for propositional truncation}, another useful example is set truncated quotients\todo{write up constructors for set truncated quotients}.
 \\ \\
-A problem that arise when using a constructive type theory is the axiom of choice and the law of excluded middle, which does not have a computational interpretation, so to maintain the computational aspects of HoTT and CTT, we try to not use these axioms \cite[Introduction]{hottbook}.
+We have formalized all of \chapterref{M-types} and \chapterref{M-types-examples} and some of \chapterref{QM-types} \todo{add remaing chapters} in the proof assistant / programming languge Cubical Agda. A \textbf{proof assistant} helps with verifying proofs, while making the process of making proofs interactive. \textbf{Cubical Agda} \cite{cubicalagda} is an implementation of a cubical type theory (inspired by CCHM \cite{DBLP:CCHM}) made by extending the proof assistant Agda. One of the main additions is the interval and path types. The \textbf{interval} \(\mathbb{I}\) can be thought of as elements in \([0,1]\). When working with the interval, we can only access the left and right endpoint \(\constant{i0}\) and \(\constant{i1}\) or some unspecified point in the middle \(i\), keeping with the intuition of a continuous interval. Cubical agda also generalizes transporting, given a type line \(\typeformer{A} : \mathbb{I} \rightarrow \universe{\mathcal{U}}\), and the endpoint \(\typeformer{A}~\constant{i0}\) you get a line from \(\typeformer{A}~\constant{i0}\) to \(\typeformer{A}~\constant{i1}\). \todo{Axioms of cubical Agda} \todo{Some better (intuitive) description of the interval type!!}
 \\ \\
-\todo[inline]{W-types, Induction , M-types, Coinduction..., see introduction?}
-Coinduction is the dual concept (in a categorical manner) of induction. The induction principle is an equivalence principle for congruent elements in an initial algebra.
-\\ \\
-Cubical Agda has a hierarchy of universes
-\todo[inline]{Universes}
-
-\subsubsection{UIP}
-\paragraph{Path type}
-We add a type \(\mathbb{I}\), which is defined to be a free de Morgan algebra on a discrete infinite set of names \todo{cite: https://arxiv.org/pdf/1611.02108.pdf}. The elements of \(\mathbb{I}\) can be described by the grammar
-\begin{equation}
-  r,s ::= 0 \mid 1 \mid i \mid 1 - r \mid r \land s \mid r \lor s
-\end{equation}
-The set \(\mathbb{I}\) has decidable equality. The elements in \(\mathbb{I}\) can be thought as formal representations of elements in the unit interval \([0,1]\). There is a special substitution with \(\constant{i0}\) and \(\constant{i1}\) being the endpoints of \([0,1]\).
-
-\subsection{Problems with using AC and LEM}
-These axioms does not have a computational interpretation, so to maintain the computational aspects of HoTT and CTT, we try to not use these axioms. \cite[Introduction]{hottbook}
-
-\subsection{Universes ??}
+Cubical Agda has a hierarchy of universes, \(\universe{\mathcal{U}}_0, \universe{\mathcal{U}}_1, \dots\), however we will leave the index implicit and write \(\universe{\mathcal{U}}\).
+\todo[inline]{Universes??}
 
 \section{Notation}
 Most of the work is formalized in the Cubical Agda proof assistant. The following is the notation / fonts used to denote specific definitions / concepts
@@ -285,7 +268,7 @@ Furthermore we define some useful notation for casing on natural numbers.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
 
 \chapter{\texttt{M}-types}
-\label{ch:m-types}
+\label{ch:M-types}
 In this chapter we will introduce containers (aka. signatures), and use them to construct \texttt{M}-types and operations \(\function{in}\) and \(\function{out}\) on the \texttt{M}-types (\thmref{M-shift}). We conclude the chapter by defining a coinduction principle for \texttt{M}-types \cite{DBLP:non-wellfounded}. \todo{Some formalization of coalgebras is missing?}
 
 \section{Containers / Signatures}
@@ -485,7 +468,8 @@ We can now construct a coinduction principle given a bisimulation relation.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
 
-\chapter{Instantiation of M-types}
+\chapter{Examples of M-types}
+\label{ch:M-types-examples}
 In this section we show some examples of types that can be constructed as \(M\)-types, and show how their constructors can be defined. We then conclude the chapter with some general observation, and define some rules for how to construct \texttt{M}-types. \todo{Is there anything else that is show for each M-type?}
 
 \todo{complete this section}
@@ -686,7 +670,7 @@ This show that we can define coinductive types, with rather complex structure.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
 
-\chapter{QM-types}
+\chapter{Q\texttt{M}-types}
 In this chapter we will introduce quotients, and show how to construct quotiented \texttt{M}-types which we call Q\texttt{M}-types. We show you can be constructed a QIIT that is equal to the Q\texttt{M}-type assuming axiom of choice. \todo{better introduction to chapter, and reference to main points}
 
 \section{Quotienting and Constructors}
@@ -1332,6 +1316,7 @@ We define weak bisimilarity relation for sequences \todo{Is this defined for par
 \end{thm}
 
 \subsection{QM-types}
+\label{ch:QM-types}
 We want to define sequences based on \texttt{M}-types, here are some examples
 \begin{align}
   \typeformer{Seq}_{\typeformer{M}_{\containerpair{\type{A}}{\empt}}} &= \type{A} \\
@@ -1425,7 +1410,7 @@ as expected. Transporting along \eqref{eq:zip-equality} gives us a definition fo
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
 
-\chapter{Examples of \texttt{M}-types}
+\chapter{TODO: \texttt{M}-types}
 \section{TODO: Place these subsections}
 \todo[inline]{What makes a relation a bisimulation? Is bisim and equality equal.}
 \subsection{Identity Bisimulation}
@@ -1624,6 +1609,7 @@ We want to define spin, as being the fixed point \(\mathtt{spin} = \mathtt{later
 \addcontentsline{toc}{chapter}{Bibliography}
 \bibliographystyle{plain} 
 \bibliography{Thesis}
+% \todo[inline]{get your bibtex entries from \url{https://dblp.org/}}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
 
