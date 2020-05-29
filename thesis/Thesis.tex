@@ -66,8 +66,8 @@
 \newcommand*{\pathterm}[1]{\textcolor{green!40!black}{#1}}
 \newcommand*{\type}[1]{\textcolor{magenta!90!black}{#1}}
 % \newcommand*{\dependenttype}[1]{\textcolor{magenta!70!black}{#1}}
-\newcommand*{\container}[1]{\textcolor{red}{#1}}
-\newcommand*{\containerpair}[2]{\ensuremath{\colorlet{savedleftcolor}{.}\color{red}\left(\color{savedleftcolor}#1\,\textcolor{red}{\mathbf{,}}\,#2\color{red}\right)\color{savedleftcolor}}}
+\newcommand*{\container}[1]{\textcolor{orange}{#1}}
+\newcommand*{\containerpair}[2]{\ensuremath{\colorlet{savedleftcolor}{.}\color{orange}\left(\color{savedleftcolor}#1\,\textcolor{orange}{\mathbf{,}}\,#2\color{orange}\right)\color{savedleftcolor}}}
 \newcommand*{\containerpairsimple}[2]{\containerpair{#1}{\lambda\,\_,\,#2}}
 \newcommand*{\universe}[1]{\textcolor{orange!80!black}{#1}}
 \newcommand*{\unit}{\type{\textbf{1}}}
@@ -79,7 +79,7 @@
 
 \newcommand*{\function}[1]{\textcolor{blue!60!black}{\ensuremath{\mathtt{#1}}}}
 \newcommand*{\constructor}[1]{\textcolor{purple!60!black}{\ensuremath{\mathtt{#1}}}}
-\newcommand*{\destructor}[1]{\textcolor{pink!60!black}{\ensuremath{\mathtt{#1}}}}
+\newcommand*{\destructor}[1]{\textcolor{yellow!60!black}{\ensuremath{\mathtt{#1}}}}
 \newcommand*{\typeformer}[1]{\ensuremath{\mathtt{#1}}}
 \newcommand*{\functor}[1]{\ensuremath{\mathbf{\mathtt{#1}}}}
 
@@ -121,7 +121,7 @@
 \chapter*{Abstract}
 \addcontentsline{toc}{chapter}{Abstract}
 
-We present a construction of \texttt{M}-types from containers in a cubical type theory (CTT), We show how the containers construct a coalgebra, for which we can define a coinduction principle, making strong bisimulation imply equality. We then show constructions of \texttt{M}-types, and how they can be quotiented to construct what we call \texttt{QM}-types. The problem with \texttt{QM}-types is \todo{... problem with quotients ...}, but this is solved by defining the quotienting relation and the type at the same time as a quotient inductive-inductive type (QIIT), which assuming the axiom of (countable) choice, is equal to the \texttt{QM}-type. We conclude with some examples of how to use \texttt{M}-types and some properties. All work is formalized in Cubical Agda, and the work on defining \texttt{M}-types has been accepted to the Cubical Agda github repository.
+We present a construction of \texttt{M}-types from containers in a cubical type theory (CTT), We show how the containers construct a coalgebra, for which we can define a coinduction principle, making strong bisimulation imply equality. We then show constructions of \texttt{M}-types, and how they can be quotiented to construct what we call \texttt{QM}-types. The problem with \texttt{QM}-types is that in general assuming that we can lift function types of equivalence classes is equivalent to the axiom of choice \cite{DBLP:tt-in-tt}, but this can be solved by defining the quotienting relation and the type at the same time as a quotient inductive-inductive type (QIIT), which assuming the axiom of (countable) choice, is equal to the \texttt{QM}-type. We conclude with some examples of how to use \texttt{M}-types and some properties. All work is formalized in Cubical Agda, and the work on defining \texttt{M}-types has been accepted to the Cubical Agda github repository.
 
 \chapter*{Resum\'e}
 \addcontentsline{toc}{chapter}{Resum\'e}
@@ -130,7 +130,7 @@ We present a construction of \texttt{M}-types from containers in a cubical type 
 
 \chapter*{Acknowledgments}
 \addcontentsline{toc}{chapter}{Acknowledgments}
-I would like to thank my supervisor Bas Spitters for some enlightening discussions and for taking the time to do weekly meetings about this masters thesis. I would also like to thank my fellow students, who made this time less lonely even through the Corona pandemic.
+I would like to thank my supervisor Bas Spitters for some enlightening discussions and quick responses and for taking the time to do weekly meetings regarding this masters thesis. I would also like to thank my fellow students, who made this challenging but fun time less lonely even in the time of the Corona pandemic.
 \vspace{2ex}
 \begin{flushright}
   \emph{Lasse Letager Hansen,}\\
@@ -146,7 +146,11 @@ I would like to thank my supervisor Bas Spitters for some enlightening discussio
 
 \chapter{Introduction} % Everyone interested should be able to read this!
 \label{ch:intro}
-when \todo{...}... a constructor for a type \(\type{A}\) is a function, that takes some arguments, and returns an element \(a : \type{A}\), dually a destructor of \(\type{A}\) will return something given an element \(a : \type{A}\). \todo{...}... from a set of constructors, for example the natural numbers \(\mathbb{N}\) which are defined by the two constructors
+
+\todo[inline]{motivate and explain the problem to be addressed}
+\todo[inline]{get your bibtex entries from \url{https://dblp.org/}}
+
+when \todo{...}... a constructor for a type \(\type{A}\) is a function, that takes some arguments, and returns an element \(a : \type{A}\), dually a destructor of \(\type{A}\) will return something given an element \(a : \type{A}\). \todo{...}... we can define a type inductively from a set of constructors, for example the natural numbers \(\mathbb{N}\), which are defined by the two constructors
 \begin{center}
   \strut
   \hfill
@@ -206,16 +210,8 @@ we can again define an equivalence relation \(\relation{\sim_{stream}}\), but th
 \end{equation}
 This relation does not give an equality in MLTT, we just get bisimilarity meaning elements "behave" the same, but they are not equivalent. However one of the advantages of using homotopy type theory is that bisimilarity becomes equality. We will use this advantage to get the "correct" for of equality for some example of coinductive types. \todo{...}... An algebra is an operator \(\functor{F}\) with some closure relation \todo{cite something}. \todo{...}... inductive types are given as the initial algebra for some functor, this can be formalized as \texttt{W}-types, dually the coinductive types that we are interested in, can be formalized as the final coalgebra \todo{final coalgebra is scary words, find something more "noob" friendly} for some functor. We will be looking at how to define some coinductive types, as \texttt{M}-types, and define some bisimilarity relations for these types, showing we get equality when using homotopy type theory. We will then introduce weaker notion of bisimilarity, that does not yield equality, but can be used to construct a new type, by quotienting with the relation, giving us a type where the relation gives equality\todo{describe quotienting and its usefullness by a couple examples}. \todo{...}... When working with quotiented coinductive types. \todo{What is a monad?} \todo{...}... We define the quotiented delay monad \(\typeformer{Delay}/\relation{\sim_{weak}}\), and want to show that we can construct a partiality monad from this construction. A problem with the partiality operation \(D(-)/{\sim}_D\) is that countable choice is needed to show that it is a monad, however using QIIT types we can get around this problem, furthermore we can show that assuming countable choice, these two constructions are equal.
 
-~\\ \\ \\ \\
-When working in Martin L\"of / Intensional Type Theory reasoning about equality of objects...
-
-% The goal of this work is to formalize coinduction, build as coalgebras. 
-% In this thesis we will present a construction of non-wellfounded sets as a limits
-% \\ \\
-In the second chapter we introduce/summarize some background theory. In the third chapter we construct \texttt{M}-types from containers, and define a coinduction principle for the M-types. In the fourth chapter we introduce quotiented \texttt{M}-types (QM-types), and show equalities between these and quotient inductive inductive types (QIITs). We then go through various applications of the theory developed in the first couple chapters. Finally we conclude by discussion future research and improvements.
-
-\todo[inline]{motivate and explain the problem to be addressed}
-\todo[inline]{get your bibtex entries from \url{https://dblp.org/}}
+\subsection{A Brief Overview of the Thesis}
+The rest of this chapter will introduce the some background theory and notation used in the rest of the thesis. In the second chapter we construct \texttt{M}-types from containers, and define a coinduction principle for the M-types. In the third chapter we give some example constructions of \texttt{M}-types. In the fourth chapter we introduce quotiented \texttt{M}-types (QM-types), and show equalities between these and quotient inductive-inductive types (QIITs), we show the construction of the partiality monad as an example. In the fifth and sixth chapter we go through various applications of the theory developed in the first couple chapters. Finally we conclude by discussion future research and improvements.
 
 \section{Background Theory}
 We start by giving some background theory / history on cubical type theory and summarize important concepts used in the rest of this thesis. \todo{Should a description of Set Theory be included}
@@ -240,6 +236,8 @@ Most of the work in this thesis has been formalized in the proof assistant / pro
 \\ \\
 Homotopy type theory is proof relevant, which means that a there might be multiple proofs of one statement, and these proofs might not be interchangeable (equal). The reason is that types in HoTT have a H-level, describing how equality behaves. We start from (-2) with contractiable types, meaning there is an element which all other element are equal to. Then there is (-1)-types which are mere propositions or hProp, where all elements of the type are equal, but there might not be any. If the type is inhabited, then we say the proposition is true. The 0-types are the hSets, where all equalities between two elements \(x,y\) are equal. For 1-types (1-groupoids) we get equalities of equalities are equal, and then so on for homotopy \(n\)-types. Any \(n\)-type is also a \(n+1\)-type, but with trivial equalities at the \(n+1\) level. If we don't want to do proof relevant mathematics we can do propositional truncation, converting types to \(-1\)-type, meaning we ignore the difference in proofs by just look at whether a type is inhabited or not. However doing this we loose some of the reasoning power of HoTT. One of the tools we get using the full power of HoTT is \textbf{Higher order inductive types (HITs)}, where we define types with point constructors and equality constructors, an example is the propositional truncation we just described\todo{write up constructors for propositional truncation}, another useful example is set truncated quotients\todo{write up constructors for set truncated quotients}.
 \\ \\
+A problem that arise when using a constructive type theory is the axiom of choice and the law of excluded middle, which does not have a computational interpretation, so to maintain the computational aspects of HoTT and CTT, we try to not use these axioms \cite[Introduction]{hottbook}.
+\\ \\
 \todo[inline]{W-types, Induction , M-types, Coinduction..., see introduction?}
 Coinduction is the dual concept (in a categorical manner) of induction. The induction principle is an equivalence principle for congruent elements in an initial algebra.
 \\ \\
@@ -254,7 +252,7 @@ We add a type \(\mathbb{I}\), which is defined to be a free de Morgan algebra on
 \end{equation}
 The set \(\mathbb{I}\) has decidable equality. The elements in \(\mathbb{I}\) can be thought as formal representations of elements in the unit interval \([0,1]\). There is a special substitution with \(\constant{i0}\) and \(\constant{i1}\) being the endpoints of \([0,1]\).
 
-\subsection{Problems with / Getting around using AC and LEM}
+\subsection{Problems with using AC and LEM}
 These axioms does not have a computational interpretation, so to maintain the computational aspects of HoTT and CTT, we try to not use these axioms. \cite[Introduction]{hottbook}
 
 \subsection{Universes ??}
@@ -288,7 +286,7 @@ Furthermore we define some useful notation for casing on natural numbers.
 
 \chapter{\texttt{M}-types}
 \label{ch:m-types}
-In this chapter we will introduce containers (aka. signatures), and use them to construct \texttt{M}-types and operations \(\function{in}\) and \(\function{out}\) on the \texttt{M}-types (\thmref{M-shift}). We conclude the chapter by defining a coinduction principle for \texttt{M}-types. \todo{Some formalization of coalgebras is missing?}
+In this chapter we will introduce containers (aka. signatures), and use them to construct \texttt{M}-types and operations \(\function{in}\) and \(\function{out}\) on the \texttt{M}-types (\thmref{M-shift}). We conclude the chapter by defining a coinduction principle for \texttt{M}-types \cite{DBLP:non-wellfounded}. \todo{Some formalization of coalgebras is missing?}
 
 \section{Containers / Signatures}
 \begin{defn}
@@ -399,15 +397,15 @@ In this chapter we will introduce containers (aka. signatures), and use them to 
   \end{proof}
 \end{lem}
 \begin{lem}\label{lem:limit-collapse}
-  Given \(\function{\ell} : \prod_{(n : \mathbb{N})} (\type{X}_{n} \rightarrow \type{X}_{n+1})\) and \(\term{y} : \sum_{\left(\term{x} : \prod_{(n : \mathbb{N})} \type{X}_n\right)} \term{x}_{n + 1} \equiv \term{l}_n~\term{x}_n\) the chain collapses as the equality \(\type{\mathcal{L}} \equiv \type{X}_0\).
+  Given \(\function{\ell} : \prod_{(n : \mathbb{N})} (\type{X}_{n} \rightarrow \type{X}_{n+1})\) and \(\term{y} : \sum_{\left(\term{x} : \prod_{(n : \mathbb{N})} \type{X}_n\right)} \term{x}_{n + 1} \equiv \function{\ell}_n~\term{x}_n\) the chain collapses as the equality \(\type{\mathcal{L}} \equiv \type{X}_0\).
   \begin{proof}
     We define this collapse by the isomorphism
     \begin{align}
-      \function{fun}_{\mathcal{L}collapse}~(\term{x} , \pathterm{r}) &= \term{x}_0 \\
-      \function{inv}_{\mathcal{L}collapse}~\term{x}_0 &= (\lambda\,n,~\function{\ell}^n~\term{x}_0)~,~(\lambda\,n,~\mathtt{refl}_{(\function{\ell}^{(n+1)}\,\term{x}_0)}) \\
-      \function{rinv}~\term{x}_0 &= \mathtt{refl}_{\term{x}_0}
+      &\function{fun}_{\pathterm{\mathcal{L}collapse}}~(\term{x} , \pathterm{r}) = \term{x}_0 \\
+      &\function{inv}_{\pathterm{\mathcal{L}collapse}}~\term{x}_0 = (\lambda\,n,~\function{\ell}^{(n)}~\term{x}_0)~,~(\lambda\,n,~\mathtt{refl}_{(\function{\ell}^{(n+1)}\,\term{x}_0)}) \\
+      &\function{rinv}_{\pathterm{\mathcal{L}collapse}}~\term{x}_0 = \mathtt{refl}_{\term{x}_0}
     \end{align}
-    where \(\function{\ell}^n = \function{\ell}_n \circ \function{\ell}_{n-1} \circ \dots \circ \function{\ell}_1 \circ \function{\ell}_0\). To define \(\function{linv}~(\term{x} , \pathterm{r})\), we first define a fiber \((\type{X} , \term{z}, \function{\ell})\) over \(\mathbb{N}\) given some \(\term{z} : \type{X}_0\). Then any element of the type \(\sum_{\left(\term{x} : \prod_{(n : \mathbb{N})} \type{X}_n\right)} \term{x}_{n + 1} \equiv \function{\ell}_n~\term{x}_n\) is equal to a section over the fiber we defined. This means \(\term{y}\) is equal to a section. Since the sections are defined over \(\mathbb{N}\), which is an initial algebra for the functor \(\functor{G}\type{Y} = \unit + \type{Y}\), we get that sections are contractible, meaning \(\term{y} \equiv \function{inv}_{\mathcal{L}collapse} (\function{fun}_{\mathcal{L}collapse}~\term{y})\), since both are equal to sections over \(\mathbb{N}\).
+    where \(\function{\ell}^{(n)} = \function{\ell}_n \circ \function{\ell}_{n-1} \circ \dots \circ \function{\ell}_1 \circ \function{\ell}_0\). To define \(\function{linv}_{\pathterm{\mathcal{L}collapse}}~(\term{x} , \pathterm{r})\), we first define a fiber \((\type{X} , \term{z}, \function{\ell})\) over \(\mathbb{N}\) given some \(\term{z} : \type{X}_0\). Then any element of the type \(\sum_{\left(\term{x} : \prod_{(n : \mathbb{N})} \type{X}_n\right)} \term{x}_{n + 1} \equiv \function{\ell}_n~\term{x}_n\) is equal to a section over the fiber we defined. This means \(\term{y}\) is equal to a section. Since the sections are defined over \(\mathbb{N}\), which is an initial algebra for the functor \(\functor{G}\type{Y} = \unit + \type{Y}\), we get that sections are contractible, meaning \(\term{y} \equiv \function{inv}_{\mathcal{L}collapse} (\function{fun}_{\mathcal{L}collapse}~\term{y})\), since both are equal to sections over \(\mathbb{N}\).
 \end{proof}
 \end{lem}
 \noindent We can now define the construction of \function{in} and \function{out}.
@@ -500,51 +498,61 @@ As described earlier, given a type \(\type{A}\) we define the stream of that typ
 this is equal to an alternative definition of streams \todo{...}
 
 \section{ITrees as \texttt{M}-types}
-We want the following rules for ITrees
+Interaction trees (ITrees) \cite{DBLP:itrees} are used to model effectful behavior, where computations can interact with an external environment by events. ITrees are defined by the following constructors
 \begin{equation}
   \vcenter{\infer[\mathtt{I}_{\constructor{Ret}}]{\constructor{Ret}~\term{r} : \typeformer{itree}~\typeformer{E}~\type{R}}{r : \type{R}}}
 \end{equation}
 \begin{equation}
   \vcenter{\infer[\mathtt{I}_{\constructor{Vis}}]{\constructor{Vis}~\term{a}~\term{f} : \typeformer{itree}~\typeformer{E}~\type{R}}{\type{A} : \universe{\mathcal{U}} & \term{a} : \typeformer{E}~\type{A} & \term{f} : \type{A} \rightarrow \typeformer{itree}~\typeformer{E}~\type{R}}}.
 \end{equation}
-Elimination rules
 \begin{equation}
   \vcenter{\infer[\mathtt{E}_{\constructor{Tau}}]{\constructor{Tau}~\term{t} : \typeformer{itree}~\typeformer{E}~\type{R}}{\term{t} : \typeformer{itree}~\typeformer{E}~\type{R}}}.
 \end{equation}
+where \(\type{R}\) is the type for returned values, while \(\typeformer{E}\) is a dependent type for events representing external interactions.
 
 \subsection{Delay Monad}
-We start by looking at ITrees without the \(\constructor{Vis}\) constructor, this type is also know as the delay monad\todo[inline]{check this statement}. We construct this type by letting \(\container{S} = (\unit + \type{R},\lambda \{ \texttt{inl}~\_ \rightarrow \unit~;~\texttt{inr}~\_ \rightarrow \empt \})\), we then get the polynomial functor
+We start by looking at ITrees without the \(\constructor{Vis}\) constructor, this type is also know as the delay monad. It can be used to model delayed computations, either returning immediately given by the constructor \(\constructor{now} = \constructor{Ret}\), or delayed some (possibly infinite) number of steps by the constructor \(\constructor{later} = \constructor{Tau}\). We construct this type as an \texttt{M}-type.
+\begin{defn}
+  The  delay monad can be defined as the \texttt{M}-type for the container
+  \begin{equation}
+    \container{S} = \containerpair{\type{R} +\unit}{\begin{cases} \empt & \mathtt{inl}~\term{r} \\ \unit & \mathtt{inr}~\unitelem \end{cases}}
+  \end{equation}
+\end{defn}
+\noindent The polynomial functor for this container is
 \begin{equation}
-  \functor{P}_{\container{S}}(\type{X}) = \sum_{\term{x} : \unit + \type{R}} \lambda \{ \texttt{inl}~\_ \rightarrow \unit ; \texttt{inr}~\_ \rightarrow \empt\}~\term{x} \rightarrow \type{X},
+  \functor{P}_{\container{S}}(\type{X}) = \sum_{(\term{x} : \type{R} + \unit)} \begin{cases} \empt & \term{x} = \mathtt{inl}~\term{r} \\ \unit & \term{x} = \mathtt{inr}~\unitelem \end{cases} \rightarrow \type{X},
 \end{equation}
-which is equal to
+which we can simplify
 \begin{equation}
-  \functor{P}_{\container{S}}(\type{X}) = \type{X} + \type{R} \times (\empt \rightarrow \type{X}).
+  \functor{P}_{\container{S}}(\type{X}) = \type{R} \times (\empt \rightarrow \type{X}) + \type{X}.
 \end{equation}
-We know that \((\empt \rightarrow \type{X}) \equiv \unit\), so we can reduce further to
+We know that \((\empt \rightarrow \type{X}) \equiv \unit\), so we can simplify further to
 \begin{equation}
   \functor{P}_{\container{S}}(\type{X}) = \type{X} + \type{R}
 \end{equation}
-meaning we get the following diagram.
-
+meaning we get diagram in \figref{delay-monad}.
 \begin{figure}[h]
   \centering
   \begin{tikzcd}[row sep=large,column sep=large]
-    \type{R} \ar[dr,"\constructor{now}"'] \ar[r,"\texttt{inl}"] & \type{R} + \typeformer{M}  & \typeformer{M} \ar[l,"\texttt{inr}"'] \ar[dl,"\constructor{later}"] \\
-    & \typeformer{M} \ar[u,"\function{out}"']
+    \type{R} \ar[dr,"\constructor{now}"'] \ar[r,"\texttt{inl}"] & \type{R} + \typeformer{M} \ar[d,"\function{in}"'] & \typeformer{M} \ar[l,"\texttt{inr}"'] \ar[dl,"\constructor{later}"] \\
+    & \typeformer{M}
   \end{tikzcd}
   \caption{Delay monad}
+  \label{fig:delay-monad}
 \end{figure}
-\noindent Meaning we can define the operations \(\constructor{now}\) and \(\constructor{later}\) using \(\function{in} = \function{out}^{-1}\) together with the injections \(\mathtt{inl}\) and \(\mathtt{inr}\). \todo[inline]{(Later = Tau, Ret = Now)}
+\noindent We can define the constructors \(\constructor{now}\) and \(\constructor{later}\) using \(\function{in}\) function for \texttt{M}-types, together with the injections \(\mathtt{inl}\) and \(\mathtt{inr}\).
 
 \subsection{Tree}
-Now lets look at the example where we remove the \(\constructor{Tau}\) constructor. We let
+Now lets look at the example, where we remove the \(\constructor{Tau}\) constructor. This gives us a type of tree, with leaves given by \(\constructor{Ret}\), and nodes given by \(\constructor{Vis}\) branching based on some type \(\type{A}\), for an event \(\term{a} : \typeformer{E}~\type{A}\). 
+\begin{defn}
+  We can define \(\type{R}\)-valued \(\typeformer{E}\)-event trees as the \texttt{M}-type defined by the container
+  \begin{equation}
+    \container{S} = \containerpair{\type{R} + \sum_{(\type{A} : \universe{\mathcal{U}})} \typeformer{E}~\type{A}}{\begin{cases}\empt & \mathtt{inl}~\term{r} \\ \type{A} & \mathtt{inr}~(\type{A},\term{e})\end{cases}}.
+  \end{equation}
+\end{defn}
+\noindent The polynomial functor for this container is
 \begin{equation}
-  \container{S} = \left(\type{R} + \sum_{\type{A} : \universe{\mathcal{U}}} \typeformer{E}~\type{A}~,~\lambda \{ \texttt{inl}~\_ \rightarrow \empt ~;~ \texttt{inr}~(\type{A},\term{e}) \rightarrow \type{A} \} \right).
-\end{equation}
-This will give us the polynomial functor
-\begin{equation}
-  \functor{P}_{\container{S}}(\type{X}) = \sum_{\term{x} : \type{R} + \sum_{\type{A} : \universe{\mathcal{U}}} \typeformer{E}~\type{A}} \lambda \{ \texttt{inl}~\_ \rightarrow \empt ~;~ \texttt{inr}~(\type{A},\term{e}) \rightarrow \type{A} \}~\term{x} \rightarrow \type{X},
+  \functor{P}_{\container{S}}(\type{X}) = \sum_{(\term{x} : \type{R} + \sum_{(\type{A} : \universe{\mathcal{U}})} \typeformer{E}\,\type{A})} \begin{cases}\empt & \term{x} = \mathtt{inl}~\term{r} \\ \type{A} & \term{x} = \mathtt{inr}~(\type{A},\term{e})\end{cases} \rightarrow \type{X},
 \end{equation}
 which simplifies to
 \begin{equation}
@@ -554,37 +562,41 @@ and further
 \begin{equation}
   \functor{P}_{\container{S}}(\type{X}) = \type{R} + \sum_{\type{A} : \universe{\mathcal{U}}} \typeformer{E}~\type{A} \times (\type{A} \rightarrow \type{X}).
 \end{equation}
-We get the following diagram for the \(\functor{P}\)-coalgebra.
-
+We get the diagram in \figref{tree-constructors} for the \(\functor{P}\)-coalgebra.
 \begin{figure}[h]
   \centering
   \begin{tikzcd}[row sep=large,column sep=large]
-    \type{R} \ar[dr,"\function{Ret}"'] \ar[r,"\texttt{inl}"] & \type{R} + \sum_{\type{A} : \universe{U}} \typeformer{E}~\type{A} \times (\type{A} \rightarrow \typeformer{M})  & \sum_{\type{A} : \universe{U}} \typeformer{E}~\type{A} \times (\type{A} \rightarrow \typeformer{M}) \ar[l,"\texttt{inr}"'] \ar[dl,"\function{Vis}"] \\
-    & \typeformer{M} \ar[u,"\function{out}"]
+    \type{R} \ar[dr,"\constructor{Ret}"'] \ar[r,"\texttt{inl}"] & \type{R} + \sum_{\type{A} : \universe{U}} \typeformer{E}~\type{A} \times (\type{A} \rightarrow \typeformer{M}) \ar[d,"\function{in}"]  & \sum_{\type{A} : \universe{U}} \typeformer{E}~\type{A} \times (\type{A} \rightarrow \typeformer{M}) \ar[l,"\texttt{inr}"'] \ar[dl,"\constructor{Vis}"] \\
+    & \typeformer{M}
   \end{tikzcd}
-  \caption{TODO}
+  \caption{Tree Constructors}
+  \label{fig:tree-constructors}
 \end{figure}
-\noindent Again we can define \(\function{Ret}\) and \(\function{Vis}\) using the \(\function{in}\) function.
+\noindent Again we can define \(\constructor{Ret}\) and \(\constructor{Vis}\) using the \(\function{in}\) function.
 
 \subsection{ITrees}
 \todo[inline]{Get the correct equivalence for ITrees (Part of project description?)}
-Now we should have all the knowledge needed to make ITrees using \texttt{M}-types. We define ITrees by the container
+Now we should have all the knowledge needed to make ITrees using \texttt{M}-types.
+\begin{defn}
+  We define the type of ITrees as the \texttt{M}-type given by the container
+  \begin{equation}
+    \container{S} = \containerpair{\type{R}+\unit+\sum_{\type{A}:\universe{\mathcal{U}}} (\typeformer{E}~\type{A})}{\begin{cases} \empt & \texttt{inl}~r \\ \unit & \texttt{inl}~(\texttt{inl}~\unitelem) \\ \type{A} & \texttt{inr}~(\texttt{inr}~(\type{A},\term{e})) \end{cases}}.
+  \end{equation}
+\end{defn}
+\noindent The (reduced) polynomial functor for this container is
 \begin{equation}
-  \container{S} = \left( \unit+\type{R}+\sum_{\type{A}:\universe{\mathcal{U}}} (\typeformer{E}~\type{A}) ~~,~~ \lambda\left\{ \texttt{inl}~(\texttt{inl}~\_) \rightarrow \unit ~;~ \texttt{inl}~(\texttt{inr}~\_) \rightarrow \empt ~;~ \texttt{inr} (\type{A},\_)  \rightarrow \type{A} \right\} \right).
+  \functor{P}_{\container{S}}(\type{X}) = \type{R} + \type{X} + \sum_{(\type{A} : \universe{\mathcal{U}})} (\typeformer{E}~\type{A} \times (\type{A} \rightarrow \type{X}))
 \end{equation}
-Such that the (reduced) polynomial functor becomes
-\begin{equation}
-  \functor{P}_{\container{S}}(\type{X}) = \type{X} + \type{R} + \sum_{\type{A} : \universe{\mathcal{U}}} ((\typeformer{E}~\type{A}) \times (\type{A} \rightarrow \type{X}))
-\end{equation}
-Giving us the diagram
+Giving us the diagram in \figref{ITree-constructors}, from which the constructors of the type can be defined using \(\function{in}\).
 \begin{figure}[h]
   \centering
   \begin{tikzcd}[row sep=large,column sep=large]
-    \type{R} \ar[ddrr,"\function{Ret}"'] \ar[r,"\texttt{inl}\,\circ\,\texttt{inr}"] & \typeformer{M} + \type{R} + \sum_{\type{A} : \universe{\mathcal{U}}} (\typeformer{E}~\type{A} \times (\type{A} \rightarrow \typeformer{M})) & & \sum_{\type{A} : \universe{U}} \typeformer{E}~\type{A} \times (\type{A} \rightarrow \typeformer{M}) \ar[ll,"\texttt{inr}"'] \ar[ddl,"\function{Vis}"] \\
-    & & \typeformer{M} \ar[ul,"\texttt{inl}\,\circ\,\texttt{inl}"'] \ar[d,"\function{Tau}"'] \\
-    & & \typeformer{M} \ar[uul,"\function{out}"]
+    \type{R} \ar[ddrr,"\constructor{Ret}"'] \ar[r,"\texttt{inl}\,\circ\,\texttt{inr}"] & \typeformer{M} + \type{R} + \sum_{(\type{A} : \universe{\mathcal{U}})} (\typeformer{E}~\type{A} \times (\type{A} \rightarrow \typeformer{M})) \ar[ddr,"\function{in}"] & & \sum_{\type{A} : \universe{U}} \typeformer{E}~\type{A} \times (\type{A} \rightarrow \typeformer{M}) \ar[ll,"\texttt{inr}"'] \ar[ddl,"\constructor{Vis}"] \\
+    & & \typeformer{M} \ar[ul,"\texttt{inl}\,\circ\,\texttt{inl}"'] \ar[d,"\constructor{Tau}"'] \\
+    & & \typeformer{M}
   \end{tikzcd}
-  \caption{TODO}
+  \caption{ITree constructors}
+  \label{fig:ITree-constructors}
 \end{figure}
 
 \section{Automaton}
@@ -608,7 +620,7 @@ we get that it corresponds to the M-type for the container \(\containerpairsimpl
 \begin{equation}
   \vcenter{\infer{\destructor{tl}~\term{a} : \type{T}}{\term{a} : \type{T}}}
 \end{equation}
-the container is \(\containerpairsimple{\unit}{\unit}\) \todo{why gives some arguements or illustations showing these reasonings}. If we want a type with both these rules, then we just take the disjoint union of the two containers
+the container is \(\containerpairsimple{\unit}{\unit}\) \todo{why give some arguments or illustation showing these reasonings}. If we want a type with both these rules, then we just take the disjoint union of the two containers
 \begin{equation}
   \containerpair{\type{A} + \unit}{\begin{cases} \empt & \mathtt{inl}~\term{a} \\ \unit & \mathtt{inr}~\unitelem \end{cases}}
 \end{equation}
@@ -620,7 +632,7 @@ has container \(\containerpair{\unit}{\type{A}}\). We can types with a given des
 \begin{equation}
   \vcenter{\infer{\destructor{hd}~\term{a} : \type{A}}{\term{a} : \type{T}}}
 \end{equation}
-has container \(\containerpairsimple{A}{\empt}\), but this is the same as for \(\constructor{ret}\), and we do not always want both. The difference is how they are added to other constructors / destructors. Destructors are easily added together, take for example \(\destructor{hd}\) and \(\destructor{tl}\), \(\containerpairsimple{A}{\unit}\). In general adding containers \(\containerpair{\type{A}}{\typeformer{B}}\) and \(\containerpair{\type{C}}{\typeformer{D}}\) for two constructors together is done by
+has container \(\containerpairsimple{\type{A}}{\empt}\), but this is the same as for \(\constructor{ret}\), and we do not always want both. The difference is how they are added to other constructors / destructors. Destructors are easily added together, take for example \(\destructor{hd}\) and \(\destructor{tl}\), \(\containerpairsimple{\type{A}}{\unit}\). In general adding containers \(\containerpair{\type{A}}{\typeformer{B}}\) and \(\containerpair{\type{C}}{\typeformer{D}}\) for two constructors together is done by
 \begin{equation}
   \containerpair{\type{A} + \type{C}}{ \begin{cases} \typeformer{B}~\term{a} & \mathtt{inl}~\term{a} \\ \typeformer{D}~\term{c} & \mathtt{inr}~\term{c} \end{cases}}
 \end{equation}
@@ -649,10 +661,13 @@ so we would also expect that a type defined as a (coinductive) record is equal t
 But we run into problems if ... \todo{Problem cases} \todo{What differes from W and M types for closure of constructors / destructors?}
 
 \section{Wacky \texttt{M}-type}
-We end this chapter by showing of some wacky \texttt{M}-type, that utilizes the definition of the \texttt{M}-type to the fullest
-\begin{equation}
-  \containerpair{\mathbb{N} + \mathbb{N}}{\begin{cases} \mathbb{N} & \mathtt{inl}~0 \\ \empt & \mathtt{inl}~\term{x} \land \term{x}~\text{is odd} \\ \empt & \mathtt{inr}~\term{x} \land \term{x}~\text{is even} \\ \unit & o.w. \end{cases}}
-\end{equation}
+We end this chapter by showing of some wacky \texttt{M}-type, that utilizes the definition of the \texttt{M}-type to the fullest.
+\begin{defn}
+  We define a wacky \texttt{M}-type by the following container
+  \begin{equation}
+    \containerpair{\mathbb{N} + \mathbb{N}}{\begin{cases} \mathbb{N} & \mathtt{inl}~0 \\ \empt & \mathtt{inl}~\term{x} \land \term{x}~\text{is odd} \\ \empt & \mathtt{inr}~\term{x} \land \term{x}~\text{is even} \\ \unit & o.w. \end{cases}}
+  \end{equation}
+\end{defn}
 this container gives the \texttt{M}-type and constructors / destructors shown in \figref{wacky-m-type}
 \begin{figure}[h]
   \centering
@@ -663,15 +678,16 @@ this container gives the \texttt{M}-type and constructors / destructors shown in
   \caption{wacky \texttt{M}-type}
   \label{fig:wacky-m-type}
 \end{figure}
-This is a stream of coproducts of natural numbers, that terminates whenever it is the left injection and even, or the right injection and odd, and whenever the left injection is zero, it splits in a branches indexed by the natural numbers.
-
-\todo{define a wacky M-type showing some of the use of M-types / complexity}
+The type can be interpreted as a stream of coproducts of natural numbers, that terminates whenever it is the left injection and even, or the right injection and odd, and whenever the left injection is zero, it splits in a branches indexed by the natural numbers.
+\\ \\
+This show that we can define coinductive types, with rather complex structure.
+\todo[inline]{define a wacky M-type showing some of the use of M-types / complexity}
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
 
 \chapter{QM-types}
-In this chapter we will introduce quotients, and show how quotients of \texttt{M}-types, are equal to QIIT. \todo{better introduction to chapter, and reference to main points}
+In this chapter we will introduce quotients, and show how to construct quotiented \texttt{M}-types which we call Q\texttt{M}-types. We show you can be constructed a QIIT that is equal to the Q\texttt{M}-type assuming axiom of choice. \todo{better introduction to chapter, and reference to main points}
 
 \section{Quotienting and Constructors}
 \todo[inline]{Describe set truncated quotients and their construction / elimination principles, and how it relates to quotienting M-types}
@@ -760,6 +776,7 @@ In this section we will define the partiality monad (see below) and show that (a
 \end{defn}
 
 \subsection{Delay monad to Sequences}
+\todo{introduction to subsection}
 \begin{defn}
   We define
   \begin{equation}
@@ -1036,7 +1053,9 @@ This recursor allows us to lift the function \(\function{Seq{\rightarrow}(-)_\bo
 \end{lem}
 \begin{lem}
   Assuming countable choice, the function \(\function{Seq/{\sim}{\rightarrow}(-)_\bot}\) is surjective
-  
+  \begin{proof}
+    \todo{Complete proof}
+  \end{proof}
 \end{lem}
 \begin{thm}
   Assuming countable choice, we get an equivalence between sequences and the partiality monad.
@@ -1045,29 +1064,65 @@ This recursor allows us to lift the function \(\function{Seq{\rightarrow}(-)_\bo
 \end{proof}
 \end{thm}
 
+\subsubsection{Building the weak bisimulation on the M-type as a M-type}
+\todo[inline]{Is this possible? Yes! Should it be included?}
+
 \subsubsection{Building the Partiality Monad as a limit (Dialgebra?)}
 \todo[inline]{Is this possible?}
 
-\subsection{Permutation Trees}
-\subsubsection{Binary Trees}
-We define binary trees \(\type{bT}\) as the \texttt{M}-type over
-\begin{equation}
-  \left(\unit+\unit, \begin{cases} \empt & \mathtt{inl}~\unitelem\\ \unit + \unit & \mathtt{inr}~\unitelem \end{cases}\right)
-\end{equation}
-We get constructors
-\begin{equation}
-  \vcenter{\infer{\constructor{leaf} : \type{bT}}{\strut}}
-\end{equation}
-\begin{equation}
-  \vcenter{\infer{\constructor{node}~\function{f} : \type{bT}}{\function{f} : \unit + \unit \rightarrow \type{bT}}}
-\end{equation}
-We want to define trees where the permutation does not matter \(\type{bTp}\)
+\section{Permutation Trees}
+\todo[inline]{introduction to section}
+\subsection{Binary Trees}
+\todo[inline]{introduction to section}
+\begin{defn}
+  Binary trees \(\type{bT}\) are given as the \texttt{M}-type defined by the container
+  \begin{equation}
+    \left(\unit+\unit, \begin{cases} \empt & \mathtt{inl}~\unitelem\\ \unit + \unit & \mathtt{inr}~\unitelem \end{cases}\right)
+  \end{equation}
+\end{defn}
+\noindent For which we get the constructors\\[-10mm]
+\begin{center}
+  \strut
+  \hfill
+  \begin{minipage}{0.20\linewidth}
+    \begin{equation}
+      \vcenter{\infer{\constructor{leaf} : \type{bT}}{\strut}}
+    \end{equation}
+  \end{minipage}
+  \hfill
+  \begin{minipage}{0.25\linewidth}
+    \begin{equation}
+      \vcenter{\infer{\constructor{node}~\function{f} : \type{bT}}{\function{f} : \unit + \unit \rightarrow \type{bT}}}
+    \end{equation}
+  \end{minipage}
+  \hfill
+  \strut
+\end{center}
+We want to define trees where the permutation does not matter, that is the following rule is true
 \begin{equation}
   \vcenter{\infer[\constructor{mix}]{\constructor{node}~\function{f} \equiv \constructor{node}~(\function{f} \circ \function{g})}{\function{f} : \unit + \unit \rightarrow \type{bT} & \function{g} : \unit + \unit \rightarrow \unit + \unit & \mathtt{isIso}~\function{g}}}
 \end{equation}
-We can either define this as a quotient \(\type{bT} / \relation{\sim}\), meaning \(\relation{\sim} = \constructor{mix}\) or as a QIIT type where \(\constructor{mix}\) and \(\constructor{bTp\text{-}isSet}\) are additional constructors. These two definitions are equal
+this type of tree we call  \(\type{bTp}\). We can either define this as a quotient \(\type{bT} / \relation{\sim}\), where
+\begin{center}
+  \strut
+  \hfill
+  \begin{minipage}{0.3\linewidth}
+    \begin{equation}
+      \vcenter{\infer[\constructor{\sim_{leaf}}]{\constructor{leaf}~\relation{\sim}~\constructor{leaf}}{\strut}}
+    \end{equation}
+  \end{minipage}
+  \hfill
+  \begin{minipage}{0.35\linewidth}
+    \begin{equation}
+      \vcenter{\infer[\constructor{\sim_{node}}]{\constructor{node}~\function{f}~\relation{\sim}~\constructor{node}~\function{g}}{\prod_{(\term{x} : \unit + \unit)} \function{f}~\term{x}~\relation{\sim}~\function{g}~\term{x}}}
+    \end{equation}
+  \end{minipage}
+  \hfill
+  \strut
+\end{center}
+and \(\constructor{\sim_mix}\) is \(\constructor{mix}\) with \(\sim\) replacing the equality. Another way to define the type is as a QIIT type where \(\constructor{mix}\) and \(\constructor{bTp\text{-}isSet}\) are additional constructors. We will show these two definitions are equal
 \begin{thm}
-  \(\type{bT}/\relation{\sim} \equiv \type{bTp}\)
+  There is an equality \(\type{bT}/\relation{\sim} \equiv \type{bTp}\)
   \begin{proof}
     \begin{equation}
       \begin{aligned}
@@ -1075,10 +1130,17 @@ We can either define this as a quotient \(\type{bT} / \relation{\sim}\), meaning
         &\function{bT{\rightarrow}bTp}~(\constructor{node}_{\type{bT}}~\function{f}) = \constructor{node}_{\type{bTp}}~(\function{bT{\rightarrow}bTp} \circ \function{f})
       \end{aligned}
     \end{equation}
+    This definition takes weakly bisimilar elements to equivalent elements
+    \begin{equation}
+      \begin{aligned}
+        &\function{bT{\rightarrow}bTp\text{-}{\approx}{\rightarrow}{\equiv}}~(\constructor{\sim_{leaf}}) = \mathtt{refl} \\
+        &\function{bT{\rightarrow}bTp\text{-}{\approx}{\rightarrow}{\equiv}}~(\constructor{\sim_{node}}~\function{p}) = \mathtt{ap}~\constructor{node}_{\type{bTp}}~(\function{bT{\rightarrow}bTp\text{-}{\approx}{\rightarrow}{\equiv}} \circ \function{p})
+      \end{aligned}
+    \end{equation}
     Then we lift the definition to the quotient
     \begin{equation}
       \begin{aligned}
-        &\function{bT/{\sim}{\rightarrow}bTp} = \function{rec}~\function{bT{\rightarrow}bTp}~(\function{Seq{\rightarrow}(-)_\bot\text{-}{\approx}{\rightarrow}{\equiv}}~\term{A_{set}})~\constructor{bTp\text{-}isSet}
+        &\function{bT/{\sim}{\rightarrow}bTp} = \function{rec}~\function{bT{\rightarrow}bTp}~(\function{bT{\rightarrow}bTp\text{-}{\approx}{\rightarrow}{\equiv}}~\term{A_{set}})~\constructor{bTp\text{-}isSet}
       \end{aligned}
     \end{equation}
   \end{proof}
@@ -1364,41 +1426,6 @@ as expected. Transporting along \eqref{eq:zip-equality} gives us a definition fo
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
 
 \chapter{Examples of \texttt{M}-types}
-
-\section{The Partiality monad}
-To construct the partiality monad, we start with the delay monad, and the preorder
-\begin{equation}
-\forall x, \bot \sqsubseteq x
-\end{equation}
-\begin{equation}
-\forall\,x, x \sqsubseteq x
-\end{equation}
-\begin{equation}
-\forall\,x\,y\,z, x \sqsubseteq y \rightarrow y \sqsubseteq z \rightarrow x \sqsubseteq z
-\end{equation}
-we can then define the partiality monad
-
-The partiality monad \((-)_\bot\) is a way of adding partiality to a given computation. Along with the partiality monad, we also get a partial ordering \((\cdot \sqsubseteq \cdot)\), by
-\begin{equation}
-\forall x, \bot \sqsubseteq x
-\end{equation}
-\begin{equation}
-\forall\,x, x \sqsubseteq x
-\end{equation}
-\begin{equation}
-\forall\,x\,y\,z, x \sqsubseteq y \rightarrow y \sqsubseteq z \rightarrow x \sqsubseteq z
-\end{equation}
-\begin{equation}
-\forall\,x\,y, x \sqsubseteq y \rightarrow y \sqsubseteq x \rightarrow x \equiv y
-\end{equation}
-We now want to show that we can construct the partiality monad from the delay monad. We need an operation that given an element of the delay monad, maps to an element of the partiality monad.
-\begin{equation}
-  \function{now}~x = x + \unit
-\end{equation}
-\begin{equation}
-  \function{later}~y = y
-\end{equation}
-
 \section{TODO: Place these subsections}
 \todo[inline]{What makes a relation a bisimulation? Is bisim and equality equal.}
 \subsection{Identity Bisimulation}
