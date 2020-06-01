@@ -59,7 +59,9 @@
 
 \newcommand*{\thmref}[1]{\hyperref[thm:#1]{Theorem~\ref*{thm:#1}}} % Theorem~\ref
 \newcommand*{\lemref}[1]{\hyperref[lem:#1]{Lemma~\ref*{lem:#1}}}
+\newcommand*{\defref}[1]{\hyperref[defn:#1]{Definition~\ref*{defn:#1}}}
 \newcommand*{\figref}[1]{\hyperref[fig:#1]{Figure~\ref*{fig:#1}}}
+\newcommand*{\exmpref}[1]{\hyperref[exmp:#1]{Example~\ref*{exmp:#1}}}
 \newcommand*{\chapterref}[1]{\hyperref[ch:#1]{Chapter~\ref*{ch:#1}}}
 
 \newcommand*{\set}[1]{\left\{#1\right\}}
@@ -235,13 +237,13 @@ Inductively defined data types are initial algebras, meaning that they are the s
 \\ \\
 If you are used to working in set theory, then working in HoTT will take some getting used to. Homotopy type theory is proof relevant, which means that a there might be multiple proofs of one statement, and these proofs might not be interchangeable (equal). The reason is that types in HoTT have a H-level, describing how equality behaves. We start from (-2) with contractiable types, meaning there is an element which all other element are equal to. Then there is (-1)-types which are mere propositions or hProp, where all elements of the type are equal, but there might not be any. If the type is inhabited, then we say the proposition is true. The 0-types are the hSets, where all equalities between two elements \(x,y\) are equal. For 1-types (1-groupoids) we get equalities of equalities are equal, and then so on for homotopy \(n\)-types. Any \(n\)-type is also a \(n+1\)-type, but with trivial equalities at the \(n+1\) level. If we don't want to do proof relevant mathematics we can do propositional truncation, converting types to \(-1\)-type, meaning we ignore the difference in proofs by just look at whether a type is inhabited or not. However doing this we loose some of the reasoning power of HoTT. One of the tools we get using the full power of HoTT is \textbf{Higher order inductive types (HITs)}, where we define types with point constructors and equality constructors, an example is the propositional truncation we just described\todo{write up constructors for propositional truncation}, another useful example is set truncated quotients\todo{write up constructors for set truncated quotients}.
 \\ \\
-We have formalized all of \chapterref{M-types} and \chapterref{M-types-examples} and some of \chapterref{QM-types} \todo{add remaing chapters} in the proof assistant / programming languge Cubical Agda. A \textbf{proof assistant} helps with verifying proofs, while making the process of making proofs interactive. \textbf{Cubical Agda} \cite{cubicalagda} is an implementation of a cubical type theory (inspired by CCHM \cite{DBLP:CCHM}) made by extending the proof assistant Agda. One of the main additions is the interval and path types. The \textbf{interval} \(\mathbb{I}\) can be thought of as elements in \([0,1]\). When working with the interval, we can only access the left and right endpoint \(\constant{i0}\) and \(\constant{i1}\) or some unspecified point in the middle \(i\), keeping with the intuition of a continuous interval. Cubical agda also generalizes transporting, given a type line \(\typeformer{A} : \mathbb{I} \rightarrow \universe{\mathcal{U}}\), and the endpoint \(\typeformer{A}~\constant{i0}\) you get a line from \(\typeformer{A}~\constant{i0}\) to \(\typeformer{A}~\constant{i1}\). \todo{Axioms of cubical Agda} \todo{Some better (intuitive) description of the interval type!!}
+We have formalized most of \chapterref{M-types} (accepted to the cubical agda github: \url{https://github.com/agda/cubical/pull/245}) and \chapterref{M-types-examples} and some of \chapterref{QM-types} \todo{add remaing chapters} in the proof assistant / programming languge Cubical Agda. A \textbf{proof assistant} helps with verifying proofs, while making the process of making proofs interactive. \textbf{Cubical Agda} \cite{cubicalagda} is an implementation of a cubical type theory (inspired by CCHM \cite{DBLP:CCHM}) made by extending the proof assistant Agda. One of the main additions is the interval and path types. The \textbf{interval} \(\mathbb{I}\) can be thought of as elements in \([0,1]\). When working with the interval, we can only access the left and right endpoint \(\constant{i0}\) and \(\constant{i1}\) or some unspecified point in the middle \(i\), keeping with the intuition of a continuous interval. Cubical agda also generalizes transporting, given a type line \(\typeformer{A} : \mathbb{I} \rightarrow \universe{\mathcal{U}}\), and the endpoint \(\typeformer{A}~\constant{i0}\) you get a line from \(\typeformer{A}~\constant{i0}\) to \(\typeformer{A}~\constant{i1}\). \todo{Axioms of cubical Agda} \todo{Some better (intuitive) description of the interval type!!}
 \\ \\
 Cubical Agda has a hierarchy of universes, \(\universe{\mathcal{U}}_0, \universe{\mathcal{U}}_1, \dots\), however we will leave the index implicit and write \(\universe{\mathcal{U}}\).
 \todo[inline]{Universes??}
 
 \section{Notation}
-Most of the work is formalized in the Cubical Agda proof assistant. The following is the notation / fonts used to denote specific definitions / concepts
+The following is the notation / fonts used to denote specific definitions / concepts
 \begin{itemize}
 \item Universe \(\universe{\mathcal{U}}_i\) or \(\universe{\mathcal{U}}\)
 \item Type \(\type{A} : \universe{\mathcal{U}}\)
@@ -269,7 +271,7 @@ Furthermore we define some useful notation for casing on natural numbers.
 
 \chapter{\texttt{M}-types}
 \label{ch:M-types}
-In this chapter we will introduce containers (aka. signatures), and use them to construct \texttt{M}-types and operations \(\function{in}\) and \(\function{out}\) on the \texttt{M}-types (\thmref{M-shift}). We conclude the chapter by defining a coinduction principle for \texttt{M}-types \cite{DBLP:non-wellfounded}. \todo{Some formalization of coalgebras is missing?}
+In this chapter we will introduce containers (aka. signatures), and use them to construct \texttt{M}-types and operations \(\function{in}\) and \(\function{out}\) on the \texttt{M}-types (\thmref{M-shift}) and showing that \(\coalg{\typeformer{M}}{\function{out}}\) is a final coalgebra (\thmref{M-type-final}). We conclude the chapter by proving a coinduction principle for \texttt{M}-types (\thmref{M-coinduction-principle}) \cite{DBLP:non-wellfounded}. \todo{Some formalization of coalgebras is missing?}
 
 \section{Containers / Signatures}
 \begin{defn}
@@ -292,6 +294,7 @@ In this chapter we will introduce containers (aka. signatures), and use them to 
   \end{equation}
 \end{defn}
 \begin{exmp}
+  \label{exmp:stream-polyfunctor-example}
   The polynomial functor for streams over the type \(\type{A}\) is defined by the container \(\container{S} = \containerpairsimple{\type{A}}{\unit}\), we get
   \begin{equation}
     \label{eq:stream-polyfunctor-pre}
@@ -318,14 +321,17 @@ In this chapter we will introduce containers (aka. signatures), and use them to 
 \end{defn}
 \noindent We can now define \texttt{M}-types.
 \begin{defn}
+  \label{defn:M-type-final-def}
   Given a container \(\container{S}\), we define \(\mathtt{M}\)-types as the type, making the coalgebra given by \(\typeformer{M}_{\container{S}}\) and \(\function{out} : \typeformer{M}_{\container{S}} \rightarrow \functor{P}_{\container{S}}(\typeformer{M}_{\container{S}})\) fulfill the property
   \begin{equation}
     \typeformer{Final}_{\container{S}} := \sum_{(\coalg{\type{X}}{\function{\rho}} : \mathtt{Coalg}_{\container{S}})} \prod_{(\coalg{\type{C}}{\function{\gamma}} : \mathtt{Coalg}_{\container{S}})} \mathtt{isContr}~(\coalg{\type{C}}{\function{\gamma}} \Rightarrow \coalg{\type{X}}{\function{\rho}}).
   \end{equation}
-  That is \(\prod_{(\coalg{\type{C}}{\function{\gamma}} : \mathtt{Coalg}_{\container{S}})} \mathtt{isContr}(\coalg{\type{C}}{\function{\gamma}} \Rightarrow \coalg{\typeformer{M}_{\container{S}}}{\function{out}})\). We denote the \texttt{M}-type as \(\typeformer{M}_{\containerpair{\type{A}}{\typeformer{B}}}\) or \(\typeformer{M}_{\container{S}}\) or just \(\typeformer{M}\) when the Container is clear from the context.
+  That is \(\prod_{(\coalg{\type{C}}{\function{\gamma}} : \mathtt{Coalg}_{\container{S}})} \mathtt{isContr}(\coalg{\type{C}}{\function{\gamma}} \Rightarrow \coalg{\typeformer{M}_{\container{S}}}{\function{out}})\). We denote the \texttt{M}-type as \(\typeformer{M}_{\containerpair{\type{A}}{\typeformer{B}}}\) or \(\typeformer{M}_{\container{S}}\) or just \(\typeformer{M}\) when the Container is clear from the context. When writing \(\mathtt{isContr}~\type{A}\), we mean \(\type{A}\) is of H-level \((-2)\), that is \(\sum_{\term{x} : \type{A}} \prod_{\term{y} : \type{A}} \term{y} \equiv \term{x}\) or equivalently \(\type{A} \equiv \unit\).
 \end{defn}
 \noindent Continuing our example we now construct streams as an \(\mathtt{M}\)-type.
-\begin{exmp} We define streams over the type \(\type{A}\) as the \(\mathtt{M}\)-type over the container \(\containerpairsimple{\type{A}}{\unit}\). If we apply the polynomial functor to the \texttt{M}-type, then we get \(\functor{P}_{\containerpairsimple{\type{A}}{\unit}} \typeformer{M} = \type{A} \times \typeformer{M}_{\containerpair{\type{A}}{\lambda\,\_,\unit}}\), illustrated in \figref{stream-M-type}.
+\begin{exmp}
+  \label{exmp:stream-M-type-example}
+  We define streams over the type \(\type{A}\) as the \(\mathtt{M}\)-type over the container \(\containerpairsimple{\type{A}}{\unit}\). If we apply the polynomial functor to the \texttt{M}-type, then we get \(\functor{P}_{\containerpairsimple{\type{A}}{\unit}} \typeformer{M} = \type{A} \times \typeformer{M}_{\containerpair{\type{A}}{\lambda\,\_,\unit}}\), illustrated in \figref{stream-M-type}.
   \begin{figure}[h]
     \centering
     \begin{tikzcd}[row sep=large,column sep=large]
@@ -359,7 +365,7 @@ In this chapter we will introduce containers (aka. signatures), and use them to 
   \end{figure}  
 \end{defn}
 \begin{lem}\label{lem:function-to-M-type-is-cone}
-  For all coalgebras \(\coalg{\type{C}}{\function{\gamma}}\) for the container \(\container{S}\), we get \(\type{C} \rightarrow \typeformer{M}_{\container{S}} \equiv \typeformer{Cone}_{\coalg{\type{C}}{\function{\gamma}}}\), where \(\typeformer{Cone} = \sum_{(\function{f} : \prod_{(n : \mathbb{N})} \type{C} \rightarrow \type{X}_n)} \prod_{(n : \mathbb{N})} \function{\pi}_{(n)} \circ (\function{f}_{(n+1)}) \equiv f_n\) illustrated in \figref{M-seq-cone}.
+  For all coalgebras \(\coalg{\type{C}}{\function{\gamma}}\) for the container \(\container{S}\), we get \(\type{C} \rightarrow \typeformer{M}_{\container{S}} \equiv \typeformer{Cone}_{\coalg{\type{C}}{\function{\gamma}}}\), where \(\typeformer{Cone} = \sum_{(\function{f} : \prod_{(n : \mathbb{N})} \type{C} \rightarrow \type{X}_n)} \prod_{(n : \mathbb{N})} \function{\pi}_{(n)} \circ \function{f}_{n+1} \equiv \function{f}_n\) illustrated in \figref{M-seq-cone}.
   \begin{figure}[h]
     \centering
     \begin{tikzcd}[row sep=large,column sep=large]
@@ -435,6 +441,58 @@ In this chapter we will introduce containers (aka. signatures), and use them to 
     We furthermore get the definitions \(\function{in} = \mathtt{transport}~\pathterm{shift}\) and \(\function{out} = \mathtt{transport}~(\sym{\pathterm{shift}})\), since \function{in} and \function{out} are part of an equality relation \(\pathterm{shift}\), they are both surjective and embeddings. \todo{is surjectivity and embedding important here? Describe this where relevant instead!}
   \end{proof}
 \end{thm}
+\begin{thm}
+  \label{thm:M-type-final}
+  The \texttt{M}-type \(\typeformer{M}_{\container{S}}\) is defined as the limit for a polynomial functor \(\functor{P}_{\container{S}}\), meaning that it fulfills \defref{M-type-final-def} \(\typeformer{Final}_{\container{S}}~\mathcal{L}\).
+  \begin{proof}
+    So we need to show that \(\prod_{(\coalg{\type{C}}{\function{\gamma}} : \mathtt{Coalg}_{\container{S}})} \mathtt{isContr}~(\coalg{\type{C}}{\function{\gamma}} \Rightarrow \coalg{\type{\mathcal{L}}}{\function{out}})\), so we assume we are given some \(\coalg{\type{C}}{\function{\gamma}} : \mathtt{Coalg}_{\container{S}}\), to show \((\coalg{\type{C}}{\function{\gamma}} \Rightarrow \coalg{\type{\mathcal{L}}}{\function{out}}) \equiv \unit\). We have    
+    \begin{align}
+      &\quad~\coalg{\type{C}}{\function{\gamma}} \Rightarrow \coalg{\type{\mathcal{L}}}{\function{out}} \\
+      &\equiv \sum_{(\function{f} : \type{C} \rightarrow \type{\mathcal{L}})} (\function{out} \circ \function{f} \equiv \functor{P}\function{f} \circ \function{\gamma}) \\
+      &\equiv \sum_{(\function{f} : \type{C} \rightarrow \type{\mathcal{L}})} (\function{in} \circ \function{out} \circ \function{f} \equiv \function{in} \circ \functor{P}\function{f} \circ \function{\gamma}) \\
+      &\equiv \sum_{(\function{f} : \type{C} \rightarrow \type{\mathcal{L}})} (\function{f} \equiv \function{in} \circ \functor{P}\function{f} \circ \function{\gamma}) \\
+    \end{align}
+    we let \(\function{\psi} = \function{in} \circ \functor{P}\function{f} \circ \function{\gamma}\), which simplifies the expression to \(\sum_{(\function{f} : \type{C} \rightarrow \type{\mathcal{L}})} (\function{f} \equiv \function{\psi}~\function{f})\). We define \(e\) to be the function from right to left for the equality in \lemref{function-to-M-type-is-cone}, we then get the equality
+    \begin{equation}
+      \sum_{(\function{f} : \type{C} \rightarrow \type{\mathcal{L}})} (\function{f} \equiv \function{\psi}~\function{f}) \quad \equiv \quad \sum_{(\term{c} : \typeformer{Cone}_{\coalg{C}{\gamma}})} (\function{e}~\term{c} \equiv \function{\psi}~(\function{e}~\term{c}))
+  \end{equation}
+  if we define the function \(\phi : \typeformer{Cone}_{\container{S}} \rightarrow \typeformer{Cone}_{\container{S}}\) as \(\function{\phi}~(\function{u},\function{g}) = (\function{\phi}_0~\function{u},\function{\phi}_1~\function{u}~\function{g})\) where
+  \begin{align}
+    \function{\phi}_0~\function{u} &= \natcases{(\lambda\,\_, \unitelem)}{\functor{P}\function{f} \circ \function{\gamma} \circ \function{u}} \\
+    \function{\phi}_1~\function{u}~\function{g} &= \natcases{\mathtt{funExt}~\lambda\,\_, \mathtt{refl}_{\unitelem}}{\mathtt{ap}~(\functor{P}\function{f} \circ \function{\gamma}) \circ \function{g}}
+  \end{align}
+  then we get the commuting square in \figref{commuting-square},
+    \begin{figure}[h]
+    \centering
+    \begin{tikzcd}
+      \typeformer{Cone}_{\coalg{\type{C}}{\function{\gamma}}} \ar[d,"\phi"] \ar[r,"e"] & (\type{C} \rightarrow \type{\mathcal{L}}) \ar[d,"\psi"] \\
+      \typeformer{Cone}_{\coalg{\type{C}}{\function{\gamma}}} \ar[r,"e"] & (\type{C} \rightarrow \type{\mathcal{L}})
+    \end{tikzcd}
+    \caption{commuting square}
+    \label{fig:commuting-square}
+  \end{figure}
+  which says \(\function{\psi}~(\function{e}~\term{c}) = \function{e}~(\function{\phi}~\term{c})\), so we can continue the simplification
+  \begin{equation}
+    \sum_{(\term{c} : \typeformer{Cone}_{\coalg{\type{C}}{\function{\gamma}}})} (\function{e}~\function{c} \equiv \function{e}~(\function{\phi}~\function{c}))
+  \end{equation}
+  We know that \(\function{e}\) is part of an equality (namely \lemref{function-to-M-type-is-cone}), so it is an embedding, that is for all \(\term{a},\term{b}\) the equality \(\function{e}~\term{a} \equiv \function{e}~\term{b}\) implies \(\term{a} \equiv \term{b}\), so we get
+  \begin{align}
+    &\quad~\sum_{(\term{c} : \typeformer{Cone}_{\coalg{\type{C}}{\function{\gamma}}})} (\function{c} \equiv \function{\phi}~\function{c}) \\
+    &\equiv \sum_{(\term{(\function{u},\function{g})} : \typeformer{Cone}_{\coalg{\type{C}}{\function{\gamma}}})} ((\function{u},\function{g}) \equiv (\function{\phi}_0~\function{u},\function{\phi}_1~\function{u}~\function{g})) \\
+    &\equiv \sum_{(\term{(\function{u},\function{g})} : \typeformer{Cone}_{\coalg{\type{C}}{\function{\gamma}}})} \sum_{(\pathterm{p} : \function{u} \equiv \function{\phi}_0\,\function{u})} \function{g} \equiv_{*} \function{\phi}_1~\function{u}~\function{g}
+  \end{align}
+  We split the order of the \(\Sigma\)'s, by unfolding the definition of \(\typeformer{Cone}\).
+  \begin{equation}
+    \sum_{\big(\term{(\function{u},\pathterm{p})} : \sum_{(\function{u} : \prod_{(n:\mathbb{N})} \type{C} \rightarrow \type{X}_n)} \function{u} \equiv \function{\phi}_0\,\function{u}\big)} \sum_{(\function{g} : \prod_{(n:\mathbb{N})} \function{\pi}_{(n)} \circ \function{u}_{n+1} \equiv \function{u}_n)}\function{g} \equiv_{*} \function{\phi}_1~\function{u}~\function{g}
+  \end{equation}
+  Now with the following two properties, given by \lemref{limit-collapse}, we are done
+  \begin{align}
+    \unit &\equiv \left(\sum_{(\function{u} : \prod_{(n:\mathbb{N})} \type{C} \rightarrow \type{X}_n)} \function{u} \equiv \function{\phi}_0\,\function{u}\right)  \\
+    \unit &\equiv_{*} \left(\sum_{(\function{g} : \prod_{(n:\mathbb{N})} \function{\pi}_{(n)} \circ \function{u}_{n+1} \equiv \function{u}_n)}\function{g} \equiv_{*} \function{\phi}_1~\function{u}~\function{g}\right)
+  \end{align}
+  since we get the type \(\sum_{\unitelem : \unit} \unit\) which is equal to \(\unit\).
+  \end{proof}
+\end{thm}
 
 \section{Coinduction Principle for \texttt{M}-types}
 We can now construct a coinduction principle given a bisimulation relation.
@@ -449,22 +507,26 @@ We can now construct a coinduction principle given a bisimulation relation.
     \label{fig:coalgebra-coinduction-definition}
   \end{figure}
 \end{defn}
-\begin{defn}[Coinduction principle]
-  \noindent Given a relation \(\relation{\mathcal{R}}\), that is part of a bisimulation over a final \(\functor{P}\)-coalgebra \(\coalg{\typeformer{M}}{\function{out}}:\mathtt{Coalg}_{\container{S}}\) we get the diagram in \figref{final-coalgebra-coinduction},
-  \begin{figure}[h]
-    \centering
-    \begin{tikzcd}[row sep=huge,column sep=huge]
-      \coalg{\typeformer{M}}{\function{out}} & \coalg{\type{\overline{\mathcal{R}}}}{\function{\alpha}_{\relation{\mathcal{R}}}} \ar[l,Rightarrow,"{\pi_1}^{\type{\overline{\mathcal{R}}}}"'] \ar[r,Rightarrow,"{\pi_2}^{\type{\overline{\mathcal{R}}}}"] & \coalg{\typeformer{M}}{\function{out}}
-    \end{tikzcd}
-    \caption{Bisimulation principle for final coalgebra}
-    \label{fig:final-coalgebra-coinduction}
-  \end{figure}
-  \noindent where \(\pi_1^{\type{\overline{\mathcal{R}}}} = ~! = \pi_2^{\type{\overline{\mathcal{R}}}}\) \todo{what is \(!\)} where \(!\) is the unique mapping property (UMP) out of the final coalgebra. Given \(\term{r} : \term{m}~\relation{\mathcal{R}}~\term{m'}\) we get the equation
-  \begin{equation}
-    \term{m} = \pi_1^{\type{\overline{\mathcal{R}}}} (\term{m}, \term{m'}, \term{r}) = \pi_2^{\type{\overline{\mathcal{R}}}} (\term{m}, \term{m'}, \term{r}) = \term{m'}.
-  \end{equation}
-  \todo{What is the consequence of this?}
-\end{defn}
+\begin{thm}[Coinduction principle]
+  \label{thm:M-coinduction-principle}
+  Given a relation \(\relation{\mathcal{R}}\), that is a bisimulation for an \texttt{M}-type, then for all \(\term{x},\term{y}\) if they are related \(\term{x}~\relation{\mathcal{R}}~\term{y}\) then they are equal \(\term{x} \equiv \term{y}\).  
+  \begin{proof}
+    Given a relation \(\relation{\mathcal{R}}\), that is part of a bisimulation over a final \(\functor{P}\)-coalgebra \(\coalg{\typeformer{M}}{\function{out}}:\mathtt{Coalg}_{\container{S}}\) we get the diagram in \figref{final-coalgebra-coinduction},
+    \begin{figure}[h]
+      \centering
+      \begin{tikzcd}[row sep=huge,column sep=huge]
+        \coalg{\typeformer{M}}{\function{out}} & \coalg{\type{\overline{\mathcal{R}}}}{\function{\alpha}_{\relation{\mathcal{R}}}} \ar[l,Rightarrow,"{\pi_1}^{\type{\overline{\mathcal{R}}}}"'] \ar[r,Rightarrow,"{\pi_2}^{\type{\overline{\mathcal{R}}}}"] & \coalg{\typeformer{M}}{\function{out}}
+      \end{tikzcd}
+      \caption{Bisimulation principle for final coalgebra}
+      \label{fig:final-coalgebra-coinduction}
+    \end{figure}
+    \noindent where \(\pi_1^{\type{\overline{\mathcal{R}}}} = ~! = \pi_2^{\type{\overline{\mathcal{R}}}}\) \todo{what is \(!\)} where \(!\) is the unique mapping property (UMP) out of the final coalgebra. Given \(\term{r} : \term{x}~\relation{\mathcal{R}}~\term{y}\) we get the equation
+    \begin{equation}
+      \term{x} = \pi_1^{\type{\overline{\mathcal{R}}}} (\term{x}, \term{y}, \term{r}) = \pi_2^{\type{\overline{\mathcal{R}}}} (\term{x}, \term{y}, \term{r}) = \term{y}.
+    \end{equation}
+    \todo{What is the consequence of this?}
+  \end{proof}
+\end{thm}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
 
@@ -475,11 +537,7 @@ In this section we show some examples of types that can be constructed as \(M\)-
 \todo{complete this section}
 
 \section{Stream Formalization using \texttt{M}-types}
-As described earlier, given a type \(\type{A}\) we define the stream of that type as
-\begin{equation}
-  \typeformer{stream}~\type{A} := \typeformer{M}_{\containerpair{\type{A}}{\lambda\,\_,\unit}}
-\end{equation}
-this is equal to an alternative definition of streams \todo{...}
+As shown in \exmpref{stream-polyfunctor-example} and \exmpref{stream-M-type-example} above, we can define streams as an \texttt{M}-type. \todo{Anything to add to this section?}
 
 \section{ITrees as \texttt{M}-types}
 Interaction trees (ITrees) \cite{DBLP:itrees} are used to model effectful behavior, where computations can interact with an external environment by events. ITrees are defined by the following constructors
@@ -594,6 +652,7 @@ An automaton is defined as a set of state \(\type{V}\) and an alphabet \(\type{\
   \caption{automaton}
   \label{fig:automaton}
 \end{figure}
+\todo{Complete section about automaton}
 
 \section{General rules for constructing \texttt{M}-types}
 We want to create a calculus for defining coinductive types as \texttt{M}-types. We would like to be able to define a type that has a given set of constructor / destructors rules. If we for example is given the rule
@@ -674,15 +733,180 @@ This show that we can define coinductive types, with rather complex structure.
 In this chapter we will introduce quotients, and show how to construct quotiented \texttt{M}-types which we call Q\texttt{M}-types. We show you can be constructed a QIIT that is equal to the Q\texttt{M}-type assuming axiom of choice. \todo{better introduction to chapter, and reference to main points}
 
 \section{Quotienting and Constructors}
-\todo[inline]{Describe set truncated quotients and their construction / elimination principles, and how it relates to quotienting M-types}
-\section{Quotient \texttt{M}-type}
-Since we know that \texttt{M}-types preserves the H-level, we can use set-truncated quotients, to define quotient \texttt{M}-types, though we run into the problem of \todo{problem of direct quotients}, as a solution we use QIIT to define the relation and type at the same type.
+A very useful way to construct a specific type, is by constructing the "free" such type, and then quotienting with a relation. We can define quotiented types by using the higher inductive type defined by the constructors\\[-10mm]
+\begin{center}
+  \strut
+  \hfill
+  \begin{minipage}{0.2\linewidth}
+    \begin{equation}
+      \vcenter{\infer{\constructor{[}\,x\,\constructor{]} : \type{A} / \relation{\mathcal{R}}}{\term{x} : \type{A}}}
+    \end{equation}
+  \end{minipage}
+  \hfill
+  \begin{minipage}{0.3\linewidth}
+    \begin{equation}
+      \vcenter{\infer{\constructor{eq/}~\term{x}~\term{y}~\term{r} : \term{x} \equiv \term{y}}{\term{x}, \term{y} : \type{A} / \relation{\mathcal{R}} & \term{r} : \term{x}~\relation{\mathcal{R}}~\term{y}}}
+    \end{equation}
+  \end{minipage}
+  \hfill
+  \begin{minipage}{0.35\linewidth}
+    \begin{equation}
+      \vcenter{\infer{\constructor{squash/} :\texttt{isSet}~(\type{A} / \relation{R})}{\strut}}
+    \end{equation}
+  \end{minipage}
+  \hfill
+  \strut
+\end{center}
+with recursor and eliminator defined as follows.
+\begin{defn}[Recursor for quotient]
+  \label{defn:quotient-recursor}
+  For all elements \(\term{x}, \term{y} : \type{A}\), functions \(\function{f} : \type{A} \rightarrow \type{B}\) and relations \(\function{g} : \term{x}~\relation{R}~\term{y} \rightarrow \function{f}~\term{x} \equiv \function{f}~\term{y}\), then if \(\type{B}\) is a set, we get a function from \(\type{A} / \relation{R}\) to \(\type{B}\), defined by case as
+  \begin{equation}
+    \label{eq:quotient-recursor}
+    \begin{aligned}
+      &\function{rec}~\constructor{[}\,\term{a}\,\constructor{]} = \function{f}~\term{a} \\
+      &\function{rec}~(\constructor{eq/}~\_~\_~\term{r}~i) = \function{g}~\term{r}~i \\
+      &\function{rec}~(\constructor{squash/}~\term{a}~\term{b}~\pathterm{p}~\pathterm{q}~i~j) = \term{B_{set}}~(\function{rec}~\term{a})~(\function{rec}~\term{b})~(\mathtt{ap}~\function{rec}~\pathterm{p})~(\mathtt{ap}~\function{rec}~\pathterm{q})~i~j
+    \end{aligned}
+  \end{equation}
+\end{defn}
+\begin{defn}[Propositional eliminator for quotient]
+  \label{defn:propositional-elimination-quotient}
+  Given a proposition \(\typeformer{P} : \type{A} / \relation{R} \rightarrow \universe{\mathcal{U}}\) for quotients, that fulfills \(\function{P_{prop}} : \prod_{(\term{x} : \type{A} / \relation{R})} \typeformer{isProp}~(\typeformer{P}~\term{x})\), then if \(\function{f} : \prod_{(\term{a} : \type{A})} \typeformer{P}~\constructor{[}\,\term{a}\,\constructor{]}\) we get a function from \(\term{x} : \type{A} / \relation{R}\) to \(\typeformer{P}~\term{x}\), defined as
+  \begin{equation}
+    \begin{aligned}
+      &\function{elimProp}~\constructor{[}\,\term{a}\,\constructor{]} = \function{f}~\term{a}\\
+      &\function{elimProp}~(\constructor{eq/}~\term{a}~\term{b}~i) = \function{P_{prop}}~(\function{elimProp}~\term{a})~(\function{elimProp}~\term{b})~(\constructor{eq/}~\term{a}~\term{b})~i \\
+      &\function{elimProp}~(\constructor{squash/}~\term{a}~\term{b}~\pathterm{p}~\pathterm{q}~i~j) = \\
+      &\qquad\function{isSet{\rightarrow}isSetDep}~(\function{isProp{\rightarrow}isSet} \circ \function{P_{prop}}) \\
+      &\qquad\quad (\function{elimProp}~\term{a})~(\function{elimProp}~\term{b})~(\mathtt{ap}~\function{elimProp}~p)~(\mathtt{ap}~\function{elimProp}~q)\\
+      &\qquad\quad (\constructor{squash/}~\term{a}~\term{b}~\pathterm{p}~\pathterm{q})~i~j
+    \end{aligned}
+  \end{equation}
+  where \(\function{isSet{\rightarrow}isSetDep}\) takes a function \(\prod_{\term{a} : \type{A}} \function{isSet}~(\typeformer{B}~\term{a})\) to the dependent version \(\function{isSetDep}~\type{A}~\typeformer{B}\). Using this eliminator we can to do propositional elimination of a quotient, by supplying the base case \(\typeformer{P}~\constructor{[}\,\term{a}\,\constructor{]}\).
+\end{defn}
+\noindent We can now construct some more interesting data types, by set quotienting \texttt{M}-types, which we call Q\texttt{M}-types, some examples follow in the following section. \todo{preserves the H-level} \todo{we cannot always lift the constructors of \texttt{M}-type to the quotiented type}
 
-\section{Quotient inductive-inductive types (QIITs)}
-A quotient inductive-inductive type (QIIT) is a type together with a relation defined on that type. QIITs are HIITs that are set truncated.
+\section{Q\texttt{M}-types and Quotient inductive-inductive types (QIITs)}
+In this section we will show some examples of quotiented \texttt{M}-types, and alternative ways of defining an equal type, but using quotient inductive-inductive types instead. A quotient inductive-inductive type (QIIT) is a type defined at the same time as a relation over that type. Furthermore QIITs are set truncated. We belive that every QM-types is equal (under the axiom of choice) to a QITT, however QIITs are more general than our Q\texttt{M}-types, so we cannot expect every QIIT to have a corresponding Q\texttt{M}-type. \todo{Go into more details!} % QIITs are HIITs that are set truncated. 
 
-\section{Partiality monad}
-In this section we will define the partiality monad (see below) and show that (assuming the axiom of countable choice) the delay monad quotiented by weak bisimilarity.
+\subsection{Multiset}
+In this subsection we define infinite trees, where the order of subtrees does not matter also known as multisets \cite{DBLP:QIIT}\cite{DBLP:tt-in-tt}\cite{DBLP:Constructing-QIITs}.
+\begin{defn}
+  We define \(\type{X}\)-valued \(\mathbb{N}\)-branching trees \(\typeformer{T}~\type{X}\) as the \texttt{M}-type defined by the container
+  \begin{equation}
+    \left(\type{X}+\unit, \begin{cases} \empt & \mathtt{inl}~\term{x} \\ \mathbb{N} & \mathtt{inr}~\unitelem \end{cases}\right)
+  \end{equation}
+\end{defn}
+\noindent For which we get the constructors\\[-10mm]
+\begin{center}
+  \strut
+  \hfill
+  \begin{minipage}{0.25\linewidth}
+    \begin{equation}
+      \vcenter{\infer{\constructor{leaf}~\term{x} : \typeformer{T}~\type{X}}{\term{x} : \type{X}}}
+    \end{equation}
+  \end{minipage}
+  \hfill
+  \begin{minipage}{0.25\linewidth}
+    \begin{equation}
+      \vcenter{\infer{\constructor{node}~\function{f} : \typeformer{T}~\type{X}}{\function{f} : \mathbb{N} \rightarrow \type{T}~\type{X}}}
+    \end{equation}
+  \end{minipage}
+  \hfill
+  \strut
+\end{center}
+We want to define trees where the permutation does not matter, that is multisets, we do this by ensuring the following rule is true
+\begin{equation}
+  \vcenter{\infer[\constructor{perm}]{\constructor{node}~\function{f} \equiv \constructor{node}~(\function{f} \circ \function{g})}{\function{f} : \mathbb{N} \rightarrow \typeformer{T}~\type{X} & \function{g} : \mathbb{N} \rightarrow \mathbb{N} & \mathtt{isIso}~\function{g}}}
+\end{equation}
+One way to define this type is as the QM-type given by quotienting \(\typeformer{T}~\type{X}\) by the relation \(\relation{\sim_T}\) defined by the constructors
+\begin{center}
+  \strut
+  \hfill
+  \begin{minipage}{0.35\linewidth}
+    \begin{equation}
+      \vcenter{\infer[\constructor{\sim_{leaf}}]{\constructor{leaf}~\term{x}~\relation{\sim}~\constructor{leaf}~\term{y}}{\term{x} \equiv \term{y}}}
+    \end{equation}
+  \end{minipage}
+  \hfill
+  \begin{minipage}{0.35\linewidth}
+    \begin{equation}
+      \vcenter{\infer[\constructor{\sim_{node}}]{\constructor{node}~\function{f}~\relation{\sim}~\constructor{node}~\function{g}}{\prod_{(n : \mathbb{N})} \function{f}~n~\relation{\sim}~\function{g}~n}}
+    \end{equation}
+  \end{minipage}
+  \hfill
+  \strut
+\end{center}
+\begin{equation}
+  \vcenter{\infer[\constructor{\sim_{perm}}]{\constructor{node}~\function{f} \equiv \constructor{node}~(\function{f} \circ \function{g})}{\function{f} : \mathbb{N} \rightarrow \typeformer{T}~\type{X} & \function{g} : \mathbb{N} \rightarrow \mathbb{N} & \mathtt{isIso}~\function{g}}}
+\end{equation}
+Again we have the problem that we cannot lift the \(\constructor{node}\) to the quotiented type, without the use of the axiom of choice. However we can define multisets as a QIIT \(\typeformer{MS}~\type{X}\), with the constructors \(\constructor{leaf}, \constructor{node},\constructor{perm}\) and set quotiented \(\constructor{MS\text{-}isSet}\). These two ways of constructing a type for multisets are equal assuming the axiom of (countable) choice.
+\begin{defn}
+  There is a function from \(\typeformer{T}~\type{X}\) to \(\typeformer{MS}~\type{X}\)
+  \begin{equation}
+    \begin{aligned}
+      &\function{T{\rightarrow}MS}~(\constructor{leaf}_{\typeformer{T}}~\term{x}) = \constructor{leaf}_{\typeformer{MS}}~\term{x} \\
+      &\function{T{\rightarrow}MS}~(\constructor{node}_{\typeformer{T}}~\function{f}) = \constructor{node}_{\typeformer{MS}}~(\function{T{\rightarrow}MS} \circ \function{f})
+    \end{aligned}
+  \end{equation}
+\end{defn}
+This function takes weakly bisimilar objects to equal once.
+\begin{lem}
+  If \(\term{x}, \term{y} : \typeformer{T}~\type{X}\) are weakly bisimilar \(p : \term{x}~\relation{\sim_{T}}~\term{y}\) then \(\function{T{\rightarrow}MS}~\term{x} \equiv \function{T{\rightarrow}MS}~\term{y}\).
+  \begin{proof}
+    We do the proof by casing on the weak bisimilarity.
+    \begin{equation}
+      \begin{aligned}
+        &\function{T{\rightarrow}MS\text{-}{\sim}{\rightarrow}{\equiv}}~(\constructor{\sim_{leaf}}~\pathterm{p}) = \mathtt{ap}~\constructor{leaf}_{\typeformer{MS}}~\pathterm{p} \\
+        &\function{T{\rightarrow}MS\text{-}{\sim}{\rightarrow}{\equiv}}~(\constructor{\sim_{node}}~\function{k}) = \mathtt{ap}~\constructor{node}_{\typeformer{MS}}~(\mathtt{funExt}~(\function{T{\rightarrow}MS\text{-}{\sim}{\rightarrow}{\equiv}} \circ \function{k})) \\
+        &\function{T{\rightarrow}MS\text{-}{\sim}{\rightarrow}{\equiv}}~(\constructor{\sim_{perm}}~\function{f}~\function{g}~\term{e}) = \constructor{perm}~(\function{T{\rightarrow}MS} \circ \function{f})~\function{g}~\term{e}
+      \end{aligned}
+    \end{equation}
+  \end{proof}
+\end{lem}
+\noindent With this lemma, we can lift the function \(\function{T{\rightarrow}MS}\) to the quotient.
+\begin{defn}
+  There is a function \(\function{T/{\sim}{\rightarrow}MS}\) from \(\typeformer{T}~\type{X}/\relation{\sim_{T}}\) to \(\typeformer{MS}~\type{X}\), defined using the recursor for quotients defined in \defref{quotient-recursor}, with \(\function{f} = \function{T{\rightarrow}MS}\) and \(\function{g} = \function{T{\rightarrow}MS\text{-}{\sim}{\rightarrow}{\equiv}}\) and \(\typeformer{MS}\) is a set by \(\constructor{MS\text{-}isSet}\)
+\end{defn}
+\begin{lem}
+  \label{lem:weak-bisim-to-eq-multiset}
+  Given an equality \(\function{T{\rightarrow}MS}~\term{x} \equiv \function{T{\rightarrow}MS}~\term{y}\) then \(\term{x}~\relation{\sim_{T}}~\term{y}\).
+  \begin{proof}
+    If \(x\) and \(y\) are leafs with values \(a\) and \(b\) then \(a \equiv b\) by the injectivity of the constructor \(\constructor{leaf}_{\typeformer{MS}}\), making a bisimilarity using \(\sim_{leaf}\). If \(x\) and \(y\) are nodes defined by functions \(f\) and \(g\), then by the injectivity of the constructor \(\constructor{node}_{\typeformer{MS}}\), we get \(\prod_{(n : \mathbb{N})} \function{f}~n \equiv \function{g}~n\) and by induction we get \(\prod_{(n : \mathbb{N})} \function{f}~n~\relation{\sim_{T}}~\function{g}~n\), making us able to use \(\constructor{\sim_{node}}\) to construct the bisimilarity. We do not get any other equalities, since \(\constructor{leaf}_{\typeformer{MS}}\) and \(\constructor{node}_{\typeformer{MS}}\) are disjoint.
+  \end{proof}
+\end{lem}
+\begin{lem}
+  The function \(\function{T/{\sim}{\rightarrow}MS}\) is injective, meaning \(\function{T/{\sim}{\rightarrow}MS}~\ter{x} \equiv \function{T/{\sim}{\rightarrow}MS}~\term{y}\) implies \(\term{x} \equiv \term{y}\).
+  \begin{proof}
+    We show injectivity by doing propositional elimination defined in \defref{propositional-elimination-quotient}, with
+    \begin{equation}
+      \typeformer{P} = (\lambda\,\term{x},~\function{T/{\sim}{\rightarrow}MS}~\term{x} \equiv \function{T/{\sim}{\rightarrow}MS}~\term{y} \rightarrow \term{x} \equiv \term{y})
+    \end{equation}
+    which is a proposition for all \(\term{x}\) by \(\function{P_{prop}} = \lambda\,\term{x},~\function{isProp\Pi}~(\lambda\,\_, \constructor{squash/}~\term{x}~\term{y})\). We do it twice, first for \(\term{x}\) and then for \(\term{y}\) where we define \(\typeformer{P}\) and \(\function{P_{prop}}\) similarly, but with \(x = \constructor{[}\,a\,\constructor{]}\) since it has already been propositionally eliminated. 
+    \begin{equation}
+      \begin{aligned}
+        &\function{elimProp}~(\lambda\,\term{a},~\function{elimProp} (\lambda\,\term{b},~\constructor{eq/}~\term{a}~\term{b} \circ \function{T{\rightarrow}MS\text{-}{\equiv}{\rightarrow}{\sim}}~\term{a}~\term{b})~\term{y})~\term{x}
+      \end{aligned}
+    \end{equation}
+    where \(\function{T{\rightarrow}MS\text{-}{\equiv}{\rightarrow}{\sim}}\) is \lemref{weak-bisim-to-eq-multiset}.
+  \end{proof}
+\end{lem}
+\begin{lem}
+  The function \(\function{T/{\sim}{\rightarrow}MS}\) is surjective \((\prod_{(\term{b} : \typeformer{MS})}, \| \Sigma_{(\term{x} : \typeformer{T})}~\function{T/{\sim}{\rightarrow}MS}~\term{x} \equiv \term{b} \|)\), assuming the axiom of choice.
+  \begin{proof}
+    We only need to look at the point constructors of \(\typeformer{MS}\). For the leaf case, we have the simple equality \(\function{T/{\sim}{\rightarrow}MS}~\constructor{[}\,\constructor{leaf}_{\typeformer{T}}~\term{x}\,\constructor{]} \equiv \constructor{leaf}_{\typeformer{MS}}~\term{x}\). For the node case with \(\constructor{node}~\function{f}\) then by induction, surjection of \(\constructor{[}\,\cdot\,\constructor{]}\) and the axiom of choice, we get \(\function{g} : \mathbb{N} \rightarrow \typeformer{T}~\type{X}\) such that \(\prod_{(n : \mathbb{N})} \,\function{T/{\sim}{\rightarrow}MS}~\constructor{[}\,\function{g}~n\,\constructor{]} \equiv \function{f}~n\), making \(\function{T/{\sim}{\rightarrow}MS}~\constructor{[}\,\constructor{node}~\function{g}\,\constructor{]} \equiv \constructor{node}~\function{f}\).
+  \end{proof}
+\end{lem}
+\begin{thm}
+  The is an equality between the types \(\typeformer{T}~\type{X}/\relation{\sim_{T}}\) and \(\typeformer{MS}~\type{X}\), assuming the axoim of choice.
+  \begin{proof}
+    Since the function \(\function{T/{\sim}{\rightarrow}MS}\) is injective and surjective, it becomes an equality.
+  \end{proof}
+\end{thm}
+
+\subsection{Partiality monad}
+In this subsection we will define the partiality monad (see below) and show that (assuming the axiom of countable choice) the delay monad quotiented by weak bisimilarity.
 \begin{defn}[Partiality Monad]
   A simple example of a quotient inductive-inductive type is the partiality monad \((-)_\bot\) over a type \(\type{R}\), defined by the constructors\\[-9mm]
   \begin{center}
@@ -759,7 +983,7 @@ In this section we will define the partiality monad (see below) and show that (a
   \end{equation}
 \end{defn}
 
-\subsection{Delay monad to Sequences}
+\subsubsection{Delay monad to Sequences}
 \todo{introduction to subsection}
 \begin{defn}
   We define
@@ -822,9 +1046,9 @@ We also introduce notation for the two special cases of sequences given above
 \begin{lem}[\(\constant{inl{\not\equiv}inr}\)]
   For any two elements \(\term{x} = \mathtt{inl}~\term{a}\) and \(\term{y} = \mathtt{inr}~\term{b}\) then \(\term{x} \not\equiv \term{y}\).
   \begin{proof}
-    The constructors are disjoint, so there is not a path between them \todo{better formulated proof}.
+    The constructors \texttt{inl} and \texttt{inr} are disjoint, so there does not exists a path between them, meaning constructing one is a contradiction.
   \end{proof}
-f\end{lem}
+\end{lem}
 \begin{defn}
   We define a function from \(\typeformer{Delay}~\type{R}\) to \(\typeformer{Seq}_{\type{R}}\)
   \begin{equation}
@@ -884,7 +1108,7 @@ f\end{lem}
   \end{proof}
 \end{cor}
 
-\subsection{Sequence to Partiality Monad}
+\subsubsection{Sequence to Partiality Monad}
 In this section we will show that assuming the "Axiom of Countable Choice", we get an equivalence between sequences and the partiality monad.
 \begin{defn}[Sequence Termination]
   The following relations says that a sequence \((\function{s},\function{q}) : \typeformer{Seq}_{\type{R}}\) terminates with a given value \(\term{r} : \type{R}\),
@@ -959,25 +1183,19 @@ This rewriting confirms that if \(\function{isMon}~\function{s}\), then \(\funct
     Given two sequences, if one is smaller than the another, then the least upper bounds of each sequence respect the ordering. \todo{should this be formalized entirely, or should there just be a comment about monotonicity? Does not seem relevant? (There is alot of work here..)}
   \end{proof}
 \end{lem}
-\begin{defn}
+\begin{lem}
   If two sequences \(\term{x},\term{y}\) are weakly bisimular, then \(\function{Seq{\rightarrow}(-)_\bot}~\term{x} \equiv \function{Seq{\rightarrow}(-)_\bot}~\term{y}\)
-\begin{equation}
-  \function{Seq{\rightarrow}(-)_\bot\text{-}{\approx}{\rightarrow}{\equiv}}~\term{A_{set}}~\term{x}~\term{y}~(\term{p} , \term{q}) = \constructor{\alpha_{\bot}}~(\function{Seq{\rightarrow}(-)_\bot\text{-}mono}~\term{A_{set}}~\term{x}~\term{y}~\term{p})~(\function{Seq{\rightarrow}(-)_\bot\text{-}mono}~\term{A_{set}}~\term{y}~\term{x}~\term{q})
-\end{equation}
-\end{defn}
-\begin{defn}[Recursor for Quotient]
-  \todo{is this a recursor, and for what? The quotient?}
-  For all sequences \(\term{x}, \term{y} : \typeformer{Seq}_{\type{A}}\), functions \(\function{f} : \type{A} \rightarrow \type{B}\) and relations \(\function{g} : \term{x}~\relation{R}~\term{y} \rightarrow \function{f}~\term{x} \equiv \function{f}~\term{y}\), then if \(\type{B}\) is a set \(\term{B_{set}} : \typeformer{isSet}~\type{B}\), we get a function \(\function{rec} : \type{A} / \relation{R} \rightarrow \type{B}\), defined by case as
-  \begin{equation}
-    \label{eq:quotient-recursor}
-    \begin{aligned}
-      &\function{rec}~\function{[}\,\term{z}\,\function{]} = \function{f}~\term{z} \\
-      &\function{rec}~(\function{eq/}~\_~\_~\term{r}~i) = \function{g}~\term{r}~i \\
-      &\function{rec}~(\function{squash/}~\term{a}~\term{b}~\pathterm{p}~\pathterm{q}~i~j) = \term{B_{set}}~(\function{rec}~\term{a})~(\function{rec}~\term{b})~(\mathtt{ap}~\function{rec}~\pathterm{p})~(\mathtt{ap}~\function{rec}~\pathterm{q})~i~j
-    \end{aligned}
-  \end{equation}
-\end{defn}
-This recursor allows us to lift the function \(\function{Seq{\rightarrow}(-)_\bot}\) to the quotient
+  \begin{proof}
+    \todo{describe instead of proof term!}
+    \begin{equation}
+      \begin{aligned}
+        &\function{Seq{\rightarrow}(-)_\bot\text{-}{\approx}{\rightarrow}{\equiv}}~\term{A_{set}}~\term{x}~\term{y}~(\term{p} , \term{q}) = \\
+        &\qquad\qquad\qquad\constructor{\alpha_{\bot}}~(\function{Seq{\rightarrow}(-)_\bot\text{-}mono}~\term{A_{set}}~\term{x}~\term{y}~\term{p})~(\function{Seq{\rightarrow}(-)_\bot\text{-}mono}~\term{A_{set}}~\term{y}~\term{x}~\term{q})
+      \end{aligned}
+    \end{equation}
+  \end{proof}
+\end{lem}
+\noindent The recursor for quotients \defref{quotient-recursor} allows us to lift the function \(\function{Seq{\rightarrow}(-)_\bot}\) to the quotient
 \begin{defn}
   \label{eq:QuotientedSeqToPartialityMonad}
   We can define a function \(\function{Seq/{\sim}{\rightarrow}(-)_\bot}\) from \(\typeformer{Seq}_{\type{A}}\) to \(\type{A}_{\bot}\), where \(\term{A_{set}} : \typeformer{isSet}~\type{A}\) as
@@ -999,23 +1217,18 @@ This recursor allows us to lift the function \(\function{Seq{\rightarrow}(-)_\bo
 \begin{lem}
   The function \(\function{Seq/{\sim}{\rightarrow}(-)_\bot}\) is injective.
   \begin{proof}
-    We use propositional elimination of quotients \todo{Should this be formalized?}
-    \begin{equation}
-      \begin{aligned}
-        \function{elimProp} :~& (\typeformer{B} :\typeformer{Seq}_{\type{R}} / \relation{\sim_{seq}} \rightarrow \universe{\mathcal{U}}) \rightarrow ((\term{x} : \typeformer{Seq}_{\type{R}} / \relation{\sim_{seq}}) \rightarrow \typeformer{isProp}~(\typeformer{B}~\term{x})) \\
-        \rightarrow~& (\function{f} : (\term{a} : \typeformer{Seq}_{\type{R}}) \rightarrow \typeformer{B}~\function{[}~a~\function{]}) \rightarrow (\term{x} : \typeformer{Seq}_{\type{R}} / \relation{\sim_{seq}}) \rightarrow \typeformer{B}~\term{x}
-      \end{aligned}
-    \end{equation}
-    to show the injectivity, meaning for all \(\term{x}~\term{y} : \typeformer{Seq}_{\type{R}} / \relation{\sim_{seq}}\) we get \(\function{Seq/{\sim}{\rightarrow}(-)_\bot}~\term{x} \equiv \function{Seq/{\sim}{\rightarrow}(-)_\bot}~\term{y} \rightarrow \term{x} \equiv \term{y}\). We start by eliminating \(\term{x}\), followed by elimination of \(y\), this gives us the proof term \todo{Convert to text, instead of a proof term!?}
+    We use propositional elimination of quotients \defref{propositional-elimination-quotient} \todo{Should this be formalized?} to show the injectivity, meaning for all \(\term{x}~\term{y} : \typeformer{Seq}_{\type{R}} / \relation{\sim_{seq}}\) we get \(\function{Seq/{\sim}{\rightarrow}(-)_\bot}~\term{x} \equiv \function{Seq/{\sim}{\rightarrow}(-)_\bot}~\term{y} \rightarrow \term{x} \equiv \term{y}\). We start by eliminating \(\term{x}\), followed by elimination of \(y\), this gives us the proof term \todo{Convert to text, instead of a proof term!?}
     \begin{equation}
       \begin{aligned}
         &\function{elimProp} \\
         &\quad (\lambda\,\term{a},~\function{Seq/{\sim}{\rightarrow}(-)_\bot}~\term{a} \equiv \function{Seq/{\sim}{\rightarrow}(-)_\bot}~\term{y} \rightarrow \term{a} \equiv \term{y}) \\
         &\quad (\lambda\,\term{a},~\function{isProp\Pi}~(\lambda\,\_, \constructor{squash/}~\term{a}~\term{y})) \\
         &\quad (\lambda\,\term{a},~\function{elimProp} \\
-        &\qquad\qquad\quad (\lambda\,\term{b},~\function{Seq{\rightarrow}(-)_\bot}~\term{a} \equiv \function{Seq/{\sim}{\rightarrow}(-)_\bot}~\term{b} \rightarrow \function{[}~\term{a}~\function{]} \equiv \term{b}) \\
-        &\qquad\qquad\quad (\lambda\,\term{b},~\function{isProp\Pi}~(\lambda\,\_, \constructor{squash/}~\function{[}~\term{a}~\function{]}~\term{b})) \\
-        &\qquad\qquad\quad (\lambda\,\term{b},~(\constructor{eq/}~\term{a}~\term{b}) \circ (\function{Seq{\rightarrow}(-)_\bot\text{-}isInjective}~\term{a}~\term{b})))
+        &\qquad\qquad\quad (\lambda\,\term{b},~\function{Seq{\rightarrow}(-)_\bot}~\term{a} \equiv \function{Seq/{\sim}{\rightarrow}(-)_\bot}~\term{b} \rightarrow \constructor{[}\,\term{a}\,\constructor{]} \equiv \term{b}) \\
+        &\qquad\qquad\quad (\lambda\,\term{b},~\function{isProp\Pi}~(\lambda\,\_, \constructor{squash/}~\constructor{[}\,\term{a}\,\constructor{]}~\term{b})) \\
+        &\qquad\qquad\quad (\lambda\,\term{b},~(\constructor{eq/}~\term{a}~\term{b}) \circ (\function{Seq{\rightarrow}(-)_\bot\text{-}isInjective}~\term{a}~\term{b})) \\
+        &\qquad\qquad\quad y) \\
+        &\quad x
       \end{aligned}
     \end{equation}
     where \(\function{Seq{\rightarrow}(-)_\bot\text{-}isInjective}\) is \eqref{eq:injectivity-lemma}, 
@@ -1048,296 +1261,22 @@ This recursor allows us to lift the function \(\function{Seq{\rightarrow}(-)_\bo
 \end{proof}
 \end{thm}
 
-\subsubsection{Building the weak bisimulation on the M-type as a M-type}
-\todo[inline]{Is this possible? Yes! Should it be included?}
+\todo[inline]{Building the weak bisimulation on the M-type as a M-type - Is this possible? Yes! Should it be included?}
+\todo[inline]{Building the Partiality Monad as a limit (Dialgebra?) - Is this possible?}
 
-\subsubsection{Building the Partiality Monad as a limit (Dialgebra?)}
-\todo[inline]{Is this possible?}
-
-\section{Permutation Trees}
-\todo[inline]{introduction to section}
-\subsection{Binary Trees}
-\todo[inline]{introduction to section}
-\begin{defn}
-  Binary trees \(\type{bT}\) are given as the \texttt{M}-type defined by the container
-  \begin{equation}
-    \left(\unit+\unit, \begin{cases} \empt & \mathtt{inl}~\unitelem\\ \unit + \unit & \mathtt{inr}~\unitelem \end{cases}\right)
-  \end{equation}
-\end{defn}
-\noindent For which we get the constructors\\[-10mm]
-\begin{center}
-  \strut
-  \hfill
-  \begin{minipage}{0.20\linewidth}
-    \begin{equation}
-      \vcenter{\infer{\constructor{leaf} : \type{bT}}{\strut}}
-    \end{equation}
-  \end{minipage}
-  \hfill
-  \begin{minipage}{0.25\linewidth}
-    \begin{equation}
-      \vcenter{\infer{\constructor{node}~\function{f} : \type{bT}}{\function{f} : \unit + \unit \rightarrow \type{bT}}}
-    \end{equation}
-  \end{minipage}
-  \hfill
-  \strut
-\end{center}
-We want to define trees where the permutation does not matter, that is the following rule is true
-\begin{equation}
-  \vcenter{\infer[\constructor{mix}]{\constructor{node}~\function{f} \equiv \constructor{node}~(\function{f} \circ \function{g})}{\function{f} : \unit + \unit \rightarrow \type{bT} & \function{g} : \unit + \unit \rightarrow \unit + \unit & \mathtt{isIso}~\function{g}}}
-\end{equation}
-this type of tree we call  \(\type{bTp}\). We can either define this as a quotient \(\type{bT} / \relation{\sim}\), where
-\begin{center}
-  \strut
-  \hfill
-  \begin{minipage}{0.3\linewidth}
-    \begin{equation}
-      \vcenter{\infer[\constructor{\sim_{leaf}}]{\constructor{leaf}~\relation{\sim}~\constructor{leaf}}{\strut}}
-    \end{equation}
-  \end{minipage}
-  \hfill
-  \begin{minipage}{0.35\linewidth}
-    \begin{equation}
-      \vcenter{\infer[\constructor{\sim_{node}}]{\constructor{node}~\function{f}~\relation{\sim}~\constructor{node}~\function{g}}{\prod_{(\term{x} : \unit + \unit)} \function{f}~\term{x}~\relation{\sim}~\function{g}~\term{x}}}
-    \end{equation}
-  \end{minipage}
-  \hfill
-  \strut
-\end{center}
-and \(\constructor{\sim_mix}\) is \(\constructor{mix}\) with \(\sim\) replacing the equality. Another way to define the type is as a QIIT type where \(\constructor{mix}\) and \(\constructor{bTp\text{-}isSet}\) are additional constructors. We will show these two definitions are equal
-\begin{thm}
-  There is an equality \(\type{bT}/\relation{\sim} \equiv \type{bTp}\)
-  \begin{proof}
-    \begin{equation}
-      \begin{aligned}
-        &\function{bT{\rightarrow}bTp}~\constructor{leaf}_{\type{bT}} = \constructor{leaf}_{\type{bTp}} \\
-        &\function{bT{\rightarrow}bTp}~(\constructor{node}_{\type{bT}}~\function{f}) = \constructor{node}_{\type{bTp}}~(\function{bT{\rightarrow}bTp} \circ \function{f})
-      \end{aligned}
-    \end{equation}
-    This definition takes weakly bisimilar elements to equivalent elements
-    \begin{equation}
-      \begin{aligned}
-        &\function{bT{\rightarrow}bTp\text{-}{\approx}{\rightarrow}{\equiv}}~(\constructor{\sim_{leaf}}) = \mathtt{refl} \\
-        &\function{bT{\rightarrow}bTp\text{-}{\approx}{\rightarrow}{\equiv}}~(\constructor{\sim_{node}}~\function{p}) = \mathtt{ap}~\constructor{node}_{\type{bTp}}~(\function{bT{\rightarrow}bTp\text{-}{\approx}{\rightarrow}{\equiv}} \circ \function{p})
-      \end{aligned}
-    \end{equation}
-    Then we lift the definition to the quotient
-    \begin{equation}
-      \begin{aligned}
-        &\function{bT/{\sim}{\rightarrow}bTp} = \function{rec}~\function{bT{\rightarrow}bTp}~(\function{bT{\rightarrow}bTp\text{-}{\approx}{\rightarrow}{\equiv}}~\term{A_{set}})~\constructor{bTp\text{-}isSet}
-      \end{aligned}
-    \end{equation}
-  \end{proof}
-\end{thm}
-
-\subsection{Silhouette Trees}
-We start by defining an \(\type{R}\) valued \(\type{E}\) branching tree, as the \texttt{M}-type given by the following container
-\begin{equation}
-  \left(\type{R} + \unit , \begin{cases} \empt & \mathtt{inl}~\term{a} \\ \type{E} & \mathtt{inr}~\unitelem \end{cases}\right)
-\end{equation}
-We get the constructors
-\begin{equation}
-  \vcenter{\infer{\constructor{leaf}~\term{a} : \typeformer{tree}~\type{R}~\type{E}}{\term{a} : \type{R}}}
-\end{equation}
-\begin{equation}
-  \vcenter{\infer{\constructor{node}~\function{k} : \typeformer{tree}~\type{R}~\type{E}}{\function{k} : \type{E} \rightarrow \typeformer{tree}~\type{R}~\type{E}}}
-\end{equation}
-Then we define the weak bisimilarity relation \(\relation{\sim_{tree}}\)
-\begin{equation}
-  \vcenter{\infer[\constructor{\sim_{leaf}}]{\constructor{leaf}~x~\relation{\sim_{tree}}~\constructor{leaf}~y}{\strut}}
-\end{equation}
-\begin{equation}
-  \vcenter{\infer[\constructor{\sim_{node}}]{\constructor{node}~\function{k_1}~\relation{\sim_{tree}}~\constructor{node}~\function{k_2}}{\prod_{(v : \type{E})}~\function{k_1}~\term{v}~\relation{\sim_{tree}}~\function{k_2}~\term{v}}}
-\end{equation}
-This is enough to define, what we call, silhouette trees, which are trees quotiented by this notion of weak bisimilarity, namely \(\typeformer{tree} / \relation{\sim_{tree}}\). We can also construct this type directly as a QIIT, with type constructors \todo{add all needed constructors}
-\begin{equation}
-  \vcenter{\infer{\constructor{leaf}_{\typeformer{sTree}} : \typeformer{sTree}~\type{E}}{\strut}}
-\end{equation}
-\begin{equation}
-  \vcenter{\infer{\constructor{node}_{\typeformer{sTree}}~\function{k} : \typeformer{sTree}~\type{E}}{\function{k} : \type{E} \rightarrow \typeformer{sTree}~\type{E}}}
-\end{equation}
-And the ordering relation \((\cdot~\relation{\sqsubseteq_{sTree}}~\cdot)\) of how "defined" the trees are by the constructors \todo{add all needed constructors}
-\begin{equation}
-  \vcenter{\infer{\constructor{\alpha}_{\typeformer{sTree}}~\term{x}~\term{y} : \typeformer{sTree}~\type{E}}{\term{x}~\relation{\sqsubseteq_{sTree}}~\term{y} & \term{y}~\relation{\sqsubseteq_{sTree}}~\term{x}}}
-\end{equation}
-\begin{equation}
-  \vcenter{\infer{\mathop{\constructor{\bigsqcup}}_{(\function{e} : \mathbb{N} \rightarrow \type{E})}~(\function{s}~\function{e})}{\function{s} : (\mathbb{N} \rightarrow \type{E}) \rightarrow \typeformer{sTree}~\type{E}}}
-\end{equation}
-
-\subsubsection{From \(\typeformer{tree}\) to \(\typeformer{Seq}_{tree}\)}
-We now want to show the equivalence between these two constructions, to do this we define an intermediate construction \(\typeformer{Seq}_{tree}\), where we get an ordering on the "definedness" of trees.
-\begin{defn}
-  We define monotone increasing sequences of trees as \todo{ordering is container ordering not maybe?}, all breanches are monotone increasing \todo{specify branches increasing?}.
-  \begin{equation}
-    \typeformer{Seq}_{tree} = \prod_{(\function{e} : \mathbb{N} \rightarrow \type{E})} \sum_{(\function{s} : \mathbb{N} \rightarrow \type{R} + \unit)} \prod_{(n : \mathbb{N})} \function{s}_n~\relation{\sqsubseteq_{\type{R}+\unit}}~\function{s}_{n+1}
-  \end{equation}
-  where \(\relation{\sqsubseteq_{\type{R}+\unit}}\) is similar to the relation defined at \eqref{eq:maybe-order} \todo{how does it differ? Constructors are equal type is different (trees instead of delay)}.
-\end{defn}
-\begin{defn}
-  We define a function to shift a \(\typeformer{Seq}_{tree}\), it takes \(\function{f} : \type{E} \rightarrow \typeformer{Seq}_{tree}\) as an argument. We let \(\function{s'} = \function{f}~\function{e}_0~(\function{e} \circ \constructor{succ})\), then the definition is given as
-  \begin{equation}
-    \begin{aligned}
-      &\function{shift\text{-}seq}~\function{f} = \\[-5mm]
-      &\qquad \lambda\,\function{e}, \natcases{\mathtt{inr}~\unitelem}{\pi_1~\function{s'}} , \left(\lambda\,n, \begin{cases} \mathtt{inr}~(\mathtt{refl} , \constant{inl{\not\equiv}inr}) & n = 0 \land \pi_1~\function{s'}~0 = \mathtt{inl}~r \\ \mathtt{inl}~\mathtt{refl} & n = 0 \land \pi_1~\function{s'}~0 = \mathtt{inr}~\unitelem \\ \pi_2~\function{s'}~m & n = m + 1 \end{cases}\right)
-    \end{aligned}
-  \end{equation}
-\end{defn}
-\begin{defn}
-  We define a function to unshift a \(Seq_{tree}\)
-  \begin{equation}
-    \begin{aligned}
-      &\function{unshift\text{-}seq}~\function{s}~\term{v} = \lambda\,\function{e},~(\pi_1~(\function{s}~(\natcases{\term{v}}{\function{e}})) \circ \constructor{succ}) , (\pi_2~(\function{s}~(\natcases{v}{\function{e}})) \circ \constructor{succ})
-    \end{aligned}
-  \end{equation}
-\end{defn}
-\begin{lem}
-  Shift and unshift er inverse to each other
-  \begin{proof}
-    The same reasoning as for \todo{shift - unshift}
-  \end{proof}
-\end{lem}
-\begin{defn}
-  We get a function from trees to monotone sequences
-  \begin{equation}
-    \begin{aligned}
-      &\function{tree{\rightarrow}Seq}~(\constructor{leaf}~\term{r}) = \lambda\,\_, (\lambda\,\_, \mathtt{inl}~\term{r}) , (\lambda\,\_, \mathtt{inl}~\mathtt{refl}) \\
-      &\function{tree{\rightarrow}Seq}~(\constructor{node}~\function{k}) = \function{shift}~(\function{tree{\rightarrow}Seq} \circ \function{k})
-    \end{aligned}
-  \end{equation}
-\end{defn}
-\begin{defn}
-  We get a function from monotone sequences to trees
-  \begin{equation}
-    \begin{aligned}
-      &\function{Seq{\rightarrow}tree}~\function{s} = \begin{cases} \constructor{leaf}~\term{r} & \prod_{(\function{e} : \mathbb{N} \rightarrow \type{E})} \pi_1~(\function{s}~\function{e})~0 = \mathtt{inl}~\term{r} \\ \constructor{node}~(\function{Seq{\rightarrow}tree} \circ \function{unshift}~\function{s}) & o.w.  \end{cases}
-    \end{aligned}
-  \end{equation}
-\end{defn}
-\begin{lem}
-  \label{lem:seq-first-is-leaf}
-  If the first element in the sequence is terminated / a leaf, then the rest of the elements will also be terminated.
-  \begin{equation}
-    \left(\prod_{e : \mathbb{N} \rightarrow \type{E}} \pi_1~(\function{s}~\function{e})~0 = \mathtt{inl}~\term{r}\right) \Leftrightarrow \left(\function{s} \equiv \lambda\,\_,(\lambda\,\_,\mathtt{inl}~\term{r}),(\lambda\,\_,\mathtt{inl}~\mathtt{refl})\right)
-  \end{equation}
-  \begin{proof}
-    Since the sequence is monotone, and \(\mathtt{inl}~\term{r}\) is the top element of the order, if the first element is \(\mathtt{inl}~\term{r}\), then the sequence must be \(\lambda\,\_,(\lambda\,\_,\mathtt{inl}~\term{r}),(\lambda\,\_,\mathtt{inl}~\mathtt{refl})\). The other direction is trivial.
-  \end{proof}
-\end{lem}
-\begin{thm}
-  The types \(\typeformer{tree}\) and \(\typeformer{Seq}_{tree}\) are equal
-  \begin{proof}
-    We construct an isomorphism by the functions \(\function{tree{\rightarrow}Seq}\) and \(\function{Seq{\rightarrow}tree}\), with right inverse given by two cases, one where the first element in the sequence is \(\mathtt{inl}~\term{r}\), meaning representing a leaf with value \(r\), then we need to show that \(\function{s} \equiv \lambda\,\_,(\lambda\,\_,\mathtt{inl}~\term{r}),(\lambda\,\_,\mathtt{inl}~\mathtt{refl})\) which follows from \lemref{seq-first-is-leaf}. Otherwise we need to show that
-    \begin{equation}
-      \function{shift}~(\function{tree{\rightarrow}Seq} \circ \function{Seq{\rightarrow}tree} \circ \function{unshift}~\function{s}) \equiv \function{s}
-    \end{equation}
-    By induction we get
-    \begin{equation}
-      \function{tree{\rightarrow}Seq} \circ \function{Seq{\rightarrow}tree} \circ \function{unshift}~\function{s} \equiv \function{unshift}~\function{s}
-    \end{equation}
-    then by the right inverse of the equality between shift and unshift, we are done. For the left inverse we do case analysis, using induction and the left inverse of the equality between shift and unshift
-    \begin{equation}
-      \begin{aligned}
-        &\function{tree\text{-}Seq}~(\constructor{leaf}~\term{r}) = \mathtt{refl} \\
-        &\function{tree\text{-}Seq}~(\constructor{node}~\term{k}) = \function{unshift\text{-}shift}~(\function{tree{\rightarrow}Seq} \circ \function{k}) \ct \function{tree\text{-}Seq}~k
-      \end{aligned}
-    \end{equation}
-  \end{proof}
-\end{thm}
-\noindent We start by defining some ordering relation on \(\typeformer{Seq}_{tree}\)
-\begin{defn}[Sequence Termination]
-  The following relations says that a branche \(\function{e} : \mathbb{N} \rightarrow \type{E}\) of a sequence \(\function{s} : \typeformer{Seq}_{tree}\) terminates at depth \(n\),
-  \begin{equation}
-    (\function{s}~\function{e})~\relation{\downarrow_{\typeformer{Seq}_{tree}}}~n = (\function{s}~\function{e}~n) \downarrow_{\type{R} + \unit}.
-  \end{equation}
-\end{defn}
-We define weak bisimilarity relation for sequences \todo{Is this defined for partiality monad?}
-\begin{defn}
-  \begin{equation}
-    \function{s}~\relation{\sim_{\typeformer{Seq}_{tree}}}~\function{t} = \prod_{(e : \type{E})} \prod_{(n : \mathbb{N})} \left(\|(\function{s}~\function{e})~\relation{\downarrow_{\mathtt{Seq}}}~\term{n}\| \longleftrightarrow \| (\function{t}~\function{e})~\relation{\downarrow_{\mathtt{Seq}}}~\term{n}\|\right)
-  \end{equation}
-  where \(\| \cdot \|\) is propositional truncation.
-\end{defn}
-\begin{cor}
-  The types \(\typeformer{tree}/\relation{\sim_{tree}}\) and \(\typeformer{Seq}_{tree} / \relation{\sim_{\typeformer{Seq}_{tree}}}\) are equal.
-  \begin{proof}
-    We follow the same strategy as for \(\typeformer{Delay}/{\sim}\) and \(\typeformer{Seq}/{\sim}\)
-  \end{proof}
-\end{cor}
-
-\subsubsection{\(\typeformer{Seq}_{tree}\) to \(\typeformer{sTree}\)}
-\todo{Introduction to Seq to tree}
-\begin{defn}
-  We define a function converting a sequence on trees to a monotone sequence on \typeformer{sTree}'s
-  \begin{equation}
-    \function{Seq{\rightarrow}incSeq}
-  \end{equation}
-\end{defn}
-\begin{defn}
-  There is a function from \(\typeformer{Seq}_{tree}\) to \(\typeformer{sTree}\)
-  \begin{equation}
-    \begin{aligned}
-      &\function{Seq{\rightarrow}sTree}~\function{s} = \mathop{\constructor{\bigsqcup}}_{(\function{e} : \mathbb{N} \rightarrow \type{E})}~(\function{Seq{\rightarrow}incSeq}~\function{s}~\function{e})
-    \end{aligned}
-  \end{equation}
-\end{defn}
-\begin{lem}
-  Given \(a~\relation{\sqsubseteq_{\typeformer{Seq}_{tree}}}~b\), then \(\function{Seq{\rightarrow}sTree}~a~\relation{\sqsubseteq_{sTree}}~\function{Seq{\rightarrow}sTree}~b\).
-  \begin{proof}
-    \todo{Complete proof}.
-  \end{proof}
-\end{lem}
-\noindent Since this definition is monotone, it can be lifted to the quotiented sequences.
-\begin{lem}
-  If two elements are weakly bisimilar, then they are equal as \function{sTrees} \todo{describe better}
-  \begin{equation}
-    \begin{aligned}
-      &\function{Seq{\rightarrow}sTree\text{-}{\approx}{\rightarrow}{\equiv}}~\term{x}~\term{y}~(\function{p},\function{q}) = \\
-      &\qquad\constructor{\alpha_{sTree}}~(\function{Seq{\rightarrow}sTree\text{-}mono}~\term{x}~\term{y}~\function{p})~(\function{Seq{\rightarrow}sTree\text{-}mono}~\term{y}~\term{x}~\function{q})
-    \end{aligned}
-  \end{equation}
-\end{lem}
-\begin{defn}
-  Function from \(\typeformer{Seq/{\sim}}\) to \(\typeformer{sTree}\)
-  \begin{equation}
-    \function{Seq/{\sim}{\rightarrow}sTree} = \function{rec}~\function{Seq{\rightarrow}sTree}~\function{Seq{\rightarrow}sTree\text{-}{\approx}{\rightarrow}{\equiv}}~\constructor{sTree\text{-}isSet}
-  \end{equation}
-\end{defn}
-\begin{lem}
-  \(\function{Seq/{\sim}{\rightarrow}sTree}\) is injective
-  \todo{TODO}
-\end{lem}
-\begin{lem}
-  \(\function{Seq/{\sim}{\rightarrow}sTree}\) is surjective
-  \todo{TODO}
-\end{lem}
-\begin{thm}
-  \(\function{Seq/{\sim}{\rightarrow}sTree}\) is an equivalence.
-  \todo{TODO}
-\end{thm}
-
-\subsection{QM-types}
+\section{QM-types}
 \label{ch:QM-types}
-We want to define sequences based on \texttt{M}-types, here are some examples
-\begin{align}
-  \typeformer{Seq}_{\typeformer{M}_{\containerpair{\type{A}}{\empt}}} &= \type{A} \\
-  \typeformer{Seq}_{\typeformer{M}_{\containerpair{\type{A} + \unit}{[\empt,\unit]}}} &= \sum_{(\function{s} : \mathbb{N} \rightarrow \type{A} + \unit)} \prod_{(n : \mathbb{N})} \function{s}_n \sqsubseteq \function{s}_{n+1} \\
-  \typeformer{Seq}_{\typeformer{M}_{\containerpair{\unit + \unit}{[\empt,\type{E}]}}} &= \prod_{(\function{e} : \mathbb{N} \rightarrow \type{E})}\sum_{(\function{s} : \mathbb{N} \rightarrow \unit + \unit)} \prod_{(n : \mathbb{N})} \function{s}_n \sqsubseteq \function{s}_{n+1} \\
-  \typeformer{Seq}_{\typeformer{M}_{\containerpair{\type{A} + \unit}{[\empt,\type{E}]}}} &= \prod_{(\function{e} : \mathbb{N} \rightarrow \type{E})}\sum_{(\function{s} : \mathbb{N} \rightarrow \type{A} + \unit)} \prod_{(n : \mathbb{N})} \function{s}_n \sqsubseteq \function{s}_{n+1} \\
-  \typeformer{Seq}_{\typeformer{M}_{\containerpair{\type{A} + \type{B}}{[\empt,\type{E}]}}} &= \prod_{(\function{e} : \mathbb{N} \rightarrow \type{E})}\sum_{(\function{s} : \mathbb{N} \rightarrow \type{A} + \type{B})} \prod_{(n : \mathbb{N})} \function{s}_n \sqsubseteq \function{s}_{n+1} \\
-  \typeformer{Seq}_{\typeformer{M}_{\containerpair{\unit}{\unit + \unit}}} &=~\prod_{(\function{e} : \mathbb{N} \rightarrow \unit + \unit)}\sum_{(\function{s} : \mathbb{N} \rightarrow \type{1})}\prod_{(n : \mathbb{N})} \function{s}_n \sqsubseteq \function{s}_{n+1} \\
-  \typeformer{Seq}_{\typeformer{M}_{\containerpair{\type{A}}{\unit + \unit}}} &=~\prod_{(\function{e} : \mathbb{N} \rightarrow \unit + \unit)}\sum_{(\function{s} : \mathbb{N} \rightarrow \type{A})}\prod_{(n : \mathbb{N})} \function{s}_n \sqsubseteq \function{s}_{n+1} \\
-  \typeformer{Seq}_{\typeformer{M}_{\containerpair{\type{A}}{\typeformer{B}}}} &=~\prod_{(\function{e} : (n : \mathbb{N}) \rightarrow \typeformer{B}\,\function{s}_{n-1})}\sum_{(\function{s} : \mathbb{N} \rightarrow \type{A})}\prod_{(n : \mathbb{N})} \function{s}_n \sqsubseteq \function{s}_{n+1} \\
-  \typeformer{Seq}_{\typeformer{M}_{\containerpair{\type{A}}{\typeformer{B}}}}^{(n)}~(\function{s}_{n-1} : \type{A}) &=~\sum_{(\function{s}_n : \type{A})} \prod_{(n : \mathbb{N})} \prod_{(\function{e} : (n : \mathbb{N}) \rightarrow \typeformer{B}\,\function{s}_{n-1})} \function{s}_n \sqsubseteq \function{s}_{n+1} \\
-  \typeformer{Seq}_{\typeformer{M}_{\containerpair{\type{A} + \type{B}}{[\type{X} , \type{Y}]}}} &=~\prod_{\left(\function{e} : (n : \mathbb{N}) \rightarrow {\begin{cases}  {\scriptstyle  X~a} & {\scriptstyle  \function{s}_{n-1} = \mathtt{inl}~a} \\[-2mm] {\scriptstyle  Y~b} & {\scriptstyle  \function{s}_{n-1} = \mathtt{inr}~b} \end{cases}}\right)}\sum_{(\function{s} : \mathbb{N} \rightarrow \type{A})}\prod_{(n : \mathbb{N})} \function{s}_n \sqsubseteq \function{s}_{n+1}
-\end{align}
-\begin{equation}
-  \typeformer{Seq}_{\typeformer{M}_{\containerpair{\type{A}}{\type{B}}}} = \sum_{(\term{s'} : \typeformer{M}_{\containerpair{\type{A}}{\typeformer{B}}})}  \sum_{(\function{s} : \mathbb{N} \rightarrow \sum_{(\term{a} : \type{A})} \typeformer{B}\,\term{a} \rightarrow \typeformer{M}_{\containerpair{\type{A}}{\typeformer{B}}})} \left(\prod_{\term{p} : \sum_{\term{a} : \type{A}} \typeformer{B}\,\term{a}} \term{s'} \sqsubseteq (\function{s}_0~\term{p})\right) \times \left( \prod_{(n : \mathbb{N})} \prod_{(p : \sum_{(a : A)} B\,a)} (s_n~p) \sqsubseteq (s_{n+1}~p) \right)
-\end{equation}
-\todo{which other QM types can be expressed as QIITs}
-A QM-type is a quotiented M-type, we try to define this as a quotient on containers. We define container quotients as
+We want to define what a Q\texttt{M}-type means in general, we draw inspiration from QW-types \cite{DBLP:Constructing-QIITs}, quotient containers \cite{DBLP:quotient-container} and the LEAN paper "Data types as quotients of polynomial functors" \cite{DBLP:QM-lean}. From what we have seen in the previous section, equality construction between QM-types and QIITs are given as
+\begin{itemize}
+\item A function \function{QM{\rightarrow}QIIT} from QM to QIIT
+\item A proof \(\function{QM{\rightarrow}QIIT\text{-}{\sim}{\rightarrow}{\equiv}}\) that \(\term{x}~\relation{\sim_{QM}}~\term{y}\) implies \(\function{QM{\rightarrow}QIIT}~\term{x} \equiv \function{QM{\rightarrow}QIIT}~\term{y}\)
+\item Lifting \(\function{QM{\rightarrow}QIIT}\) to \(\function{QM/{\sim}{\rightarrow}QIIT}\) using the quotient recursor with \(\function{QM{\rightarrow}QIIT\text{-}{\sim}{\rightarrow}{\equiv}}\) and \(\constructor{QIIT\text{-}isSet}\)
+\item Showing injectivity by using propositional elimination of the quotient together with the inverse of \(\function{QM{\rightarrow}QIIT\text{-}{\sim}{\rightarrow}{\equiv}}\), namely \(\function{QM{\rightarrow}QIIT\text{-}injective}\) saying that \(\function{QM{\rightarrow}QIIT}~\term{x} \equiv \function{QM{\rightarrow}QIIT}~\term{y}\) implies \(\term{x}~\relation{\sim_{QM}}~\term{y}\).
+\item Lastly we show surjectivity by induction using the eliminator of QIIT and the axiom of choice. Another thing that comes into play is the surjectivity of \(\constructor{[}\,\cdot\,\constructor{]}\).
+\end{itemize}
+Lets try this strategy in general, lets say we are given an \texttt{M}-type and weak bisimulation \(\sim_{M}\) on that type. We then define a QIIT with all the constructors of the M-type, given as 
 
-\section{Cofree Coalgebra / Dialgebra}
-\todo[inline]{Is this relevant?}
+\todo[inline]{Cofree Coalgebra / Dialgebra -- Is this relevant? }
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
 
@@ -1395,11 +1334,13 @@ We start with containers and work up to \texttt{M}-types.
   \end{equation}
   \end{proof}
 \end{thm}
-\begin{exmp} For streams we get
-\begin{equation}
-  \typeformer{stream}~\type{A} \times \typeformer{stream}~\type{B} \equiv \typeformer{M}_{\containerpair{\type{A}}{\lambda~\_,\unit}} \times \typeformer{M}_{\containerpair{\type{B}}{\lambda~\_,\unit}} \equiv \typeformer{M}_{\containerpair{\type{A}}{\lambda~\_,\unit} \times \containerpair{\type{B}}{\lambda~\_,\unit}} \equiv \typeformer{stream}~(\type{A} \times \type{B}) \label{eq:zip-equality}
-\end{equation}
-as expected. Transporting along \eqref{eq:zip-equality} gives us a definition for \function{zip}.
+\begin{exmp}
+  \label{exmp:stream-zip-exmp}
+  For streams we get
+  \begin{equation}
+    \typeformer{stream}~\type{A} \times \typeformer{stream}~\type{B} \equiv \typeformer{M}_{\containerpair{\type{A}}{\lambda~\_,\unit}} \times \typeformer{M}_{\containerpair{\type{B}}{\lambda~\_,\unit}} \equiv \typeformer{M}_{\containerpair{\type{A}}{\lambda~\_,\unit} \times \containerpair{\type{B}}{\lambda~\_,\unit}} \equiv \typeformer{stream}~(\type{A} \times \type{B}) \label{eq:zip-equality}
+  \end{equation}
+  as expected. Transporting along \eqref{eq:zip-equality} gives us a definition for \function{zip}.
 \end{exmp}
 
 \subsection{Co-product}
@@ -1602,6 +1543,14 @@ We want to define spin, as being the fixed point \(\mathtt{spin} = \mathtt{later
 \label{ch:conclusion}
 
 \todo[inline]{conclude on the problem statement from the introduction}
+
+
+\section{Future Work}
+We have not proof the equality between types defined as (coinducitve) records and M-types.
+\\ \\
+All the work done here, should generalize to indexed M-types, which would be nice to have formalized.
+\\ \\
+Define the weak bisimilarity relations as \texttt{M}-types, since these are also coindcutve types. However this seems to need something more general than "Index M-types"
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
 
