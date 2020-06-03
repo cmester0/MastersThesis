@@ -66,7 +66,7 @@
 
 \newcommand*{\set}[1]{\left\{#1\right\}}
 \newcommand*{\term}[1]{\textcolor{green!30!black}{#1}} % \textcolor{green!70!black} \textcolor{blue!80!black}
-\newcommand*{\pathterm}[1]{\textcolor{green!40!black}{#1}}
+\newcommand*{\pathterm}[1]{\textcolor{green!65!red!75!black}{#1}}
 \newcommand*{\type}[1]{\textcolor{magenta!90!black}{#1}}
 % \newcommand*{\dependenttype}[1]{\textcolor{magenta!70!black}{#1}}
 \newcommand*{\container}[1]{\textcolor{orange}{#1}}
@@ -87,6 +87,7 @@
 \newcommand*{\functor}[1]{\ensuremath{\mathbf{\mathtt{#1}}}}
 
 \newcommand*{\unitelem}{\constant{\star}} % \constant{tt}
+\newcommand*{\quotientconstructor}[1]{\constructor{[}\,#1\,\constructor{]}}
 
 \newcommand*{\ssfrac}[2]{ {\LARGE \text{\sfrac{\ensuremath{#1}}{\ensuremath{#2}}}}}
 
@@ -237,7 +238,7 @@ Inductively defined data types are initial algebras, meaning that they are the s
 \\ \\
 If you are used to working in set theory, then working in HoTT will take some getting used to. Homotopy type theory is proof relevant, which means that a there might be multiple proofs of one statement, and these proofs might not be interchangeable (equal). The reason is that types in HoTT have a H-level, describing how equality behaves. We start from (-2) with contractiable types, meaning there is an element which all other element are equal to. Then there is (-1)-types which are mere propositions or hProp, where all elements of the type are equal, but there might not be any. If the type is inhabited, then we say the proposition is true. The 0-types are the hSets, where all equalities between two elements \(x,y\) are equal. For 1-types (1-groupoids) we get equalities of equalities are equal, and then so on for homotopy \(n\)-types. Any \(n\)-type is also a \(n+1\)-type, but with trivial equalities at the \(n+1\) level. If we don't want to do proof relevant mathematics we can do propositional truncation, converting types to \(-1\)-type, meaning we ignore the difference in proofs by just look at whether a type is inhabited or not. However doing this we loose some of the reasoning power of HoTT. One of the tools we get using the full power of HoTT is \textbf{Higher order inductive types (HITs)}, where we define types with point constructors and equality constructors, an example is the propositional truncation we just described\todo{write up constructors for propositional truncation}, another useful example is set truncated quotients\todo{write up constructors for set truncated quotients}.
 \\ \\
-We have formalized most of \chapterref{M-types} (accepted to the cubical agda github: \url{https://github.com/agda/cubical/pull/245}) and \chapterref{M-types-examples} and some of \chapterref{QM-types} \todo{add remaing chapters} in the proof assistant / programming languge Cubical Agda. A \textbf{proof assistant} helps with verifying proofs, while making the process of making proofs interactive. \textbf{Cubical Agda} \cite{cubicalagda} is an implementation of a cubical type theory (inspired by CCHM \cite{DBLP:CCHM}) made by extending the proof assistant Agda. One of the main additions is the interval and path types. The \textbf{interval} \(\mathbb{I}\) can be thought of as elements in \([0,1]\). When working with the interval, we can only access the left and right endpoint \(\constant{i0}\) and \(\constant{i1}\) or some unspecified point in the middle \(i\), keeping with the intuition of a continuous interval. Cubical agda also generalizes transporting, given a type line \(\typeformer{A} : \mathbb{I} \rightarrow \universe{\mathcal{U}}\), and the endpoint \(\typeformer{A}~\constant{i0}\) you get a line from \(\typeformer{A}~\constant{i0}\) to \(\typeformer{A}~\constant{i1}\). \todo{Axioms of cubical Agda} \todo{Some better (intuitive) description of the interval type!!}
+We have formalized most of \chapterref{M-types} (accepted to the cubical agda github: \url{https://github.com/agda/cubical/pull/245}) and \chapterref{M-types-examples} and some of \chapterref{QM-types} \todo{add remaing chapters} in the proof assistant / programming languge Cubical Agda. A \textbf{proof assistant} helps with verifying proofs, while making the process of making proofs interactive. \textbf{Cubical Agda} \cite{cubicalagda} is an implementation of a cubical type theory (inspired by CCHM \cite{DBLP:CCHM}) made by extending the proof assistant Agda. One of the main additions is the interval and path types. The \textbf{interval} \(\mathbb{I}\) can be thought of as elements in \([0,1]\). When working with the interval, we can only access the left and right endpoint \(\constant{i0}\) and \(\constant{i1}\) or some unspecified point in the middle \(i\), keeping with the intuition of a continuous interval. Cubical agda also generalizes transporting, given a type line \(\typeformer{A} : \mathbb{I} \rightarrow \universe{\mathcal{U}}\), and the endpoint \(\typeformer{A}\,\constant{i0}\) you get a line from \(\typeformer{A}\,\constant{i0}\) to \(\typeformer{A}\,\constant{i1}\). \todo{Axioms of cubical Agda} \todo{Some better (intuitive) description of the interval type!!}
 \\ \\
 Cubical Agda has a hierarchy of universes, \(\universe{\mathcal{U}}_0, \universe{\mathcal{U}}_1, \dots\), however we will leave the index implicit and write \(\universe{\mathcal{U}}\).
 \todo[inline]{Universes??}
@@ -288,8 +289,8 @@ In this chapter we will introduce containers (aka. signatures), and use them to 
   and for a function \(\function{f} : \type{X} \rightarrow \type{Y}\) as
   \begin{equation}
     \begin{aligned}
-      &\functor{P}_{\container{S}}\function{f} : \functor{P}_{\container{S}}\type{X} \rightarrow \functor{P}_{\container{S}}\type{Y} \\
-      &\functor{P}_{\container{S}}\function{f}(\term{a},\function{g}) = (\term{a}, \function{f} \circ \function{g}).
+      &\functor{P}_{\container{S}}\,\function{f} : \functor{P}_{\container{S}}\type{X} \rightarrow \functor{P}_{\container{S}}\type{Y} \\
+      &\functor{P}_{\container{S}}\,\function{f}~(\term{a},\function{g}) = (\term{a}, \function{f} \circ \function{g}).
     \end{aligned}
   \end{equation}
 \end{defn}
@@ -341,7 +342,7 @@ In this chapter we will introduce containers (aka. signatures), and use them to 
     \caption{\texttt{M}-types of streams}
     \label{fig:stream-M-type}
   \end{figure}
-  We will that \(\function{out}\) is an isomorphism with inverse \(\function{in} : \functor{P}_{\container{S}}(\typeformer{M}) \rightarrow \typeformer{M}\) later in this section. We now have a semantic for the rules, we would expect for streams, if we let \(\constructor{cons} = \function{in}\) and \(\typeformer{stream}~\type{A} = \typeformer{M}_{\containerpair{\type{A}}{\lambda\,\_,\unit}}\),
+  We will show that \(\function{out}\) is an isomorphism with inverse \(\function{in} : \functor{P}_{\container{S}}(\typeformer{M}) \rightarrow \typeformer{M}\) later in this section. We now have a semantic for the rules, we would expect for streams, if we let \(\constructor{cons} = \function{in}\) and \(\typeformer{stream}~\type{A} = \typeformer{M}_{\containerpair{\type{A}}{\lambda\,\_,\unit}}\),
   \begin{equation}
     \vcenter{\infer[\mathtt{E}_{\destructor{hd}}]{\destructor{hd}~\term{s} : \type{A}}{\type{A} : \universe{\mathcal{U}} & \term{s} : \typeformer{stream}~\type{A}}}
   \end{equation}
@@ -431,7 +432,7 @@ In this chapter we will introduce containers (aka. signatures), and use them to 
       \type{\mathcal{L}}^{\functor{P}} &\equiv \sum_{(\term{x} : \prod_{(n : \mathbb{N})} \sum_{(\term{a} : \type{A})} \typeformer{B}\,\term{a} \rightarrow \type{X}_n)} \prod_{(n : \mathbb{N})} \function{\pi}_{(n+1)}~\term{x}_{n+1} \equiv \term{x}_{n} \\
       &\equiv \sum_{(\term{x} : \sum_{(\term{a} : \prod_{(n : \mathbb{N})} \type{A})} \prod_{(n : \mathbb{N})} \term{a}_{n+1} \equiv \term{a}_n)} \sum_{(\function{u} : \prod_{(n : \mathbb{N})} \typeformer{B}\,{(\pi_1\,\term{x})}_n \rightarrow \type{X}_n)} \prod_{(n : \mathbb{N})} \function{\pi}_{(n)} \circ \function{u}_{n+1} \equiv_* \function{u}_n \label{eq:alpha-unfold} \\
       &\equiv \sum_{(\term{a} : \type{A})} \sum_{(\function{u} : \prod_{(n : \mathbb{N})} \typeformer{B}\,a \rightarrow \type{X}_n)} \prod_{(n : \mathbb{N})} \function{\pi}_{(n)} \circ \function{u}_{n+1} \equiv \function{u}_n \label{eq:alpha-limit-collapse} \\
-      &\equiv \sum_{(\term{a} : \type{A})} \typeformer{B}~\term{a} \rightarrow \type{\mathcal{L}} \label{eq:alpha-cone}\\
+      &\equiv \sum_{(\term{a} : \type{A})} \typeformer{B}\,\term{a} \rightarrow \type{\mathcal{L}} \label{eq:alpha-cone}\\
       &\equiv \functor{P}\type{\mathcal{L}}
     \end{align}
     To collapse \(\sum_{(\term{a} : \prod_{(n : \mathbb{N})} \type{A})} \prod_{(n : \mathbb{N})} \term{a}_{n+1} \equiv \term{a}_n\) to \(\type{A}\) between \eqref{eq:alpha-unfold} and \eqref{eq:alpha-limit-collapse} we use \lemref{limit-collapse} . We use \lemref{function-to-M-type-is-cone} for the equality between \eqref{eq:alpha-limit-collapse} and \eqref{eq:alpha-cone}. The rest of the equalities are trivial. The definition of \(\pathterm{shift}\) is
@@ -542,13 +543,13 @@ As shown in \exmpref{stream-polyfunctor-example} and \exmpref{stream-M-type-exam
 \section{ITrees as \texttt{M}-types}
 Interaction trees (ITrees) \cite{DBLP:itrees} are used to model effectful behavior, where computations can interact with an external environment by events. ITrees are defined by the following constructors
 \begin{equation}
-  \vcenter{\infer[\mathtt{I}_{\constructor{Ret}}]{\constructor{Ret}~\term{r} : \typeformer{itree}~\typeformer{E}~\type{R}}{r : \type{R}}}
+  \vcenter{\infer[\mathtt{I}_{\constructor{Ret}}]{\constructor{Ret}~\term{r} : \typeformer{itree}~\typeformer{E}\,\type{R}}{r : \type{R}}}
 \end{equation}
 \begin{equation}
-  \vcenter{\infer[\mathtt{I}_{\constructor{Vis}}]{\constructor{Vis}~\term{a}~\term{f} : \typeformer{itree}~\typeformer{E}~\type{R}}{\type{A} : \universe{\mathcal{U}} & \term{a} : \typeformer{E}~\type{A} & \term{f} : \type{A} \rightarrow \typeformer{itree}~\typeformer{E}~\type{R}}}.
+  \vcenter{\infer[\mathtt{I}_{\constructor{Vis}}]{\constructor{Vis}~\term{a}~\term{f} : \typeformer{itree}~\typeformer{E}\,\type{R}}{\type{A} : \universe{\mathcal{U}} & \term{a} : \typeformer{E}\,\type{A} & \term{f} : \type{A} \rightarrow \typeformer{itree}~\typeformer{E}\,\type{R}}}.
 \end{equation}
 \begin{equation}
-  \vcenter{\infer[\mathtt{E}_{\constructor{Tau}}]{\constructor{Tau}~\term{t} : \typeformer{itree}~\typeformer{E}~\type{R}}{\term{t} : \typeformer{itree}~\typeformer{E}~\type{R}}}.
+  \vcenter{\infer[\mathtt{E}_{\constructor{Tau}}]{\constructor{Tau}~\term{t} : \typeformer{itree}~\typeformer{E}\,\type{R}}{\term{t} : \typeformer{itree}~\typeformer{E}\,\type{R}}}.
 \end{equation}
 where \(\type{R}\) is the type for returned values, while \(\typeformer{E}\) is a dependent type for events representing external interactions.
 
@@ -585,11 +586,11 @@ meaning we get diagram in \figref{delay-monad}.
 \noindent We can define the constructors \(\constructor{now}\) and \(\constructor{later}\) using \(\function{in}\) function for \texttt{M}-types, together with the injections \(\mathtt{inl}\) and \(\mathtt{inr}\).
 
 \subsection{Tree}
-Now lets look at the example, where we remove the \(\constructor{Tau}\) constructor. This gives us a type of tree, with leaves given by \(\constructor{Ret}\), and nodes given by \(\constructor{Vis}\) branching based on some type \(\type{A}\), for an event \(\term{a} : \typeformer{E}~\type{A}\). 
+Now lets look at the example, where we remove the \(\constructor{Tau}\) constructor. This gives us a type of tree, with leaves given by \(\constructor{Ret}\), and nodes given by \(\constructor{Vis}\) branching based on some type \(\type{A}\), for an event \(\term{a} : \typeformer{E}\,\type{A}\). 
 \begin{defn}
   We can define \(\type{R}\)-valued \(\typeformer{E}\)-event trees as the \texttt{M}-type defined by the container
   \begin{equation}
-    \container{S} = \containerpair{\type{R} + \sum_{(\type{A} : \universe{\mathcal{U}})} \typeformer{E}~\type{A}}{\begin{cases}\empt & \mathtt{inl}~\term{r} \\ \type{A} & \mathtt{inr}~(\type{A},\term{e})\end{cases}}.
+    \container{S} = \containerpair{\type{R} + \sum_{(\type{A} : \universe{\mathcal{U}})} \typeformer{E}\,\type{A}}{\begin{cases}\empt & \mathtt{inl}~\term{r} \\ \type{A} & \mathtt{inr}~(\type{A},\term{e})\end{cases}}.
   \end{equation}
 \end{defn}
 \noindent The polynomial functor for this container is
@@ -598,17 +599,17 @@ Now lets look at the example, where we remove the \(\constructor{Tau}\) construc
 \end{equation}
 which simplifies to
 \begin{equation}
-  \functor{P}_{\container{S}}(\type{X}) = (\type{R} \times (\empt \rightarrow \type{X})) + (\sum_{\type{A} : \universe{\mathcal{U}}} \typeformer{E}~\type{A} \times (\type{A} \rightarrow \type{X})),
+  \functor{P}_{\container{S}}(\type{X}) = (\type{R} \times (\empt \rightarrow \type{X})) + (\sum_{\type{A} : \universe{\mathcal{U}}} \typeformer{E}\,\type{A} \times (\type{A} \rightarrow \type{X})),
 \end{equation}
 and further
 \begin{equation}
-  \functor{P}_{\container{S}}(\type{X}) = \type{R} + \sum_{\type{A} : \universe{\mathcal{U}}} \typeformer{E}~\type{A} \times (\type{A} \rightarrow \type{X}).
+  \functor{P}_{\container{S}}(\type{X}) = \type{R} + \sum_{\type{A} : \universe{\mathcal{U}}} \typeformer{E}\,\type{A} \times (\type{A} \rightarrow \type{X}).
 \end{equation}
 We get the diagram in \figref{tree-constructors} for the \(\functor{P}\)-coalgebra.
 \begin{figure}[h]
   \centering
   \begin{tikzcd}[row sep=large,column sep=large]
-    \type{R} \ar[dr,"\constructor{Ret}"'] \ar[r,"\texttt{inl}"] & \type{R} + \sum_{\type{A} : \universe{U}} \typeformer{E}~\type{A} \times (\type{A} \rightarrow \typeformer{M}) \ar[d,"\function{in}"]  & \sum_{\type{A} : \universe{U}} \typeformer{E}~\type{A} \times (\type{A} \rightarrow \typeformer{M}) \ar[l,"\texttt{inr}"'] \ar[dl,"\constructor{Vis}"] \\
+    \type{R} \ar[dr,"\constructor{Ret}"'] \ar[r,"\texttt{inl}"] & \type{R} + \sum_{\type{A} : \universe{U}} \typeformer{E}\,\type{A} \times (\type{A} \rightarrow \typeformer{M}) \ar[d,"\function{in}"]  & \sum_{\type{A} : \universe{U}} \typeformer{E}\,\type{A} \times (\type{A} \rightarrow \typeformer{M}) \ar[l,"\texttt{inr}"'] \ar[dl,"\constructor{Vis}"] \\
     & \typeformer{M}
   \end{tikzcd}
   \caption{Tree Constructors}
@@ -622,18 +623,18 @@ Now we should have all the knowledge needed to make ITrees using \texttt{M}-type
 \begin{defn}
   We define the type of ITrees as the \texttt{M}-type given by the container
   \begin{equation}
-    \container{S} = \containerpair{\type{R}+\unit+\sum_{\type{A}:\universe{\mathcal{U}}} (\typeformer{E}~\type{A})}{\begin{cases} \empt & \texttt{inl}~r \\ \unit & \texttt{inl}~(\texttt{inl}~\unitelem) \\ \type{A} & \texttt{inr}~(\texttt{inr}~(\type{A},\term{e})) \end{cases}}.
+    \container{S} = \containerpair{\type{R}+\unit+\sum_{\type{A}:\universe{\mathcal{U}}} (\typeformer{E}\,\type{A})}{\begin{cases} \empt & \texttt{inl}~r \\ \unit & \texttt{inl}~(\texttt{inl}~\unitelem) \\ \type{A} & \texttt{inr}~(\texttt{inr}~(\type{A},\term{e})) \end{cases}}.
   \end{equation}
 \end{defn}
 \noindent The (reduced) polynomial functor for this container is
 \begin{equation}
-  \functor{P}_{\container{S}}(\type{X}) = \type{R} + \type{X} + \sum_{(\type{A} : \universe{\mathcal{U}})} (\typeformer{E}~\type{A} \times (\type{A} \rightarrow \type{X}))
+  \functor{P}_{\container{S}}(\type{X}) = \type{R} + \type{X} + \sum_{(\type{A} : \universe{\mathcal{U}})} (\typeformer{E}\,\type{A} \times (\type{A} \rightarrow \type{X}))
 \end{equation}
 Giving us the diagram in \figref{ITree-constructors}, from which the constructors of the type can be defined using \(\function{in}\).
 \begin{figure}[h]
   \centering
   \begin{tikzcd}[row sep=large,column sep=large]
-    \type{R} \ar[ddrr,"\constructor{Ret}"'] \ar[r,"\texttt{inl}\,\circ\,\texttt{inr}"] & \typeformer{M} + \type{R} + \sum_{(\type{A} : \universe{\mathcal{U}})} (\typeformer{E}~\type{A} \times (\type{A} \rightarrow \typeformer{M})) \ar[ddr,"\function{in}"] & & \sum_{\type{A} : \universe{U}} \typeformer{E}~\type{A} \times (\type{A} \rightarrow \typeformer{M}) \ar[ll,"\texttt{inr}"'] \ar[ddl,"\constructor{Vis}"] \\
+    \type{R} \ar[ddrr,"\constructor{Ret}"'] \ar[r,"\texttt{inl}\,\circ\,\texttt{inr}"] & \typeformer{M} + \type{R} + \sum_{(\type{A} : \universe{\mathcal{U}})} (\typeformer{E}\,\type{A} \times (\type{A} \rightarrow \typeformer{M})) \ar[ddr,"\function{in}"] & & \sum_{\type{A} : \universe{U}} \typeformer{E}\,\type{A} \times (\type{A} \rightarrow \typeformer{M}) \ar[ll,"\texttt{inr}"'] \ar[ddl,"\constructor{Vis}"] \\
     & & \typeformer{M} \ar[ul,"\texttt{inl}\,\circ\,\texttt{inl}"'] \ar[d,"\constructor{Tau}"'] \\
     & & \typeformer{M}
   \end{tikzcd}
@@ -677,11 +678,11 @@ has container \(\containerpair{\unit}{\type{A}}\). We can types with a given des
 \end{equation}
 has container \(\containerpairsimple{\type{A}}{\empt}\), but this is the same as for \(\constructor{ret}\), and we do not always want both. The difference is how they are added to other constructors / destructors. Destructors are easily added together, take for example \(\destructor{hd}\) and \(\destructor{tl}\), \(\containerpairsimple{\type{A}}{\unit}\). In general adding containers \(\containerpair{\type{A}}{\typeformer{B}}\) and \(\containerpair{\type{C}}{\typeformer{D}}\) for two constructors together is done by
 \begin{equation}
-  \containerpair{\type{A} + \type{C}}{ \begin{cases} \typeformer{B}~\term{a} & \mathtt{inl}~\term{a} \\ \typeformer{D}~\term{c} & \mathtt{inr}~\term{c} \end{cases}}
+  \containerpair{\type{A} + \type{C}}{ \begin{cases} \typeformer{B}\,\term{a} & \mathtt{inl}~\term{a} \\ \typeformer{D}\,\term{c} & \mathtt{inr}~\term{c} \end{cases}}
 \end{equation}
 whereas adding containers for two destructors is done by \todo{Is this correct? Seems correct..}
 \begin{equation}
-  \containerpairsimple{\type{A} \times \type{C}}{\lambda\,(\term{a},\term{c}),~\typeformer{B}~\term{a} + \typeformer{D}~\term{c}}  
+  \containerpairsimple{\type{A} \times \type{C}}{\lambda\,(\term{a},\term{c}),~\typeformer{B}\,\term{a} + \typeformer{D}\,\term{c}}  
 \end{equation}
 however combining destructors and constructors is not as simple. Anything type \(\type{T}\) that is defined using a record (except higher inductive types), will also be definable as an \texttt{M}-type. Given a record, which is a list of fields \(\term{f}_1 : \type{F}_1,\term{f}_2 : \type{F}_2,\dots,\term{f}_n : \type{F}_n\), we can construct the \texttt{M}-types by the container
 \begin{equation}
@@ -695,9 +696,9 @@ however, if any of the destructors/fields are non dependent, then the can be add
 \begin{equation}
   \containerpair{\sum_{(\type{f}_1 : \universe{\mathcal{U}})} \left(\unit \times \sum_{(\term{f}_3 : \typeformer{F}_3)} \cdots \sum_{(\term{f}_{n-1} : \typeformer{F}_{n-1})}\typeformer{F}_n\right)}{\lambda\,(\type{f}_1,\unitelem,\term{f}_3,\dots),\typeformer{F}_2}
 \end{equation}
-where \(\typeformer{F}_2\) have been moved to the last part of the container, we can even leave out the "\(\unit \times\)" from the container. The types of the field can also be dependent \(\typeformer{F_2} = (\term{x} : \type{f}_1) \rightarrow \typeformer{B}~\term{x} \rightarrow \mathtt{M}\), but again by currying we can get \(\typeformer{F_2} : \sum_{(\term{x} : \type{f}_1)} \typeformer{B}~\term{x} \rightarrow \mathtt{M}\) which is defined by the container
+where \(\typeformer{F}_2\) have been moved to the last part of the container, we can even leave out the "\(\unit \times\)" from the container. The types of the field can also be dependent \(\typeformer{F_2} = (\term{x} : \type{f}_1) \rightarrow \typeformer{B}\,\term{x} \rightarrow \mathtt{M}\), but again by currying we can get \(\typeformer{F_2} : \sum_{(\term{x} : \type{f}_1)} \typeformer{B}\,\term{x} \rightarrow \mathtt{M}\) which is defined by the container
 \begin{equation}
-  \containerpair{\sum_{(\type{f}_1 : \universe{\mathcal{U}})} \sum_{(\term{f}_3 : \typeformer{F_3})} \cdots \sum_{(\term{f}_{n-1} : \typeformer{F_{n-1}})}\typeformer{F_n}}{\lambda\,(\type{f}_1,\term{f}_3,\dots),\sum_{\term{x} : \type{f}_1} (\typeformer{B}~\term{x})}
+  \containerpair{\sum_{(\type{f}_1 : \universe{\mathcal{U}})} \sum_{(\term{f}_3 : \typeformer{F_3})} \cdots \sum_{(\term{f}_{n-1} : \typeformer{F_{n-1}})}\typeformer{F_n}}{\lambda\,(\type{f}_1,\term{f}_3,\dots),\sum_{\term{x} : \type{f}_1} (\typeformer{B}\,\term{x})}
 \end{equation}
 so we would also expect that a type defined as a (coinductive) record is equal to the version defined as a \texttt{M}-type. \todo{which is the case, proof needed!}
 \\ \\
@@ -739,7 +740,7 @@ A very useful way to construct a specific type, is by constructing the "free" su
   \hfill
   \begin{minipage}{0.2\linewidth}
     \begin{equation}
-      \vcenter{\infer{\constructor{[}\,x\,\constructor{]} : \type{A} / \relation{\mathcal{R}}}{\term{x} : \type{A}}}
+      \vcenter{\infer{\quotientconstructor{\term{x}} : \type{A} / \relation{\mathcal{R}}}{\term{x} : \type{A}}}
     \end{equation}
   \end{minipage}
   \hfill
@@ -764,7 +765,7 @@ with recursor and eliminator defined as follows.
   \begin{equation}
     \label{eq:quotient-recursor}
     \begin{aligned}
-      &\function{rec}~\constructor{[}\,\term{a}\,\constructor{]} = \function{f}~\term{a} \\
+      &\function{rec}~\quotientconstructor{\term{a}} = \function{f}~\term{a} \\
       &\function{rec}~(\constructor{eq/}~\_~\_~\term{r}~i) = \function{g}~\term{r}~i \\
       &\function{rec}~(\constructor{squash/}~\term{a}~\term{b}~\pathterm{p}~\pathterm{q}~i~j) = \term{B_{set}}~(\function{rec}~\term{a})~(\function{rec}~\term{b})~(\mathtt{ap}~\function{rec}~\pathterm{p})~(\mathtt{ap}~\function{rec}~\pathterm{q})~i~j
     \end{aligned}
@@ -772,10 +773,10 @@ with recursor and eliminator defined as follows.
 \end{defn}
 \begin{defn}[Propositional eliminator for quotient]
   \label{defn:propositional-elimination-quotient}
-  Given a proposition \(\typeformer{P} : \type{A} / \relation{R} \rightarrow \universe{\mathcal{U}}\) for quotients, that fulfills \(\function{P_{prop}} : \prod_{(\term{x} : \type{A} / \relation{R})} \typeformer{isProp}~(\typeformer{P}~\term{x})\), then if \(\function{f} : \prod_{(\term{a} : \type{A})} \typeformer{P}~\constructor{[}\,\term{a}\,\constructor{]}\) we get a function from \(\term{x} : \type{A} / \relation{R}\) to \(\typeformer{P}~\term{x}\), defined as
+  Given a proposition \(\typeformer{P} : \type{A} / \relation{R} \rightarrow \universe{\mathcal{U}}\) for quotients, that fulfills \(\function{P_{prop}} : \prod_{(\term{x} : \type{A} / \relation{R})} \typeformer{isProp}~(\typeformer{P}\,\term{x})\), then if \(\function{f} : \prod_{(\term{a} : \type{A})} \typeformer{P}\,\quotientconstructor{\term{a}}\) we get a function from \(\term{x} : \type{A} / \relation{R}\) to \(\typeformer{P}\,\term{x}\), defined as
   \begin{equation}
     \begin{aligned}
-      &\function{elimProp}~\constructor{[}\,\term{a}\,\constructor{]} = \function{f}~\term{a}\\
+      &\function{elimProp}~\quotientconstructor{\term{a}} = \function{f}~\term{a}\\
       &\function{elimProp}~(\constructor{eq/}~\term{a}~\term{b}~i) = \function{P_{prop}}~(\function{elimProp}~\term{a})~(\function{elimProp}~\term{b})~(\constructor{eq/}~\term{a}~\term{b})~i \\
       &\function{elimProp}~(\constructor{squash/}~\term{a}~\term{b}~\pathterm{p}~\pathterm{q}~i~j) = \\
       &\qquad\function{isSet{\rightarrow}isSetDep}~(\function{isProp{\rightarrow}isSet} \circ \function{P_{prop}}) \\
@@ -783,7 +784,20 @@ with recursor and eliminator defined as follows.
       &\qquad\quad (\constructor{squash/}~\term{a}~\term{b}~\pathterm{p}~\pathterm{q})~i~j
     \end{aligned}
   \end{equation}
-  where \(\function{isSet{\rightarrow}isSetDep}\) takes a function \(\prod_{\term{a} : \type{A}} \function{isSet}~(\typeformer{B}~\term{a})\) to the dependent version \(\function{isSetDep}~\type{A}~\typeformer{B}\). Using this eliminator we can to do propositional elimination of a quotient, by supplying the base case \(\typeformer{P}~\constructor{[}\,\term{a}\,\constructor{]}\).
+  where \(\function{isSet{\rightarrow}isSetDep}\) takes a function \(\prod_{\term{a} : \type{A}} \function{isSet}~(\typeformer{B}\,\term{a})\) to the dependent version \(\function{isSetDep}~\type{A}~\typeformer{B}\). Using this eliminator we can to do propositional elimination of a quotient, by supplying the base case \(\typeformer{P}\,\quotientconstructor{\term{a}}\).
+\end{defn}
+\begin{defn}[Eliminator for quotients]
+  \label{defn:quotient-eliminator}
+  Given a statement \(\typeformer{P} : \type{A} / \relation{R} \rightarrow \universe{\mathcal{U}}\) which is a set \(\function{P_{set}} : \prod_{(\term{x} : \type{A}/\relation{R})} \function{isSet}~(\typeformer{P}\,\term{x})\), a proof for the base case \(\function{f} : \prod_{(\term{a} : \type{A})} \typeformer{P}\,\quotientconstructor{\term{a}}\) and a proof for equality \(\function{f_{eq}} : \prod_{(\term{a},\term{b} : A)} \prod_{(\term{r} : \term{a}~\relation{R}~\term{b})} \function{f}~\term{a} \equiv_* \function{f}~\term{b}\) over \(\constructor{eq/}~\term{a}~\term{b}~\term{r}\), we get a function \(\function{elim} : (\term{x} : \type{A} / \relation{R}) \rightarrow \typeformer{P}\,\term{x}\) as follows
+  \begin{equation}
+    \begin{aligned}
+      &\function{elim}~\quotientconstructor{\term{a}} = \function{f}~\term{a} \\
+      &\function{elim}~(\constructor{eq/}~\term{a}~\term{b}~\term{r}~i) = \function{f_{eq}}~\term{a}~\term{b}~\term{r}~i \\[1mm]
+      &\function{elim}~(\constructor{squash/}~\term{a}~\term{b}~\pathterm{p}~\pathterm{q}~i~j) = \\[-1mm]
+      &\quad\function{isSet{\rightarrow}isSetDep}~\function{P_{set}}~(\function{elim}~\term{a})~(\function{elim}~\term{b})~(\mathtt{ap}~\function{elim}~\pathterm{p})~(\mathtt{ap}~\function{elim}~\pathterm{q})~(\constructor{squash/}~\term{a}~\term{b}~\pathterm{p}~\pathterm{q})~i~j
+    \end{aligned}
+  \end{equation}
+  which is the eliminator for quotients.
 \end{defn}
 \noindent We can now construct some more interesting data types, by set quotienting \texttt{M}-types, which we call Q\texttt{M}-types, some examples follow in the following section. \todo{preserves the H-level} \todo{we cannot always lift the constructors of \texttt{M}-type to the quotiented type}
 
@@ -793,9 +807,9 @@ In this section we will show some examples of quotiented \texttt{M}-types, and a
 \subsection{Multiset}
 In this subsection we define infinite trees, where the order of subtrees does not matter also known as multisets \cite{DBLP:QIIT}\cite{DBLP:tt-in-tt}\cite{DBLP:Constructing-QIITs}.
 \begin{defn}
-  We define \(\type{X}\)-valued \(\mathbb{N}\)-branching trees \(\typeformer{T}~\type{X}\) as the \texttt{M}-type defined by the container
+  We define \(\type{A}\)-valued \(\mathbb{N}\)-branching trees \(\typeformer{T}\,\type{A}\) as the \texttt{M}-type defined by the container
   \begin{equation}
-    \left(\type{X}+\unit, \begin{cases} \empt & \mathtt{inl}~\term{x} \\ \mathbb{N} & \mathtt{inr}~\unitelem \end{cases}\right)
+    \left(\type{A}+\unit, \begin{cases} \empt & \mathtt{inl}~\term{a} \\ \mathbb{N} & \mathtt{inr}~\unitelem \end{cases}\right)
   \end{equation}
 \end{defn}
 \noindent For which we get the constructors\\[-10mm]
@@ -804,13 +818,13 @@ In this subsection we define infinite trees, where the order of subtrees does no
   \hfill
   \begin{minipage}{0.25\linewidth}
     \begin{equation}
-      \vcenter{\infer{\constructor{leaf}~\term{x} : \typeformer{T}~\type{X}}{\term{x} : \type{X}}}
+      \vcenter{\infer{\constructor{leaf}~\term{a} : \typeformer{T}\,\type{A}}{\term{a} : \type{A}}}
     \end{equation}
   \end{minipage}
   \hfill
   \begin{minipage}{0.25\linewidth}
     \begin{equation}
-      \vcenter{\infer{\constructor{node}~\function{f} : \typeformer{T}~\type{X}}{\function{f} : \mathbb{N} \rightarrow \type{T}~\type{X}}}
+      \vcenter{\infer{\constructor{node}~\function{f} : \typeformer{T}\,\type{A}}{\function{f} : \mathbb{N} \rightarrow \typeformer{T}\,\type{A}}}
     \end{equation}
   \end{minipage}
   \hfill
@@ -818,32 +832,32 @@ In this subsection we define infinite trees, where the order of subtrees does no
 \end{center}
 We want to define trees where the permutation does not matter, that is multisets, we do this by ensuring the following rule is true
 \begin{equation}
-  \vcenter{\infer[\constructor{perm}]{\constructor{node}~\function{f} \equiv \constructor{node}~(\function{f} \circ \function{g})}{\function{f} : \mathbb{N} \rightarrow \typeformer{T}~\type{X} & \function{g} : \mathbb{N} \rightarrow \mathbb{N} & \mathtt{isIso}~\function{g}}}
+  \vcenter{\infer[\constructor{perm}]{\constructor{node}~\function{f} \equiv \constructor{node}~(\function{f} \circ \function{g})}{\function{f} : \mathbb{N} \rightarrow \typeformer{T}\,\type{A} & \function{g} : \mathbb{N} \rightarrow \mathbb{N} & \mathtt{isIso}~\function{g}}}
 \end{equation}
-One way to define this type is as the QM-type given by quotienting \(\typeformer{T}~\type{X}\) by the relation \(\relation{\sim_T}\) defined by the constructors
+One way to define this type is as the QM-type given by quotienting \(\typeformer{T}\,\type{A}\) by the relation \(\relation{\sim_T}\) defined by the constructors
 \begin{center}
   \strut
   \hfill
   \begin{minipage}{0.35\linewidth}
     \begin{equation}
-      \vcenter{\infer[\constructor{\sim_{leaf}}]{\constructor{leaf}~\term{x}~\relation{\sim}~\constructor{leaf}~\term{y}}{\term{x} \equiv \term{y}}}
+      \vcenter{\infer[\constructor{\sim_{leaf}}]{\constructor{leaf}~\term{x}~\relation{\sim_{T}}~\constructor{leaf}~\term{y}}{\term{x} \equiv \term{y}}}
     \end{equation}
   \end{minipage}
   \hfill
   \begin{minipage}{0.35\linewidth}
     \begin{equation}
-      \vcenter{\infer[\constructor{\sim_{node}}]{\constructor{node}~\function{f}~\relation{\sim}~\constructor{node}~\function{g}}{\prod_{(n : \mathbb{N})} \function{f}~n~\relation{\sim}~\function{g}~n}}
+      \vcenter{\infer[\constructor{\sim_{node}}]{\constructor{node}~\function{f}~\relation{\sim_T}~\constructor{node}~\function{g}}{\prod_{(n : \mathbb{N})} \function{f}~n~\relation{\sim_T}~\function{g}~n}}
     \end{equation}
   \end{minipage}
   \hfill
   \strut
 \end{center}
 \begin{equation}
-  \vcenter{\infer[\constructor{\sim_{perm}}]{\constructor{node}~\function{f} \equiv \constructor{node}~(\function{f} \circ \function{g})}{\function{f} : \mathbb{N} \rightarrow \typeformer{T}~\type{X} & \function{g} : \mathbb{N} \rightarrow \mathbb{N} & \mathtt{isIso}~\function{g}}}
+  \vcenter{\infer[\constructor{\sim_{perm}}]{\constructor{node}~\function{f}~\relation{\sim_T}~\constructor{node}~(\function{f} \circ \function{g})}{\function{f} : \mathbb{N} \rightarrow \typeformer{T}\,\type{A} & \function{g} : \mathbb{N} \rightarrow \mathbb{N} & \mathtt{isIso}~\function{g}}}
 \end{equation}
-Again we have the problem that we cannot lift the \(\constructor{node}\) to the quotiented type, without the use of the axiom of choice. However we can define multisets as a QIIT \(\typeformer{MS}~\type{X}\), with the constructors \(\constructor{leaf}, \constructor{node},\constructor{perm}\) and set quotiented \(\constructor{MS\text{-}isSet}\). These two ways of constructing a type for multisets are equal assuming the axiom of (countable) choice.
+Again we have the problem that we cannot lift the \(\constructor{node}\) to the quotiented type, without the use of the axiom of choice. However we can define multisets as a QIIT denoted \(\typeformer{MS}~\type{A}\), with the constructors \(\constructor{leaf}, \constructor{node},\constructor{perm}\) and set quotiented \(\constructor{MS\text{-}isSet}\). These two ways of constructing a type for multisets are equal assuming the axiom of (countable) choice.
 \begin{defn}
-  There is a function from \(\typeformer{T}~\type{X}\) to \(\typeformer{MS}~\type{X}\)
+  There is a function from \(\typeformer{T}\,\type{A}\) to \(\typeformer{MS}~\type{A}\)
   \begin{equation}
     \begin{aligned}
       &\function{T{\rightarrow}MS}~(\constructor{leaf}_{\typeformer{T}}~\term{x}) = \constructor{leaf}_{\typeformer{MS}}~\term{x} \\
@@ -853,7 +867,7 @@ Again we have the problem that we cannot lift the \(\constructor{node}\) to the 
 \end{defn}
 This function takes weakly bisimilar objects to equal once.
 \begin{lem}
-  If \(\term{x}, \term{y} : \typeformer{T}~\type{X}\) are weakly bisimilar \(p : \term{x}~\relation{\sim_{T}}~\term{y}\) then \(\function{T{\rightarrow}MS}~\term{x} \equiv \function{T{\rightarrow}MS}~\term{y}\).
+  If \(\term{x}, \term{y} : \typeformer{T}\,\type{A}\) are weakly bisimilar \(p : \term{x}~\relation{\sim_{T}}~\term{y}\) then \(\function{T{\rightarrow}MS}~\term{x} \equiv \function{T{\rightarrow}MS}~\term{y}\).
   \begin{proof}
     We do the proof by casing on the weak bisimilarity.
     \begin{equation}
@@ -867,7 +881,7 @@ This function takes weakly bisimilar objects to equal once.
 \end{lem}
 \noindent With this lemma, we can lift the function \(\function{T{\rightarrow}MS}\) to the quotient.
 \begin{defn}
-  There is a function \(\function{T/{\sim}{\rightarrow}MS}\) from \(\typeformer{T}~\type{X}/\relation{\sim_{T}}\) to \(\typeformer{MS}~\type{X}\), defined using the recursor for quotients defined in \defref{quotient-recursor}, with \(\function{f} = \function{T{\rightarrow}MS}\) and \(\function{g} = \function{T{\rightarrow}MS\text{-}{\sim}{\rightarrow}{\equiv}}\) and \(\typeformer{MS}\) is a set by \(\constructor{MS\text{-}isSet}\)
+  There is a function \(\function{T/{\sim}{\rightarrow}MS}\) from \(\typeformer{T}\,\type{A}/\relation{\sim_{T}}\) to \(\typeformer{MS}~\type{A}\), defined using the recursor for quotients defined in \defref{quotient-recursor}, with \(\function{f} = \function{T{\rightarrow}MS}\) and \(\function{g} = \function{T{\rightarrow}MS\text{-}{\sim}{\rightarrow}{\equiv}}\) and \(\typeformer{MS}\) is a set by \(\constructor{MS\text{-}isSet}\)
 \end{defn}
 \begin{lem}
   \label{lem:weak-bisim-to-eq-multiset}
@@ -877,13 +891,13 @@ This function takes weakly bisimilar objects to equal once.
   \end{proof}
 \end{lem}
 \begin{lem}
-  The function \(\function{T/{\sim}{\rightarrow}MS}\) is injective, meaning \(\function{T/{\sim}{\rightarrow}MS}~\ter{x} \equiv \function{T/{\sim}{\rightarrow}MS}~\term{y}\) implies \(\term{x} \equiv \term{y}\).
+  The function \(\function{T/{\sim}{\rightarrow}MS}\) is injective, meaning \(\function{T/{\sim}{\rightarrow}MS}~\term{x} \equiv \function{T/{\sim}{\rightarrow}MS}~\term{y}\) implies \(\term{x} \equiv \term{y}\).
   \begin{proof}
     We show injectivity by doing propositional elimination defined in \defref{propositional-elimination-quotient}, with
     \begin{equation}
       \typeformer{P} = (\lambda\,\term{x},~\function{T/{\sim}{\rightarrow}MS}~\term{x} \equiv \function{T/{\sim}{\rightarrow}MS}~\term{y} \rightarrow \term{x} \equiv \term{y})
     \end{equation}
-    which is a proposition for all \(\term{x}\) by \(\function{P_{prop}} = \lambda\,\term{x},~\function{isProp\Pi}~(\lambda\,\_, \constructor{squash/}~\term{x}~\term{y})\). We do it twice, first for \(\term{x}\) and then for \(\term{y}\) where we define \(\typeformer{P}\) and \(\function{P_{prop}}\) similarly, but with \(x = \constructor{[}\,a\,\constructor{]}\) since it has already been propositionally eliminated. 
+    which is a proposition for all \(\term{x}\) by \(\function{P_{prop}} = \lambda\,\term{x},~\function{isProp\Pi}~(\lambda\,\_, \constructor{squash/}~\term{x}~\term{y})\). We do it twice, first for \(\term{x}\) and then for \(\term{y}\) where we define \(\typeformer{P}\) and \(\function{P_{prop}}\) similarly, but with \(\term{x} = \quotientconstructor{\term{a}}\) since it has already been propositionally eliminated. 
     \begin{equation}
       \begin{aligned}
         &\function{elimProp}~(\lambda\,\term{a},~\function{elimProp} (\lambda\,\term{b},~\constructor{eq/}~\term{a}~\term{b} \circ \function{T{\rightarrow}MS\text{-}{\equiv}{\rightarrow}{\sim}}~\term{a}~\term{b})~\term{y})~\term{x}
@@ -895,11 +909,11 @@ This function takes weakly bisimilar objects to equal once.
 \begin{lem}
   The function \(\function{T/{\sim}{\rightarrow}MS}\) is surjective \((\prod_{(\term{b} : \typeformer{MS})}, \| \Sigma_{(\term{x} : \typeformer{T})}~\function{T/{\sim}{\rightarrow}MS}~\term{x} \equiv \term{b} \|)\), assuming the axiom of choice.
   \begin{proof}
-    We only need to look at the point constructors of \(\typeformer{MS}\). For the leaf case, we have the simple equality \(\function{T/{\sim}{\rightarrow}MS}~\constructor{[}\,\constructor{leaf}_{\typeformer{T}}~\term{x}\,\constructor{]} \equiv \constructor{leaf}_{\typeformer{MS}}~\term{x}\). For the node case with \(\constructor{node}~\function{f}\) then by induction, surjection of \(\constructor{[}\,\cdot\,\constructor{]}\) and the axiom of choice, we get \(\function{g} : \mathbb{N} \rightarrow \typeformer{T}~\type{X}\) such that \(\prod_{(n : \mathbb{N})} \,\function{T/{\sim}{\rightarrow}MS}~\constructor{[}\,\function{g}~n\,\constructor{]} \equiv \function{f}~n\), making \(\function{T/{\sim}{\rightarrow}MS}~\constructor{[}\,\constructor{node}~\function{g}\,\constructor{]} \equiv \constructor{node}~\function{f}\).
+    We only need to look at the point constructors of \(\typeformer{MS}\). For the leaf case, we have the simple equality \(\function{T/{\sim}{\rightarrow}MS}~\quotientconstructor{\constructor{leaf}_{\typeformer{T}}~\term{x}} \equiv \constructor{leaf}_{\typeformer{MS}}~\term{x}\). For the node case with \(\constructor{node}~\function{f}\) then by induction, surjection of \(\quotientconstructor{{\cdot}}\) and the axiom of choice, we get \(\function{g} : \mathbb{N} \rightarrow \typeformer{T}\,\type{A}\) such that \(\prod_{(n : \mathbb{N})} \,\function{T/{\sim}{\rightarrow}MS}~\quotientconstructor{\function{g}~n} \equiv \function{f}~n\), making \(\function{T/{\sim}{\rightarrow}MS}~\quotientconstructor{\constructor{node}~\function{g}} \equiv \constructor{node}~\function{f}\).
   \end{proof}
 \end{lem}
 \begin{thm}
-  The is an equality between the types \(\typeformer{T}~\type{X}/\relation{\sim_{T}}\) and \(\typeformer{MS}~\type{X}\), assuming the axoim of choice.
+  The is an equality between the types \(\typeformer{T}\,\type{A}/\relation{\sim_{T}}\) and \(\typeformer{MS}~\type{A}\), assuming the axoim of choice.
   \begin{proof}
     Since the function \(\function{T/{\sim}{\rightarrow}MS}\) is injective and surjective, it becomes an equality.
   \end{proof}
@@ -1224,8 +1238,8 @@ This rewriting confirms that if \(\function{isMon}~\function{s}\), then \(\funct
         &\quad (\lambda\,\term{a},~\function{Seq/{\sim}{\rightarrow}(-)_\bot}~\term{a} \equiv \function{Seq/{\sim}{\rightarrow}(-)_\bot}~\term{y} \rightarrow \term{a} \equiv \term{y}) \\
         &\quad (\lambda\,\term{a},~\function{isProp\Pi}~(\lambda\,\_, \constructor{squash/}~\term{a}~\term{y})) \\
         &\quad (\lambda\,\term{a},~\function{elimProp} \\
-        &\qquad\qquad\quad (\lambda\,\term{b},~\function{Seq{\rightarrow}(-)_\bot}~\term{a} \equiv \function{Seq/{\sim}{\rightarrow}(-)_\bot}~\term{b} \rightarrow \constructor{[}\,\term{a}\,\constructor{]} \equiv \term{b}) \\
-        &\qquad\qquad\quad (\lambda\,\term{b},~\function{isProp\Pi}~(\lambda\,\_, \constructor{squash/}~\constructor{[}\,\term{a}\,\constructor{]}~\term{b})) \\
+        &\qquad\qquad\quad (\lambda\,\term{b},~\function{Seq{\rightarrow}(-)_\bot}~\term{a} \equiv \function{Seq/{\sim}{\rightarrow}(-)_\bot}~\term{b} \rightarrow \quotientconstructor\term{a}} \equiv \term{b}) \\
+        &\qquad\qquad\quad (\lambda\,\term{b},~\function{isProp\Pi}~(\lambda\,\_, \constructor{squash/}~\quotientconstructor{\term{a}}~\term{b})) \\
         &\qquad\qquad\quad (\lambda\,\term{b},~(\constructor{eq/}~\term{a}~\term{b}) \circ (\function{Seq{\rightarrow}(-)_\bot\text{-}isInjective}~\term{a}~\term{b})) \\
         &\qquad\qquad\quad y) \\
         &\quad x
@@ -1266,17 +1280,79 @@ This rewriting confirms that if \(\function{isMon}~\function{s}\), then \(\funct
 
 \section{QM-types}
 \label{ch:QM-types}
-We want to define what a Q\texttt{M}-type means in general, we draw inspiration from QW-types \cite{DBLP:Constructing-QIITs}, quotient containers \cite{DBLP:quotient-container} and the LEAN paper "Data types as quotients of polynomial functors" \cite{DBLP:QM-lean}. From what we have seen in the previous section, equality construction between QM-types and QIITs are given as
+We want to define what a Q\texttt{M}-type means in general, we draw inspiration from QW-types \cite{DBLP:Constructing-QIITs}, quotient containers \cite{DBLP:quotient-container} and the LEAN paper "Data types as quotients of polynomial functors" \cite{DBLP:QM-lean}. From what we have seen as examples in the previous section, equality construction between Set Quotiented \texttt{M}-types and QIITs are given as
 \begin{itemize}
 \item A function \function{QM{\rightarrow}QIIT} from QM to QIIT
 \item A proof \(\function{QM{\rightarrow}QIIT\text{-}{\sim}{\rightarrow}{\equiv}}\) that \(\term{x}~\relation{\sim_{QM}}~\term{y}\) implies \(\function{QM{\rightarrow}QIIT}~\term{x} \equiv \function{QM{\rightarrow}QIIT}~\term{y}\)
 \item Lifting \(\function{QM{\rightarrow}QIIT}\) to \(\function{QM/{\sim}{\rightarrow}QIIT}\) using the quotient recursor with \(\function{QM{\rightarrow}QIIT\text{-}{\sim}{\rightarrow}{\equiv}}\) and \(\constructor{QIIT\text{-}isSet}\)
 \item Showing injectivity by using propositional elimination of the quotient together with the inverse of \(\function{QM{\rightarrow}QIIT\text{-}{\sim}{\rightarrow}{\equiv}}\), namely \(\function{QM{\rightarrow}QIIT\text{-}injective}\) saying that \(\function{QM{\rightarrow}QIIT}~\term{x} \equiv \function{QM{\rightarrow}QIIT}~\term{y}\) implies \(\term{x}~\relation{\sim_{QM}}~\term{y}\).
-\item Lastly we show surjectivity by induction using the eliminator of QIIT and the axiom of choice. Another thing that comes into play is the surjectivity of \(\constructor{[}\,\cdot\,\constructor{]}\).
+\item Lastly we show surjectivity by induction using the eliminator of QIIT and the axiom of choice. Another thing that comes into play is the surjectivity of \(\quotientconstructor{{\cdot}}\).
 \end{itemize}
-Lets try this strategy in general, lets say we are given an \texttt{M}-type and weak bisimulation \(\sim_{M}\) on that type. We then define a QIIT with all the constructors of the M-type, given as 
 
 \todo[inline]{Cofree Coalgebra / Dialgebra -- Is this relevant? }
+
+\subsection{Lifting Quotient Construction from Containers}
+\todo{"The category of containers lacks good coequalisers" - \cite{DBLP:CategoryOfContainers}}
+An alternative to directly set quotienting the \texttt{M}-types we have defined, is to do the quotienting on the underlying container \cite{DBLP:quotient-container} / polynomial functor \cite{DBLP:QM-lean}, and then do the fixed point construction we did for polynomial functors, but on the quotiented functor instead. We start by defining quotients on containers.
+\begin{defn}
+  Given a container \(\containerpair{\type{A}}{\typeformer{B}}\), and a relation \todo{...} we can form a quotiented container \(\containerpair{\type{A}}{\typeformer{B}} / \relation{R}\) \todo{Complete definition}
+\end{defn}
+\noindent Which gives us the following definition of a polynomial functor.
+\begin{defn}
+  Given a container \(\containerpair{\type{A}}{\typeformer{B}}\) and for all \(\type{X}\) a family of relations \(\relation{\sim}_{\term{a}} : (\typeformer{B}\,\term{a} \rightarrow \type{X}) \rightarrow (\typeformer{B}\,\term{a} \rightarrow \type{X}) \rightarrow \universe{\mathcal{U}}\) indexed by \(\type{A}\), we can define a quotiented polynomial functor (QPF). We define it for types as
+  \begin{equation}
+    \functor{F}\,\type{X} =  \sum_{\term{a} : \type{A}} ((\typeformer{B}\,\term{a} \rightarrow \type{X}) / \relation{\sim}_{\term{a}})
+  \end{equation}
+  and for a function \(\function{f} : \type{X} \rightarrow \type{Y}\), we use the quotient eliminator from \defref{quotient-eliminator}, with \(\typeformer{P} = \lambda\,\_, (\typeformer{B}\,\term{a} \rightarrow \type{Y})/\relation{\sim}_{\term{a}}\) which is a set \(\constructor{squash/}\), since we are using set truncated quotients. The base case \(\function{f} = \lambda\,\_,\quotientconstructor{\function{f} \circ \function{g}}\) and equality case \(\function{f_{eq}} = \lambda\,\function{x}\,\function{y}\,\term{r},~\constructor{eq/}~(\function{f} \circ \function{x})~(\function{f} \circ \function{y})~(\function{\sim_{ap}}~\function{f}~\term{r})\), where \(\function{\sim_{ap}}\) says that given \(\function{x}~\relation{\sim}_{\term{a}}~\function{y}\) and a function \(\function{f}\) then \(\function{f} \circ \function{x}~\relation{\sim}_{\term{a}}~\function{g} \circ \function{y}\)  \todo{Composition?}. With this the definition for the quotient polynomial functor for functions is
+  \begin{equation}
+    \begin{aligned}
+      &\functor{F}\,\function{f}~(\term{a} , \function{g}) = (\term{a} , \function{elim}~\function{g})
+    \end{aligned} 
+  \end{equation}
+  completing the definition of a quotiented polynomial functor.
+\end{defn}
+\noindent If there is a function \(\function{abs}_{\type{X}} : \functor{P}\,\type{X} \rightarrow \functor{F}\,\type{X}\) that makes the diagram in \figref{QPF-diagram} commute (as in \cite{DBLP:QM-lean}), then we can construct the final \(\functor{F}\)-coalgebra, to get another notion of quotiented \texttt{M}-type.
+\begin{figure}[h]
+  \centering
+  \begin{tikzcd}
+    \functor{P}\,\type{X} \ar[r,"\functor{P}\,\function{f}"] \ar[d,"\function{abs}_{\type{X}}"'] & \functor{P}\,\type{Y} \ar[d,"\function{abs}_{\type{Y}}"] \\
+    \functor{F}\,\type{X} \ar[r,"\functor{F}\,\function{f}"] & \functor{F}\,\type{Y}
+  \end{tikzcd}
+  \caption{Quotiented polynomial function}
+  \label{fig:QPF-diagram}
+\end{figure}
+If \(\function{abs}\) is surjective, then the square will commute, so we just have to define a relation that has the \function{\sim_{ap}} property, and a surjective function \(\function{abs}_{X}\) to construct a quotient \texttt{M}-type, with a function \(\function{in_Q} : \typeformer{M}_{\container{S}} \rightarrow \typeformer{M}_{\container{S}} / \relation{\sim}\). As an example, lets try and construct the QPF and QM type for multisets, with this alternative approach
+\begin{exmp}
+  We have the following polynomial functor for \(\type{A}\)-valued \(\mathbb{N}\)-branching trees
+  \begin{equation}
+    \functor{P}\,\type{X} = \sum_{\term{a} : \type{A} + \unit} \begin{cases} \empt \rightarrow \type{X} & \term{a} = \mathtt{inl}~\term{r} \\ \mathbb{N} \rightarrow \type{X} & \term{a} = \mathtt{inr}~\unitelem \end{cases}
+  \end{equation}
+  for which we define the family of relations \((\relation{\sim_{PT}})_{(\term{a} : \type{A} + \unit)}\), if \(\term{a} = \mathtt{inl}~\term{r}\) then the equality relations is just the trivial equalities, since the relation is between elements of type \(\empt \rightarrow \type{X}\), which is contractive. On the other hand if \(\term{a} = \mathtt{inr}~\unitelem\), then we define the relation as
+  \begin{equation}
+    \vcenter{\infer{\function{f}~\relation{\sim_{PT}}~\function{h}}{\function{f}, \function{h} : \mathbb{N} \rightarrow \type{X} & \function{g} : \mathbb{N} \rightarrow \mathbb{N} & \function{isIso}~\function{g} & \function{f} \circ \function{g} \equiv \function{h}}}
+  \end{equation}
+  we can see with this approach, we only need to define the non-trival equalities, meaning those that are not just reflexivity. This relations fulfills the \(\function{\sim_{ap}}\) property, since if \(\term{a} = \mathtt{inl}~\term{r}\) then it holds trivially, and if \(\term{a} = \mathtt{inr}~\unitelem\) then we have \(f~\relation{\sim_{PT}}~h\) and want to show \(\function{k} \circ \function{f}~\relation{\sim_{PT}}~\function{k} \circ \function{h}\) for any function \(\function{k}\), which just boils down to showing \(\function{k} \circ \function{f} \circ \function{g} \equiv \function{k} \circ \function{h}\) given \(\pathterm{p} : \function{f} \circ \function{g} \equiv \function{h}\), which is done by \(\mathtt{ap}~\function{k}~\pathterm{p}\). We therefore have a QPF \(\functor{F}\). Now we want to define \(\function{abs}\),
+  \begin{equation}
+    \begin{aligned}
+      &\function{abs}~(\mathtt{inl}~\term{r}~,~\lambda\,(\,)) = (\mathtt{inl}~\term{r}~,~\quotientconstructor{\lambda\,(\,)}) \\
+      &\function{abs}~(\mathtt{inr}~\unitelem~,~\function{f}) = (\mathtt{inr}~\unitelem~,~\quotientconstructor{\function{f}})
+    \end{aligned}
+  \end{equation}
+  and show that it is surjective, which follows directly from the surjectivity of \(\quotientconstructor{{\cdot}}\). Taking the limit we get the square in \figref{QPF-limit-multiset}
+  \begin{figure}[h]
+  \centering
+  \begin{tikzcd}
+    \typeformer{T}~\type{A} \ar[r,"\function{out}"] \ar[d,"\function{abs}_{\typeformer{T}\,\type{A}}"'] & \functor{P}~(\typeformer{T}~\type{A}) \ar[d,"\function{abs}_{\functor{P}\,(\typeformer{T}\,\type{A})}"] \\
+    \typeformer{MS}~\type{A} \ar[r,"\function{out_{QM}}"] & \functor{F}\,(\typeformer{MS}~\type{A})
+  \end{tikzcd}
+  \caption{QPF and limit diagram for multiset construction}
+  \label{fig:QPF-limit-multiset}
+\end{figure}
+\end{exmp}
+
+
+
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
 
@@ -1288,7 +1364,7 @@ We start with containers and work up to \texttt{M}-types.
 \begin{defn}
   The product of two containers is defined as \cite{ContainerRules}
   \begin{equation}
-    \containerpair{\type{A}}{\typeformer{B}} \times \containerpair{\type{C}}{\typeformer{D}} \equiv \containerpair{\type{A} \times \type{C}}{\lambda\,(\term{a} , \term{c}), \typeformer{B}~\term{a} \times \typeformer{D}~\term{c}}.
+    \containerpair{\type{A}}{\typeformer{B}} \times \containerpair{\type{C}}{\typeformer{D}} \equiv \containerpair{\type{A} \times \type{C}}{\lambda\,(\term{a} , \term{c}), \typeformer{B}\,\term{a} \times \typeformer{D}\,\term{c}}.
   \end{equation}
 \end{defn}
 \noindent We can lift this rule, through the diagram in \figref{container-products}, used to define \texttt{M}-types.
@@ -1321,10 +1397,10 @@ We start with containers and work up to \texttt{M}-types.
     \begin{align}
       &~ {\functor{P}_{\containerpair{\type{A}}{\typeformer{B}}}}^{m+1}~\unit \times {\functor{P}_{\containerpair{\type{C}}{\typeformer{D}}}}^{m+1}~\unit \\
       \equiv&~ \functor{P}_{\containerpair{\type{A}}{\typeformer{B}}} ({\functor{P}_{\containerpair{\type{A}}{\typeformer{B}}}}^m~\unit) \times \functor{P}_{\containerpair{\type{C}}{\typeformer{D}}} ({\functor{P}_{\containerpair{\type{C}}{\typeformer{D}}}}^m~\unit) \\
-      \equiv&~ \sum_{\term{a} : \type{A}} \typeformer{B}~\term{a} \rightarrow {\functor{P}_{\containerpair{\type{A}}{\typeformer{B}}}}^m~\unit \times \sum_{\term{c} : \type{C}} \typeformer{D}~\term{c} \rightarrow {\functor{P}_{\containerpair{\type{C}}{\typeformer{D}}}}^m~\unit \\
-      \equiv&~ \sum_{\term{a} , \term{c} : \type{A} \times \type{C}} (\typeformer{B}~\term{a} \rightarrow {\functor{P}_{\containerpair{\type{A}}{\typeformer{B}}}}^m~\unit) \times (\typeformer{D}~\term{c} \rightarrow {\functor{P}_{\containerpair{\type{C}}{\typeformer{D}}}}^m~\unit) \\
-      \equiv&~ \sum_{\term{a} , \term{c} : \type{A} \times \type{C}} \typeformer{B}~\term{a} \times \typeformer{D}~\term{c} \rightarrow {\functor{P}_{\containerpair{\type{A}}{\typeformer{B}}}}^m~\unit \times {\functor{P}_{\containerpair{\type{C}}{\typeformer{D}}}}^m~\unit \\
-      \equiv&~ \sum_{\term{a} , \term{c} : \type{A} \times \type{C}} \typeformer{B}~\term{a} \times \typeformer{D}~\term{c} \rightarrow {\functor{P}_{\containerpair{\type{A}}{\typeformer{B}} \times \containerpair{\type{C}}{\typeformer{D}}}}^m~\unit \\
+      \equiv&~ \sum_{\term{a} : \type{A}} \typeformer{B}\,\term{a} \rightarrow {\functor{P}_{\containerpair{\type{A}}{\typeformer{B}}}}^m~\unit \times \sum_{\term{c} : \type{C}} \typeformer{D}\,\term{c} \rightarrow {\functor{P}_{\containerpair{\type{C}}{\typeformer{D}}}}^m~\unit \\
+      \equiv&~ \sum_{\term{a} , \term{c} : \type{A} \times \type{C}} (\typeformer{B}\,\term{a} \rightarrow {\functor{P}_{\containerpair{\type{A}}{\typeformer{B}}}}^m~\unit) \times (\typeformer{D}\,\term{c} \rightarrow {\functor{P}_{\containerpair{\type{C}}{\typeformer{D}}}}^m~\unit) \\
+      \equiv&~ \sum_{\term{a} , \term{c} : \type{A} \times \type{C}} \typeformer{B}\,\term{a} \times \typeformer{D}\,\term{c} \rightarrow {\functor{P}_{\containerpair{\type{A}}{\typeformer{B}}}}^m~\unit \times {\functor{P}_{\containerpair{\type{C}}{\typeformer{D}}}}^m~\unit \\
+      \equiv&~ \sum_{\term{a} , \term{c} : \type{A} \times \type{C}} \typeformer{B}\,\term{a} \times \typeformer{D}\,\term{c} \rightarrow {\functor{P}_{\containerpair{\type{A}}{\typeformer{B}} \times \containerpair{\type{C}}{\typeformer{D}}}}^m~\unit \\
       \equiv&~ \functor{P}_{\containerpair{\type{A}}{\typeformer{B}} \times \containerpair{\type{C}}{\typeformer{D}}} ({\functor{P}_{\containerpair{\type{A}}{\typeformer{B}} \times \containerpair{\type{C}}{\typeformer{D}}}}^m~\unit) \\
       \equiv&~ {\functor{P}_{\containerpair{\type{A}}{\typeformer{B}} \times \containerpair{\type{C}}{\typeformer{D}}}}^{m+1}~\unit
     \end{align}
@@ -1430,10 +1506,10 @@ We define our bisimulation coalgebra from the strong bisimulation relation \(\ma
   \vcenter{\infer[\mathtt{EqRet}]{\mathtt{Ret}~\term{a} \cong \mathtt{Ret}~\term{b}}{\term{a},\term{b} : \type{R} & \term{a} \equiv_{\type{R}} \term{b}}}
 \end{equation}
 \begin{equation}
-  \vcenter{\infer[\mathtt{EqTau}]{\mathtt{Tau}~\term{t} \cong \mathtt{Tau}~\term{u}}{\term{t},\term{u} : \mathtt{itree}~\typeformer{E}~\type{R} & \term{t} \cong \term{u}}}
+  \vcenter{\infer[\mathtt{EqTau}]{\mathtt{Tau}~\term{t} \cong \mathtt{Tau}~\term{u}}{\term{t},\term{u} : \mathtt{itree}~\typeformer{E}\,\type{R} & \term{t} \cong \term{u}}}
 \end{equation}
 \begin{equation}
-  \vcenter{\infer[\mathtt{EqVis}]{\mathtt{Vis}~\term{e}~\term{k_1} \cong \mathtt{Tau}~\term{e}~\term{k_2}}{\type{A} : \universe{\mathcal{U}} & \term{e} : \typeformer{E}~\type{A} & \term{k_1},\term{k_2} : \type{A} \rightarrow \mathtt{itree}~\typeformer{E}~\type{R} & \term{t} \cong \term{u}}}
+  \vcenter{\infer[\mathtt{EqVis}]{\mathtt{Vis}~\term{e}~\term{k_1} \cong \mathtt{Tau}~\term{e}~\term{k_2}}{\type{A} : \universe{\mathcal{U}} & \term{e} : \typeformer{E}\,\type{A} & \term{k_1},\term{k_2} : \type{A} \rightarrow \mathtt{itree}~\typeformer{E}\,\type{R} & \term{t} \cong \term{u}}}
 \end{equation}
 Now we just need to define \(\term{\alpha}_{\relation{\mathcal{R}}}\) \todo[inline]{define the \(\alpha_{\relation{R}}\) function}. Now we have a bisimulation relation, which is equivalent to equality, using what we showed in the previous section.
 
@@ -1595,3 +1671,9 @@ Define the weak bisimilarity relations as \texttt{M}-types, since these are also
 % On academic writing : https://oac.cdlib.org/findaid/ark:/13030/kt287035zn/entire_text/
 % Mathematical Writing (CS 209) Videorecordings (V0174). Dept. of Special Collections and University Archives, Stanford University Libraries, Stanford, Calif.
 % http://askarov.net/on-writing-and-presenting.html
+
+% https://www.cs.le.ac.uk/people/mabbott/docs/thesis.pdf
+% https://arxiv.org/pdf/1504.05531.pdf
+% https://www.cs.nott.ac.uk/~psztxa/publ/indexed-containers.pdf
+
+% https://www.cs.le.ac.uk/people/mabbott/
