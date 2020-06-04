@@ -125,12 +125,12 @@
 \chapter*{Abstract}
 \addcontentsline{toc}{chapter}{Abstract}
 
-We present a construction of \texttt{M}-types from containers in a cubical type theory (CTT), We show how the containers construct a coalgebra, for which we can define a coinduction principle, making strong bisimulation imply equality. We then show constructions of \texttt{M}-types, and how they can be quotiented to construct what we call Q\texttt{M}-types. The problem with Q\texttt{M}-types is that in general assuming that we can lift function types of equivalence classes is equivalent to the axiom of choice \cite{DBLP:tt-in-tt}, but this can be solved by defining the quotienting relation and the type at the same time as a quotient inductive-inductive type (QIIT), which assuming the axiom of (countable) choice, is equal to the Q\texttt{M}-type. We conclude with some examples of how to use \texttt{M}-types and some properties. All work is formalized in Cubical Agda, and the work on defining \texttt{M}-types has been accepted to the Cubical Agda github repository.
+We present a construction of \texttt{M}-types from containers in a cubical type theory (CTT), We show how the containers construct a coalgebra, for which we can define a coinduction principle, making strong bisimulation imply equality. We then show constructions of \texttt{M}-types, and how they can be quotiented to construct what we call Q\texttt{M}-types. The problem with Q\texttt{M}-types is that in general assuming that we can lift function types of equivalence classes is equivalent to the axiom of choice \cite{DBLP:tt-in-tt}, but this can be solved by defining the quotienting relation and the type at the same time as a quotient inductive-inductive type (QIIT), which assuming the axiom of (countable) choice, is equal to the Q\texttt{M}-type. We construct multisets and the partiality monad as some examples of quotiented M-types and show the equivalence between the two constructions. We then discuss the pros and cons of the two constructions, and relate them to an alternative construction, which defines quotient polynomial functors (QPF), and define the quotiented \texttt{M}-type as the final coalgebra for the QPF. However this construction requires the axiom of choice, so it is still not a suitable construction. We conclude with some examples of how to use \texttt{M}-types and some properties. All work is formalized in Cubical Agda, and the work on defining \texttt{M}-types has been accepted to the Cubical Agda github repository. \todo{complete}
 
 \chapter*{Resum\'e}
 \addcontentsline{toc}{chapter}{Resum\'e}
 
-\todo[inline]{in Danish\dots}
+I denne afhandling vil vi give en konstruktion af M-typer ved brug af "containers". Formaliseringen af dette bliver udført i en "Cubical Type Theory". Given en "conatiner" kan vi konstruere en polynomisk functor, og ved gentaget anvendelse af denne på enhedstypen, får vi en sekvens af typer, som vi kan tage grænsen af. Denne grænse giver os en endelig coalgebra, hvilket vi definere M-type som. Vi giver nogle eksempler på M-typer. Vi beskriver tre mulige definitioner for kvotient M-typer, kaldet en QM-type, den første er at bruge set trunkeret kvotienter givet en relation, problemet ved denne defintion er at vi ikke kan løfte konstruktørerne for M-typerne til QM-typen. Vores anden defination er kvotient inductive-inductive typer (QIITs), hvor relationen og typen defineres samtidig. Vi giver nogle eksempler på denne konstruktion, og viser eksempler på ækvivalence mellem de konstruktioner, dog kræver disse antagelsen af "Axiom of Choice". Den tredje konstruktion er at lave en kvotient polynomisk functor, og tage grænsen af denne, for at få en QM-type, men igen kræver det "Axiom of Choice", siden vi skal løfte operationerne fra kvotienten. \todo{complete}
 
 \chapter*{Acknowledgments}
 \addcontentsline{toc}{chapter}{Acknowledgments}
@@ -152,12 +152,12 @@ I would like to thank my supervisor Bas Spitters for some enlightening discussio
 \label{ch:intro}
 
 \section{Overview}
-There has been done a lot of work on understanding and formalizing inductive types in homotopy type theory (HoTT) / cubical type theory. One such body of work is W-types, which have been shown equal to inductive types. However there has not been much work on the dual concept, namely coinductive types defined using M-types. The goal of this thesis is to get an understanding of M-types. We also want to construct examples and show properties of M-types, since we want to make the theory of M-types more accessible. A useful technique used alot in constructive mathematics is quotienting free objects, as such we will also look into what it means to quotient M-types in the setting of cubical type theory, and the problems the obvious approach encounters.
+Inductive types in homotopy type theory (HoTT) / cubical type theory have been studied a lot, one body of work is W-types, which has been shown equal to inductive types. However there has not been much work done on the dual concept, namely coinductive types in HoTT defined as \texttt{M}-types. The goal of this thesis is to get an understanding of \texttt{M}-types and extend on the existing theory. We construct some examples and show properties of M-types, since we want to make the theory of M-types more accessible. A useful technique used alot in constructive mathematics is quotienting free objects, as such we will also look into what it means to quotient M-types in the setting of cubical type theory, and the problems the obvious approach encounters.
 \\ \\
 In the rest of this chapter we will introduce some of the background theory and notation used in the rest of the thesis. In the second chapter we construct \texttt{M}-types from containers, and define a coinduction principle for the \texttt{M}-types. In the third chapter we give some example constructions of \texttt{M}-types. In the fourth chapter we introduce quotiented \texttt{M}-types (Q\texttt{M}-types), and show equalities between these and quotient inductive-inductive types (QIITs), we show the construction of the partiality monad as an example. In the fifth and sixth chapter we go through various applications of the theory developed in the first couple chapters. Finally we conclude with a discussion of future research and improvements.
 
 \section{Background Theory}
-We start by giving some background theory / history on cubical type theory and summarize important concepts used in the rest of this thesis. \todo{Should a description of Set Theory be included}
+We start by giving some background theory / history on cubical type theory and summarize important concepts used in the rest of this thesis.
 \\ \\
 We will be using \textbf{type theory} as the basis for mathematics. In type theory every term \(\term{x}\) is an element of some type \(\type{A}\), written \(\term{x} : \type{A}\). The idea in type theory is that propositions are types, so proofs boils down to showing that there exists an element of some type representing a proposition. Specifically proofs of equality becomes construction of an element of an equality type. The type theory we are working in is inspired by \textbf{Martin L\"of Type Theory (MLTT)} / Intuitionistic type Theory (ITT), which is designed on the principles of mathematical constructivism, where any existence proof must contain a witness. Meaning a proof of existence, can be converted into an algorithm that finds the element making the statement true. MLTT is built from the three finite types \(\empt\), \(\unit\) and \(\type{\mathbf{2}}\), and type constructors \(\Sigma\), \(\pi\) and \(=\). There is only a single way to make terms of \(=\)-type, and that is \(\mathtt{refl} : \prod_{a : A} (a = a)\). \todo{inductive types, universes and judgements} \todo{extensional vs intensional \url{https://ncatlab.org/nlab/show/intensional+type+theory}} \todo{find citation, currently \url{https://en.wikipedia.org/wiki/Intuitionistic_type_theory}}.
 \\ \\
@@ -1238,7 +1238,7 @@ This rewriting confirms that if \(\function{isMon}~\function{s}\), then \(\funct
         &\quad (\lambda\,\term{a},~\function{Seq/{\sim}{\rightarrow}(-)_\bot}~\term{a} \equiv \function{Seq/{\sim}{\rightarrow}(-)_\bot}~\term{y} \rightarrow \term{a} \equiv \term{y}) \\
         &\quad (\lambda\,\term{a},~\function{isProp\Pi}~(\lambda\,\_, \constructor{squash/}~\term{a}~\term{y})) \\
         &\quad (\lambda\,\term{a},~\function{elimProp} \\
-        &\qquad\qquad\quad (\lambda\,\term{b},~\function{Seq{\rightarrow}(-)_\bot}~\term{a} \equiv \function{Seq/{\sim}{\rightarrow}(-)_\bot}~\term{b} \rightarrow \quotientconstructor\term{a}} \equiv \term{b}) \\
+        &\qquad\qquad\quad (\lambda\,\term{b},~\function{Seq{\rightarrow}(-)_\bot}~\term{a} \equiv \function{Seq/{\sim}{\rightarrow}(-)_\bot}~\term{b} \rightarrow \quotientconstructor{\term{a}} \equiv \term{b}) \\
         &\qquad\qquad\quad (\lambda\,\term{b},~\function{isProp\Pi}~(\lambda\,\_, \constructor{squash/}~\quotientconstructor{\term{a}}~\term{b})) \\
         &\qquad\qquad\quad (\lambda\,\term{b},~(\constructor{eq/}~\term{a}~\term{b}) \circ (\function{Seq{\rightarrow}(-)_\bot\text{-}isInjective}~\term{a}~\term{b})) \\
         &\qquad\qquad\quad y) \\
@@ -1286,7 +1286,7 @@ We want to define what a Q\texttt{M}-type means in general, we draw inspiration 
 \item A proof \(\function{QM{\rightarrow}QIIT\text{-}{\sim}{\rightarrow}{\equiv}}\) that \(\term{x}~\relation{\sim_{QM}}~\term{y}\) implies \(\function{QM{\rightarrow}QIIT}~\term{x} \equiv \function{QM{\rightarrow}QIIT}~\term{y}\)
 \item Lifting \(\function{QM{\rightarrow}QIIT}\) to \(\function{QM/{\sim}{\rightarrow}QIIT}\) using the quotient recursor with \(\function{QM{\rightarrow}QIIT\text{-}{\sim}{\rightarrow}{\equiv}}\) and \(\constructor{QIIT\text{-}isSet}\)
 \item Showing injectivity by using propositional elimination of the quotient together with the inverse of \(\function{QM{\rightarrow}QIIT\text{-}{\sim}{\rightarrow}{\equiv}}\), namely \(\function{QM{\rightarrow}QIIT\text{-}injective}\) saying that \(\function{QM{\rightarrow}QIIT}~\term{x} \equiv \function{QM{\rightarrow}QIIT}~\term{y}\) implies \(\term{x}~\relation{\sim_{QM}}~\term{y}\).
-\item Lastly we show surjectivity by induction using the eliminator of QIIT and the axiom of choice. Another thing that comes into play is the surjectivity of \(\quotientconstructor{{\cdot}}\).
+\item Lastly we show surjectivity by induction using the eliminator of QIIT and the axiom of choice. Another thing that comes into play is the surjectivity of \(\quotientconstructor{{\cdot}}\) \cite[6.10.2]{hottbook}.
 \end{itemize}
 
 \todo[inline]{Cofree Coalgebra / Dialgebra -- Is this relevant? }
@@ -1321,7 +1321,7 @@ An alternative to directly set quotienting the \texttt{M}-types we have defined,
   \caption{Quotiented polynomial function}
   \label{fig:QPF-diagram}
 \end{figure}
-If \(\function{abs}\) is surjective, then the square will commute, so we just have to define a relation that has the \function{\sim_{ap}} property, and a surjective function \(\function{abs}_{X}\) to construct a quotient \texttt{M}-type, with a function \(\function{in_Q} : \typeformer{M}_{\container{S}} \rightarrow \typeformer{M}_{\container{S}} / \relation{\sim}\). As an example, lets try and construct the QPF and QM type for multisets, with this alternative approach
+If \(\function{abs}\) is surjective, then the square will commute, so we just have to define a relation that has the \function{\sim_{ap}} property, and a surjective function \(\function{abs}_{\type{X}}\) to construct a quotient \texttt{M}-type. The quotiented \texttt{M}-type has a surjective function \(\function{QM\text{-}intro} : \typeformer{M}_{\container{S}} \rightarrow \typeformer{M}_{\container{S}} / \relation{\sim}\), given as \(\functor{F}^{\infty} \circ \function{abs}_{\typeformer{M}}\), where \(\functor{F}^\infty\) is the function into the limit. As an example, lets try and construct the QM-type and the QPF for multisets, with this alternative approach
 \begin{exmp}
   We have the following polynomial functor for \(\type{A}\)-valued \(\mathbb{N}\)-branching trees
   \begin{equation}
@@ -1338,20 +1338,20 @@ If \(\function{abs}\) is surjective, then the square will commute, so we just ha
       &\function{abs}~(\mathtt{inr}~\unitelem~,~\function{f}) = (\mathtt{inr}~\unitelem~,~\quotientconstructor{\function{f}})
     \end{aligned}
   \end{equation}
-  and show that it is surjective, which follows directly from the surjectivity of \(\quotientconstructor{{\cdot}}\). Taking the limit we get the square in \figref{QPF-limit-multiset}
+  and show that it is surjective, which follows directly from the surjectivity of \(\quotientconstructor{{\cdot}}\). Taking the limit we get the commuting square in \figref{QPF-limit-multiset}.
   \begin{figure}[h]
   \centering
   \begin{tikzcd}
-    \typeformer{T}~\type{A} \ar[r,"\function{out}"] \ar[d,"\function{abs}_{\typeformer{T}\,\type{A}}"'] & \functor{P}~(\typeformer{T}~\type{A}) \ar[d,"\function{abs}_{\functor{P}\,(\typeformer{T}\,\type{A})}"] \\
+    \typeformer{T}~\type{A} \ar[r,"\function{out}"] \ar[d,"\function{QM\text{-}intro}"'] & \functor{P}~(\typeformer{T}~\type{A}) \ar[d,"\function{abs}_{\functor{P}\,(\typeformer{T}\,\type{A})}"] \\
     \typeformer{MS}~\type{A} \ar[r,"\function{out_{QM}}"] & \functor{F}\,(\typeformer{MS}~\type{A})
   \end{tikzcd}
   \caption{QPF and limit diagram for multiset construction}
   \label{fig:QPF-limit-multiset}
 \end{figure}
 \end{exmp}
+We have just postulated that the quotiented \texttt{M}-type, is an \(\functor{F}\)-coalgebra, however this is not necessarily the case, since this requires us to show that given \(\function{fq} : (\typeformer{B}~\term{a} \rightarrow \type{X}) / \relation{R}\) then we can construct a function \((\typeformer{B}~\term{a} \rightarrow \type{X})\).
 
-
-
+\todo{...} again we run into problems with the axiom of choice. The construction of QW types got around this problem, by doing the construction as a QIIT, we will try and follow the same ideas and show what that would look like for \texttt{M}-types. \todo{Complete construction of QW inspired QM-types}
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
