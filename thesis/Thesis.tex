@@ -564,7 +564,7 @@ We will show that \texttt{M}-types can be defined as the limit of a chain define
 \section{Coinduction Principle for \texttt{M}-types}
 We can now construct a coinduction principle for \texttt{M}-types given a (strong) bisimulation relation.
 \begin{defn}
-  For all coalgebras \(\coalg{\type{C}}{\function{\gamma}} : \typeformer{Coalg}_{\container{S}}\), then a relation \(\relation{\mathcal{R}} : \type{C} \rightarrow \type{C} \rightarrow \universe{\mathcal{U}}\) is a (strong) bisimulation relation, if the type \(\type{\overline{\mathcal{R}}} = \sum_{(\term{a} : \type{C})} \sum_{(\term{b} : \type{C})} \term{a}~\relation{\mathcal{R}}~\term{b}\) and the function \(\function{\alpha}_{\relation{\mathcal{R}}} : \type{\overline{\mathcal{R}}} \rightarrow \functor{P}_{\container{S}}\,\type{\overline{\mathcal{R}}}\) forms a \(\functor{P}\)-coalgebra \(\coalg{\type{\overline{\mathcal{R}}}}{\function{\alpha}_{\relation{\mathcal{R}}}} : \mathtt{Coalg}_{\container{S}}\), that makes the diagram in \figref{coalgebra-coinduction-definition} commute (\(\Longrightarrow\) represents \(\functor{P}\)-coalgebra morphisms). That is \(\function{\gamma} \circ \pi_1^{\type{\overline{\mathcal{R}}}} \equiv \functor{P}\,\pi_1^{\type{\overline{\mathcal{R}}}} \circ \function{\alpha}_\relation{R}\), and similarly for \(\pi_2^{\type{\overline{\mathcal{R}}}}\).
+  For all coalgebras \(\coalg{\type{C}}{\function{\gamma}} : \typeformer{Coalg}_{\container{S}}\), then a relation \(\relation{\mathcal{R}} : \type{C} \rightarrow \type{C} \rightarrow \universe{\mathcal{U}}\) is a (strong) bisimulation relation, if the type \(\type{\overline{\mathcal{R}}} = \sum_{(\term{a} : \type{C})} \sum_{(\term{b} : \type{C})} \term{a}~\relation{\mathcal{R}}~\term{b}\) and the function \(\function{\alpha}_{\relation{\mathcal{R}}} : \type{\overline{\mathcal{R}}} \rightarrow \functor{P}_{\container{S}}\,\type{\overline{\mathcal{R}}}\) forms a \(\functor{P}\)-coalgebra \(\coalg{\type{\overline{\mathcal{R}}}}{\function{\alpha}_{\relation{\mathcal{R}}}} : \mathtt{Coalg}_{\container{S}}\), that makes the diagram in \figref{coalgebra-coinduction-definition} commute (\(\Longrightarrow\) represents \(\functor{P}\)-coalgebra morphisms). That is \(\function{\gamma} \circ \pi_1^{\type{\overline{\mathcal{R}}}} \equiv \functor{P}\,\pi_1^{\type{\overline{\mathcal{R}}}} \circ \function{\alpha}_{\relation{R}}\), and similarly for \(\pi_2^{\type{\overline{\mathcal{R}}}}\).
   \begin{figure}[h]
     \centering
     \begin{tikzcd}[row sep=huge,column sep=huge]
@@ -600,9 +600,7 @@ We can now construct a coinduction principle for \texttt{M}-types given a (stron
 
 \chapter{Examples of \texttt{M}-types}
 \label{ch:M-types-examples}
-In this section we show some examples of coinductive types that can be constructed as \mathtt{M}-types, and show how to define the constructors/destructors of these types. We conclude this chapter with some general observation, and define some rules for how to construct \texttt{M}-types. \todo{Is there anything else that is show for each M-type?}
-
-\todo{complete this section}
+In this section we show some examples of coinductive types that can be constructed as \texttt{M}-types, and show how to define the constructors/destructors of these types. We conclude this chapter with some general observation, and define some rules for how to construct \texttt{M}-types. \todo{Is there anything else that is show for each M-type?}
 
 \section{ITrees as \texttt{M}-types}
 Interaction trees (ITrees) \cite{DBLP:itrees} are used to model effectful behavior, where computations can interact with an external environment by events. ITrees are defined by the following constructors
@@ -638,7 +636,7 @@ We start by looking at ITrees without the \(\constructor{Vis}\) constructor, thi
     \begin{equation}
       \functor{P}_{\container{S}}\,\type{X} = \type{R} + \type{X}
     \end{equation}
-    meaning we get diagram in \figref{delay-monad}, by applying \(\functor{P}_\container{S}\) to \(\mathtt{M}_{\container{S}}\) and using the functions \(\function{in}\) and \(\function{out}\) defined by the equality \(\pathterm{shift}\).
+    meaning we get diagram in \figref{delay-monad}, by applying \(\functor{P}_{\container{S}}\) to \(\mathtt{M}_{\container{S}}\) and using the functions \(\function{in}\) and \(\function{out}\) defined by the equality \(\pathterm{shift}\).
     \begin{figure}[h]
       \centering
       \begin{tikzcd}[row sep=large,column sep=large]
@@ -716,21 +714,8 @@ Now we should have all the knowledge needed to make ITrees using \texttt{M}-type
   \end{proof}
 \end{thm}
 
-\section{Automaton}
-An automaton is defined as a set of state \(\type{V}\) and an alphabet \(\type{\alpha}\) and a transition function \(\function{\delta} : \type{V} \rightarrow \type{\alpha} \rightarrow \type{V}\). This gives us the diagram in \figref{automaton}
-\begin{figure}[h]
-  \centering
-  \begin{tikzcd}[row sep=huge,column sep=huge]
-    \type{V} \times (\type{V} \rightarrow \type{\alpha} \rightarrow \type{V}) \ar[dr,"build"'] \ar[r] & M & M \ar[dl,"step"] \ar[l] \\
-    & M \ar[u]
-  \end{tikzcd}
-  \caption{automaton}
-  \label{fig:automaton}
-\end{figure}
-\todo{Complete section about automaton}
-
 \section{General rules for constructing \texttt{M}-types}
-We want to create a calculus for defining coinductive types as \texttt{M}-types. We would like to be able to define a type that has a given set of constructor / destructors rules. If we for example is given the rule
+We want to create a rule set for how to define coinductive types as \texttt{M}-types. We would like to be able to define a type from a given set of constructor / destructors. If we for example is given the rule
 \begin{equation}
   \vcenter{\infer{\constructor{ret}~a : \type{T}}{\term{a} : \type{A}}}
 \end{equation}
@@ -738,19 +723,19 @@ we get that it corresponds to the \texttt{M}-type for the container \(\container
 \begin{equation}
   \vcenter{\infer{\destructor{tl}~\term{a} : \type{T}}{\term{a} : \type{T}}}
 \end{equation}
-the container is \(\containerpairsimple{\unit}{\unit}\) \todo{why give some arguments or illustation showing these reasonings}. If we want a type with both these rules, then we just take the disjoint union of the two containers
+the container is \(\containerpairsimple{\unit}{\unit}\). If we want a type with both these rules, then we just take the disjoint union of the two containers
 \begin{equation}
   \containerpair{\type{A} + \unit}{\begin{cases} \empt & \mathtt{inl}~\term{a} \\ \unit & \mathtt{inr}~\unitelem \end{cases}}
 \end{equation}
-which is the delay type. We can also define some more involved constructors, that build on the type itself
+which is the delay type. We can define some more involved constructors, that build on the type itself
 \begin{equation}
   \vcenter{\infer{\constructor{node}~\term{a} : \type{T}}{\term{a} : \type{A} \rightarrow \type{T}}}
 \end{equation}
-has container \(\containerpair{\unit}{\type{A}}\). We can types with a given destructor
+has container \(\containerpair{\unit}{\type{A}}\). A type for the destructor
 \begin{equation}
   \vcenter{\infer{\destructor{hd}~\term{a} : \type{A}}{\term{a} : \type{T}}}
 \end{equation}
-has container \(\containerpairsimple{\type{A}}{\empt}\), but this is the same as for \(\constructor{ret}\), and we do not always want both. The difference is how they are added to other constructors / destructors. Destructors are easily added together, take for example \(\destructor{hd}\) and \(\destructor{tl}\), \(\containerpairsimple{\type{A}}{\unit}\). In general adding containers \(\containerpair{\type{A}}{\typeformer{B}}\) and \(\containerpair{\type{C}}{\typeformer{D}}\) for two constructors together is done by
+can be constructed by the container \(\containerpairsimple{\type{A}}{\empt}\), but this container is the same as the one for \(\constructor{ret}\), so do we get both? Whether we get a constructor or destructor depends on how we combine the containers with the containers for other constructors / destructors. In general adding containers \(\containerpair{\type{A}}{\typeformer{B}}\) and \(\containerpair{\type{C}}{\typeformer{D}}\) for two constructors together is done by
 \begin{equation}
   \containerpair{\type{A} + \type{C}}{ \begin{cases} \typeformer{B}\,\term{a} & \mathtt{inl}~\term{a} \\ \typeformer{D}\,\term{c} & \mathtt{inr}~\term{c} \end{cases}}
 \end{equation}
@@ -758,34 +743,29 @@ whereas adding containers for two destructors is done by \todo{Is this correct? 
 \begin{equation}
   \containerpairsimple{\type{A} \times \type{C}}{\lambda\,(\term{a},\term{c}),~\typeformer{B}\,\term{a} + \typeformer{D}\,\term{c}}  
 \end{equation}
-however combining destructors and constructors is not as simple. Anything type \(\type{T}\) that is defined using a record (except higher inductive types), will also be definable as an \texttt{M}-type. Given a record, which is a list of fields \(\term{f}_1 : \type{F}_1,\term{f}_2 : \type{F}_2,\dots,\term{f}_n : \type{F}_n\), we can construct the \texttt{M}-types by the container
+however combining destructors and constructors is not as simple. Any type \(\type{T}\) that can be defined using a (coinductive) record (except for higher inductive types), will also be definable as an \texttt{M}-type. Given a record, which is a list of fields \(\term{f}_1 : \type{F}_1,\term{f}_2 : \type{F}_2,\dots,\term{f}_n : \type{F}_n\), we can construct the \texttt{M}-types by the container
 \begin{equation}
   \containerpairsimple{\type{F}_1 \times \type{F}_2 \times \dots \times \type{F}_n}{\empt}
 \end{equation}
-where each destructor \(\destructor{d_n} : \type{T} \rightarrow \type{F_n}\) for the field \(\term{f}_n\) will be defined as \(\destructor{d_n}~\term{t} = \pi_n~(\function{out}~\term{t})\). However fields in a coinductive container may depend on previous defined fields, as given by the general list of fields \(\term{f}_1 : \type{F}_1,\term{f}_2 : \typeformer{F}_2,\cdots,\term{f}_n : \typeformer{F}_n\), where each field depends on all the previous once, this can be defined by the container
+where each destructor \(\destructor{d_n} : \type{T} \rightarrow \type{F_n}\) for the field \(\term{f}_n\) will be defined as \(\destructor{d_n}~\term{t} = \pi_n~(\function{out}~\term{t})\). However fields in a coinductive record may depend on previous defined fields. That is we can have the list of fields \(\term{f}_1 : \type{F}_1,\term{f}_2 : \typeformer{F}_2,\cdots,\term{f}_n : \typeformer{F}_n\), where each field depends on all the previous once. We can define this as the \texttt{M}-type for the container
 \begin{equation}
   \containerpairsimple{\sum_{(\term{f}_1 : \type{F}_1)} \sum_{(\term{f_2} : \typeformer{F}_2)} \cdots \sum_{(\term{f}_{n-1} : \typeformer{F}_{n-1})}\typeformer{F}_n}{\empt}
 \end{equation}
-however, if any of the destructors/fields are non dependent, then the can be added as a product (\(\times\)) instead of a dependent product (\(\Sigma\)). Furthermore the fields may construct an element of the type of the record \(\type{T}\), however anything after that field cannot on it, since it will break the strictness requirements of the record / coinductive type. As an example let \(\type{f}_1\) be a type and \(\function{f_2}\) be the function with type \(\typeformer{F}_2 = \type{f}_1 \rightarrow (\type{f}_1 \rightarrow \type{A}) \rightarrow \mathtt{M}\), which by currying is equal to \(\type{f}_1 \times (\type{f}_1 \rightarrow \type{A}) \rightarrow \mathtt{M}\), we can then define by the container
+however, if any of the fields are non dependent, then they can be added as a product (\(\times\)) instead of a dependent sum (\(\Sigma\)). Fields may also coinductively construct an element of the record \(\type{T}\), however other fields may not refer to such a field, since it will break the strictness requirements of the record / coinductive type. As an example let \(\type{f}_1\) be a type and \(\function{f_2}\) be the function with type \(\typeformer{F}_2 = \type{f}_1 \rightarrow (\type{f}_1 \rightarrow \type{A}) \rightarrow \mathtt{M}\), which by currying is equal to \(\type{f}_1 \times (\type{f}_1 \rightarrow \type{A}) \rightarrow \mathtt{M}\), we can then define by the container
 \begin{equation}
   \containerpair{\sum_{(\type{f}_1 : \universe{\mathcal{U}})} \left(\unit \times \sum_{(\term{f}_3 : \typeformer{F}_3)} \cdots \sum_{(\term{f}_{n-1} : \typeformer{F}_{n-1})}\typeformer{F}_n\right)}{\lambda\,(\type{f}_1,\unitelem,\term{f}_3,\dots),\typeformer{F}_2}
 \end{equation}
-where \(\typeformer{F}_2\) have been moved to the last part of the container, we can even leave out the "\(\unit \times\)" from the container. The types of the field can also be dependent \(\typeformer{F_2} = (\term{x} : \type{f}_1) \rightarrow \typeformer{B}\,\term{x} \rightarrow \mathtt{M}\), but again by currying we can get \(\typeformer{F_2} : \sum_{(\term{x} : \type{f}_1)} \typeformer{B}\,\term{x} \rightarrow \mathtt{M}\) which is defined by the container
+where \(\typeformer{F}_2\) have been moved to the last part of the container, we can even leave out the "\(\unit \times\)" from the container. Another case is that the type of a field is dependent \(\typeformer{F_2} = (\term{x} : \type{f}_1) \rightarrow \typeformer{B}\,\term{x} \rightarrow \mathtt{M}\), but again by currying we can get \(\typeformer{F_2} : \sum_{(\term{x} : \type{f}_1)} \typeformer{B}\,\term{x} \rightarrow \mathtt{M}\) which can be defined by the container
 \begin{equation}
   \containerpair{\sum_{(\type{f}_1 : \universe{\mathcal{U}})} \sum_{(\term{f}_3 : \typeformer{F_3})} \cdots \sum_{(\term{f}_{n-1} : \typeformer{F_{n-1}})}\typeformer{F_n}}{\lambda\,(\type{f}_1,\term{f}_3,\dots),\sum_{\term{x} : \type{f}_1} (\typeformer{B}\,\term{x})}
 \end{equation}
-so we would also expect that a type defined as a (coinductive) record is equal to the version defined as a \texttt{M}-type. \todo{which is the case, proof needed!}
-\\ \\
-But we run into problems if ... \todo{Problem cases} \todo{What differes from W and M types for closure of constructors / destructors?}
+so we would also expect that a type defined as a (coinductive) record is equal to the version defined as a \texttt{M}-type. However this has not been shown formally.
 
 \section{Wacky \texttt{M}-type}
-We end this chapter by showing of some wacky \texttt{M}-type, that utilizes the definition of the \texttt{M}-type to the fullest.
-\begin{defn}
-  We define a wacky \texttt{M}-type by the following container
-  \begin{equation}
-    \containerpair{\mathbb{N} + \mathbb{N}}{\begin{cases} \mathbb{N} & \mathtt{inl}~0 \\ \empt & \mathtt{inl}~\term{x} \land \term{x}~\text{is odd} \\ \empt & \mathtt{inr}~\term{x} \land \term{x}~\text{is even} \\ \unit & o.w. \end{cases}}
-  \end{equation}
-\end{defn}
+We end this chapter by exploring a wacky \texttt{M}-type, that utilizes the definition of the \texttt{M}-type to the fullest. We define a wacky \texttt{M}-type by the following container
+\begin{equation}
+  \containerpair{\mathbb{N} + \mathbb{N}}{\begin{cases} \mathbb{N} & \mathtt{inl}~0 \\ \empt & \mathtt{inl}~\term{x} \land \term{x}~\text{is odd} \\ \empt & \mathtt{inr}~\term{x} \land \term{x}~\text{is even} \\ \unit & o.w. \end{cases}}
+\end{equation}
 this container gives the \texttt{M}-type and constructors / destructors shown in \figref{wacky-m-type}
 \begin{figure}[h]
   \centering
@@ -799,8 +779,6 @@ this container gives the \texttt{M}-type and constructors / destructors shown in
 The type can be interpreted as a stream of coproducts of natural numbers, that terminates whenever it is the left injection and even, or the right injection and odd, and whenever the left injection is zero, it splits in a branches indexed by the natural numbers.
 \\ \\
 This show that we can define coinductive types, with rather complex structure.
-\todo[inline]{define a wacky \texttt{M}-type showing some of the use of \texttt{M}-types / complexity}
-
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
 
