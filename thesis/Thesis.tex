@@ -61,9 +61,12 @@
 
 \newcommand*{\thmref}[1]{\hyperref[thm:#1]{Theorem~\ref*{thm:#1}}} % Theorem~\ref
 \newcommand*{\lemref}[1]{\hyperref[lem:#1]{Lemma~\ref*{lem:#1}}}
+\newcommand*{\corref}[1]{\hyperref[cor:#1]{Corollary~\ref*{cor:#1}}}
 \newcommand*{\defref}[1]{\hyperref[defn:#1]{Definition~\ref*{defn:#1}}}
 \newcommand*{\figref}[1]{\hyperref[fig:#1]{Figure~\ref*{fig:#1}}}
 \newcommand*{\exmpref}[1]{\hyperref[exmp:#1]{Example~\ref*{exmp:#1}}}
+\newcommand*{\sectionref}[1]{\hyperref[sec:#1]{Section~\ref*{sec:#1}}}
+\newcommand*{\subsectionref}[1]{\hyperref[sec:#1]{Subsection~\ref*{sec:#1}}}
 \newcommand*{\chapterref}[1]{\hyperref[ch:#1]{Chapter~\ref*{ch:#1}}}
 
 \newcommand*{\set}[1]{\left\{#1\right\}}
@@ -132,11 +135,11 @@ We present a construction of \texttt{M}-types from containers in a cubical type 
 \chapter*{Resum\'e}
 \addcontentsline{toc}{chapter}{Resum\'e}
 
-I denne afhandling vil vi give en konstruktion af \texttt{M}-typer ved brug af "containers". Formaliseringen af dette bliver udført i en "Cubical Type Theory". Given en "conatiner" kan vi konstruere en polynomisk functor, og ved gentaget anvendelse af denne på enhedstypen, får vi en sekvens af typer, som vi kan tage grænsen af. Denne grænse giver os en endelig coalgebra, hvilket vi definere \texttt{M}-type som. Vi giver nogle eksempler på \texttt{M}-typer. Vi beskriver tre mulige definitioner for kvotient \texttt{M}-typer, kaldet en Q\texttt{M}-type, den første er at bruge set trunkeret kvotienter givet en relation, problemet ved denne defintion er at vi ikke kan løfte konstruktørerne for \texttt{M}-typerne til Q\texttt{M}-typen. Vores anden defination er kvotient inductive-inductive typer (QIITs), hvor relationen og typen defineres samtidig. Vi giver nogle eksempler på denne konstruktion, og viser eksempler på ækvivalence mellem de konstruktioner, dog kræver disse antagelsen af "Axiom of Choice". Den tredje konstruktion er at lave en kvotient polynomisk functor, og tage grænsen af denne, for at få en Q\texttt{M}-type, men igen kræver det "Axiom of Choice", siden vi skal løfte operationerne fra kvotienten. \todo{complete}
+I denne afhandling vil vi give en konstruktion af \texttt{M}-typer ved brug af "containers". Formaliseringen af dette bliver udført i en "Cubical Type Theory". Given en "conatiner" kan vi konstruere en polynomisk funktor, og ved gentaget anvendelse af denne på enhedstypen, får vi en sekvens af typer, som vi kan tage grænsen af. Denne grænse giver os en endelig coalgebra, hvilket vi definere \texttt{M}-type som. Vi giver nogle eksempler på \texttt{M}-typer. Vi beskriver tre mulige definitioner for kvotient \texttt{M}-typer, kaldet en Q\texttt{M}-type, den første er at bruge set trunkeret kvotienter givet en relation, problemet ved denne defintion er at vi ikke kan løfte konstruktørerne for \texttt{M}-typerne til Q\texttt{M}-typen. Vores anden defination er kvotient inductive-inductive typer (QIITs), hvor relationen og typen defineres samtidig. Vi giver nogle eksempler på denne konstruktion, og viser eksempler på ækvivalence mellem de konstruktioner, dog kræver disse antagelsen af udvalgsaksiomet. Den tredje konstruktion er at lave en kvotient polynomisk functor, og tage grænsen af denne, for at få en Q\texttt{M}-type, men igen kræver det udvalgsaksiomet, siden vi skal løfte operationerne fra kvotienten. \todo{complete}
 
 \chapter*{Acknowledgments}
 \addcontentsline{toc}{chapter}{Acknowledgments}
-I would like to thank my supervisor Bas Spitters for some enlightening discussions and quick responses and for taking the time to do weekly meetings regarding this masters thesis. I would also like to thank my fellow students, who made this challenging but fun time less lonely even in the time of the Corona pandemic.
+I would like to thank my supervisor Bas Spitters for some enlightening discussions and quick responses and for taking the time to do weekly meetings regarding this masters thesis. I would also like to thank my fellow students, who made this challenging but fun time less lonely despite the Corona pandemic.
 \vspace{2ex}
 \begin{flushright}
   \emph{Lasse Letager Hansen,}\\
@@ -739,7 +742,7 @@ can be constructed by the container \(\containerpairsimple{\type{A}}{\empt}\), b
 \begin{equation}
   \containerpair{\type{A} + \type{C}}{ \begin{cases} \typeformer{B}\,\term{a} & \mathtt{inl}~\term{a} \\ \typeformer{D}\,\term{c} & \mathtt{inr}~\term{c} \end{cases}}
 \end{equation}
-whereas adding containers for two destructors is done by \todo{Is this correct? Seems correct..}
+whereas adding containers for two destructors is done by
 \begin{equation}
   \containerpairsimple{\type{A} \times \type{C}}{\lambda\,(\term{a},\term{c}),~\typeformer{B}\,\term{a} + \typeformer{D}\,\term{c}}  
 \end{equation}
@@ -762,7 +765,7 @@ where \(\typeformer{F}_2\) have been moved to the last part of the container, we
 so we would also expect that a type defined as a (coinductive) record is equal to the version defined as a \texttt{M}-type. However this has not been shown formally.
 
 \section{Wacky \texttt{M}-type}
-We end this chapter by exploring a wacky \texttt{M}-type, that utilizes the definition of the \texttt{M}-type to the fullest. We define a wacky \texttt{M}-type by the following container
+We end this chapter by exploring a wacky \texttt{M}-type, that utilizes the power of containers to the fullest. We define a wacky \texttt{M}-type by the following container
 \begin{equation}
   \containerpair{\mathbb{N} + \mathbb{N}}{\begin{cases} \mathbb{N} & \mathtt{inl}~0 \\ \empt & \mathtt{inl}~\term{x} \land \term{x}~\text{is odd} \\ \empt & \mathtt{inr}~\term{x} \land \term{x}~\text{is even} \\ \unit & o.w. \end{cases}}
 \end{equation}
@@ -776,18 +779,16 @@ this container gives the \texttt{M}-type and constructors / destructors shown in
   \caption{wacky \texttt{M}-type}
   \label{fig:wacky-m-type}
 \end{figure}
-The type can be interpreted as a stream of coproducts of natural numbers, that terminates whenever it is the left injection and even, or the right injection and odd, and whenever the left injection is zero, it splits in a branches indexed by the natural numbers.
-\\ \\
-This show that we can define coinductive types, with rather complex structure.
+The type can be interpreted as a stream of coproducts of natural numbers, that terminates whenever it is the left injection and even, or the right injection and odd, and whenever the left injection is zero, it splits in a branches indexed by the natural numbers. This show that we can define coinductive types, with rather complex structure, but a type being complex does not make it useful.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
 
 \chapter{Q\texttt{M}-types}
 \label{ch:QM-types}
-In this chapter we will introduce quotients, and show how to construct quotiented \texttt{M}-types which we call Q\texttt{M}-types. We show you can be constructed a QIIT that is equal to the Q\texttt{M}-type assuming axiom of choice. \todo{better introduction to chapter, and reference to main points}
+In this chapter we will introduce rules for set truncated quotients, and show some ways of how to construct quotiented \texttt{M}-types which we call Q\texttt{M}-types. We show examples of how you can be constructed a quotient inductive-inductive type (QIIT) that is equal to the Q\texttt{M}-type assuming axiom of choice. The examples are multisets and the partiality monad, defined as quotients with weak bisimilarity relations. We conclude the chapter by discussion, how we should define Q\texttt{M}-types.
 
 \section{Quotienting and Constructors}
-The recursor and eliminator defined as follows.
+We start by defining the recursor and some eliminators for the set truncated quotient, which will be used in the upcoming sections.
 \begin{defn}[Recursor for quotient]
   \label{defn:quotient-recursor}
   For all elements \(\term{x}, \term{y} : \type{A}\), functions \(\function{f} : \type{A} \rightarrow \type{B}\) and relations \(\function{g} : \term{x}~\relation{R}~\term{y} \rightarrow \function{f}~\term{x} \equiv \function{f}~\term{y}\), then if \(\type{B}\) is a set, we get a function from \(\type{A} / \relation{R}\) to \(\type{B}\), defined by case as
@@ -802,7 +803,7 @@ The recursor and eliminator defined as follows.
 \end{defn}
 \begin{defn}[Propositional eliminator for quotient]
   \label{defn:propositional-elimination-quotient}
-  Given a proposition \(\typeformer{P} : \type{A} / \relation{R} \rightarrow \universe{\mathcal{U}}\) for quotients, that fulfills \(\function{P_{prop}} : \prod_{(\term{x} : \type{A} / \relation{R})} \typeformer{isProp}~(\typeformer{P}\,\term{x})\), then if \(\function{f} : \prod_{(\term{a} : \type{A})} \typeformer{P}\,\quotientconstructor{\term{a}}\) we get a function from \(\term{x} : \type{A} / \relation{R}\) to \(\typeformer{P}\,\term{x}\), defined as
+  Given a dependent type \(\typeformer{P} : \type{A} / \relation{R} \rightarrow \universe{\mathcal{U}}\) , that is a proposition at all points \(\function{P_{prop}} : \prod_{(\term{x} : \type{A} / \relation{R})} \typeformer{isProp}~(\typeformer{P}\,\term{x})\), then given a proof for the base case \(\function{f} : \prod_{(\term{a} : \type{A})} \typeformer{P}\,\quotientconstructor{\term{a}}\) we get a function from \(\term{x} : \type{A} / \relation{R}\) to \(\typeformer{P}\,\term{x}\), defined as
   \begin{equation}
     \begin{aligned}
       &\function{elimProp}~\quotientconstructor{\term{a}} = \function{f}~\term{a}\\
@@ -817,7 +818,7 @@ The recursor and eliminator defined as follows.
 \end{defn}
 \begin{defn}[Eliminator for quotients]
   \label{defn:quotient-eliminator}
-  Given a statement \(\typeformer{P} : \type{A} / \relation{R} \rightarrow \universe{\mathcal{U}}\) which is a set \(\function{P_{set}} : \prod_{(\term{x} : \type{A}/\relation{R})} \function{isSet}~(\typeformer{P}\,\term{x})\), a proof for the base case \(\function{f} : \prod_{(\term{a} : \type{A})} \typeformer{P}\,\quotientconstructor{\term{a}}\) and a proof for equality \(\function{f_{eq}} : \prod_{(\term{a},\term{b} : A)} \prod_{(\term{r} : \term{a}~\relation{R}~\term{b})} \function{f}~\term{a} \equiv_* \function{f}~\term{b}\) over \(\constructor{eq/}~\term{a}~\term{b}~\term{r}\), we get a function \(\function{elim} : (\term{x} : \type{A} / \relation{R}) \rightarrow \typeformer{P}\,\term{x}\) as follows
+  Given a dependent type \(\typeformer{P} : \type{A} / \relation{R} \rightarrow \universe{\mathcal{U}}\) which is a set \(\function{P_{set}} : \prod_{(\term{x} : \type{A}/\relation{R})} \function{isSet}~(\typeformer{P}\,\term{x})\), a proof for the base case \(\function{f} : \prod_{(\term{a} : \type{A})} \typeformer{P}\,\quotientconstructor{\term{a}}\) and a proof for the equality case \(\function{f_{eq}} : \prod_{(\term{a},\term{b} : A)} \prod_{(\term{r} : \term{a}~\relation{R}~\term{b})} \function{f}~\term{a} \equiv_* \function{f}~\term{b}\) for the equality constructor \(\constructor{eq/}~\term{a}~\term{b}~\term{r}\), we get a function \(\function{elim} : (\term{x} : \type{A} / \relation{R}) \rightarrow \typeformer{P}\,\term{x}\) as follows
   \begin{equation}
     \begin{aligned}
       &\function{elim}~\quotientconstructor{\term{a}} = \function{f}~\term{a} \\
@@ -828,38 +829,38 @@ The recursor and eliminator defined as follows.
   \end{equation}
   which is the eliminator for quotients.
 \end{defn}
-\noindent We can now construct some more interesting data types, by set quotienting \texttt{M}-types, which we call Q\texttt{M}-types, some examples follow in the following section. \todo{preserves the H-level} \todo{we cannot always lift the constructors of \texttt{M}-type to the quotiented type}
+\noindent We can now construct some more interesting data types, by set quotienting \texttt{M}-types, which we call Q\texttt{M}-types, some examples follow in the following section. \todo{preserves the H-level}
 
 \section{Q\texttt{M}-types and Quotient inductive-inductive types (QIITs)}
-In this section we will show some examples of quotiented \texttt{M}-types, and alternative ways of defining an equal type, but using quotient inductive-inductive types instead. A quotient inductive-inductive type (QIIT) is a type defined at the same time as a relation over that type. Furthermore QIITs are set truncated. We belive that every Q\texttt{M}-types is equal (under the axiom of choice) to a QITT, however QIITs are more general than our Q\texttt{M}-types, so we cannot expect every QIIT to have a corresponding Q\texttt{M}-type. \todo{Go into more details!} % QIITs are HIITs that are set truncated. 
+In this section we will show some examples of quotiented \texttt{M}-type, defined using set truncated quotients. We will construct the same type using quotient inductive-inductive types instead, and show these two construction gives equal types, assuming the axiom of choice. A quotient inductive-inductive type (QIIT) is a type that is defined at the same time as a relation over that type and set truncated. We believe, but do not show, that this equality between the two ways of constructing Q\texttt{M}-types is general. However QIITs are more general than our Q\texttt{M}-types, so we cannot expect every QIIT to have a corresponding Q\texttt{M}-type.
 
 \subsection{Multiset}
-In this subsection we define infinite trees, where the order of subtrees does not matter also known as multisets \cite{DBLP:QIIT}\cite{DBLP:tt-in-tt}\cite{DBLP:Constructing-QIITs}.
+In this subsection we define infinite trees, where the order of subtrees does not matter also known as multisets \cite{DBLP:QIIT}\cite{DBLP:tt-in-tt}\cite{DBLP:Constructing-QIITs}, we construct the type of multisets as a QM-type and as a QIIT and show these are equal (\thmref{QM-QIIT-eq-multiset}). We start by defining the tree type we want to quotient.
 \begin{defn}
   We define \(\type{A}\)-valued \(\mathbb{N}\)-branching trees \(\typeformer{T}\,\type{A}\) as the \texttt{M}-type defined by the container
   \begin{equation}
     \left(\type{A}+\unit, \begin{cases} \empt & \mathtt{inl}~\term{a} \\ \mathbb{N} & \mathtt{inr}~\unitelem \end{cases}\right)
   \end{equation}
+  For which we get the constructors\\[-10mm]
+  \begin{center}
+    \strut
+    \hfill
+    \begin{minipage}{0.25\linewidth}
+      \begin{equation}
+        \vcenter{\infer{\constructor{leaf}~\term{a} : \typeformer{T}\,\type{A}}{\term{a} : \type{A}}}
+      \end{equation}
+    \end{minipage}
+    \hfill
+    \begin{minipage}{0.25\linewidth}
+      \begin{equation}
+        \vcenter{\infer{\constructor{node}~\function{f} : \typeformer{T}\,\type{A}}{\function{f} : \mathbb{N} \rightarrow \typeformer{T}\,\type{A}}}
+      \end{equation}
+    \end{minipage}
+    \hfill
+    \strut
+  \end{center}
 \end{defn}
-\noindent For which we get the constructors\\[-10mm]
-\begin{center}
-  \strut
-  \hfill
-  \begin{minipage}{0.25\linewidth}
-    \begin{equation}
-      \vcenter{\infer{\constructor{leaf}~\term{a} : \typeformer{T}\,\type{A}}{\term{a} : \type{A}}}
-    \end{equation}
-  \end{minipage}
-  \hfill
-  \begin{minipage}{0.25\linewidth}
-    \begin{equation}
-      \vcenter{\infer{\constructor{node}~\function{f} : \typeformer{T}\,\type{A}}{\function{f} : \mathbb{N} \rightarrow \typeformer{T}\,\type{A}}}
-    \end{equation}
-  \end{minipage}
-  \hfill
-  \strut
-\end{center}
-We want to define trees where the permutation does not matter, that is multisets, we do this by ensuring the following rule is true
+\noindent Trees where the permutation of subtrees does not matter is multisets. We can define equality between permuation of subtrees by the following rule
 \begin{equation}
   \vcenter{\infer[\constructor{perm}]{\constructor{node}~\function{f} \equiv \constructor{node}~(\function{f} \circ \function{g})}{\function{f} : \mathbb{N} \rightarrow \typeformer{T}\,\type{A} & \function{g} : \mathbb{N} \rightarrow \mathbb{N} & \mathtt{isIso}~\function{g}}}
 \end{equation}
@@ -884,7 +885,7 @@ One way to define this type is as the Q\texttt{M}-type given by quotienting \(\t
 \begin{equation}
   \vcenter{\infer[\constructor{\sim_{perm}}]{\constructor{node}~\function{f}~\relation{\sim_T}~\constructor{node}~(\function{f} \circ \function{g})}{\function{f} : \mathbb{N} \rightarrow \typeformer{T}\,\type{A} & \function{g} : \mathbb{N} \rightarrow \mathbb{N} & \mathtt{isIso}~\function{g}}}
 \end{equation}
-Again we have the problem that we cannot lift the \(\constructor{node}\) to the quotiented type, without the use of the axiom of choice. However we can define multisets as a QIIT denoted \(\typeformer{MS}~\type{A}\), with the constructors \(\constructor{leaf}, \constructor{node},\constructor{perm}\) and set quotiented \(\constructor{MS\text{-}isSet}\). These two ways of constructing a type for multisets are equal assuming the axiom of (countable) choice.
+We have the problem that we cannot lift the definition of \(\constructor{node}\) to the quotiented type, without the use of the axiom of choice. To solve this problem we can define multisets as a QIIT denoted \(\typeformer{MS}~\type{A}\), with the constructors \(\constructor{leaf}, \constructor{node}\) and \(\constructor{perm}\) and set truncation constructor \(\constructor{MS\text{-}isSet}\). We show these two ways of constructing a type for multisets are equal assuming the axiom of (countable) choice.
 \begin{defn}
   There is a function from \(\typeformer{T}\,\type{A}\) to \(\typeformer{MS}~\type{A}\)
   \begin{equation}
@@ -942,14 +943,15 @@ This function takes weakly bisimilar objects to equal once.
   \end{proof}
 \end{lem}
 \begin{thm}
-  The is an equality between the types \(\typeformer{T}\,\type{A}/\relation{\sim_{T}}\) and \(\typeformer{MS}~\type{A}\), assuming the axoim of choice.
+  \label{thm:QM-QIIT-eq-multiset}
+  There is an equality between the types \(\typeformer{T}\,\type{A}/\relation{\sim_{T}}\) and \(\typeformer{MS}~\type{A}\), assuming the axoim of choice.
   \begin{proof}
     Since the function \(\function{T/{\sim}{\rightarrow}MS}\) is injective and surjective, it becomes an equality.
   \end{proof}
 \end{thm}
 
 \subsection{Partiality monad}
-In this subsection we will define the partiality monad (see below) and show that (assuming the axiom of countable choice) the delay monad quotiented by weak bisimilarity.
+In this subsection we will define the partiality monad (see below) and show that it is equal to the delay monad quotiented by weak bisimilarity, assuming the axiom of choice. We do this proof by defining an intermediate representation of sequences, and then first showing the delay monad equal to this type (\subsectionref{delay-monad-to-sequences}), and then showing that sequences quotiented by weak are equal to the partiality monad (\subsectionref{sequences-to-partiality-monad}) \cite{Partiality-Revisited}.
 \begin{defn}[Partiality Monad]
   A simple example of a quotient inductive-inductive type is the partiality monad \((-)_\bot\) over a type \(\type{R}\), defined by the constructors\\[-9mm]
   \begin{center}
@@ -971,7 +973,7 @@ In this subsection we will define the partiality monad (see below) and show that
       \end{equation}
     \end{minipage}
   \end{center}
-  and a relation \((\cdot~\relation{\sqsubseteq_{\bot}}~\cdot)\) indexed twice over \(\type{R}_\bot\), with properties\\[-9mm] \todo{Should I define what it means to be an ordering relation separately, and just say the relation here is an instance of that? (Generalize?)}
+  and a relation \((\cdot~\relation{\sqsubseteq_{\bot}}~\cdot)\) indexed twice over \(\type{R}_\bot\), with properties\\[-9mm]
   \begin{center}
     \begin{minipage}{0.45\linewidth}
       \begin{equation}
@@ -1027,7 +1029,8 @@ In this subsection we will define the partiality monad (see below) and show that
 \end{defn}
 
 \subsubsection{Delay monad to Sequences}
-\todo{introduction to subsection}
+We define sequences, and show they are equal to the delay monad (\thmref{seq-eq-delay}). We then extend this equality to an equality between the types quotient by weak bisimilarity (\corref{delay-to-seq-quotient}). We start by defining the type of sequences.
+\label{sec:delay-monad-to-sequences}
 \begin{defn}
   We define
   \begin{equation}
@@ -1050,7 +1053,6 @@ We also introduce notation for the two special cases of sequences given above
 \begin{equation}
   \constant{never}_{Seq} = (\lambda\,\_, \mathtt{inr}~\unitelem) , (\lambda\,\_, \mathtt{inl}~\mathtt{refl})
 \end{equation}
-\todo[inline]{Some comment about decidable equivalence needed to show that \(\function{s}_{n+1} \not\equiv \mathtt{inr}~\unitelem\)}
 \begin{defn}
   We can shift a sequence \((\function{s},\function{q})\) by inserting an element (and an equality) \((\term{z_s},\term{z_q})\) at \(n = 0\),
   \begin{equation}
@@ -1085,13 +1087,13 @@ We also introduce notation for the two special cases of sequences given above
     If we shift followed by an unshift, we just introduce a value to instantly remove it, meaning the value does not matter.
   \end{proof}
 \end{lem}
-\noindent We now define an equivalence between \(\typeformer{delay}~\type{R}\) and \(\typeformer{Seq}_{\type{R}}\), where \(\constructor{later}\) are equivalent to shifts, and \(\constructor{now}~\term{r}\) is equivalent terminated sequence with value \(\term{r}\). We do this by defining equivalence functions, and the left and right identities.
 \begin{lem}[\(\constant{inl{\not\equiv}inr}\)]
   For any two elements \(\term{x} = \mathtt{inl}~\term{a}\) and \(\term{y} = \mathtt{inr}~\term{b}\) then \(\term{x} \not\equiv \term{y}\).
   \begin{proof}
     The constructors \texttt{inl} and \texttt{inr} are disjoint, so there does not exists a path between them, meaning constructing one is a contradiction.
   \end{proof}
 \end{lem}
+\noindent We now define an equivalence between \(\typeformer{delay}~\type{R}\) and \(\typeformer{Seq}_{\type{R}}\), where \(\constructor{later}\) are equivalent to shifts, and \(\constructor{now}~\term{r}\) is equivalent terminated sequence with value \(\term{r}\). We do this by defining equivalence functions, and the left and right identities.
 \begin{defn}
   We define a function from \(\typeformer{Delay}~\type{R}\) to \(\typeformer{Seq}_{\type{R}}\)
   \begin{equation}
@@ -1111,7 +1113,8 @@ We also introduce notation for the two special cases of sequences given above
     \end{equation}
 \end{defn}
 \begin{thm}
-  The type \(\typeformer{Seq}_{\type{R}}\) is equal to \(\typeformer{Delay}~\type{R}\)
+  \label{thm:seq-eq-delay}
+  The type \(\typeformer{Delay}~\type{R}\) is equal to \(\typeformer{Seq}_{\type{R}}\)
   \begin{proof}  
     We define right and left identity, saying that for any sequence \((\function{s},\function{q})\), we get
     \begin{equation}
@@ -1129,21 +1132,20 @@ We also introduce notation for the two special cases of sequences given above
     \begin{equation}
       \function{Delay{\rightarrow}Seq}~(\function{Seq{\rightarrow}Delay}~(\function{unshift}~(\function{s},\function{q}))) \equiv \function{unshift}~(\function{s},\function{q})
     \end{equation}
-    since shift and unshift are inverse, we get the needed equality.
-    \todo[inline]{Shift takes two arguemnts, either clarify that its shift' that inserts inr tt or ...}
-    For the left identity, we need to show that for any delay monad \(\term{t}\) we get
+    since shift and unshift are inverse, we get the needed equality. For the left identity, we need to show that for any delay monad \(\term{t}\) we get
     \begin{equation}
       \function{Seq{\rightarrow}Delay}~(\function{Delay{\rightarrow}Seq}~\term{t}) \equiv \term{t}
     \end{equation}
-    defined by case analysis on \(\term{t}\), if \(\term{t} = \constructor{now}~a\) then the equality is \(\mathtt{refl}\). If \(\term{t} = \constructor{later}~\term{x}\) then we need to show
+    We do case analysis on \(\term{t}\), if \(\term{t} = \constructor{now}~a\) then the equality is \(\mathtt{refl}\). If \(\term{t} = \constructor{later}~\term{x}\) then we need to show
     \begin{equation}
-      \constructor{later}~(\function{Seq{\rightarrow}Delay}~(\function{unshift}~(\function{shift}~(\function{Delay{\rightarrow}Seq}~x))) \equiv \constructor{later}~x
+      \constructor{later}~(\function{Seq{\rightarrow}Delay}~(\function{unshift}~(\function{shift}~(\function{Delay{\rightarrow}Seq}~x)))) \equiv \constructor{later}~x
     \end{equation}
-    By unshift and shift being inverse, and the induction hypothesis we get the wanted equality. Since we are able to define a left and right identity function, we get the wanted equality.
+    from unshift and shift being inverse and the induction hypothesis, we get the wanted equality. We have now defined a left and right identity function, so we get the wanted equality.
   \end{proof}
 \end{thm}
 \begin{cor}
-  The types \(\typeformer{Delay}/\sim\) and \(\typeformer{Seq}/\sim\) are equal.
+  \label{cor:delay-to-seq-quotient}
+  The types \(\typeformer{Delay}~\type{R}/\relation{\sim}\) and \(\typeformer{Seq}_{\type{R}}/\relation{\sim}\) are equal.
   \begin{proof}
     We show that if \(a~\relation{\sim_{delay}}~b\) then \(\function{Delay{\rightarrow}Seq}~a~\relation{\sim_{Seq}}~\function{Delay{\rightarrow}Seq}~b\), \todo{Show this}
     \\ \\
@@ -1152,20 +1154,21 @@ We also introduce notation for the two special cases of sequences given above
 \end{cor}
 
 \subsubsection{Sequence to Partiality Monad}
-In this section we will show that assuming the "Axiom of Countable Choice", we get an equivalence between sequences and the partiality monad.
+\label{sec:sequences-to-partiality-monad}
+In this section we will show that assuming the axiom of choice, we get an equivalence between sequences quotiented by weak bisimilarity and the partiality monad (\thmref{sequence-partiality-monad-eq}). We start by defining some relation on sequences.
 \begin{defn}[Sequence Termination]
   The following relations says that a sequence \((\function{s},\function{q}) : \typeformer{Seq}_{\type{R}}\) terminates with a given value \(\term{r} : \type{R}\),
   \begin{equation}
     (\function{s},\function{q})~\relation{\downarrow_{\mathtt{Seq}}}~\term{r} = \sum_{(n : \mathbb{N})} \function{s}_n \downarrow_{\type{R} + \unit} \term{r}.
   \end{equation}
 \end{defn}
-\begin{defn}[Sequence Ordering]
+\begin{defn}[Sequence Ordering] We can define an ordering of sequences as
   \begin{equation}
     (\function{s},\function{q})~\relation{\sqsubseteq_{\mathtt{Seq}}}~(\function{t},\function{p}) = \prod_{(\term{a} : \type{R})} \left(\|\function{s}~\relation{\downarrow_{\mathtt{Seq}}}~\term{a}\| \rightarrow \| \function{t}~\relation{\downarrow_{\mathtt{Seq}}}~\term{a}\|\right)
   \end{equation}
   where \(\| \cdot \|\) is propositional truncation.
 \end{defn}
-\begin{defn} There is a conversion from \(\type{R} + \unit\) to the partiality monad \(\type{R}_\bot\)
+\begin{defn} There is a function from \(\type{R} + \unit\) to the partiality monad \(\type{R}_\bot\)
   \begin{equation}
     \begin{aligned}
       &\function{Maybe{\rightarrow}(-)_\bot}~(\mathtt{inl}~\term{r}) = \constructor{\eta}~\term{r} \\
@@ -1175,7 +1178,7 @@ In this section we will show that assuming the "Axiom of Countable Choice", we g
 \end{defn}
 \begin{defn}[Maybe Ordering]
   \label{eq:maybe-order}
-  Given some \(x,y : \type{R} + \unit\), the ordering relation is defined as
+  We can define an ordering relation on \(\type{R} + \unit\) as 
   \begin{equation}
     \term{x}~\relation{\sqsubseteq_{\type{R} + \unit}}~\term{y} = (\term{x} \equiv \term{y}) + ((\term{x}  \downarrow_{\type{R} + \unit}) \times (\term{y} \uparrow_{\type{R} + \unit}))
   \end{equation}
@@ -1186,7 +1189,7 @@ In this section we will show that assuming the "Axiom of Countable Choice", we g
 \end{equation}
 This rewriting confirms that if \(\function{isMon}~\function{s}\), then \(\function{s}\) is monotone, and therefore a sequence of partial values\todo{there exists non-monotone sequences, it just follows our definition of a sequence.}.
 \begin{lem}
-  The function \(\function{Maybe{\rightarrow}(-)_\bot}\) is monotone, that is, if \(\term{x}~\relation{\sqsubseteq_{\type{A} + \unit}}~\term{y}\), for some \(\term{x}\) and \(\term{y}\), then \((\function{Maybe{\rightarrow}(-)_\bot}~\term{x})~\relation{\sqsubseteq_{\bot}}~(\function{Maybe{\rightarrow}(-)_\bot}~\term{y})\).
+  The function \(\function{Maybe{\rightarrow}(-)_\bot}\) is monotone, that is, if \(\term{x}~\relation{\sqsubseteq_{\type{R} + \unit}}~\term{y}\), for some \(\term{x}\) and \(\term{y}\), then \((\function{Maybe{\rightarrow}(-)_\bot}~\term{x})~\relation{\sqsubseteq_{\bot}}~(\function{Maybe{\rightarrow}(-)_\bot}~\term{y})\).
   \begin{proof}
     We do the proof by case.
     \begin{equation}
@@ -1200,19 +1203,16 @@ This rewriting confirms that if \(\function{isMon}~\function{s}\), then \(\funct
   \end{proof}
 \end{lem}
 \begin{defn}
-  There is a function taking a sequence to an increasing sequence \todo{What is an increasing sequence ??, this is not defined anywhere!!}
+  There is a function taking a sequence to an increasing sequence of partiality monads
   \begin{equation}
-    \begin{aligned}
-      &\function{Seq{\rightarrow}incSeq} \\
-      &\function{Seq{\rightarrow}incSeq}~(\function{g} , \function{q}) = \function{Maybe{\rightarrow}(-)_\bot} \circ \function{g} , \function{Maybe{\rightarrow}(-)_\bot\text{-}mono} \circ \function{q}
-    \end{aligned}
+      \function{Seq{\rightarrow}incSeq}~(\function{s} , \function{q}) = \function{Maybe{\rightarrow}(-)_\bot} \circ \function{s} , \function{Maybe{\rightarrow}(-)_\bot\text{-}mono} \circ \function{q}
   \end{equation}
 \end{defn}
 \begin{defn}
   There is a function taking a sequence to the partiality monad
   \begin{equation}
     \begin{aligned}
-      &\function{Seq{\rightarrow}(-)_\bot} : \typeformer{Seq}_{\type{A}} \rightarrow \type{A}_{\bot} \\
+      &\function{Seq{\rightarrow}(-)_\bot} : \typeformer{Seq}_{\type{R}} \rightarrow \type{R}_{\bot} \\
       &\function{Seq{\rightarrow}(-)_\bot}~(\function{g},\function{q}) = \bigsqcup \circ~\function{Seq{\rightarrow}incSeq}
     \end{aligned}
   \end{equation}
@@ -1220,30 +1220,23 @@ This rewriting confirms that if \(\function{isMon}~\function{s}\), then \(\funct
 \begin{lem}
   The function \(\function{Seq{\rightarrow}(-)_\bot}\) is monotone. 
   \begin{equation}
-    \function{Seq{\rightarrow}(-)_\bot\text{-}mono} : \typeformer{isSet} \type{A} \rightarrow (\term{x}~\term{y} : \typeformer{Seq}_{\type{A}}) \rightarrow \term{x}~\relation{\sqsubseteq_{seq}}~\term{y} \rightarrow \function{Seq{\rightarrow}(-)_\bot}~\term{x}~\relation{\sqsubseteq_{\bot}}~\function{Seq{\rightarrow}(-)_\bot}~\term{y}
+    \function{Seq{\rightarrow}(-)_\bot\text{-}mono} : (\term{x}~\term{y} : \typeformer{Seq}_{\type{R}}) \rightarrow \term{x}~\relation{\sqsubseteq_{seq}}~\term{y} \rightarrow \function{Seq{\rightarrow}(-)_\bot}~\term{x}~\relation{\sqsubseteq_{\bot}}~\function{Seq{\rightarrow}(-)_\bot}~\term{y}
 \end{equation}
   \begin{proof}
-    Given two sequences, if one is smaller than the another, then the least upper bounds of each sequence respect the ordering. \todo{should this be formalized entirely, or should there just be a comment about monotonicity? Does not seem relevant? (There is alot of work here..)}
+    Given two sequences, where one is smaller than the another, then taking the least upper bounds of each sequence respect the ordering. \todo{should this be formalized entirely (There is alot of work here.. but not interesting.)} \todo{removed "isSet A", where is it used?}
   \end{proof}
 \end{lem}
 \begin{lem}
   If two sequences \(\term{x},\term{y}\) are weakly bisimular, then \(\function{Seq{\rightarrow}(-)_\bot}~\term{x} \equiv \function{Seq{\rightarrow}(-)_\bot}~\term{y}\)
-  \begin{proof}
-    \todo{describe instead of proof term!}
-    \begin{equation}
-      \begin{aligned}
-        &\function{Seq{\rightarrow}(-)_\bot\text{-}{\approx}{\rightarrow}{\equiv}}~\term{A_{set}}~\term{x}~\term{y}~(\term{p} , \term{q}) = \\
-        &\qquad\qquad\qquad\constructor{\alpha_{\bot}}~(\function{Seq{\rightarrow}(-)_\bot\text{-}mono}~\term{A_{set}}~\term{x}~\term{y}~\term{p})~(\function{Seq{\rightarrow}(-)_\bot\text{-}mono}~\term{A_{set}}~\term{y}~\term{x}~\term{q})
-      \end{aligned}
-    \end{equation}
+  \begin{proof} We know that the \(\function{Seq{\rightarrow}(-)_{\bot}}\) is monotone, so we can use this monotonicity principle on \(p : \term{x}~\relation{\sqsubseteq_{seq}}~\term{y}\) and \(q : \term{y}~\relation{\sqsubseteq_{seq}}~\term{x}\) given by the bisimilarity, to get \(\function{Seq{\rightarrow}(-)_\bot}~\term{x}~\relation{\sqsubseteq_{\bot}}~\function{Seq{\rightarrow}(-)_\bot}~\term{y}\) and \(\function{Seq{\rightarrow}(-)_\bot}~\term{y}~\relation{\sqsubseteq_{\bot}}~\function{Seq{\rightarrow}(-)_\bot}~\term{x}\) by using \(\constructor{\alpha_{\bot}}\) we get the equality \(\function{Seq{\rightarrow}(-)_\bot}~\term{x} \equiv \function{Seq{\rightarrow}(-)_\bot}~\term{y}\). We denote this construction as the function \(\function{Seq{\rightarrow}(-)_\bot\text{-}{\approx}{\rightarrow}{\equiv}}\)
   \end{proof}
 \end{lem}
 \noindent The recursor for quotients \defref{quotient-recursor} allows us to lift the function \(\function{Seq{\rightarrow}(-)_\bot}\) to the quotient
 \begin{defn}
   \label{eq:QuotientedSeqToPartialityMonad}
-  We can define a function \(\function{Seq/{\sim}{\rightarrow}(-)_\bot}\) from \(\typeformer{Seq}_{\type{A}}\) to \(\type{A}_{\bot}\), where \(\term{A_{set}} : \typeformer{isSet}~\type{A}\) as
+  We can define a function \(\function{Seq/{\sim}{\rightarrow}(-)_\bot}\) from \(\typeformer{Seq}_{\type{R}}\) to \(\type{R}_{\bot}\)
   \begin{equation}
-    \function{Seq/{\sim}{\rightarrow}(-)_\bot} = \function{rec}~\function{Seq{\rightarrow}(-)_\bot}~(\function{Seq{\rightarrow}(-)_\bot\text{-}{\approx}{\rightarrow}{\equiv}}~\term{A_{set}})~\constructor{(-)_\bot\text{-}isSet}
+    \function{Seq/{\sim}{\rightarrow}(-)_\bot} = \function{rec}~\function{Seq{\rightarrow}(-)_\bot}~(\function{Seq{\rightarrow}(-)_\bot\text{-}{\approx}{\rightarrow}{\equiv}})~\constructor{(-)_\bot\text{-}isSet}
   \end{equation} 
 \end{defn}
 \begin{lem}
@@ -1254,27 +1247,25 @@ This rewriting confirms that if \(\function{isMon}~\function{s}\), then \(\funct
     \begin{equation}
       \term{s}~\relation{\sim_{seq}}~\term{t} = \left(\prod_{(\term{r} : \type{R})} \| \term{x}~\relation{\downarrow_{seq}}~\term{r} \| \rightarrow \| \term{y}~\relation{\downarrow_{seq}}~\term{r} \|\right) \times \left(\prod_{(\term{r} : \type{R})} \| \term{y}~\relation{\downarrow_{seq}}~\term{r} \| \rightarrow \| \term{x}~\relation{\downarrow_{seq}}~\term{r} \|\right)
     \end{equation}
-    so we can just show one part and get the other by symmetry. We assume \(\| \term{x}~\relation{\downarrow_{seq}}~\term{r} \|\), to show \(\| \term{y}~\relation{\downarrow_{seq}}~\term{r} \|\). By the mapping property of propositional truncation, we reduce the proof to defining a function \(\term{x}~\relation{\downarrow_{seq}}~\term{r} \rightarrow \term{y}~\relation{\downarrow_{seq}}~\term{r}\). Since \(\term{x}~\relation{\downarrow_{seq}}~\term{r}\), then \(\constructor{\eta}~\term{r}~\relation{\sqsubseteq_{\bot}}~\function{Seq{\rightarrow}(-)_\bot}~\term{x}\), but we have assumed \(\function{Seq{\rightarrow}(-)_\bot}~\term{x} \equiv \function{Seq{\rightarrow}(-)_\bot}~\term{y}\), so we get \(\constructor{\eta}~\term{r}~\relation{\sqsubseteq_{\bot}}~\function{Seq{\rightarrow}(-)_\bot}~\term{y}\), and thereby \(\term{y}~\relation{\downarrow_{seq}}~\term{r}\).
+    meaning we can show one part and get the other for free by symmetry. We assume \(\| \term{x}~\relation{\downarrow_{seq}}~\term{r} \|\), to show \(\| \term{y}~\relation{\downarrow_{seq}}~\term{r} \|\). By the mapping property of propositional truncation, we reduce the proof to defining a function \(\term{x}~\relation{\downarrow_{seq}}~\term{r} \rightarrow \term{y}~\relation{\downarrow_{seq}}~\term{r}\). Since \(\term{x}~\relation{\downarrow_{seq}}~\term{r}\), then \(\constructor{\eta}~\term{r}~\relation{\sqsubseteq_{\bot}}~\function{Seq{\rightarrow}(-)_\bot}~\term{x}\), but we have assumed \(\function{Seq{\rightarrow}(-)_\bot}~\term{x} \equiv \function{Seq{\rightarrow}(-)_\bot}~\term{y}\), so we get \(\constructor{\eta}~\term{r}~\relation{\sqsubseteq_{\bot}}~\function{Seq{\rightarrow}(-)_\bot}~\term{y}\), and thereby \(\term{y}~\relation{\downarrow_{seq}}~\term{r}\).
   \end{proof}
 \end{lem}
 \begin{lem}
+  \label{lem:sequence-to-partiality-monad-injectivity}
   The function \(\function{Seq/{\sim}{\rightarrow}(-)_\bot}\) is injective.
   \begin{proof}
-    We use propositional elimination of quotients \defref{propositional-elimination-quotient} \todo{Should this be formalized?} to show the injectivity, meaning for all \(\term{x}~\term{y} : \typeformer{Seq}_{\type{R}} / \relation{\sim_{seq}}\) we get \(\function{Seq/{\sim}{\rightarrow}(-)_\bot}~\term{x} \equiv \function{Seq/{\sim}{\rightarrow}(-)_\bot}~\term{y} \rightarrow \term{x} \equiv \term{y}\). We start by eliminating \(\term{x}\), followed by elimination of \(y\), this gives us the proof term \todo{Convert to text, instead of a proof term!?}
+    We use propositional elimination of quotients (see \defref{propositional-elimination-quotient}) to show injectivity, meaning for all \(\term{x}, \term{y} : \typeformer{Seq}_{\type{R}} / \relation{\sim_{seq}}\) we get \(\function{Seq/{\sim}{\rightarrow}(-)_\bot}~\term{x} \equiv \function{Seq/{\sim}{\rightarrow}(-)_\bot}~\term{y} \rightarrow \term{x} \equiv \term{y}\). We do propositional eliminating of \(\term{x}\), followed by propositional elimination of \(y\). We use \defref{propositional-elimination-quotient}, with
     \begin{equation}
-      \begin{aligned}
-        &\function{elimProp} \\
-        &\quad (\lambda\,\term{a},~\function{Seq/{\sim}{\rightarrow}(-)_\bot}~\term{a} \equiv \function{Seq/{\sim}{\rightarrow}(-)_\bot}~\term{y} \rightarrow \term{a} \equiv \term{y}) \\
-        &\quad (\lambda\,\term{a},~\function{isProp\Pi}~(\lambda\,\_, \constructor{squash/}~\term{a}~\term{y})) \\
-        &\quad (\lambda\,\term{a},~\function{elimProp} \\
-        &\qquad\qquad\quad (\lambda\,\term{b},~\function{Seq{\rightarrow}(-)_\bot}~\term{a} \equiv \function{Seq/{\sim}{\rightarrow}(-)_\bot}~\term{b} \rightarrow \quotientconstructor{\term{a}} \equiv \term{b}) \\
-        &\qquad\qquad\quad (\lambda\,\term{b},~\function{isProp\Pi}~(\lambda\,\_, \constructor{squash/}~\quotientconstructor{\term{a}}~\term{b})) \\
-        &\qquad\qquad\quad (\lambda\,\term{b},~(\constructor{eq/}~\term{a}~\term{b}) \circ (\function{Seq{\rightarrow}(-)_\bot\text{-}isInjective}~\term{a}~\term{b})) \\
-        &\qquad\qquad\quad y) \\
-        &\quad x
-      \end{aligned}
+\typeformer{P} = \function{Seq/{\sim}{\rightarrow}(-)_\bot}~\term{x} \equiv \function{Seq/{\sim}{\rightarrow}(-)_\bot}~\term{y} \rightarrow \term{x} \equiv \term{y}
+\end{equation}
+\begin{equation}
+\function{P_{prop}} = \function{isProp\Pi}~(\lambda\,\_, \constructor{squash/}~\term{x}~\term{y})
+\end{equation}
+where we index by \(\term{x}\) for the first elimination, and by \(\term{y}\) for the second with \(\term{x} = \quotientconstructor{a}\). The proof is then completed by
+    \begin{equation}
+      \function{elimProp}~(\lambda\,\term{a},~\function{elimProp}~(\lambda\,\term{b},~(\constructor{eq/}~\term{a}~\term{b}) \circ (\function{Seq{\rightarrow}(-)_\bot\text{-}{\equiv}{\rightarrow}{\sim}}~\term{a}~\term{b}))~\term{y})~\term{x}
     \end{equation}
-    where \(\function{Seq{\rightarrow}(-)_\bot\text{-}isInjective}\) is \eqref{eq:injectivity-lemma}, 
+    where \(\function{Seq{\rightarrow}(-)_\bot\text{-}{\equiv}{\rightarrow}{\sim}}\) is \eqref{eq:injectivity-lemma}, 
   \end{proof}
 \end{lem}
 \begin{lem}
@@ -1284,28 +1275,58 @@ This rewriting confirms that if \(\function{isMon}~\function{s}\), then \(\funct
     The left side of the equality reduces to \(\function{Maybe{\rightarrow}(-)_\bot}\) applied on the least upper bound of the constant sequence, which is exactly the right hand side of the equality.
   \end{proof}
 \end{lem}
+\begin{defn}[Propositional eliminator for \((-)_{\bot}\)]
+  Given a dependent type \(\typeformer{P} : \type{R}_{\bot} \rightarrow \universe{\mathcal{U}}\) that is a proposition at all points \(\function{P_{prop}} : \prod_{(\term{x} : \type{R}_{\bot})} \mathtt{isProp}~(\typeformer{P}~\term{x})\), then given a proof for the base cases \(\term{P_{\bot}} : \typeformer{P}~\constructor{\bot}\) and \(\function{P_{\eta}} : \prod_{(a : \type{R})}\typeformer{P}~(\constructor{\eta}~a)\), and a proof \(\function{P_{\sqcup}}\) that for all \((\function{s},\function{q}) : \sum_{(\function{s} : \mathbb{N} \rightarrow \type{R}_{\bot})} \prod_{(n : \mathbb{N})} \function{s}\,n\,\relation{\sqsubseteq_{\bot}}\,\function{s}\,(n+1)\) we get \(\big( \prod_{(n : \mathbb{N})} \typeformer{P}~(\function{s}~n)\big) \rightarrow \typeformer{P}~\constructor{\bigsqcup} (\function{s},\function{q})\). Then we get a function from any \(\term{x} : \type{R}_{\bot}\) to \(\typeformer{P}~\term{x}\)
+  \begin{equation}
+    \begin{aligned}
+      &\function{elimProp_{\bot}}~\constructor{\bot} = \term{P_{\bot}} \\
+      &\function{elimProp_{\bot}}~(\constructor{\eta}~\term{a}) = \function{P_{\eta}}~\term{a} \\
+      &\function{elimProp_{\bot}}~\constructor{\sqcup~(\function{s},\function{q})} = \term{P_{\sqcup}} (\function{s},\function{q})~(\function{elimProp_{\bot}} \circ s) \\[1mm]
+      &\function{elimProp_{\bot}}~(\constructor{\alpha}~\pathterm{p}~\pathterm{q}~i) = \\
+      &\quad\function{isProp{\rightarrow}isDepProp}~\function{P_{prop}}~(\function{elimProp_{\bot}}~\term{x})~(\function{elimProp_{\bot}}~\term{y})~(\constructor{\alpha}~\pathterm{p}~\pathterm{q})~i \\[1mm]
+      &\function{elimProp_{\bot}}~(\constructor{\bot\text{-}isSet}~\term{x}~\term{y}~\pathterm{p}~\pathterm{q}~i~j) = \\
+      &\quad\function{isSet{\rightarrow}isDepSet}~(\function{isProp{\rightarrow}isSet} \circ \function{P_{prop}})~(\function{elimProp_{\bot}}~\term{x})~(\function{elimProp_{\bot}}~\term{y}) \\
+      &\quad\quad(\mathtt{ap}~\function{elimProp_{\bot}}~\pathterm{p})~(\mathtt{ap}~\function{elimProp_{\bot}}~\pathterm{q})~(\constructor{\bot\text{-}isSet}~\term{x}~\term{y}~\pathterm{p}~\pathterm{q})~i~j \\
+    \end{aligned}
+  \end{equation}
+  where \(\term{x}\) and \(\term{y}\) in the \(\constructor{\alpha}\) case are the endpoints of the paths \(\pathterm{p}\) and \(\pathterm{q}\).
+\end{defn}
 \begin{lem}
-  Assuming countable choice, the function \(\function{Seq{\rightarrow}(-)_\bot}\) is surjective
-  \todo[inline]{describe countable choice (and why it is needed!)}
+  The function \(\function{Seq{\rightarrow}(-)_{\bot}}\) is surjective, assuming the axiom of choice.
   \begin{proof}
-    We do the proof by case \todo{describe what it means to do the surjective proof by case!} on \(\type{R}_{\bot}\), if it is \(\constructor{\eta}~r\) or \(\constructor{never}\), we convert them to the sequences \(\function{now}_{seq}~\term{r}\) and \(\constant{never}_{seq}\) respectively, then we are done by \eqref{eq:constant-sequence-equality}. For the least upper bound \(\constructor{\bigsqcup} (\function{s},\function{b})\), we translate to the (increasing) sequence, defined by \((\function{s},\function{b})\) \todo{more precise description!}. \todo{Complete the rest of the proof!}
+    We do the proof by using the propositional eliminator for the partiality monad, with
+    \begin{equation}
+      \typeformer{P} = \lambda \term{y}, \bigg\| \sum_{(\term{x} : \typeformer{Seq}_{\type{R}})} \function{Seq{\rightarrow}\bot}~\term{x} \equiv \term{y} \bigg\|
+    \end{equation}
+    and \(\function{P_{prop}}\) follows from the propositional truncation. For \(\constructor{\bot}\) and \(\constructor{\eta}~\term{a}\), we use \(\function{now}_{seq}~\term{a}\) and \(\constant{never}_{seq}\) respectively, and by \eqref{eq:constant-sequence-equality} we get \(\typeformer{P}~\constructor{\bot}\) and \(\typeformer{P}~(\constructor{\eta}~\term{a})\). For the least upper bound \(\constructor{\bigsqcup} (\function{s},\function{q})\), we may assume \(\prod_{(n : \mathbb{N})}~\typeformer{P}~(\function{s}~n)\) which gives us a pointwise equivalence
+    \begin{equation}
+    \prod_{(n : \mathbb{N})} \bigg\| \sum_{(\function{f} : \mathbb{N} \rightarrow \typeformer{Seq}_{\type{R}})} \function{Seq{\rightarrow}{\bot}}~(\function{f}~n) \equiv \function{s}~n) \bigg\|
+  \end{equation}
+  which by the axoim of choice becomes
+  \begin{equation}
+    \bigg\| \prod_{(n : \mathbb{N})} \sum_{(\function{f} : \mathbb{N} \rightarrow \typeformer{Seq}_{\type{R}})} \function{Seq{\rightarrow}{\bot}}~(\function{f}~n) \equiv \function{s}~n) \bigg\|
+  \end{equation}
+  Since we have a pointwise equivalence, we get an equivalence for the upper bound \todo{Should I go into more depth about pointwise equivalence?}
+  \begin{equation}
+    \bigg\| \sum_{(\function{x} : \typeformer{Seq}_{\type{R}})} \function{Seq{\rightarrow}{\bot}}~\term{x} \equiv {\textstyle{\bigsqcup}}(\function{s},\function{q})) \bigg\|
+  \end{equation}
+  Thus we have shown all the cases needed to invoke the propositional eliminator for the partiality monad, completing the proof of surjectivity.
   \end{proof}
 \end{lem}
-\begin{lem}
-  Assuming countable choice, the function \(\function{Seq/{\sim}{\rightarrow}(-)_\bot}\) is surjective
+\begin{cor}
+  \label{cor:sequence-partiality-monad-surjective}
+  The function \(\function{Seq/{\sim}{\rightarrow}(-)_{\bot}}\) is surjective assuming the axoim of choice.
   \begin{proof}
-    \todo{Complete proof}
+    Since \(\function{Seq{\rightarrow}(-)_{\bot}}\) is surjective, we can map into the quotient with \(\quotientconstructor{{\cdot}}\).
   \end{proof}
-\end{lem}
+\end{cor}
 \begin{thm}
-  Assuming countable choice, we get an equivalence between sequences and the partiality monad.
+  \label{thm:sequence-partiality-monad-eq}
+  Sequences quotiented by weak bisimilarity is equivalent to the partiality monad \(Seq_{\type{R}} / \relation{\sim_{seq}} \equiv \type{R}_{\bot}\), assuming the axiom of choice.
   \begin{proof}
- The function \(\function{Seq/{\sim}{\rightarrow}(-)_\bot}\) is injective and surjective assuming countable choice, meaning we get an equivalence, since we are working in hSets.
+ The function \(\function{Seq/{\sim}{\rightarrow}(-)_\bot}\) is injective (\lemref{sequence-to-partiality-monad-injectivity}) and surjective (\corref{sequence-partiality-monad-surjective}) assuming the axoim of choice, meaning we get an equivalence, since we are working in hSets.
 \end{proof}
 \end{thm}
-
-\todo[inline]{Building the weak bisimulation on the \texttt{M}-type as a \texttt{M}-type - Is this possible? Yes! Should it be included?}
-\todo[inline]{Building the Partiality Monad as a limit (Dialgebra?) - Is this possible?}
 
 \section{How should Q\texttt{M}-types be defined}
 We want to define what a Q\texttt{M}-type means in general, we draw inspiration from QW-types \cite{DBLP:Constructing-QIITs}, quotient containers \cite{DBLP:quotient-container} and the LEAN paper "Data types as quotients of polynomial functors" \cite{DBLP:QM-lean}. From what we have seen as examples in the previous section, equality construction between Set Quotiented \texttt{M}-types and QIITs are given as
@@ -1392,7 +1413,11 @@ We have not proof the equality between types defined as (coinducitve) records an
 \\ \\
 All the work done here, should generalize to indexed \texttt{M}-types, which would be nice to have formalized.
 \\ \\
+Building the weak bisimulation on the \texttt{M}-type as a \texttt{M}-type - Is this possible? Yes! Should it be included?
+\\
 Define the weak bisimilarity relations as \texttt{M}-types, since these are also coindcutve types. However this seems to need something more general than "Index \texttt{M}-types"
+\\ \\
+Building the Partiality Monad as a limit (Dialgebra?) - Is this possible?
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
 
