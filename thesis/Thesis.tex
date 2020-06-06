@@ -1329,16 +1329,14 @@ where we index by \(\term{x}\) for the first elimination, and by \(\term{y}\) fo
 \end{thm}
 
 \section{How should Q\texttt{M}-types be defined}
-We want to define what a Q\texttt{M}-type means in general, we draw inspiration from QW-types \cite{DBLP:Constructing-QIITs}, quotient containers \cite{DBLP:quotient-container} and the LEAN paper "Data types as quotients of polynomial functors" \cite{DBLP:QM-lean}. From what we have seen as examples in the previous section, equality construction between Set Quotiented \texttt{M}-types and QIITs are given as
+We want to define what a Q\texttt{M}-type means in general, we draw inspiration from QW-types \cite{DBLP:Constructing-QIITs}, quotient containers \cite{DBLP:quotient-container} and the quotient polynomial functors (QPF) \cite{DBLP:QM-lean}. From what we have seen as examples in the previous section, equality construction between Set Quotiented \texttt{M}-types and QIITs are given as
 \begin{itemize}
 \item A function \function{QM{\rightarrow}QIIT} from QM to QIIT
 \item A proof \(\function{QM{\rightarrow}QIIT\text{-}{\sim}{\rightarrow}{\equiv}}\) that \(\term{x}~\relation{\sim_{QM}}~\term{y}\) implies \(\function{QM{\rightarrow}QIIT}~\term{x} \equiv \function{QM{\rightarrow}QIIT}~\term{y}\)
 \item Lifting \(\function{QM{\rightarrow}QIIT}\) to \(\function{QM/{\sim}{\rightarrow}QIIT}\) using the quotient recursor with \(\function{QM{\rightarrow}QIIT\text{-}{\sim}{\rightarrow}{\equiv}}\) and \(\constructor{QIIT\text{-}isSet}\)
 \item Showing injectivity by using propositional elimination of the quotient together with the inverse of \(\function{QM{\rightarrow}QIIT\text{-}{\sim}{\rightarrow}{\equiv}}\), namely \(\function{QM{\rightarrow}QIIT\text{-}injective}\) saying that \(\function{QM{\rightarrow}QIIT}~\term{x} \equiv \function{QM{\rightarrow}QIIT}~\term{y}\) implies \(\term{x}~\relation{\sim_{QM}}~\term{y}\).
-\item Lastly we show surjectivity by induction using the eliminator of QIIT and the axiom of choice. Another thing that comes into play is the surjectivity of \(\quotientconstructor{{\cdot}}\) \cite[6.10.2]{hottbook}.
+\item Lastly we show surjectivity by induction using the eliminator of QIIT and the axiom of choice and the surjectivity of \(\quotientconstructor{{\cdot}}\) \cite[6.10.2]{hottbook}.
 \end{itemize}
-
-\todo[inline]{Cofree Coalgebra / Dialgebra -- Is this relevant? }
 
 \subsection{Lifting Quotient Construction from Containers}
 \todo{"The category of containers lacks good coequalisers" - \cite{DBLP:CategoryOfContainers}}
@@ -1402,13 +1400,29 @@ We have just postulated that the quotiented \texttt{M}-type, is an \(\functor{F}
 
 \todo{...} again we run into problems with the axiom of choice. The construction of QW types got around this problem, by doing the construction as a QIIT, we will try and follow the same ideas and show what that would look like for \texttt{M}-types. \todo{Complete construction of QW inspired Q\texttt{M}-types}
 
+\subsection{Better behaving Q\texttt{M}-types}
+If we take inspiration from the construction of Q\texttt{W}-types, and define the quotiented types as QIITs, by using a set of rules, we will get better behaving quotients, meaning we can construct the type, without assuming the axiom of choice. The rules for constructing the QIITs are
+\begin{itemize}
+\item 
+\end{itemize}
+\todo{QIITs}
+
 \chapter{Conclusion}
 \label{ch:conclusion}
 
+We have described the construction of \texttt{M}-types as the limit of a sequence defined from repeated application of a polynomial functor for a container. We have showed that \texttt{M}-types are a final coalgebra, and used this to define a coinduction principle for \texttt{M}-types, giving us an equality relation from (strong) bisimulation. This work has been formalized in the cubical agda proof assistant, and part of the formalization has been accepted to the Cubical Agda github repository. We have used this formalization to construct a couple of examples of \texttt{M}-types, to make the theory of \texttt{M}-types more accessible, and given some rules for how to construct a container, that will give an \texttt{M}-type, with the wanted set of constructors/destructors. We have also explored the concept of quotiented \texttt{M}-types (Q\texttt{M}-types), and shown examples where we need the axiom of choice, to lift the constructor to the quotient. We have shown this problem can be solved by using quotient inductive-inductive types (QIITs), and shown that the type that arise from this construction is equal to the quotiented \texttt{M}-type, if we assume the axiom of choice. We show an alternative construction of Q\texttt{M}-types, where we quotient the polynomial functor before taking the limit, however this construction also encounters the same problem as quotienting the \texttt{M}-type directly, namely it needs the axiom of choice to work.
+
 \todo[inline]{conclude on the problem statement from the introduction}
 
-
 \section{Future Work}
+In this work we have described \texttt{M}-types, however we have not looked at the notion of indexed \texttt{M}-types, which are coinductive types indexed by another type. \todo{cite indexed types} We hope that what is done in this thesis can be generalized to work for indexed \texttt{M}-types, but formally showing this is future work.
+\\
+We similarly only discussed that types defined as (coinductive) records should be equal to types defined as \texttt{M}-types, but we did not discuss how exactly to formulate this equality and proof it. One thing to do is should the construction of \texttt{M}-types equal to a construction of \texttt{M}-types as a record. This would give us the external interpretation of constructors in records, to be able to use more features of the termination checker and the likes in the Cubical Agda proof assistant.
+\\ \\
+When looking at Q\texttt{M}-types, we did not formalize the alternative construction of quotiented \texttt{M}-types as the limit of a quotiented polynomial functor, this should follow the same lines as the construction of M-types from polynomial functors, however it is not enough, since we need the axiom of choice for this construction. Formalizing this and comparing it to the directly quotiented version of Q\texttt{M}-types would be interesting. We would also like to get a formal description/proof of how to construct the quotient inductive-inductive types representing the quotient of a given \texttt{M}-type over a given relation.
+
+\todo[inline]{Remove red text}
+\textcolor{red}{
 We have not proof the equality between types defined as (coinducitve) records and \texttt{M}-types.
 \\ \\
 All the work done here, should generalize to indexed \texttt{M}-types, which would be nice to have formalized.
@@ -1417,7 +1431,12 @@ Building the weak bisimulation on the \texttt{M}-type as a \texttt{M}-type - Is 
 \\
 Define the weak bisimilarity relations as \texttt{M}-types, since these are also coindcutve types. However this seems to need something more general than "Index \texttt{M}-types"
 \\ \\
+We have removed the section of strong bisimulations, should it be re-added. Should the section about properties of M-types (stream) be re-added?
+\\ \\
 Building the Partiality Monad as a limit (Dialgebra?) - Is this possible?
+\\
+Cofree Coalgebra / Dialgebra -- Is this relevant? 
+}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
 
@@ -1431,11 +1450,6 @@ Building the Partiality Monad as a limit (Dialgebra?) - Is this possible?
 
 \cleardoublepage
 \appendix
-
-\chapter{Additions to the Cubical Agda Library}
-% Should be in the appendix ...
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
 
 \chapter{The Technical Details}
 
