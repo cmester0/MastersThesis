@@ -45,7 +45,7 @@
 \newtheorem{thm}{Theorem}[section]
 \newtheorem{lem}[thm]{Lemma}
 \newtheorem{prop}[thm]{Proposition}
-\newtheorem*{cor}{Corollary}
+\newtheorem{cor}{Corollary}
 
 \theoremstyle{definition}
 \newtheorem{defn}[thm]{Definition}% [section] 
@@ -157,7 +157,7 @@ I would like to thank my supervisor Bas Spitters for some enlightening discussio
 \label{ch:intro}
 
 \section{Overview}
-Inductive types in homotopy type theory (HoTT) / cubical type theory have been studied a lot, one body of work is W-types, which has been shown equal to inductive types. However there has not been much work done on the dual concept, namely coinductive types in HoTT defined as \texttt{M}-types. The goal of this thesis is to get an understanding of \texttt{M}-types and extend on the existing theory. We construct some examples of \texttt{M}-types, as an attempt to make the theory of \texttt{M}-types more accessible. A useful technique for defining a type with some properties, is quotienting a free objects, as such we will look at quotients of \texttt{M}-types in the setting of cubical type theory and the problems with axiom of choice that arise from this construction.
+Inductive types in homotopy type theory (HoTT) / cubical type theory have been studied a lot, one body of work is \texttt{W}-types, which has been shown equal to inductive types. However there has not been much work done on the dual concept, namely coinductive types in HoTT defined as \texttt{M}-types. The goal of this thesis is to get an understanding of \texttt{M}-types and extend on the existing theory. We construct some examples of \texttt{M}-types, as an attempt to make the theory of \texttt{M}-types more accessible. A useful technique for defining a type with some properties, is quotienting a free objects, as such we will look at quotients of \texttt{M}-types in the setting of cubical type theory and the problems with axiom of choice that arise from this construction.
 \\ \\
 In the rest of this chapter we will introduce some of the background theory and notation used in this thesis. In \chapterref{M-types} we construct \texttt{M}-types from containers, and define a coinduction principle for the \texttt{M}-types. In \chapterref{M-types-examples} we give some example constructions of \texttt{M}-types. In \chapterref{QM-types} we introduce quotiented \texttt{M}-types (Q\texttt{M}-types), and show equalities between these and quotient inductive-inductive types (QIITs), we show the construction of multisets and the partiality monad as example, and discuss how quotients of \texttt{M}-types should be constructed. Finally in \chapterref{conclusion} we discuss future research and conclude on the work done.
 
@@ -244,7 +244,7 @@ meaning if two types are equivalent, then there is an equality between them. Thi
 \end{figure}
 ~\\ \\
 % Inductive types can be defined as \texttt{W}-types, which are constructed as the initial algebra for a polynomial functor. We can dually define coinductive types as \texttt{M}-types, which are constructed as the final coalgebra for a polynomial functor.\todo{final coalgebra is scary words, find something more "noob" friendly} \todo{... algebra for functor} \todo{W-types, Induction , M-types, Coinduction...}
-\todo[inline]{algebra for functor ? W-types? should there be a decription of these?}
+\todo[inline]{algebra for functor ? \texttt{W}-types? should there be a decription of these?}
 If you are used to working in set theory, then working in HoTT will take some getting used to. Homotopy type theory is proof relevant, which means that there might be multiple proofs of one statement, and these proofs might not be interchangeable (equal). This can be explained by the use of H-level in HoTT, which describes how equality behaves. We start from H-level (-2) which are contractiable types, meaning inhabited types, where all element are equal to. Then there is (-1)-types which are mere propositions or hProp, where all elements of the type are equal, but types might not be inhabited. If the type is inhabited, then we say the proposition is true. The 0-types are the hSets, where all equalities between two elements \(x,y\) are equal. For 1-types (1-groupoids) we get equalities of equalities are equal, and so on for homotopy \(n\)-types. Any \(n\)-type is also a \(n+1\)-type, but with trivial equalities at the \(n+1\) level. If we don't want to do proof relevant mathematics we can do propositional truncation (denoted \(\|{\cdot}\|\)), converting types to \(-1\)-types, meaning we ignore the difference in proofs by just look at whether a type is inhabited or not. However doing this we loose some of the reasoning power of HoTT. One of the tools we get using the full power of HoTT is \textbf{Higher order inductive types (HITs)}, which defines a type by point constructors and equality constructors. An example is the propositional truncation we just described, defined as a constructor taking any element to it its truncated version, and then defining equality between all propositional truncated elements
 \begin{center}
   \strut
@@ -649,14 +649,14 @@ We start by looking at ITrees without the \(\constructor{Vis}\) constructor, thi
       \caption{Delay monad}
       \label{fig:delay-monad}
     \end{figure}
-    \noindent We can define the constructors \(\constructor{now}\) and \(\constructor{later}\) using \(\function{in}\) function for \texttt{M}-types, together with the injections \(\mathtt{inl}\) and \(\mathtt{inr}\), such that the diagram in \figref{delay-monad} commutes.
+    \noindent We define the constructors \(\constructor{now}\) and \(\constructor{later}\) using \(\function{in}\) function for \texttt{M}-types, together with the injections \(\mathtt{inl}\) and \(\mathtt{inr}\), such that the diagram in \figref{delay-monad} commutes.
   \end{proof}
 \end{thm}
 
 \subsection{\(\type{R}\)-valued \(\typeformer{E}\)-event Trees}
 Now lets look at the example, where we remove the \(\constructor{Tau}\) constructor. This gives us a type of tree, with leaves given by \(\constructor{Ret}\), and nodes given by \(\constructor{Vis}\) branching based on some type \(\type{A}\), for an event \(\term{a} : \typeformer{E}\,\type{A}\). 
 \begin{thm}
-  We can define \(\type{R}\)-valued \(\typeformer{E}\)-event trees as an \texttt{M}-type
+  We define \(\type{R}\)-valued \(\typeformer{E}\)-event trees as an \texttt{M}-type
   \begin{proof}
     We want a container, with a leaf constructor, that returning immediately with a value, and a node constructor, that branches on some event. We defined this by the container
   \begin{equation}
@@ -692,7 +692,7 @@ We can again define \(\constructor{Ret}\) and \(\constructor{Vis}\) using the \(
 \todo[inline]{Get the correct equivalence for ITrees (Part of project description?)}
 Now we should have all the knowledge needed to make ITrees using \texttt{M}-types.
 \begin{thm}
-  We can define the type of ITrees as the \texttt{M}-type
+  We define the type of ITrees as the \texttt{M}-type
   \begin{proof}
     We combine the constructions of the delay monad and \(\type{R}\)-valued \(\typeformer{E}\)-event Trees, into the container
     \begin{equation}
@@ -730,7 +730,7 @@ the container is \(\containerpairsimple{\unit}{\unit}\). If we want a type with 
 \begin{equation}
   \containerpair{\type{A} + \unit}{\begin{cases} \empt & \mathtt{inl}~\term{a} \\ \unit & \mathtt{inr}~\unitelem \end{cases}}
 \end{equation}
-which is the delay type. We can define some more involved constructors, that build on the type itself
+which is the delay type. We define some more involved constructors, that build on the type itself
 \begin{equation}
   \vcenter{\infer{\constructor{node}~\term{a} : \type{T}}{\term{a} : \type{A} \rightarrow \type{T}}}
 \end{equation}
@@ -750,7 +750,7 @@ however combining destructors and constructors is not as simple. Any type \(\typ
 \begin{equation}
   \containerpairsimple{\type{F}_1 \times \type{F}_2 \times \dots \times \type{F}_n}{\empt}
 \end{equation}
-where each destructor \(\destructor{d_n} : \type{T} \rightarrow \type{F_n}\) for the field \(\term{f}_n\) will be defined as \(\destructor{d_n}~\term{t} = \pi_n~(\function{out}~\term{t})\). However fields in a coinductive record may depend on previous defined fields. That is we can have the list of fields \(\term{f}_1 : \type{F}_1,\term{f}_2 : \typeformer{F}_2,\cdots,\term{f}_n : \typeformer{F}_n\), where each field depends on all the previous once. We can define this as the \texttt{M}-type for the container
+where each destructor \(\destructor{d_n} : \type{T} \rightarrow \type{F_n}\) for the field \(\term{f}_n\) will be defined as \(\destructor{d_n}~\term{t} = \pi_n~(\function{out}~\term{t})\). However fields in a coinductive record may depend on previous defined fields. That is we can have the list of fields \(\term{f}_1 : \type{F}_1,\term{f}_2 : \typeformer{F}_2,\cdots,\term{f}_n : \typeformer{F}_n\), where each field depends on all the previous once. We define this as the \texttt{M}-type for the container
 \begin{equation}
   \containerpairsimple{\sum_{(\term{f}_1 : \type{F}_1)} \sum_{(\term{f_2} : \typeformer{F}_2)} \cdots \sum_{(\term{f}_{n-1} : \typeformer{F}_{n-1})}\typeformer{F}_n}{\empt}
 \end{equation}
@@ -860,7 +860,7 @@ In this subsection we define infinite trees, where the order of subtrees does no
     \strut
   \end{center}
 \end{defn}
-\noindent Trees where the permutation of subtrees does not matter is multisets. We can define equality between permuation of subtrees by the following rule
+\noindent Trees where the permutation of subtrees does not matter is multisets. We define equality between permuation of subtrees by the following rule
 \begin{equation}
   \vcenter{\infer[\constructor{perm}]{\constructor{node}~\function{f} \equiv \constructor{node}~(\function{f} \circ \function{g})}{\function{f} : \mathbb{N} \rightarrow \typeformer{T}\,\type{A} & \function{g} : \mathbb{N} \rightarrow \mathbb{N} & \mathtt{isIso}~\function{g}}}
 \end{equation}
@@ -1029,7 +1029,7 @@ In this subsection we will define the partiality monad (see below) and show that
 \end{defn}
 
 \subsubsection{Delay monad to Sequences}
-We define sequences, and show they are equal to the delay monad (\thmref{seq-eq-delay}). We then extend this equality to an equality between the types quotient by weak bisimilarity (\corref{delay-to-seq-quotient}). We start by defining the type of sequences.
+We define sequences, and show they are equal to the delay monad (\thmref{seq-eq-delay}). We then extend this equality to an equality between the types quotient by weak bisimilarity (\thmref{delay-to-seq-quotient}). We start by defining the type of sequences.
 \label{sec:delay-monad-to-sequences}
 \begin{defn}
   We define
@@ -1048,10 +1048,10 @@ We define sequences, and show they are equal to the delay monad (\thmref{seq-eq-
 \end{equation}
 We also introduce notation for the two special cases of sequences given above
 \begin{equation}
-  \function{now}_{Seq}~\term{r} = (\lambda\,\_, \mathtt{inl}~\term{r}) , (\lambda\,\_, \mathtt{inl}~\mathtt{refl})
+  \function{now}_{\typeformer{Seq}}~\term{r} = (\lambda\,\_, \mathtt{inl}~\term{r}) , (\lambda\,\_, \mathtt{inl}~\mathtt{refl})
 \end{equation}
 \begin{equation}
-  \constant{never}_{Seq} = (\lambda\,\_, \mathtt{inr}~\unitelem) , (\lambda\,\_, \mathtt{inl}~\mathtt{refl})
+  \constant{never}_{\typeformer{Seq}} = (\lambda\,\_, \mathtt{inr}~\unitelem) , (\lambda\,\_, \mathtt{inl}~\mathtt{refl})
 \end{equation}
 \begin{defn}
   We can shift a sequence \((\function{s},\function{q})\) by inserting an element (and an equality) \((\term{z_s},\term{z_q})\) at \(n = 0\),
@@ -1098,7 +1098,7 @@ We also introduce notation for the two special cases of sequences given above
   We define a function from \(\typeformer{Delay}~\type{R}\) to \(\typeformer{Seq}_{\type{R}}\)
   \begin{equation}
     \begin{aligned}
-      \function{Delay{\rightarrow}Seq}&~(\constructor{now}~\term{r}) = \function{now}_{Seq}~\term{r} \\
+      \function{Delay{\rightarrow}Seq}&~(\constructor{now}~\term{r}) = \function{now}_{\typeformer{Seq}}~\term{r} \\
       \function{Delay{\rightarrow}Seq}&~(\constructor{later}~\term{x}) = \\[-3mm]
       & \strut\hspace{-8mm}\function{shift}~(\function{Delay{\rightarrow}Seq}~\term{x})~\left(\mathtt{inr}~\unitelem , \begin{cases} \mathtt{inr}~(\mathtt{refl} , \constant{inl{\not\equiv}inr}) & \term{x} = \constructor{now}~\_ \\ \mathtt{inl}~\mathtt{refl} & \term{x} = \constructor{later}~\_ \end{cases}\right)
     \end{aligned}
@@ -1122,7 +1122,7 @@ We also introduce notation for the two special cases of sequences given above
     \end{equation}
     defined by cases analysis on \(\function{s}_0\), if \(\function{s}_0 = \mathtt{inl}~\term{r}\) then we need to show
     \begin{equation}
-      \function{now}_{Seq}~\term{r} \equiv (\function{s},\function{q})
+      \function{now}_{\typeformer{Seq}}~\term{r} \equiv (\function{s},\function{q})
     \end{equation}
     This is true, since \((\function{s},\function{q})\) is a monotone sequence and \(\mathtt{inl}~\term{r}\) is the top element of the order, then all elements of the sequence are \(\mathtt{inl}~\term{r}\). If \(\function{s}_0 = \mathtt{inr}~\unitelem\) then, we need to show
     \begin{equation}
@@ -1143,31 +1143,104 @@ We also introduce notation for the two special cases of sequences given above
     from unshift and shift being inverse and the induction hypothesis, we get the wanted equality. We have now defined a left and right identity function, so we get the wanted equality.
   \end{proof}
 \end{thm}
-\begin{cor}
-  \label{cor:delay-to-seq-quotient}
-  The types \(\typeformer{Delay}~\type{R}/\relation{\sim}\) and \(\typeformer{Seq}_{\type{R}}/\relation{\sim}\) are equal.
-  \begin{proof}
-    We show that if \(a~\relation{\sim_{delay}}~b\) then \(\function{Delay{\rightarrow}Seq}~a~\relation{\sim_{Seq}}~\function{Delay{\rightarrow}Seq}~b\), \todo{Show this}
-    \\ \\
-    and we show if \(x~\relation{\sim_{Seq}}~y\) then \(\function{Seq{\rightarrow}Delay}~x~\relation{\sim_{Seq}}~\function{Seq{\rightarrow}Delay}~y\), \todo{Show this}
-  \end{proof}
-\end{cor}
-
-\subsubsection{Sequence to Partiality Monad}
-\label{sec:sequences-to-partiality-monad}
-In this section we will show that assuming the axiom of choice, we get an equivalence between sequences quotiented by weak bisimilarity and the partiality monad (\thmref{sequence-partiality-monad-eq}). We start by defining some relation on sequences.
+\begin{defn}
+  We define the weak bisimulation relation for the delay monad
+  \begin{center}
+    \strut
+    \hfill
+    \begin{minipage}[h]{0.375\linewidth}
+      \begin{equation}
+        \vcenter{\infer[\constructor{\sim_{now}}]{\constructor{now}~\term{a}~\relation{\sim_{Delay}}~\constructor{now}~\term{b}}{\term{a} \equiv \term{b}}}
+      \end{equation}
+    \end{minipage}
+    \hfill
+    \begin{minipage}[h]{0.375\linewidth}
+      \begin{equation}
+        \vcenter{\infer[\constructor{\sim_{later_l}}]{(\constructor{later}~\term{x})~\relation{\sim_{Delay}}~\term{y}}{\term{x}~\relation{\sim_{Delay}}~\term{y}}}
+      \end{equation}
+    \end{minipage}
+    \hfill
+    \strut
+  \end{center}
+  \begin{center}
+    \strut
+    \hfill
+    \begin{minipage}[h]{0.375\linewidth}
+      \begin{equation}
+        \vcenter{\infer[\constructor{\sim_{later_r}}]{\term{x}~\relation{\sim_{Delay}}~(\constructor{later}~\term{y})}{\term{x}~\relation{\sim_{Delay}}~\term{y}}}
+      \end{equation}
+    \end{minipage}
+    \hfill
+    \begin{minipage}[h]{0.425\linewidth}
+      \begin{equation}
+        \vcenter{\infer[\constructor{\sim_{later}}]{\constructor{later}~\term{x}~\relation{\sim_{Delay}}~\constructor{later}~\term{y}}{\term{x}~\relation{\sim_{Delay}}~\term{y}}}
+      \end{equation}
+    \end{minipage}
+    \hfill
+    \strut
+  \end{center}
+\end{defn}
+\noindent We define weak bisimulation for sequences from the following definitions.
 \begin{defn}[Sequence Termination]
   The following relations says that a sequence \((\function{s},\function{q}) : \typeformer{Seq}_{\type{R}}\) terminates with a given value \(\term{r} : \type{R}\),
   \begin{equation}
-    (\function{s},\function{q})~\relation{\downarrow_{\mathtt{Seq}}}~\term{r} = \sum_{(n : \mathbb{N})} \function{s}_n \downarrow_{\type{R} + \unit} \term{r}.
+    (\function{s},\function{q})~\relation{\downarrow_{Seq}}~\term{r} = \sum_{(n : \mathbb{N})} \function{s}_n~\relation{\downarrow_{\type{R} + \unit}}~\term{r}.
   \end{equation}
 \end{defn}
-\begin{defn}[Sequence Ordering] We can define an ordering of sequences as
+\begin{defn}[Sequence Ordering] We define an ordering of sequences as
   \begin{equation}
-    (\function{s},\function{q})~\relation{\sqsubseteq_{\mathtt{Seq}}}~(\function{t},\function{p}) = \prod_{(\term{a} : \type{R})} \left(\|\function{s}~\relation{\downarrow_{\mathtt{Seq}}}~\term{a}\| \rightarrow \| \function{t}~\relation{\downarrow_{\mathtt{Seq}}}~\term{a}\|\right)
+    (\function{s},\function{q})~\relation{\sqsubseteq_{Seq}}~(\function{t},\function{p}) = \prod_{(\term{a} : \type{R})} \left(\|\function{s}~\relation{\downarrow_{Seq}}~\term{a}\| \rightarrow \| \function{t}~\relation{\downarrow_{Seq}}~\term{a}\|\right)
   \end{equation}
   where \(\| \cdot \|\) is propositional truncation.
 \end{defn}
+\begin{defn} We define weak bisimilarity for sequences as
+  \begin{equation}
+    (\function{s},\function{q})~\relation{\sim_{Seq}}~(\function{t},\function{p}) = (\function{s},\function{q})~\relation{\sqsubseteq_{Seq}}~(\function{t},\function{p}) \times (\function{t},\function{p})~\relation{\sqsubseteq_{Seq}}~(\function{s},\function{q})
+  \end{equation}
+\end{defn}
+\begin{thm}
+  \label{thm:delay-to-seq-quotient}
+  The types \(\typeformer{Delay}~\type{R}/\relation{\sim_{Delay}}\) and \(\typeformer{Seq}_{\type{R}}/\relation{\sim_{Seq}}\) are equal.
+  \begin{proof}
+    We show that transporting across the equality from \thmref{seq-eq-delay}, respects weak bisimilarity, starting by showing if \(\term{x}~\relation{\sim_{Delay}}~\term{y}\) then \(\function{Delay{\rightarrow}Seq}~\term{x}~\relation{\sim_{Seq}}~\function{Delay{\rightarrow}Seq}~\term{y}\), by case. If the weak bisimilarity is \(\constructor{\sim_{now}}\), then we need to construct \(\function{now}_{\typeformer{Seq}}~\term{a}~\relation{\sim_{Seq}}~\function{now}_{\typeformer{Seq}}~\term{b}\), given a path \(\pathterm{p} : \term{a} \equiv \term{b}\), since \(\relation{\sim_{Seq}}\) is reflexive, we get \(\function{now}_{\typeformer{Seq}}~\term{a}~\relation{\sim_{Seq}}~\function{now}_{\typeformer{Seq}}~\term{a}\), which gives us \(\function{now}_{\typeformer{Seq}}~\term{a}~\relation{\sim_{Seq}}~\function{now}_{\typeformer{Seq}}~\term{b}\) by transporting over \(\pathterm{p}\). If we have \(\constructor{\sim_{later_l}}\)  then by induction we get \(\function{Delay{\rightarrow}Seq}~\term{x}~\relation{\sim_{Seq}}~\function{Delay{\rightarrow}Seq}~y\), we can extend the equality by a shift, which interacts with \(\function{Delay{\rightarrow}Seq}\) to add a \(\constructor{later}\) before the argument that is we get \(\function{Delay{\rightarrow}Seq}~(\constructor{later}~\term{x})~\relation{\sim_{Seq}}~\function{Delay{\rightarrow}Seq}~y\), which is what we needed to show. By a symmetric argument we get \(\relation{\sim_{later_r}}\). To construct \(\constructor{\sim_{later}}\) we add a later to both sites of the bisimilarity.
+    \begin{equation}
+      \begin{aligned}
+        &\function{{\sim}_{Delay}{\rightarrow}{\sim}_{Seq}}~(\constructor{\sim_{now}}~\term{a}~\term{b}~\pathterm{p}) = \mathtt{subst}~(\lambda\,\term{k},~\function{now}_{\typeformer{Seq}}~\term{a}~\relation{\sim_{Seq}}~\term{k})~\pathterm{p}~(\constructor{\sim_{refl}}~\term{a}) \\
+        &\function{{\sim}_{Delay}{\rightarrow}{\sim}_{Seq}}~(\constructor{\sim_{later_l}}~\term{x}~\term{y}~\term{r}) = \function{\sim_{shift}}~(\function{{\sim}_{Delay}{\rightarrow}{\sim}_{Seq}}~\term{r}) \\
+        &\function{{\sim}_{Delay}{\rightarrow}{\sim}_{Seq}}~(\constructor{\sim_{later_r}}~\term{x}~\term{y}~\term{r}) = \function{\sim_{sym}}~(\function{\sim_{shift}}~(\function{\sim_{sym}}~(\function{{\sim}_{Delay}{\rightarrow}{\sim}_{Seq}}~\term{r})) \\
+        &\function{{\sim}_{Delay}{\rightarrow}{\sim}_{Seq}}~(\constructor{\sim_{later}}~\term{x}~\term{y}~\term{r}) = \function{\sim_{sym}}~(\function{\sim_{shift}}~(\function{\sim_{sym}}~(\function{\sim_{shift}}~(\function{{\sim}_{Delay}{\rightarrow}{\sim}_{Seq}}~\term{r}))) \\
+      \end{aligned}
+    \end{equation}
+    We show if \((\function{s},\function{q})~\relation{\sim_{Seq}}~(\function{t},\function{p})\) then \(\function{Seq{\rightarrow}Delay}~(\function{s},\function{q})~\relation{\sim_{Seq}}~\function{Seq{\rightarrow}Delay}~(\function{t},\function{p})\) by case on \(\function{s}~0\) and \(\function{t}~0\). If both are terminated meaning \(\function{s}~0 = \mathtt{inl}~\term{a}\) and \(\function{t}~0 = \mathtt{inl}~\term{b}\) then there is a \(\pathterm{p} : \term{a} \equiv \term{b}\) \todo{details?}, meaning we get \(\constructor{\sim_{now}}~\pathterm{p}\). If two sequences are weakly bisimilar, then shifting or unshifting either of them will not break the bisimilarity. We can therefore do the rest of the cases by induction. \todo{text or proof term?}
+    \\ \\
+    We know that if \(\function{s}~0 = \mathtt{inl}~\term{r}\), then \((\function{s},\function{q}) = \function{now}_{\mathtt{Seq}}~r\) and \((\function{s},\function{q})~\relation{\downarrow_{Seq}}~\term{r}\). If two sequences are weakly bisimilar and they terminate to different values, then the values are equal, we therefore get
+    \begin{equation}
+      \function{\sim_{seq\text{-}val}} : \function{now}_{\mathtt{Seq}}~\term{a}~\relation{\sim_{Seq}}~\function{now}_{\mathtt{Seq}}~\term{b} \rightarrow \term{a} \equiv \term{b}
+    \end{equation}
+    We can now define the function taking weakly bisimilar sequences to weakly bisimilar elements of the delay monad
+    \begin{equation}
+      \begin{aligned}
+        &\function{{\sim}_{Seq}{\rightarrow}{\sim}_{Delay}}~(\function{now}_{\mathtt{Seq}}~\term{a})~(\function{now}_{\mathtt{Seq}}~\term{b})~\term{r} = \constructor{\sim_{now}}~\term{a}~\term{b}~(\function{\sim_{seq\text{-}val}}~\term{r}) \\[1mm]
+        &\function{{\sim}_{Seq}{\rightarrow}{\sim}_{Delay}}~(\function{now}_{\mathtt{Seq}}~\term{a})~(\function{t},\function{p})~\term{r} = \\[-1mm]
+        &\quad\constructor{\sim_{later_r}}~(\function{Seq{\rightarrow}Delay}~(\function{s},\function{q}))~(\function{Seq{\rightarrow}Delay}~(\function{shift}~(\function{t},\function{p})~\_))~(\function{{\sim}_{Seq}{\rightarrow}{\sim}_{Delay}}~(\function{\sim_{shift_r}}~r)) \\[1mm]
+        &\function{{\sim}_{Seq}{\rightarrow}{\sim}_{Delay}}~(\function{s},\function{q})~(\function{now}_{\mathtt{Seq}}~\term{b})~\term{r} = \\[-1mm]
+        &\quad\constructor{\sim_{later_l}}~(\function{Seq{\rightarrow}Delay}~(\function{shift}~(\function{s},\function{q})~\_))~(\function{Seq{\rightarrow}Delay}~(\function{t},\function{p}))~(\function{{\sim}_{Seq}{\rightarrow}{\sim}_{Delay}}~(\function{\sim_{shift_l}}~r)) \\[1mm]
+        &\function{{\sim}_{Seq}{\rightarrow}{\sim}_{Delay}}~(\function{s},\function{q})~(\function{p},\function{t})~\term{r} = \\[-1mm]
+        &\quad\constructor{\sim_{later}}~(\function{Seq{\rightarrow}Delay}~(\function{shift}~(\function{s},\function{q})~\_))~(\function{Seq{\rightarrow}Delay}~(\function{shift}~(\function{t},\function{p})~\_))\\[-1mm]
+        &\quad\quad~(\function{{\sim}_{Seq}{\rightarrow}{\sim}_{Delay}}~(\function{\sim_{shift}}~r))
+    \end{aligned}
+  \end{equation}
+  Now we show the right and left identity for \(\function{{\sim}_{Delay}{\rightarrow}{\sim}_{Seq}}\) and \(\function{{\sim}_{Seq}{\rightarrow}{\sim}_{Delay}}\) \todo{Do this}
+  \begin{equation}
+    TODOz
+  \end{equation}
+  We have shown that weakly bisimilar relations for the delay monad and sequences respects the equality given in \thmref{seq-eq-delay}, meaning that the quotiented types are also equal. \todo{There is a bit more work to show this, how much into depth should I go?}
+  \end{proof}
+\end{thm}
+
+\subsubsection{Sequence to Partiality Monad}
+\label{sec:sequences-to-partiality-monad}
+In this section we will show that assuming the axiom of choice, we get an equivalence between sequences quotiented by weak bisimilarity and the partiality monad (\thmref{sequence-partiality-monad-eq}). We start with some useful definitions.
 \begin{defn} There is a function from \(\type{R} + \unit\) to the partiality monad \(\type{R}_\bot\)
   \begin{equation}
     \begin{aligned}
@@ -1178,7 +1251,7 @@ In this section we will show that assuming the axiom of choice, we get an equiva
 \end{defn}
 \begin{defn}[Maybe Ordering]
   \label{eq:maybe-order}
-  We can define an ordering relation on \(\type{R} + \unit\) as 
+  We define an ordering relation on \(\type{R} + \unit\) as 
   \begin{equation}
     \term{x}~\relation{\sqsubseteq_{\type{R} + \unit}}~\term{y} = (\term{x} \equiv \term{y}) + ((\term{x}  \downarrow_{\type{R} + \unit}) \times (\term{y} \uparrow_{\type{R} + \unit}))
   \end{equation}
@@ -1234,7 +1307,7 @@ This rewriting confirms that if \(\function{isMon}~\function{s}\), then \(\funct
 \noindent The recursor for quotients \defref{quotient-recursor} allows us to lift the function \(\function{Seq{\rightarrow}(-)_\bot}\) to the quotient
 \begin{defn}
   \label{eq:QuotientedSeqToPartialityMonad}
-  We can define a function \(\function{Seq/{\sim}{\rightarrow}(-)_\bot}\) from \(\typeformer{Seq}_{\type{R}}\) to \(\type{R}_{\bot}\)
+  We define a function \(\function{Seq/{\sim}{\rightarrow}(-)_\bot}\) from \(\typeformer{Seq}_{\type{R}}\) to \(\type{R}_{\bot}\)
   \begin{equation}
     \function{Seq/{\sim}{\rightarrow}(-)_\bot} = \function{rec}~\function{Seq{\rightarrow}(-)_\bot}~(\function{Seq{\rightarrow}(-)_\bot\text{-}{\approx}{\rightarrow}{\equiv}})~\constructor{(-)_\bot\text{-}isSet}
   \end{equation} 
@@ -1298,7 +1371,7 @@ where we index by \(\term{x}\) for the first elimination, and by \(\term{y}\) fo
     \begin{equation}
       \typeformer{P} = \lambda \term{y}, \bigg\| \sum_{(\term{x} : \typeformer{Seq}_{\type{R}})} \function{Seq{\rightarrow}\bot}~\term{x} \equiv \term{y} \bigg\|
     \end{equation}
-    and \(\function{P_{prop}}\) follows from the propositional truncation. For \(\constructor{\bot}\) and \(\constructor{\eta}~\term{a}\), we use \(\function{now}_{seq}~\term{a}\) and \(\constant{never}_{seq}\) respectively, and by \eqref{eq:constant-sequence-equality} we get \(\typeformer{P}~\constructor{\bot}\) and \(\typeformer{P}~(\constructor{\eta}~\term{a})\). For the least upper bound \(\constructor{\bigsqcup} (\function{s},\function{q})\), we may assume \(\prod_{(n : \mathbb{N})}~\typeformer{P}~(\function{s}~n)\) which gives us a pointwise equivalence
+    and \(\function{P_{prop}}\) follows from the propositional truncation. For \(\constructor{\bot}\) and \(\constructor{\eta}~\term{a}\), we use \(\function{now}_{\typeformer{Seq}}~\term{a}\) and \(\constant{never}_{\typeformer{Seq}}\) respectively, and by \eqref{eq:constant-sequence-equality} we get \(\typeformer{P}~\constructor{\bot}\) and \(\typeformer{P}~(\constructor{\eta}~\term{a})\). For the least upper bound \(\constructor{\bigsqcup} (\function{s},\function{q})\), we may assume \(\prod_{(n : \mathbb{N})}~\typeformer{P}~(\function{s}~n)\) which gives us a pointwise equivalence
     \begin{equation}
     \prod_{(n : \mathbb{N})} \bigg\| \sum_{(\function{f} : \mathbb{N} \rightarrow \typeformer{Seq}_{\type{R}})} \function{Seq{\rightarrow}{\bot}}~(\function{f}~n) \equiv \function{s}~n) \bigg\|
   \end{equation}
@@ -1329,7 +1402,7 @@ where we index by \(\term{x}\) for the first elimination, and by \(\term{y}\) fo
 \end{thm}
 
 \section{How should Q\texttt{M}-types be defined}
-We want to define what a Q\texttt{M}-type means in general, we draw inspiration from QW-types \cite{DBLP:Constructing-QIITs}, quotient containers \cite{DBLP:quotient-container} and the quotient polynomial functors (QPF) \cite{DBLP:QM-lean}. From what we have seen as examples in the previous section, equality construction between Set Quotiented \texttt{M}-types and QIITs are given as
+We want to define what a Q\texttt{M}-type means in general, we draw inspiration from Q\texttt{W}-types \cite{DBLP:Constructing-QIITs}, quotient containers \cite{DBLP:quotient-container} and quotient polynomial functors (QPF) \cite{DBLP:QM-lean}. From what we have seen as examples in the previous section, equality construction between Set Quotiented \texttt{M}-types and QIITs are given as
 \begin{itemize}
 \item A function \function{QM{\rightarrow}QIIT} from QM to QIIT
 \item A proof \(\function{QM{\rightarrow}QIIT\text{-}{\sim}{\rightarrow}{\equiv}}\) that \(\term{x}~\relation{\sim_{QM}}~\term{y}\) implies \(\function{QM{\rightarrow}QIIT}~\term{x} \equiv \function{QM{\rightarrow}QIIT}~\term{y}\)
@@ -1350,7 +1423,7 @@ An alternative to directly set quotienting the \texttt{M}-types we have defined,
   \begin{equation}
     \functor{F}\,\type{X} =  \sum_{\term{a} : \type{A}} ((\typeformer{B}\,\term{a} \rightarrow \type{X}) / \relation{\sim}_{\term{a}})
   \end{equation}
-  and for a function \(\function{f} : \type{X} \rightarrow \type{Y}\), we use the quotient eliminator from \defref{quotient-eliminator}, with \(\typeformer{P} = \lambda\,\_, (\typeformer{B}\,\term{a} \rightarrow \type{Y})/\relation{\sim}_{\term{a}}\) which is a set \(\constructor{squash/}\), since we are using set truncated quotients. The base case \(\function{f} = \lambda\,\_,\quotientconstructor{\function{f} \circ \function{g}}\) and equality case \(\function{f_{eq}} = \lambda\,\function{x}\,\function{y}\,\term{r},~\constructor{eq/}~(\function{f} \circ \function{x})~(\function{f} \circ \function{y})~(\function{\sim_{ap}}~\function{f}~\term{r})\), where \(\function{\sim_{ap}}\) says that given \(\function{x}~\relation{\sim}_{\term{a}}~\function{y}\) and a function \(\function{f}\) then \(\function{f} \circ \function{x}~\relation{\sim}_{\term{a}}~\function{g} \circ \function{y}\)  \todo{Composition?}. With this the definition for the quotient polynomial functor for functions is
+  and for a function \(\function{f} : \type{X} \rightarrow \type{Y}\), we use the quotient eliminator from \defref{quotient-eliminator}, with \(\typeformer{P} = \lambda\,\_, (\typeformer{B}\,\term{a} \rightarrow \type{Y})/\relation{\sim}_{\term{a}}\) which is a set \(\constructor{squash/}\), since we are using set truncated quotients. The base case \(\function{f} = \lambda\,\_,\quotientconstructor{\function{f} \circ \function{g}}\) and equality case \(\function{f_{eq}} = \lambda\,\function{x}\,\function{y}\,\term{r},~\constructor{eq/}~(\function{f} \circ \function{x})~(\function{f} \circ \function{y})~(\function{\sim_{ap}}~\function{f}~\term{r})\), where \(\function{\sim_{ap}}\) says that given \(\function{x}~\relation{\sim}_{\term{a}}~\function{y}\) and a function \(\function{f}\) then \(\function{f} \circ \function{x}~\relation{\sim}_{\term{a}}~\function{g} \circ \function{y}\). With this the definition for the quotient polynomial functor for functions is
   \begin{equation}
     \begin{aligned}
       &\functor{F}\,\function{f}~(\term{a} , \function{g}) = (\term{a} , \function{elim}~\function{g})
@@ -1398,7 +1471,7 @@ If \(\function{abs}\) is surjective, then the square will commute, so we just ha
 \end{exmp}
 We have just postulated that the quotiented \texttt{M}-type, is an \(\functor{F}\)-coalgebra, however this is not necessarily the case, since this requires us to show that given \(\function{fq} : (\typeformer{B}~\term{a} \rightarrow \type{X}) / \relation{R}\) then we can construct a function \((\typeformer{B}~\term{a} \rightarrow \type{X})\).
 
-\todo{...} again we run into problems with the axiom of choice. The construction of QW types got around this problem, by doing the construction as a QIIT, we will try and follow the same ideas and show what that would look like for \texttt{M}-types. \todo{Complete construction of QW inspired Q\texttt{M}-types}
+\todo{...} again we run into problems with the axiom of choice. The construction of Q\texttt{W}-types got around this problem, by doing the construction as a QIIT, we will try and follow the same ideas and show what that would look like for \texttt{M}-types. \todo{Complete construction of Q\texttt{W} inspired Q\texttt{M}-types}
 
 \subsection{Better behaving Q\texttt{M}-types}
 If we take inspiration from the construction of Q\texttt{W}-types, and define the quotiented types as QIITs, by using a set of rules, we will get better behaving quotients, meaning we can construct the type, without assuming the axiom of choice. The rules for constructing the QIITs are
@@ -1420,6 +1493,8 @@ In this work we have described \texttt{M}-types, however we have not looked at t
 We similarly only discussed that types defined as (coinductive) records should be equal to types defined as \texttt{M}-types, but we did not discuss how exactly to formulate this equality and proof it. One thing to do is should the construction of \texttt{M}-types equal to a construction of \texttt{M}-types as a record. This would give us the external interpretation of constructors in records, to be able to use more features of the termination checker and the likes in the Cubical Agda proof assistant.
 \\ \\
 When looking at Q\texttt{M}-types, we did not formalize the alternative construction of quotiented \texttt{M}-types as the limit of a quotiented polynomial functor, this should follow the same lines as the construction of M-types from polynomial functors, however it is not enough, since we need the axiom of choice for this construction. Formalizing this and comparing it to the directly quotiented version of Q\texttt{M}-types would be interesting. We would also like to get a formal description/proof of how to construct the quotient inductive-inductive types representing the quotient of a given \texttt{M}-type over a given relation.
+\\ \\
+We would also like to explore how these constructions behave in a guarded cubical type theory (GCTT), and whether there are any improvements to gain from using a GCTT in this regard.
 
 \todo[inline]{Remove red text}
 \textcolor{red}{
