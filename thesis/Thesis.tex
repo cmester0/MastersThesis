@@ -231,9 +231,7 @@ I would like to thank my supervisor Bas Spitters for some enlightening discussio
 Inductive types in homotopy type theory (HoTT) / cubical type theory have been studied a lot, one body of work is \texttt{W}-types, which has been shown equal to inductive types. However there has not been much work done on the dual concept, namely coinductive types in HoTT defined as \texttt{M}-types. The goal of this thesis is to get an understanding of \texttt{M}-types and extend on the existing theory. We construct some examples of \texttt{M}-types, as an attempt to make the theory of \texttt{M}-types more accessible. A useful technique for defining a type with some properties, is quotienting a free objects, as such we will look at quotients of \texttt{M}-types in the setting of cubical type theory and the problems with axiom of choice that arise from this construction.
 \\ \\
 In the rest of this chapter we will introduce some of the background theory and notation used in this thesis. In \chapterref{M-types} we construct \texttt{M}-types from containers, and define a coinduction principle for the \texttt{M}-types. In \chapterref{M-types-examples} we give some example constructions of \texttt{M}-types. In \chapterref{QM-types} we introduce quotiented \texttt{M}-types (Q\texttt{M}-types), and show equalities between these and quotient inductive-inductive types (QIITs), we show the construction of multisets and the partiality monad as example, and discuss how quotients of \texttt{M}-types should be constructed. Finally in \chapterref{conclusion} we discuss future research and conclude on the work done.
-
-\section{Expectations of reader}
-\todo{WRITE}
+We expect readers to have entry level knowledge of category theory, type theory and homotopy type theory.
 
 \section{Background Theory}
 We start by giving some background theory and summarize important concepts used in the rest of this thesis.
@@ -314,17 +312,17 @@ meaning if two types are equivalent, then there is an equality between them. Thi
   \label{fig:cubical-composition-square}
 \end{figure}
 \\ 
-If you are used to working in set theory, then working in HoTT will take some getting used to. Homotopy type theory is proof relevant, which means that there might be multiple proofs of one statement, and these proofs might not be interchangeable (equal). This can be explained by the use of H-level in HoTT, which describes how equality behaves. We start from H-level (-2) which are contractiable types, meaning inhabited types, where all element are equal to. Then there is (-1)-types which are mere propositions or hProp, where all elements of the type are equal, but types might not be inhabited. If the type is inhabited, then we say the proposition is true. The 0-types are the hSets, where all equalities between two elements \(x,y\) are equal. For 1-types (1-groupoids) we get equalities of equalities are equal, and so on for homotopy \(n\)-types. Any \(n\)-type is also a \(n+1\)-type, but with trivial equalities at the \(n+1\) level. If we don't want to do proof relevant mathematics we can do propositional truncation (denoted \(\|{\cdot}\|\)), converting types to \(-1\)-types, meaning we ignore the difference in proofs by just look at whether a type is inhabited or not. However doing this we loose some of the reasoning power of HoTT. One of the tools we get using the full power of HoTT is \textbf{Higher order inductive types (HITs)}, which defines a type by point constructors and equality constructors. An example is the propositional truncation we just described, defined as a constructor taking any element to it its truncated version, and then defining equality between all propositional truncated elements
+If you are used to working in set theory, then working in HoTT will take some getting used to. Homotopy type theory is proof relevant, which means that there might be multiple proofs of one statement, and these proofs might not be interchangeable (equal). This can be explained by the use of H-level in HoTT, which describes how equality behaves. We start from H-level (-2) which are contractiable types, meaning inhabited types, where all element are equal to. Then there is (-1)-types which are mere propositions or hProp, where all elements of the type are equal, but types might not be inhabited. If the type is inhabited, then we say the proposition is true. The 0-types are the hSets, where all equalities between two elements \(x,y\) are equal. For 1-types (1-groupoids) we get equalities of equalities are equal, and so on for homotopy \(n\)-types. Any \(n\)-type is also a \(n+1\)-type, but with trivial equalities at the \(n+1\) level. If we don't want to do proof relevant mathematics we can do propositional truncation (denoted \(\|{\cdot}\|\)), converting types to \(-1\)-types, meaning we ignore the difference in proofs by just look at whether a type is inhabited or not. However doing this we loose some of the reasoning power of HoTT. One of the tools we get using the full power of HoTT is \textbf{Higher order inductive types (HITs)}, which defines a type by point constructors and equality constructors. An example is the propositional truncation we just described, defined as a constructor taking any element to it its truncated version, and then defining equality between all propositional truncated elements\\[-9mm]
 \begin{center}
   \strut
   \hfill
-  \begin{minipage}{0.25\linewidth}
+  \begin{minipage}[b]{0.25\linewidth}
     \begin{equation}
       \vcenter{\infer{\constructor{|}\,\term{x}\,\constructor{|} : \| \type{A} \|}{\term{x} : \type{A}}}
     \end{equation}
   \end{minipage}
   \hfill
-  \begin{minipage}{0.3\linewidth}
+  \begin{minipage}[b]{0.3\linewidth}
     \begin{equation}
       \vcenter{\infer{\constructor{squash}~\term{x}~\term{y} : \term{x} \equiv \term{y}}{\term{x}, \term{y} : \|\type{A}\|}}
     \end{equation}
@@ -336,19 +334,19 @@ Another useful example is set truncated quotients. Given some free type, we can 
 \begin{center}
   \strut
   \hfill
-  \begin{minipage}{0.2\linewidth}
+  \begin{minipage}[b]{0.2\linewidth}
     \begin{equation}
       \vcenter{\infer{\quotientconstructor{\term{x}} : \type{A} / \relation{\mathcal{R}}}{\term{x} : \type{A}}}
     \end{equation}
   \end{minipage}
   \hfill
-  \begin{minipage}{0.325\linewidth}
+  \begin{minipage}[b]{0.325\linewidth}
     \begin{equation}
       \vcenter{\infer{\constructor{eq/}~\term{x}~\term{y}~\term{r} : \term{x} \equiv \term{y}}{\term{x}, \term{y} : \type{A} / \relation{\mathcal{R}} & \term{r} : \term{x}~\relation{\mathcal{R}}~\term{y}}}
     \end{equation}
   \end{minipage}
   \hfill
-  \begin{minipage}{0.325\linewidth}
+  \begin{minipage}[b]{0.325\linewidth}
     \begin{equation}
       \vcenter{\infer{\constructor{squash/} :\texttt{isSet}~(\type{A} / \relation{R})}{\strut}}
     \end{equation}
@@ -360,9 +358,13 @@ When working with these two HITs, you might need to use the axiom of choice (AC)
 \begin{equation}
   \prod_{(\term{x} : \type{X})} \big\| \typeformer{Y}~\term{x} \big\| \rightarrow \bigg\| \prod_{(\term{x} : \type{X})} \typeformer{Y}~\term{x} \bigg\|
 \end{equation}
-where \(\typeformer{Y}\) is a type family over \(\type{X}\) \cite[Section 3.8]{hottbook}. Using the axiom of choice is problematic in a constructive type theory, since they do not have a constructive interpretation. To maintain the computational aspects of HoTT and CTT, we try to avoid AC \cite[Introduction]{hottbook}.
+where \(\typeformer{Y}\) is a type family over set \(\type{X}\) \cite[Section 3.8]{hottbook}, or the weaker version axiom of countable choice (\(\text{AC}_{\omega}\))
+\begin{equation}
+  \prod_{(n : \mathbb{N})} \big\| \typeformer{Y}~n \big\| \rightarrow \bigg\| \prod_{(n : \mathbb{N})} \typeformer{Y}~n \bigg\|  
+\end{equation}
+Using the axiom of choice is problematic in a constructive type theory, since it does not have a constructive interpretation. To maintain the computational aspects of HoTT and CTT, we try to avoid the axiom of choice \cite[Introduction]{hottbook}.
 \\ \\
-We have formalized most of \chapterref{M-types}\footnote{Accepted to the cubical agda github, pull request: \url{https://github.com/agda/cubical/pull/245}}, \chapterref{M-types-examples} and some of \chapterref{QM-types} in the proof assistant / programming languge Cubical Agda. A \textbf{proof assistant} helps with verifying proofs, while making the process of making proofs interactive. \textbf{Cubical Agda} \cite{cubicalagda} is an implementation of a cubical type theory (inspired by CCHM \cite{DBLP:CCHM}) made by extending the proof assistant Agda. One of the main additions is the interval and path types. The \textbf{interval} \(\mathbb{I}\) can be thought of as elements in the interval \([0,1]\). When working with the interval, we can only access the left and right endpoint \(\constant{i0}\) and \(\constant{i1}\) or some unspecified point in the middle \(i\), keeping with the intuition of a continuous interval. Cubical agda also generalizes transporting, given a type line \(\typeformer{A} : \mathbb{I} \rightarrow \universe{\mathcal{U}}\), and the endpoint \(\typeformer{A}\,\constant{i0}\) you get a line from \(\typeformer{A}\,\constant{i0}\) to \(\typeformer{A}\,\constant{i1}\). Using these tools we can make the univalence axiom compute and it eases the formalization, since proofs become more computational.
+We have formalized most of \chapterref{M-types}\footnote{Accepted to the cubical agda github, pull request: \url{https://github.com/agda/cubical/pull/245}}, the examples in \chapterref{M-types-examples} and some of \chapterref{QM-types} in the proof assistant / programming languge Cubical Agda. A \textbf{proof assistant} helps with verifying proofs, while making the process of making proofs interactive. \textbf{Cubical Agda}\footnote{Cubical Agda commit: e8d22a50079df1186b111c1f096eb29a1e3daa20, Agda Version: Agda-2.6.2} \cite{cubicalagda} is an implementation of a cubical type theory (inspired by CCHM \cite{DBLP:CCHM}) made by extending the proof assistant Agda. One of the main additions is the interval and path types. The \textbf{interval} \(\mathbb{I}\) can be thought of as elements in the interval \([0,1]\). When working with the interval, we can only access the left and right endpoint \(\constant{i0}\) and \(\constant{i1}\) or some unspecified point in the middle \(i\), keeping with the intuition of a continuous interval. Cubical agda also generalizes transporting, given a type line \(\typeformer{A} : \mathbb{I} \rightarrow \universe{\mathcal{U}}\), and the endpoint \(\typeformer{A}\,\constant{i0}\) you get a line from \(\typeformer{A}\,\constant{i0}\) to \(\typeformer{A}\,\constant{i1}\). Using these tools we can make the univalence axiom compute and it eases the formalization, since proofs become more computational.
 
 \section{Notation}
 The following is the notation / fonts used to denote specific definitions / concepts
@@ -396,7 +398,7 @@ We do a lot of casing on the natural numbers, so we will also introduce some not
     \natcases{\term{x}}{\function{f}} = \lambda\,n, \begin{cases} \term{x} & n = 0 \\ \function{f}~m & n = m + 1 \end{cases}
   \end{equation}
 \end{defn}
-We will also define some equalities \(\type{A} \equiv \type{B}\) using an isomorphism, that is we define functions \(\function{fun} : \type{A} \rightarrow \type{B}\) and \(\function{inv} : \type{B} \rightarrow \type{A}\), and show there are right and left identities \(\function{rinv} : \function{fun} \circ \function{inv} \equiv \function{id}\).
+We may define an isomorphism to give an equality \(\type{A} \equiv \type{B}\) using an isomorphism, that is we define functions \(\function{fun} : \type{A} \rightarrow \type{B}\) and \(\function{inv} : \type{B} \rightarrow \type{A}\), and show there are right and left identities \(\function{rinv} : \function{fun} \circ \function{inv} \equiv \function{id}\).
 \noindent We will introduce further notation as we go.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
@@ -839,7 +841,7 @@ so we would also expect that a type defined as a (coinductive) record is equal t
 \label{ch:QM-types}
 In this chapter we will introduce rules for set truncated quotients, and show some ways of how to construct quotiented \texttt{M}-types which we call Q\texttt{M}-types. We show examples of how you can be constructed a quotient inductive-inductive type (QIIT) that is equal to the Q\texttt{M}-type assuming axiom of choice. The examples are multisets and the partiality monad, defined as quotients with weak bisimilarity relations. We conclude the chapter by discussion, how we should define Q\texttt{M}-types.
 
-\section{Quotienting and Constructors}
+\section{Elimintators and Recursors for the Set Truncated Quotient}
 We start by defining the recursor and some eliminators for the set truncated quotient, which will be used in the upcoming sections.
 \begin{defn}[Recursor for quotient]
   \label{defn:quotient-recursor}
@@ -897,13 +899,13 @@ In this subsection we define infinite trees, where the order of subtrees does no
   \begin{center}
     \strut
     \hfill
-    \begin{minipage}{0.25\linewidth}
+    \begin{minipage}[b]{0.25\linewidth}
       \begin{equation}
         \vcenter{\infer{\constructor{leaf}~\term{a} : \typeformer{T}\,\type{A}}{\term{a} : \type{A}}}
       \end{equation}
     \end{minipage}
     \hfill
-    \begin{minipage}{0.25\linewidth}
+    \begin{minipage}[b]{0.25\linewidth}
       \begin{equation}
         \vcenter{\infer{\constructor{node}~\function{f} : \typeformer{T}\,\type{A}}{\function{f} : \mathbb{N} \rightarrow \typeformer{T}\,\type{A}}}
       \end{equation}
@@ -996,7 +998,7 @@ This function takes weakly bisimilar objects to equal once.
 \end{lem}
 \begin{thm}
   \label{thm:QM-QIIT-eq-multiset}
-  There is an equality between the types \(\typeformer{T}\,\type{A}/\relation{\sim_{T}}\) and \(\typeformer{MS}~\type{A}\), assuming the axoim of choice.
+  There is an equality between the types \(\typeformer{T}\,\type{A}/\relation{\sim_{T}}\) and \(\typeformer{MS}~\type{A}\), assuming the axiom of choice.
   \begin{proof}
     Since the function \(\function{T/{\sim}{\rightarrow}MS}\) is injective and surjective, it becomes an equality.
   \end{proof}
@@ -1427,7 +1429,7 @@ where we index by \(\term{x}\) for the first elimination, and by \(\term{y}\) fo
     \begin{equation}
     \prod_{(n : \mathbb{N})} \bigg\| \sum_{(\function{f} : \mathbb{N} \rightarrow \typeformer{Seq}_{\type{R}})} \function{Seq{\rightarrow}{\bot}}~(\function{f}~n) \equiv \function{s}~n) \bigg\|
   \end{equation}
-  which by the axoim of choice becomes
+  which by the axiom of choice becomes
   \begin{equation}
     \bigg\| \prod_{(n : \mathbb{N})} \sum_{(\function{f} : \mathbb{N} \rightarrow \typeformer{Seq}_{\type{R}})} \function{Seq{\rightarrow}{\bot}}~(\function{f}~n) \equiv \function{s}~n) \bigg\|
   \end{equation}
@@ -1440,7 +1442,7 @@ where we index by \(\term{x}\) for the first elimination, and by \(\term{y}\) fo
 \end{lem}
 \begin{cor}
   \label{cor:sequence-partiality-monad-surjective}
-  The function \(\function{Seq/{\sim}{\rightarrow}(-)_{\bot}}\) is surjective assuming the axoim of choice.
+  The function \(\function{Seq/{\sim}{\rightarrow}(-)_{\bot}}\) is surjective assuming the axiom of choice.
   \begin{proof}
     Since \(\function{Seq{\rightarrow}(-)_{\bot}}\) is surjective, we can map into the quotient with \(\quotientconstructor{{\cdot}}\).
   \end{proof}
@@ -1449,7 +1451,7 @@ where we index by \(\term{x}\) for the first elimination, and by \(\term{y}\) fo
   \label{thm:sequence-partiality-monad-eq}
   Sequences quotiented by weak bisimilarity is equivalent to the partiality monad \(Seq_{\type{R}} / \relation{\sim_{seq}} \equiv \type{R}_{\bot}\), assuming the axiom of choice.
   \begin{proof}
- The function \(\function{Seq/{\sim}{\rightarrow}(-)_\bot}\) is injective (\lemref{sequence-to-partiality-monad-injectivity}) and surjective (\corref{sequence-partiality-monad-surjective}) assuming the axoim of choice, meaning we get an equivalence, since we are working in hSets.
+ The function \(\function{Seq/{\sim}{\rightarrow}(-)_\bot}\) is injective (\lemref{sequence-to-partiality-monad-injectivity}) and surjective (\corref{sequence-partiality-monad-surjective}) assuming the axiom of choice, meaning we get an equivalence, since we are working in hSets.
 \end{proof}
 \end{thm}
 

@@ -1,6 +1,2 @@
-cabal install agda
-
-sudo apt-get install agda-mode
-sudo apt-get install agda-stdlib
-
-add ~/.cabal/bin/ to PATH
+install Agda.2.6.2 by following instructions at https://github.com/agda/agda
+install Cubical Agda by following instructions at https://github.com/agda/cubical
