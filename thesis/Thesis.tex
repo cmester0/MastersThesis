@@ -313,9 +313,7 @@ meaning if two types are equivalent, then there is an equality between them. Thi
   \caption{Composition square}
   \label{fig:cubical-composition-square}
 \end{figure}
-~\\ \\
-% Inductive types can be defined as \texttt{W}-types, which are constructed as the initial algebra for a polynomial functor. We can dually define coinductive types as \texttt{M}-types, which are constructed as the final coalgebra for a polynomial functor.\todo{final coalgebra is scary words, find something more "noob" friendly} \todo{... algebra for functor} \todo{W-types, Induction , M-types, Coinduction...}
-\todo[inline]{algebra for functor ? \texttt{W}-types? should there be a decription of these?}
+\\ 
 If you are used to working in set theory, then working in HoTT will take some getting used to. Homotopy type theory is proof relevant, which means that there might be multiple proofs of one statement, and these proofs might not be interchangeable (equal). This can be explained by the use of H-level in HoTT, which describes how equality behaves. We start from H-level (-2) which are contractiable types, meaning inhabited types, where all element are equal to. Then there is (-1)-types which are mere propositions or hProp, where all elements of the type are equal, but types might not be inhabited. If the type is inhabited, then we say the proposition is true. The 0-types are the hSets, where all equalities between two elements \(x,y\) are equal. For 1-types (1-groupoids) we get equalities of equalities are equal, and so on for homotopy \(n\)-types. Any \(n\)-type is also a \(n+1\)-type, but with trivial equalities at the \(n+1\) level. If we don't want to do proof relevant mathematics we can do propositional truncation (denoted \(\|{\cdot}\|\)), converting types to \(-1\)-types, meaning we ignore the difference in proofs by just look at whether a type is inhabited or not. However doing this we loose some of the reasoning power of HoTT. One of the tools we get using the full power of HoTT is \textbf{Higher order inductive types (HITs)}, which defines a type by point constructors and equality constructors. An example is the propositional truncation we just described, defined as a constructor taking any element to it its truncated version, and then defining equality between all propositional truncated elements
 \begin{center}
   \strut
@@ -672,11 +670,11 @@ We can now construct a coinduction principle for \texttt{M}-types given a (stron
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
 
-\chapter{Examples of \texttt{M}-types}
+\section{Examples of \texttt{M}-types}
 \label{ch:M-types-examples}
 In this section we show some examples of coinductive types that can be constructed as \texttt{M}-types, and show how to define the constructors/destructors of these types. We conclude this chapter with some general observation, and define some rules for how to construct \texttt{M}-types. \todo{Is there anything else that is show for each M-type?}
 
-\section{ITrees as \texttt{M}-types}
+\subsection{ITrees as \texttt{M}-types}
 Interaction trees (ITrees) \cite{DBLP:itrees} are used to model effectful behavior, where computations can interact with an external environment by events. ITrees are defined by the following constructors
 \begin{equation}
   \vcenter{\infer[\mathtt{I}_{\constructor{Ret}}]{\constructor{Ret}~\term{r} : \typeformer{itree}~\typeformer{E}\,\type{R}}{r : \type{R}}}
@@ -689,7 +687,7 @@ Interaction trees (ITrees) \cite{DBLP:itrees} are used to model effectful behavi
 \end{equation}
 where \(\type{R}\) is the type for returned values, while \(\typeformer{E}\) is a dependent type for events representing external interactions. We will try and give some intuition on how to construct this type, by constructing types with two out of three of these constructors.
 
-\subsection{Delay Monad}
+\subsubsection{Delay Monad}
 We start by looking at ITrees without the \(\constructor{Vis}\) constructor, this type is also know as the delay monad. It can be used to model delayed computations, either returning immediately given by the constructor \(\constructor{now} = \constructor{Ret}\), or delayed some (possibly infinite) number of steps by the constructor \(\constructor{later} = \constructor{Tau}\). We construct this type as an \texttt{M}-type.
 \begin{thm}
   The delay monad can be defined as the \texttt{M}-type.
@@ -724,7 +722,7 @@ We start by looking at ITrees without the \(\constructor{Vis}\) constructor, thi
   \end{proof}
 \end{thm}
 
-\subsection{\(\type{R}\)-valued \(\typeformer{E}\)-event Trees}
+\subsubsection{\(\type{R}\)-valued \(\typeformer{E}\)-event Trees}
 Now lets look at the example, where we remove the \(\constructor{Tau}\) constructor. This gives us a type of tree, with leaves given by \(\constructor{Ret}\), and nodes given by \(\constructor{Vis}\) branching based on some type \(\type{A}\), for an event \(\term{a} : \typeformer{E}\,\type{A}\). 
 \begin{thm}
   We define \(\type{R}\)-valued \(\typeformer{E}\)-event trees as an \texttt{M}-type
@@ -759,9 +757,9 @@ We can again define \(\constructor{Ret}\) and \(\constructor{Vis}\) using the \(
 \end{proof}
 \end{thm}
 
-\subsection{ITrees}
-\todo[inline]{Get the correct equivalence for ITrees (Part of project description?)}
+\subsubsection{ITrees}
 Now we should have all the knowledge needed to make ITrees using \texttt{M}-types.
+\todo[inline]{Get the correct equivalence for ITrees (Part of project description?)}
 \begin{thm}
   We define the type of ITrees as the \texttt{M}-type
   \begin{proof}
@@ -788,7 +786,7 @@ Now we should have all the knowledge needed to make ITrees using \texttt{M}-type
   \end{proof}
 \end{thm}
 
-\section{General rules for constructing \texttt{M}-types}
+\subsection{General rules for constructing \texttt{M}-types}
 We want to create a rule set for how to define coinductive types as \texttt{M}-types, we take inspiration from the rules for containers \cite{DBLP:DiffContainer}. We would like to be able to define a type from a given set of constructor / destructors. If we for example is given the rule
 \begin{equation}
   \vcenter{\infer{\constructor{ret}~a : \type{T}}{\term{a} : \type{A}}}
@@ -833,24 +831,7 @@ where \(\typeformer{F}_2\) have been moved to the last part of the container, we
 \begin{equation}
   \containerpair{\sum_{(\type{f}_1 : \universe{\mathcal{U}})} \sum_{(\term{f}_3 : \typeformer{F_3})} \cdots \sum_{(\term{f}_{n-1} : \typeformer{F_{n-1}})}\typeformer{F_n}}{\lambda\,(\type{f}_1,\term{f}_3,\dots),\sum_{\term{x} : \type{f}_1} (\typeformer{B}\,\term{x})}
 \end{equation}
-so we would also expect that a type defined as a (coinductive) record is equal to the version defined as a \texttt{M}-type. However this has not been shown formally.
-
-\section{Wacky \texttt{M}-type}
-We end this chapter by exploring a wacky \texttt{M}-type, that utilizes the power of containers to the fullest. We define a wacky \texttt{M}-type by the following container
-\begin{equation}
-  \containerpair{\mathbb{N} + \mathbb{N}}{\begin{cases} \mathbb{N} & \mathtt{inl}~0 \\ \empt & \mathtt{inl}~\term{x} \land \term{x}~\text{is odd} \\ \empt & \mathtt{inr}~\term{x} \land \term{x}~\text{is even} \\ \unit & o.w. \end{cases}}
-\end{equation}
-this container gives the \texttt{M}-type and constructors / destructors shown in \figref{wacky-m-type}
-\begin{figure}[h]
-  \centering
-  \begin{tikzcd}[row sep=huge,column sep=huge]
-    \mathbb{N} \ar[dr,"\constructor{odd}"',very near start] \ar[r,"\mathtt{inl} (2n+1)"] & M & \mathbb{N} \times M \ar[dl,"\destructor{step}",very near start] \ar[l,"o.w."] \\
-    \mathbb{N} \ar[r,"\constructor{even}"'] \ar[ur,"\mathtt{inr}(2n)",very near start] & M \ar[u] & (\mathbb{N} \rightarrow M) \ar[l,"\constructor{inl\text{-}zero}"] \ar[ul,"\mathtt{inl}~0 \times f"',very near start]
-  \end{tikzcd}
-  \caption{wacky \texttt{M}-type}
-  \label{fig:wacky-m-type}
-\end{figure}
-The type can be interpreted as a stream of coproducts of natural numbers, that terminates whenever it is the left injection and even, or the right injection and odd, and whenever the left injection is zero, it splits in a branches indexed by the natural numbers. This show that we can define coinductive types, with rather complex structure, but a type being complex does not make it useful.
+so we would also expect that a type defined as a (coinductive) record is equal to the version defined as a \texttt{M}-type. However this has not been shown formally. \todo{Something about the proof almost being done}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
 
