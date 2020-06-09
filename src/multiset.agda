@@ -7,7 +7,7 @@ open import Cubical.Data.Nat
 
 open import Cubical.Data.Sum
 open import Cubical.Data.Prod
-open import Cubical.Data.Empty
+open import Cubical.Data.Empty renaming (rec to empty-rec)
 open import Cubical.Data.Bool
 open import Cubical.Data.Sigma hiding (_×_)
 
@@ -15,6 +15,7 @@ open import Cubical.HITs.PropositionalTruncation renaming (map to ∥map∥ ; el
 open import Cubical.HITs.SetQuotients
 
 open import Cubical.Foundations.Isomorphism
+open import Cubical.Foundations.Path
 open import Cubical.Foundations.Function
 open import Cubical.Foundations.Equiv
 open import Cubical.Foundations.HLevels
@@ -24,173 +25,84 @@ open import Cubical.Functions.Embedding
 open import Cubical.Functions.Surjection
 open import Cubical.Functions.FunExtEquiv
 
--- open import Cubical.Codata.M.AsLimit.Container
--- open import Cubical.Codata.M.AsLimit.itree
--- open import Cubical.Codata.M.AsLimit.M
+open import helper renaming  (rec to rec/)
 
-open import helper
+data T (X : Set) : Set where
+  leaf : X → T X
+  node : (ℕ → T X) → T X
 
-data T₀ : Set where
-  T₀-leaf : T₀
-  T₀-node : (ℕ → T₀) → T₀
+data _∼T_ {X : Set} : (_ _ : T X) → Set where
+  leaf∼ : ∀ (x y : X) → x ≡ y → leaf x ∼T leaf y
+  node∼ : {f g : ℕ → T X} → ({n : ℕ} → f n ∼T g n) → node f ∼T node g
+  perm∼ : (f : ℕ → T X) (ge : ℕ ≃ ℕ) → node f ∼T node (f ∘ ge .fst)
 
-data _∼T₀_ : (_ _ : T₀) → Set where
-  leaf∼ : T₀-leaf ∼T₀ T₀-leaf
-  node∼ : {f g : ℕ → T₀} → ({n : ℕ} → f n ∼T₀ g n) → T₀-node f ∼T₀ T₀-node g
-  perm∼ : (g : ℕ → T₀) (f : ℕ → ℕ) → isEquiv f → T₀-node g ∼T₀ T₀-node (g ∘ f)
+data MS (X : Set) : Set where
+    leaf : X → MS X
+    node : (ℕ → MS X) → MS X
+    perm : (f : ℕ → MS X) → (ge : ℕ ≃ ℕ) → node f ≡ node (f ∘ ge .fst)
+    MS-isSet : isSet (MS X)
 
-data T : Set where
-    leaf : T
-    node : (ℕ → T) → T
-    perm : (g : ℕ → T) → (f : ℕ → ℕ) → isEquiv f → node g ≡ node (g ∘ f)
+T→MS : ∀ {X} → T X → MS X
+T→MS (leaf x) = MS.leaf x
+T→MS (node f) = MS.node (T→MS ∘ f)
 
--- makes life easier..
-postulate
-  T-isSet : isSet T
-  T₀-isProp : isProp T₀
+∼→≡ : {X : Set} {x y : T X} → x ∼T y → T→MS x ≡ T→MS y
+∼→≡ (leaf∼ x y p) = cong MS.leaf p
+∼→≡ (node∼ f) = cong MS.node (funExt (λ x → ∼→≡ f))
+∼→≡ (perm∼ f (g , e)) = perm (T→MS ∘ f) (g , e)
 
-T₀→T : T₀ → T
-T₀→T T₀-leaf = leaf
-T₀→T (T₀-node f) = node (T₀→T ∘ f)
-
-∼-≡ : ∀ {a b} → a ∼T₀ b → T₀→T a ≡ T₀→T b
-∼-≡ (leaf∼) = refl
-∼-≡ (node∼ f) = cong node (funExt λ n → ∼-≡ (f {n}))
-∼-≡ (perm∼ g f p) = perm (T₀→T ∘ g) f p
-
-T₀/∼→T : T₀ / _∼T₀_ → T
-T₀/∼→T = Cubical.HITs.SetQuotients.elim (λ _ → T-isSet) T₀→T λ _ _ → ∼-≡
+T/∼→MS : {X : Set} → T X / _∼T_ → MS X
+T/∼→MS = rec/ T→MS (λ _ _ → ∼→≡) MS-isSet
 
 postulate
-  nodeIsInjective : isInjective node
+  leaf≢node : ∀ {X : Set} {x : X} {f} → MS.leaf x ≡ MS.node f → ⊥
+  nodeIsInjective : ∀ {X : Set} → isInjective (MS.node {X = X})
+  leafIsInjective : ∀ {X : Set} → isInjective (MS.leaf {X = X})
 
-leaf≢node : ∀ {f} → leaf ≡ node f → ⊥
-leaf≢node x = subst (λ { leaf → T ; _ → ⊥ }) x (x i0)
+≡→∼ : {X : Set} {x y : T X} → T→MS x ≡ T→MS y → x ∼T y
+≡→∼ {x = leaf x} {y = leaf y} p = leaf∼ x y (leafIsInjective p)
+≡→∼ {x = leaf x} {y = node g} p = empty-rec (leaf≢node p)
+≡→∼ {x = node f} {y = leaf y} p = empty-rec (leaf≢node (sym p))
+≡→∼ {x = node f} {y = node g} p =
+  node∼ λ {n} → ≡→∼ (Iso.inv funExtIso (nodeIsInjective p) n)
 
-T₀→T-isInjective : ∀ {w x} → T₀→T w ≡ T₀→T x → w ∼T₀ x
-T₀→T-isInjective {w = T₀-leaf} {x = T₀-leaf} p = leaf∼
-T₀→T-isInjective {w = T₀-node f} {x = T₀-node g} p = node∼ λ {n} → (T₀→T-isInjective ∘ (Iso.inv funExtIso (nodeIsInjective p))) n
-T₀→T-isInjective {w = T₀-node f} {x = T₀-leaf} p = Cubical.Data.Empty.rec (leaf≢node (sym p))
-T₀→T-isInjective {w = T₀-leaf} {x = T₀-node g} p = Cubical.Data.Empty.rec (leaf≢node p)
-
-T₀/∼→T-isInjective : isInjective T₀/∼→T
-T₀/∼→T-isInjective {x} {y} = -- {w = [ x ]} {x = [ y ]} 
+T/∼→MS-isInjective : {X : Set} → isInjective T/∼→MS
+T/∼→MS-isInjective {X} {x} {y} =
   elimProp
-    {A = T₀}
-    {R = _∼T₀_}
-    {B = λ x → T₀/∼→T x ≡ T₀/∼→T y → x ≡ y}
+    {A = T X}
+    {R = _∼T_}
+    {B = λ x → T/∼→MS x ≡ T/∼→MS y → x ≡ y}
     (λ x → isPropΠ λ _ → squash/ x y)
-    (λ x → elimProp
-               {A = T₀}
-               {R = _∼T₀_}
-               {B = λ y → T₀/∼→T [ x ] ≡ T₀/∼→T y → [ x ] ≡ y}
-               (λ y → isPropΠ λ _ → squash/ [ x ] y)
-               (λ y → eq/ x y ∘ T₀→T-isInjective)
-               y)
+    (λ x →
+      elimProp
+      {A = T X}
+      {R = _∼T_}
+      {B = λ y → T/∼→MS [ x ] ≡ T/∼→MS y → [ x ] ≡ y}
+      (λ y → isPropΠ λ _ → squash/ [ x ] y)
+      (λ y → eq/ x y ∘ ≡→∼)
+      y)
     x
 
-elimProp⊥ :
-  ∀ {A : Set} (P : < A >⊥ → Set)
-  → (∀ a → isProp (P a))
-  → P leaf
-  → ((a : A) → P (η a))
-  → ((s : Σ[ s ∈ (ℕ → < A >⊥) ] ((n : ℕ) → s n ⊑ s (suc n)))
-        → ((n : ℕ) → P (fst s n)) → P (⊔ s))
-  → (x : < A >⊥) → P x
-elimProp⊥ {A = A} P Pprop pn pη p⊔ x = temp x
+{-# NON_TERMINATING #-}
+elimPropMS : {X : Set} (P : MS X → Set) (Pprop : (x : MS X) → isProp (P x)) (Pleaf : (x : X) → P (leaf x)) (Pnode : {f : ℕ → MS X} → (f' : (n : ℕ) → P (f n)) → P (node f)) (t : MS X) → P t
+elimPropMS {X} P Pprop Pleaf Pnode = temp
   where
-    temp : (x : < A >⊥) → P x
-    temp never = pn
-    temp (η a) = pη a
-    temp (⊔ (s , q)) = p⊔ (s , q) (temp ∘ s)
-    temp (α {x} {y} a b i) =
-      isOfHLevel→isOfHLevelDep 1 Pprop
-        (temp x) (temp y)
-        (α a b) i
-    temp (⊥-isSet a b p q i j) =
-      isOfHLevel→isOfHLevelDep 2 (isProp→isSet ∘ Pprop)
-        (temp a) (temp b)
-        (cong temp p) (cong temp q)
-        (⊥-isSet a b p q) i j
+    temp : (t : MS X) → P t
+    temp (leaf x) = Pleaf x
+    temp (node f) = Pnode (λ n → temp (f n))
+    temp (perm g e i) =
+      isOfHLevel→isOfHLevelDep 1 Pprop (temp (node g)) (temp (node (g ∘ (e .fst)))) (perm g e) i  -- problem here
+    temp (MS-isSet a b p q i j) =
+      isOfHLevel→isOfHLevelDep 2 (isProp→isSet ∘ Pprop) (temp a) (temp b) (cong temp p) (cong temp q) (MS-isSet a b p q) i j
+  
+T→MS-isSurjection : {X : Set} → Axiom-of-countable-choice ℓ-zero → isSurjection (T→MS {X = X})
+T→MS-isSurjection {X = X} acc = elimPropMS (λ x → ∥ fiber T→MS x ∥) (λ _ → propTruncIsProp) leaf-val node-val
+  where
+    leaf-val : (x : X) → ∥ fiber T→MS (leaf x) ∥
+    leaf-val x = ∣ leaf x , refl ∣
+    
+    node-val : {f : ℕ → MS X} → (fᴹ : (n : ℕ) → ∥ fiber T→MS (f n) ∥) → ∥ fiber T→MS (node f) ∥
+    node-val = ∥map∥ (λ g → (node (fst ∘ g)) , λ i → node (funExt (snd ∘ g) i)) ∘ acc
 
-T₀→T-isSurjective : Axiom-of-countable-choice ℓ-zero → isSurjection T₀→T
-T₀→T-isSurjective _ leaf = ∣ T₀-leaf , refl ∣
-T₀→T-isSurjective acc (node f) =
-  {!!}
-
-T₀/∼→T-isSurjective : Axiom-of-countable-choice ℓ-zero → isSurjection T₀/∼→T
-T₀/∼→T-isSurjective acc b =
-  ∥map∥ (λ {(x , y) → [ x ] , y}) (T₀→T-isSurjective acc b)
-
-
---   (∥rec∥ squash (idfun ∥ Σ (T₀ / _∼T₀_) (λ x → T₀/∼→T x ≡ node f) ∥))
---   (∥map∥ (λ g →
---    ∥map∥ (λ x →
---      [ T₀-node (fst ∘ x) ] , cong node (funExt λ (n : ℕ) → cong T₀/∼→T (snd (x n)) ∙ (snd (g n))))
---    (acc (λ (n : ℕ) → []surjective (fst (g n)))))
---    (acc (T₀/∼→T-isSurjective acc ∘ f)))
--- T₀/∼→T-isSurjective acc (perm a b e i) =
---   let temp : ∥ fiber T₀/∼→T (perm a b e i) ∥
---       temp =
---         -- Iso.fun (propTruncIdempotentIso squash)
---         ((∥rec∥ squash (idfun ∥ fiber T₀/∼→T (perm a b e i) ∥))
---           (∥map∥ (λ g →
---            ∥map∥ (λ x →
---              let temp' : T₀→T ∘ (fst ∘ x) ≡ a
---                  temp' = (funExt λ (n : ℕ) → cong T₀/∼→T (snd (x n)) ∙ (snd (g n))) in
---              let temps = ∼-≡ (perm∼ (fst ∘ x) b e) in
---              let temps' : node a ≡ node (a ∘ b)
---                  temps' = transport (λ j → node (temp' j) ≡ node (temp' j ∘ b)) temps in
---              -- let temps'' : temps' ≡ perm a b e
---              --     temps'' = T-isSet (node a) (node (a ∘ b)) temps' (perm a b e) in
---              -- let tempsss : T₀→T (T₀-node (fst ∘ x)) ≡ T₀→T (T₀-node (fst ∘ x ∘ b))
---              --     tempsss = T₀→T (T₀-node (fst ∘ x)) ≡⟨ cong node temp' ⟩ node a ≡⟨ temps' ⟩ node (a ∘ b) ≡⟨ cong (λ k → node (k ∘ b)) (sym temp') ⟩ T₀→T (T₀-node (fst ∘ x ∘ b)) ∎ in
---              let temasd : [ T₀-node (fst ∘ x) ] ≡ [ T₀-node (fst ∘ x ∘ b) ]
---                  temasd = eq/ (T₀-node (fst ∘ x)) (T₀-node (fst ∘ x ∘ b)) (perm∼ (fst ∘ x) b e)
---              in
---              let hd : node (T₀→T ∘ fst ∘ x) ≡ node (T₀→T ∘ fst ∘ x ∘ b)
---                  hd = node (T₀→T ∘ fst ∘ x) ≡⟨ cong node temp' ⟩ node a ≡⟨ temps' ⟩ node (a ∘ b) ≡⟨ cong (λ k → node (k ∘ b)) (sym temp') ⟩ node (T₀→T ∘ fst ∘ x ∘ b) ∎
---              in
---              -- let tesadf :
---              --            Square
---              --              (node a ≡⟨ temps' ⟩ node (a ∘ b) ∎)
---              --              (node (T₀→T ∘ fst ∘ x) ≡⟨ cong node {!!} ⟩ node (T₀→T ∘ fst ∘ x ∘ b) ∎)
---              --              (node a ≡⟨ cong node (sym temp') ⟩ T₀→T (T₀-node (fst ∘ x)) ∎)
---              --              (node (a ∘ b) ≡⟨ cong (λ k → node (k ∘ b)) (sym temp') ⟩ T₀→T (T₀-node (fst ∘ x ∘ b)) ∎)
---              --     tesadf = {!!}
---              -- in
---              -- hcomp (λ j → λ {(i = i0) → cong node temp' ; (i = i1) -> cong (\k -> node (k ∘ b)) temp'}) (elimEq/ {A = T₀} {R = _∼T₀_} {B = λ x → {!!}} (λ k → {!!}) {!!} {!!} {!!})
---                temasd i , {!!}
---              -- ∣ temasd i , compPath-filler {x = perm a b e} {y = {!!}} {z = {!!}} {!!} {!!} ? ? ∣
---              )
---              (acc (λ (n : ℕ) → []surjective (fst (g n)))))
---              (acc (T₀/∼→T-isSurjective acc ∘ a))))
---   in {!!}
-
-
---   -- let temp'1 : ∥ fiber T₀/∼→T (node a) ∥
---   --     temp'1 = T₀/∼→T-isSurjective acc (node a) in -- ∥map∥ fst
---   -- let temp'2 : ∥ ((n : ℕ) -> fiber T₀/∼→T (a n)) ∥
---   --     temp'2 = acc (T₀/∼→T-isSurjective acc ∘ a) in
---   -- let temp'3 : ∥ (ℕ → T₀) ∥
---   --     temp'3 = ∥map∥ (λ x → fst ∘ x) {!!} in -- ∥map∥ fst
---   -- Iso.fun (propTruncIdempotentIso squash)
---   -- (∥map∥
---   --   (λ x → let temp = ∼-≡ (perm∼ x b e) in
---   --           let tempp = T₀/∼→T-isSurjective acc (temp i) in -- T₀→T ∘ x ≡ a
---   --           let temppp : T₀→T ∘ x ≡ a
---   --               temppp = {!!}
---   --           in
---   --   transport (λ j → ∥ fiber T₀/∼→T (perm (temppp j) b e i) ∥) tempp)
---   --   temp'3)
-
--- -- node (λ x₁ → T₀→T (x x₁)) ≡ node (λ x₁ → T₀→T ((x ∘ b) x₁))
-
---   -- ∥ fiber T₀/∼→T (perm a b e i) ∥
---   -- Σ[ x ∈ A ] T₀/∼→T x ≡ (perm a b e i)
-
---   -- ∥rec∥ {!!} (λ x → ∣ {!!} , {!!} ∣) temp'3
---   -- ∥map∥ (λ x → perm∼ x b e) (temp'3)
---     -- rec2 {!!} (λ x x₁ → ∣ squash/ x x₁ {!!} {!!} {!!} {!!} , {!!} ∣) {!!} {!!}
---     -- ∥ fiber T₀/∼→T (perm a b e i) ∥
---   -- ∥map∥ {!!} (acc (T₀/∼→T-isSurjective acc ∘ a))
+T/∼→MS-isSurjection : {X : Set} → Axiom-of-countable-choice ℓ-zero → isSurjection (T/∼→MS {X = X})
+T/∼→MS-isSurjection {X = X} acc = ∥map∥ (λ {(x , y) → [ x ] , y}) ∘ (T→MS-isSurjection acc)

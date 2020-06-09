@@ -103,19 +103,22 @@ Delay/∼→⊥-isInjective {R = R} {x} {y} =
     x
 
 {-# NON_TERMINATING #-}
-⊥-rec :
+elimProp⊥ :
   ∀ {A : Set} (P : < A >⊥ → Set)
   → (∀ a → isProp (P a))
   → ((a : A) → P (now a))
   → (x : < A >⊥) → P x
-⊥-rec P Pprop pn (now a) = pn a
-⊥-rec P Pprop pn (later x) = subst P (later-r x x refl) (⊥-rec P Pprop pn x) -- problem here
-⊥-rec P Pprop pn (later-l t u p i) = isOfHLevel→isOfHLevelDep 1 Pprop ((⊥-rec P Pprop pn) (later t)) ((⊥-rec P Pprop pn) u) (later-l t u p) i
-⊥-rec P Pprop pn (⊥-isSet a b p q i j) = isOfHLevel→isOfHLevelDep 2 (isProp→isSet ∘ Pprop) ((⊥-rec P Pprop pn) a) ((⊥-rec P Pprop pn) b) (cong (⊥-rec P Pprop pn) p) (cong (⊥-rec P Pprop pn) q) (⊥-isSet a b p q) i j
+elimProp⊥ {A = A} P Pprop pn = temp
+  where
+    temp : (x : < A >⊥) → P x
+    temp (now a) = pn a
+    temp (later x) = subst P (later-r x x refl) (temp x) -- problem here
+    temp (later-l t u p i) = isOfHLevel→isOfHLevelDep 1 Pprop ((temp) (later t)) ((temp) u) (later-l t u p) i
+    temp (⊥-isSet a b p q i j) = isOfHLevel→isOfHLevelDep 2 (isProp→isSet ∘ Pprop) ((temp) a) ((temp) b) (cong (temp) p) (cong (temp) q) (⊥-isSet a b p q) i j
 
 Delay/∼→⊥-isSurjective : ∀ {R} → Axiom-of-countable-choice ℓ-zero → isSurjection (Delay/∼→⊥ {R = R})
 Delay/∼→⊥-isSurjective acc =
-  ⊥-rec
+  elimProp⊥
     (λ y → ∥ fiber Delay/∼→⊥ y ∥)
     (λ _ → propTruncIsProp)
     λ a → ∣ [ now a ] , refl ∣
