@@ -41,6 +41,77 @@
 
 \usepackage{amsthm}
 
+% \DeclareUnicodeCharacter{2080}{_0}
+
+% \usepackage[math-style=TeX,vargreek-shape=unicode]{unicode-math} % loads fontspec -- no-math
+\usepackage{fontspec} 
+
+\usepackage{newunicodechar}
+\newunicodechar{λ}{\ensuremath{\lambda}}
+\newunicodechar{←}{\ensuremath{\from}}
+\newunicodechar{→}{\ensuremath{\to}}
+\newunicodechar{∀}{\ensuremath{\forall}}
+\newunicodechar{ℓ}{\ensuremath{\ell}}
+% \newunicodechar{₀}{~} %TODO?
+\newunicodechar{Σ}{\ensuremath{\Sigma}}
+\newunicodechar{≈}{\ensuremath{\approx}}
+\newunicodechar{⟨}{\ensuremath{\langle}}
+\newunicodechar{⟩}{\ensuremath{\rangle}}
+\newunicodechar{≡}{\ensuremath{\equiv}}
+\newunicodechar{π}{\ensuremath{\pi}}
+\newunicodechar{ℕ}{\ensuremath{\mathbb{N}}}
+\newunicodechar{≅}{\ensuremath{\cong}}
+
+\usepackage{listings} %lstlistings
+\lstset{inputpath=src/}
+% Cubical Agda listing config
+
+\lstdefinelanguage{agda}{
+  sensitive = true,
+  keywords={},
+  % otherkeywords={% Operators
+  %   >, <, ==
+  % },
+  keywords = [2]{module, open, import, where},
+  keywordstyle=\color{green},
+  keywordstyle=[2]\color{blue},% for example
+  keywords = [3]{postulate, private},
+  keywordstyle=[3]\color{magenta},
+  numbers=left,
+  numberstyle=\scriptsize,
+  stepnumber=1,
+  numbersep=8pt,
+  showstringspaces=false,
+  breaklines=true,
+  frame=top,
+  comment=[l]{--},
+  morecomment=[s]{\{-\#}{\#-\}},
+  commentstyle=\color{gray}\ttfamily,
+  stringstyle=\color{red}\ttfamily,
+  % morestring=[b]',
+  % morestring=[b]"
+}
+
+\lstset{
+  language=agda, 
+  basicstyle=\ttfamily\small,
+  numberstyle=\footnotesize,
+  numbers=left,
+  backgroundcolor=\color{gray!10},
+  frame=single,
+  tabsize=2,
+  rulecolor=\color{black!30},
+  title=\lstname,
+  % escapeinside={\%*}{*)},
+  breaklines=true,
+  breakatwhitespace=true,
+  framextopmargin=2pt,
+  framexbottommargin=2pt,
+  inputencoding=utf8,
+  extendedchars=true,
+  % literate={}{!}1,
+}
+
 \theoremstyle{plain} % default
 \newtheorem{thm}{Theorem}[section]
 \newtheorem{lem}[thm]{Lemma}
@@ -718,7 +789,7 @@ Now we should have all the knowledge needed to make ITrees using \texttt{M}-type
 \end{thm}
 
 \section{General rules for constructing \texttt{M}-types}
-We want to create a rule set for how to define coinductive types as \texttt{M}-types. We would like to be able to define a type from a given set of constructor / destructors. If we for example is given the rule
+We want to create a rule set for how to define coinductive types as \texttt{M}-types, we take inspiration from the rules for containers \cite{DBLP:DiffContainer}. We would like to be able to define a type from a given set of constructor / destructors. If we for example is given the rule
 \begin{equation}
   \vcenter{\infer{\constructor{ret}~a : \type{T}}{\term{a} : \type{A}}}
 \end{equation}
@@ -1412,12 +1483,16 @@ We want to define what a Q\texttt{M}-type means in general, we draw inspiration 
 \end{itemize}
 
 \subsection{Lifting Quotient Construction from Containers}
-\todo{"The category of containers lacks good coequalisers" - \cite{DBLP:CategoryOfContainers}}
-An alternative to directly set quotienting the \texttt{M}-types we have defined, is to do the quotienting on the underlying container \cite{DBLP:quotient-container} / polynomial functor \cite{DBLP:QM-lean}, and then do the fixed point construction we did for polynomial functors, but on the quotiented functor instead. We start by defining quotients on containers.
-\begin{defn}
-  Given a container \(\containerpair{\type{A}}{\typeformer{B}}\), and a relation \todo{...} we can form a quotiented container \(\containerpair{\type{A}}{\typeformer{B}} / \relation{R}\) \todo{Complete definition}
-\end{defn}
-\noindent Which gives us the following definition of a polynomial functor.
+An alternative to directly set quotienting the \texttt{M}-types we have defined, is to do the quotienting on the underlying container \cite{DBLP:quotient-container} / polynomial functor \cite{DBLP:QM-lean}, and then do the fixed point construction we did for polynomial functors, but on the quotiented functor instead. We start by defining quotiented polynomial functors
+% quotients on containers.
+% \begin{defn}
+%   Given a container \(\containerpair{\type{A}}{\typeformer{B}}\), and a relation \(\relation{R} : \prod_{(\term{a} : \type{A})} {\typeformer{B}~\term{a}} \rightarrow \typeformer{B}~\term{a} \rightarrow \universe{\mathcal{U}}\), \todo{...} we can form a quotiented container \(\containerpair{\type{A}}{\typeformer{B} / \relation{R}}\) as
+%   \begin{equation}
+    
+%   \end{equation}
+%   \todo{Complete definition} \todo{"The category of containers lacks good coequalisers" - \cite{DBLP:CategoryOfContainers}}
+% \end{defn}
+% \noindent Which gives us the following definition of a polynomial functor.
 \begin{defn}
   Given a container \(\containerpair{\type{A}}{\typeformer{B}}\) and for all \(\type{X}\) a family of relations \(\relation{\sim}_{\term{a}} : (\typeformer{B}\,\term{a} \rightarrow \type{X}) \rightarrow (\typeformer{B}\,\term{a} \rightarrow \type{X}) \rightarrow \universe{\mathcal{U}}\) indexed by \(\type{A}\), we can define a quotiented polynomial functor (QPF). We define it for types as
   \begin{equation}
@@ -1469,16 +1544,9 @@ If \(\function{abs}\) is surjective, then the square will commute, so we just ha
   \label{fig:QPF-limit-multiset}
 \end{figure}
 \end{exmp}
-We have just postulated that the quotiented \texttt{M}-type, is an \(\functor{F}\)-coalgebra, however this is not necessarily the case, since this requires us to show that given \(\function{fq} : (\typeformer{B}~\term{a} \rightarrow \type{X}) / \relation{R}\) then we can construct a function \((\typeformer{B}~\term{a} \rightarrow \type{X})\).
-
-\todo{...} again we run into problems with the axiom of choice. The construction of Q\texttt{W}-types got around this problem, by doing the construction as a QIIT, we will try and follow the same ideas and show what that would look like for \texttt{M}-types. \todo{Complete construction of Q\texttt{W} inspired Q\texttt{M}-types}
-
-\subsection{Better behaving Q\texttt{M}-types}
-If we take inspiration from the construction of Q\texttt{W}-types, and define the quotiented types as QIITs, by using a set of rules, we will get better behaving quotients, meaning we can construct the type, without assuming the axiom of choice. The rules for constructing the QIITs are
-\begin{itemize}
-\item 
-\end{itemize}
-\todo{QIITs}
+\noindent We have just postulated that the quotiented \texttt{M}-type, is a final \(\functor{F}\)-coalgebra, however this is not necessarily the case. When trying to proof this we need to show that given \(\function{fq} : (\typeformer{B}~\term{a} \rightarrow \type{X}) / \relation{R}\) then we can construct a function \((\typeformer{B}~\term{a} \rightarrow \type{X})\), however this requires the axiom of choice in general. We therefore does not get around the axiom of choice with this construction, however it is an alternative way of defining the quotient, and we get some more structure using it.
+\\ \\
+The construction of Q\texttt{W}-types in \cite{DBLP:Constructing-QIITs} got around using the axiom of choice by using QIIT, that is defining the type and the relation to quotient it by at the same time. As we have seen in the examples in this thesis, using QIITs gets around the use of the axiom of choice without adding much complexity, and if we use another construction and assume the axiom of choice, that construction will be equal to the QIIT \todo{Complete construction of Q\texttt{W} inspired Q\texttt{M}-types?}
 
 \chapter{Conclusion}
 \label{ch:conclusion}
@@ -1527,8 +1595,11 @@ Cofree Coalgebra / Dialgebra -- Is this relevant?
 \appendix
 
 \chapter{The Technical Details}
-
-\todo[inline]{\dots}
+≠≤≥×·÷±∓√\string~≈≅⇔¬∧∨∀∃∅∈∉⊆⊂∪∩∆ℕℤℝℂ∞Σ∑∏∫π
+Part of the formalization of this work has been accepted to the Cubical Agda github in the pull request \url{https://github.com/agda/cubical/pull/245}.
+\section{Examples of M-types}
+\subsection{Stream}
+\lstinputlisting[language=agda]{stream.agda}
 
 \end{document}
 
@@ -1557,3 +1628,5 @@ Cofree Coalgebra / Dialgebra -- Is this relevant?
 % https://www.cs.nott.ac.uk/~psztxa/publ/indexed-containers.pdf
 
 % https://www.cs.le.ac.uk/people/mabbott/
+% http://strictlypositive.org/dfordata.pdf
+%https://d1wqtxts1xzle7.cloudfront.net/30914822/Roland_Backhouse_DatatypeGeneric_Programming_sc.pdf?1363044821=&response-content-disposition=inline%3B+filename%3DDatatype-generic_programming.pdf&Expires=1591636564&Signature=EJttqxfFNohkRS4fr3jC5iBTwWaR7qtFeoVhjlNZj4aUpvCRbFtQ2R0l2WGUvUdxbudM-14rs0o5ZY9HYB0gCX9k13nRQDY7MN6Zz3HDA~Y8i7kkevfmMhExeAcBf5Mbqb11rmsAUs2RLcLQuq4e-MWtoPOzNZc3CTWZLWuaYI5ZBARJR1HfWxWRlfI6ZPLb~CYNIOsWOOvWLEweY~vktw7zY5M7FuEV-dLR02VbpGUV~vJsttUl3dZ7tnSFsce-YjkgLCBxPBiKCRpXUKbNUE062IYY9zA3iKUtMo4DHzBYSqZkB02pJo8z0rBTwzzDWCkIATsi7W6OAjycZTUbWw__&Key-Pair-Id=APKAJLOHF5GGSLRBV4ZA#page=219
