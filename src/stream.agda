@@ -17,7 +17,7 @@ open import Cubical.Codata.M.AsLimit.helper
 open import Cubical.Codata.M.AsLimit.Container
 
 open import Cubical.Codata.M.AsLimit.stream
-open Cubical.Codata.M.AsLimit.stream -- Re-xport
+open Cubical.Codata.M.AsLimit.stream public -- Re-xport
 
 ------------------------------
 -- Equality of stream types --

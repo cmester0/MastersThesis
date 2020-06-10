@@ -29,25 +29,6 @@ open import Cubical.HITs.PropositionalTruncation renaming (map to ∥map∥ ; re
 
 open import helper renaming (rec to rec/)
 
--- Tree defined as an M-type
-tree-S : (R : Type₀) -> Container ℓ-zero
-tree-S R = (R ⊎ Unit) , λ { (inl _) -> ⊥ ; (inr tt) -> ℕ }
-
-tree : (R : Type₀) -> Type₀
-tree R = M (tree-S R)
-
-leaf : {R : Type₀} -> R -> tree R
-leaf r = in-fun (inl r , λ ())
-
-node : {R : Type₀} -> (ℕ → tree R) -> tree R
-node f = in-fun (inr tt , f)
-
--- Weak bisimularity for tree (defining multisets)
-data _∼_ {R : Type₀} : (_ _ : tree R) → Type₀ where
-  ∼now : ∀ (s r : R) → s ≡ r → leaf s ∼ leaf r
-  ∼later : ∀ f g → (∀ n → f n ∼ g n) → node f ∼ node g
-  ∼perm : ∀ f (g : ℕ → ℕ) → isEquiv g → node f ∼ node (f ∘ g)
-
 Quotient-Container : ∀ {ℓ} → (S : Container ℓ) → (R : {a : S .fst} → (Σ ((S .snd a) → (S .snd a) → Type ℓ) λ G → isEquiv G)) → Container ℓ
 Quotient-Container (A , B) G = A , λ a → let (R , e) = G {a = a} in B a / R
 
@@ -99,22 +80,3 @@ poly-quot-constr S R R-comm =
   (λ {(a , b) → a , [ b ]}) ,
   (λ {(a , b) → ∥map∥ (λ {(g , p) → (a , g) , ((a , [ g ]) ≡⟨ ΣPathP (refl , p) ⟩ (a , b) ∎)}) ([]surjective b) }) ,
   λ {f (a , b) → refl}
-
--- QPF formalization of multisets
-∼perm' : {R : Type₀} {X : Type₀} {a : tree-S R .fst} → (tree-S R .snd a → X) → (tree-S R .snd a → X) → Type₀
-∼perm' {a = inr tt} f h = Σ[ g ∈ (ℕ → ℕ) ] (isEquiv g × (f ∘ g ≡ h))
-∼perm' {a = inl r} _ _ = Unit
-
-∼perm'-comm :  {R : Type₀} {X Y : Type₀} (f : X → Y) {a : tree-S R .fst} → {x y : tree-S R .snd a → X} → ∼perm' x y → ∼perm' (f ∘ x) (f ∘ y)
-∼perm'-comm f {a = inr tt} p = (p .fst) , ((proj₁ (p .snd)) , cong (λ a → f ∘ a) (proj₂ (p .snd)))
-
-∼perm'-comm f {a = inl r} tt = tt
-
-multiset : ∀ {R} → poly-quot (tree-S R) ∼perm' ∼perm'-comm
-multiset {R = R} = poly-quot-constr (tree-S R) ∼perm' ∼perm'-comm
-
-
-
-
-
-

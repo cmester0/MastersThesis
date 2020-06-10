@@ -84,7 +84,12 @@ T/∼→MS-isInjective {X} {x} {y} =
     x
 
 {-# NON_TERMINATING #-}
-elimPropMS : {X : Set} (P : MS X → Set) (Pprop : (x : MS X) → isProp (P x)) (Pleaf : (x : X) → P (leaf x)) (Pnode : {f : ℕ → MS X} → (f' : (n : ℕ) → P (f n)) → P (node f)) (t : MS X) → P t
+elimPropMS :
+  {X : Set} (P : MS X → Set) (Pprop : (x : MS X) → isProp (P x))
+  (Pleaf : (x : X) → P (leaf x))
+  (Pnode : {f : ℕ → MS X} → (f' : (n : ℕ) → P (f n)) → P (node f))
+  --------------------
+  (t : MS X) → P t
 elimPropMS {X} P Pprop Pleaf Pnode = temp
   where
     temp : (t : MS X) → P t
@@ -95,14 +100,14 @@ elimPropMS {X} P Pprop Pleaf Pnode = temp
     temp (MS-isSet a b p q i j) =
       isOfHLevel→isOfHLevelDep 2 (isProp→isSet ∘ Pprop) (temp a) (temp b) (cong temp p) (cong temp q) (MS-isSet a b p q) i j
   
-T→MS-isSurjection : {X : Set} → Axiom-of-countable-choice ℓ-zero → isSurjection (T→MS {X = X})
+T→MS-isSurjection : {X : Set} → Axiom-of-countable-choice → isSurjection (T→MS {X = X})
 T→MS-isSurjection {X = X} acc = elimPropMS (λ x → ∥ fiber T→MS x ∥) (λ _ → propTruncIsProp) leaf-val node-val
   where
     leaf-val : (x : X) → ∥ fiber T→MS (leaf x) ∥
     leaf-val x = ∣ leaf x , refl ∣
     
-    node-val : {f : ℕ → MS X} → (fᴹ : (n : ℕ) → ∥ fiber T→MS (f n) ∥) → ∥ fiber T→MS (node f) ∥
+    node-val : {f : ℕ → MS X} → ((n : ℕ) → ∥ fiber T→MS (f n) ∥) → ∥ fiber T→MS (node f) ∥
     node-val = ∥map∥ (λ g → (node (fst ∘ g)) , λ i → node (funExt (snd ∘ g) i)) ∘ acc
 
-T/∼→MS-isSurjection : {X : Set} → Axiom-of-countable-choice ℓ-zero → isSurjection (T/∼→MS {X = X})
+T/∼→MS-isSurjection : {X : Set} → Axiom-of-countable-choice → isSurjection (T/∼→MS {X = X})
 T/∼→MS-isSurjection {X = X} acc = ∥map∥ (λ {(x , y) → [ x ] , y}) ∘ (T→MS-isSurjection acc)
