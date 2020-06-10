@@ -50,30 +50,14 @@ tail-to-tl b = refl
 
 private
   tail-eq-x : ∀ {A : Type₀} → (b : Stream A) (n : ℕ) → fst (tl (Stream-to-stream b)) n ≡ fst (Stream-to-stream (tail b)) n
-  tail-eq-x {A = A} b n =
-    fst (tl (Stream-to-stream b)) n -- = transport (λ i → (Wₙ (stream-S A) n)) (Stream-to-stream-func-x n (tail b))
-      ≡⟨ sym (transport-filler (λ i → Wₙ (stream-S A) n) (Stream-to-stream-func-x n (tail b))) ⟩
-    fst (Stream-to-stream (tail b)) n ∎
-
-  fgsa :
-    ∀ {A : Type₀} → (b : Stream A) → (n : ℕ) →
-    PathP (λ i → πₙ (stream-S A) (tail-eq-x b (suc n) i) ≡ tail-eq-x b n i) (snd (tl (Stream-to-stream b)) n) (transport (λ i → πₙ (stream-S A) (tail-eq-x b (suc n) i) ≡ tail-eq-x b n i) (snd (tl (Stream-to-stream b)) n))
-  fgsa {A} b n = transport-filler (λ i → πₙ (stream-S A) (tail-eq-x b (suc n) i) ≡ tail-eq-x b n i) (snd (tl (Stream-to-stream b)) n)
+  tail-eq-x {A = A} b n = sym (transport-filler (λ i → Wₙ (stream-S A) n) (Stream-to-stream-func-x n (tail b)))
 
   postulate
     tail-eq-π :
       ∀ {A : Type₀} → (b : Stream A) → (n : ℕ) →
       PathP (λ i → πₙ (stream-S A) (tail-eq-x b (suc n) i) ≡ tail-eq-x b n i)
-        (snd (tl (Stream-to-stream b)) n) -- transport ? refl
-        (Stream-to-stream-func-π n (tail b)) -- = refl
-  -- tail-eq-π {A} b 0 = toPathP refl
-  -- tail-eq-π {A} b (suc n) i =
-  --   compPathP-filler
-  --     {x = transport (λ i → πₙ (stream-S A) (tail-eq-x b (suc n) i) ≡ tail-eq-x b n i) (snd (tl (Stream-to-stream b)) n)}
-  --     {y = (snd (tl (Stream-to-stream b)) n)}
-  --     {B = (λ i → πₙ (stream-S A) (tail-eq-x b (suc n) i) ≡ tail-eq-x b n i)}
-  --     {z = Stream-to-stream-func-π n (tail b)}
-  --     (symP (fgsa b n)) {!!} i {!!}
+        (snd (tl (Stream-to-stream b)) n)
+        (Stream-to-stream-func-π n (tail b))
 
 tl-to-tail :
   ∀ {A : Type₀} (b : Stream A)
@@ -81,13 +65,13 @@ tl-to-tail :
 tl-to-tail {A = A} b =
   ΣPathP (funExt (tail-eq-x b) , λ i n j → tail-eq-π b n i j)
 
-nth : ∀ {A : Type₀} → ℕ → (b : Stream A) → A
-nth 0 b = head b
-nth (suc n) b = nth n (tail b)
-
 stream-equality-iso-1 : ∀ {A : Type₀} → (b : Stream A) → stream-to-Stream (Stream-to-stream b) ≡ b
 stream-equality-iso-1 b = bisim-nat (stream-to-Stream (Stream-to-stream b)) b (helper b)
-  where
+  where  
+    nth : ∀ {A : Type₀} → ℕ → (b : Stream A) → A
+    nth 0 b = head b
+    nth (suc n) b = nth n (tail b)
+
     helper : ∀ {A : Type₀} → (b : Stream A) → ((n : ℕ) → nth n (stream-to-Stream (Stream-to-stream b)) ≡ nth n b)
     helper b 0 = head-to-hd (Stream-to-stream b) ∙ hd-to-head b
     helper b (suc n) =
