@@ -3,7 +3,7 @@
 module partiality-monad where
 
 {-
-  Inspired by  Code related to the paper 
+  Inspired by  Code related to the paper
   "Partiality, Revisited: The Partiality Monad as a Quotient Inductive-Inductive Type" (https://arxiv.org/pdf/1610.09254.pdf)
   Thorsten Altenkirch, Nils Anders Danielsson and Nicolai Kraus
   Located at: http://www.cse.chalmers.se/~nad/publications/altenkirch-danielsson-kraus-partiality/README.html
@@ -63,7 +63,7 @@ _↓_ : ∀ {A : Set} → A ⊎ Unit → A → Set
 x ↓ y = x ≡ inl y
 
 -- x ↑ means that the computation x does not have a value.
-                                                      
+
 _↑ :  ∀ {A : Set} → A ⊎ Unit → Set
 x ↑ = x ≡ inr tt
 
@@ -122,7 +122,7 @@ never-seq = (λ _ → inr tt) , (λ _ → inl refl)
 Delay→Seq : ∀ {A : Set} → Delay A → Seq A
 Delay→Seq (now a) = now-seq a
 Delay→Seq (later t) = shift' (Delay→Seq t)
-  
+
 private
   {-# NON_TERMINATING #-}
   Seq→Delay' : ∀ {A : Set} → Seq A → Delay A
@@ -137,7 +137,7 @@ Seq→Delay t = case fst t 0 of (insert-fun t)
 
 private
   seq-change-at-0 : ∀ {A} (b : Seq A) (r : A) → inl r ≡ fst b 0 → (n : ℕ) → inl r ≡ fst b n
-  seq-change-at-0 b r p 0 = p 
+  seq-change-at-0 b r p 0 = p
   seq-change-at-0 b r p (suc n) = seq-change-at-0 b r p n ∙ sym (case snd b n of (λ { (inl q) → sym q ; (inr (q , _)) → empty-rec (inl≢inr (seq-change-at-0 b r p n ∙ q)) }))
 
   mono-LE-isProp : ∀ {A} → isSet A → (b : Seq A) (n : ℕ) → isProp (LE (fst b n) (fst b (suc n)))
@@ -152,7 +152,7 @@ private
     ΣPathP (funExt (seq-change-at-0 b r q) ,
       transport (sym (PathP≡Path (λ i → ismon (funExt (seq-change-at-0 b r q) i)) (λ _ → inl refl) (snd b)))
         (funExt λ (n : ℕ) → mono-LE-isProp A-set b n (transport (λ i → ismon (funExt (seq-change-at-0 b r q) i)) (λ _ → inl refl) n) (snd b n)))
-                                                                              
+
 shift'-unshift : ∀ {A} → isSet A → (b : Seq A) → (fst b 0 ≡ inr tt) → shift' (unshift b) ≡ b
 shift'-unshift A-set b q =
   shift-seq (unshift b) (inr tt , shift'-case-fun (unshift b) (fst b 1))
@@ -163,14 +163,14 @@ shift'-unshift A-set b q =
   shift-seq (unshift b) (fst b 0 , snd b 0)
     ≡⟨ shift-unshift b ⟩
   b ∎
-    
+
 private
   isMon-helper : ∀ {A} (b : Seq A) → (n : ℕ) → Σ (A ⊎ Unit) (λ va → (fst b n ≡ va) × ismon' (fst b) n)
   isMon-helper b n = fst b n , refl , snd b n
 
 postulate
   Seq-Delay' : ∀ {A} → isSet A -> (b : Seq A) -> Delay→Seq (Seq→Delay' b) ≡ b
-                                            
+
 Seq-Delay : ∀ {A} → isSet A -> (b : Seq A) → Delay→Seq (Seq→Delay b) ≡ b
 Seq-Delay {A = A} A-set b with isMon-helper b 0
 ... | (inl r , q , _) =
@@ -179,7 +179,7 @@ Seq-Delay {A = A} A-set b with isMon-helper b 0
   Delay→Seq (now r)
     ≡⟨ refl ⟩
   (now-seq r)
-    ≡⟨ seq-const-from-0 A-set b r (sym q) ⟩ 
+    ≡⟨ seq-const-from-0 A-set b r (sym q) ⟩
   b ∎
 ... | (inr tt , q , _) =
   Delay→Seq ((insert-fun b) (fst b 0))
@@ -189,17 +189,17 @@ Seq-Delay {A = A} A-set b with isMon-helper b 0
   shift' (unshift b)
     ≡⟨ shift'-unshift A-set b q ⟩
   b ∎
-    
+
 postulate
   Delay'-Seq : ∀ {A : Set} (b : Delay A) → Seq→Delay' (Delay→Seq b) ≡ b
-                                                                      
+
 Delay-Seq : ∀ {A : Set} (b : Delay A) → Seq→Delay (Delay→Seq b) ≡ b
 Delay-Seq (now r) = refl
 Delay-Seq {A = A} (later t) = later (Seq→Delay' (unshift (shift' (Delay→Seq t)))) ≡⟨ (λ i → later (Seq→Delay' (unshift-shift {A = A} (Delay→Seq t) {va-mon = (fst (Delay→Seq t) 0) , inl refl} i))) ⟩ later (Seq→Delay' (Delay→Seq t)) ≡⟨ cong later (Delay'-Seq t) ⟩ later t ∎
-                                                                                                                                                                                                                                                                              
+
 delay-Seq-Iso : ∀ {A} → isSet A -> Iso (Delay A) (Seq A)
 delay-Seq-Iso A-set = (iso Delay→Seq Seq→Delay (Seq-Delay A-set) Delay-Seq)
-                                                                 
+
 delay≡Seq : ∀ {A} → isSet A -> Delay A ≡ Seq A
 delay≡Seq A-set = isoToPath (delay-Seq-Iso A-set)
 
@@ -212,7 +212,7 @@ s ↓seq a = Σ[ n ∈ ℕ ] fst s n ≡ inl a
 
 _⊑seq_ : ∀ {A} → ∀ (_ _ : Seq A) → Set
 _⊑seq_ {A} s t = (a : A) → ∥ (s ↓seq a) ∥ → ∥ t ↓seq a ∥
-                                                       
+
 _∼seq_ : ∀ {A} → ∀ (_ _ : Seq A) → Set
 s ∼seq t = s ⊑seq t × t ⊑seq s
 
@@ -323,7 +323,7 @@ private
 ---------------------------------------
 -- Properties for sequence orderings --
 ---------------------------------------
-                                                                                                                  
+
 shift-sim : forall {A : Set} (a b : Seq A) -> a ∼seq b -> (shift' a) ∼seq b
 shift-sim a b (p , q) =
   (λ v x → p v (∥map∥ (remove-shift↓ v a) x)) ,
@@ -331,14 +331,14 @@ shift-sim a b (p , q) =
   where
     shift↓ : ∀ {A : Set} (a : A) (b : Seq A) -> b ↓seq a -> (shift' b) ↓seq a
     shift↓ a b (n , p) = suc n , p
-                               
+
     remove-shift↓ : forall {A : Set} (a : A) (b : Seq A) -> (shift' b) ↓seq a -> b ↓seq a
     remove-shift↓ a b (0 , p) = 0 , sym (seq-change-at-0 (shift' b) a (sym p) 1)
     remove-shift↓ a b ((suc n) , p) = n , p
 
 shift-sym : forall {A : Set} (a b : Seq A) -> a ∼seq b -> b ∼seq  a
 shift-sym a b (p , q) = q , p
-                            
+
 ∼Delay→∼Seq : ∀ {A : Set} → {x y : Delay A} → x ∼delay y → (Delay→Seq x) ∼seq (Delay→Seq y)
 ∼Delay→∼Seq (∼now a b p) =
   subst (λ k → now-seq a ∼seq now-seq k) p (∼seq-refl (now-seq a))
@@ -350,32 +350,32 @@ shift-sym a b (p , q) = q , p
 ∼Delay→∼Seq (∼later-r t u p) =
   shift-sym (Delay→Seq (later u)) (Delay→Seq t) (shift-sim (Delay→Seq u) (Delay→Seq t) (shift-sym (Delay→Seq t) (Delay→Seq u) (∼Delay→∼Seq p)))
 ∼Delay→∼Seq (∼later t u p) =
-  shift-sym (Delay→Seq (later u)) (Delay→Seq (later t)) (shift-sim (Delay→Seq u) (Delay→Seq (later t)) (shift-sym (Delay→Seq (later t)) (Delay→Seq u) (shift-sim (Delay→Seq t) (Delay→Seq u) (∼Delay→∼Seq p))))    
+  shift-sym (Delay→Seq (later u)) (Delay→Seq (later t)) (shift-sim (Delay→Seq u) (Delay→Seq (later t)) (shift-sym (Delay→Seq (later t)) (Delay→Seq u) (shift-sim (Delay→Seq t) (Delay→Seq u) (∼Delay→∼Seq p))))
 
 postulate
   ∼Seq→∼Delay' : ∀ {A : Set} → {x y : Seq A} → x ∼seq y → Seq→Delay' x ∼delay Seq→Delay' y
-  ∼Seq→∼Delay'' : ∀ {A : Set} → {x y : Seq A} → x ∼seq y → Seq→Delay x ∼delay Seq→Delay' y 
-  ∼Seq→∼Delay''' : ∀ {A : Set} → {x y : Seq A} → x ∼seq y → Seq→Delay' x ∼delay Seq→Delay y 
-  
-∼Seq→∼Delay : ∀ {A : Set} → (isSet A) → {x y : Seq A} → x ∼seq y → Seq→Delay x ∼delay Seq→Delay y 
+  ∼Seq→∼Delay'' : ∀ {A : Set} → {x y : Seq A} → x ∼seq y → Seq→Delay x ∼delay Seq→Delay' y
+  ∼Seq→∼Delay''' : ∀ {A : Set} → {x y : Seq A} → x ∼seq y → Seq→Delay' x ∼delay Seq→Delay y
+
+∼Seq→∼Delay : ∀ {A : Set} → (isSet A) → {x y : Seq A} → x ∼seq y → Seq→Delay x ∼delay Seq→Delay y
 ∼Seq→∼Delay A-set {x = x} {y} (a , b) =
   case case-helper (x .fst 0) (y .fst 0) return (λ { ((a , _) , (b , _)) → insert-fun x a ∼delay insert-fun y b }) of
     λ {((inl r , p) , (inl s , q)) → ∼now r s (termination-value-unique-trunc A-set x ∣ 0 , sym p ∣ (b s ∣ 0 , sym q ∣))
       ;((inl r , p) , (inr tt , q)) →
-        let temp = 
+        let temp =
                  (∼later-r (Seq→Delay x) (Seq→Delay' (unshift y)) (∼Seq→∼Delay''
                    ((λ a₁ x₁ → ∥map∥ (λ x₂ → unshift↓ a₁ y x₂) (a a₁ x₁)) ,
                    (λ a₁ x₁ → (b a₁ (∥map∥ (remove-unshift↓ a₁ y) x₁))))))
         in
           transport (λ i → Seq→Delay (sym (seq-const-from-0 A-set x r p) i) ∼delay later (Seq→Delay' (unshift y))) temp
       ;((inr tt , p) , (inl s , q)) →
-        let temp = 
+        let temp =
                  (∼later-l (Seq→Delay' (unshift x)) (Seq→Delay y) (∼Seq→∼Delay'''
                    ((λ a₁ x₁ → a a₁ (∥map∥ (remove-unshift↓ a₁ x) x₁)) ,
                    (λ a₁ x₁ → ∥map∥ (λ x₂ → unshift↓ a₁ x x₂) (b a₁ x₁)))))
         in
           transport (λ i → later (Seq→Delay' (unshift x)) ∼delay (Seq→Delay (sym (seq-const-from-0 A-set y s q) i))) temp
-                                                                                                                      
+
       ;((inr tt , p) , (inr tt , q)) → ∼later (Seq→Delay' (unshift x)) (Seq→Delay' (unshift y)) (∼Seq→∼Delay' (
              (λ a₁ x₁ → ∥map∥ (unshift↓ a₁ y) (a a₁ (∥map∥ (remove-unshift↓ a₁ x) x₁))) ,
              (λ a₁ x₁ → ∥map∥ (unshift↓ a₁ x) (b a₁ (∥map∥ (remove-unshift↓ a₁ y) x₁)))))}
@@ -386,10 +386,10 @@ postulate
     unshift↓ : forall {A : Set} (a : A) (b : Seq A) -> b ↓seq a -> (unshift b) ↓seq a
     unshift↓ a b (0 , p) = 0 , sym (seq-change-at-0 b a (sym p) 1)
     unshift↓ a b ((suc n) , p) = n , p
-                                   
-    remove-unshift↓ : forall {A : Set} (a : A) (b : Seq A) -> (unshift b) ↓seq a -> b ↓seq a 
+
+    remove-unshift↓ : forall {A : Set} (a : A) (b : Seq A) -> (unshift b) ↓seq a -> b ↓seq a
     remove-unshift↓ a b (n , p) = suc n , p
-             
+
 delay/∼≡Seq/∼ : forall {A : Set} → (isSet A) -> Iso (Delay A / _∼delay_) (Seq A / _∼seq_)
 delay/∼≡Seq/∼ A-set =
   iso fun inv right left
@@ -401,7 +401,7 @@ delay/∼≡Seq/∼ A-set =
       right-helper :
         ∀ {A : Set} → (A-set : isSet A) → {x y : Seq A} (r : x ∼seq y)
         → PathP (λ x₁ → Seq-Delay A-set x x₁ ∼seq Seq-Delay A-set y x₁) (∼Delay→∼Seq (∼Seq→∼Delay A-set r)) r
-                                                                                                    
+
     right : ∀ b → fun (inv b) ≡ b
     right [ b ] = [ (Delay→Seq (Seq→Delay b)) ] ≡⟨ cong [_] (Seq-Delay A-set b) ⟩ [ b ] ∎
     right (eq/ a b r i) = (λ j → eq/ (Seq-Delay A-set a j) (Seq-Delay A-set b j) (right-helper A-set r j) i) ∙ refl
@@ -412,7 +412,7 @@ delay/∼≡Seq/∼ A-set =
         ∀ {A : Set} → (A-set : isSet A) → {x y : Delay A} (r : x ∼delay y)
         → PathP (λ x₁ → Delay-Seq x x₁ ∼delay Delay-Seq y x₁) (∼Seq→∼Delay A-set (∼Delay→∼Seq r)) r
     -- left-helper A-set (∼now a b p) i = ∼now a b (A-set a b (termination-value-unique-trunc A-set (now-seq a) ∣ 0 , sym refl ∣ (proj₂ (∼Delay→∼Seq (∼now a b p)) b ∣ 0 , sym refl ∣)) p i)
-                                                                                                                   
+
     left : ∀ b → inv (fun b) ≡ b
     left [ b ] = [ (Seq→Delay (Delay→Seq b)) ] ≡⟨ cong [_] (Delay-Seq b) ⟩ [ b ] ∎
     left (eq/ a b r i) = (λ j → eq/ (Delay-Seq a j) (Delay-Seq b j) (left-helper A-set r j) i) ∙ refl
@@ -457,6 +457,8 @@ mutual
     least-upper-bound : ∀ s ub → Is-upper-bound s ub → ⊔ s ⊑ ub
     ⊑-propositional   : ∀ {x y} → isProp (x ⊑ y)
 
+-- make-least-upper-bound : {A : Set} → (s : Increasing-sequence A) → Σ[ n ∈ ℕ ] (Is-upper-bound s (fst s n))
+-- make-least-upper-bound = {!!}
 
 -- Propositional Eliminator for the partiality monad
 elimProp⊥ :
@@ -500,9 +502,6 @@ private
   ∃⊑→⨆⊑⨆ : ∀ {A : Set} {s₁ s₂ : Increasing-sequence A} →
            (∀ m → Σ[ n ∈ ℕ ] (fst s₁  m ⊑ fst s₂ n)) → ⊔ s₁ ⊑ ⊔ s₂
   ∃⊑→⨆⊑⨆ s₁⊑s₂ = ⊑→⨆⊑⨆ (snd ∘ s₁⊑s₂)
-
-  postulate 
-    η⊑⊔ : ∀ {A : Set} s q (r : A) → η r ⊑ ⊔ (s , q) → ∥ Σ[ n ∈ ℕ ] η r ⊑ s n ∥  
 
   -- the least upper bound of a constant sequence, is the constant
   least-upper-bound-const-seq : ∀ {A : Set} (s : < A >⊥) → ⊔ ((λ _ → s) , (λ _ → ⊑-refl s)) ≡ s
@@ -579,20 +578,17 @@ Seq/∼→⊥-isInjective {A} A-set {x} {y} =
 
 Seq/∼→⊥-isEmbedding : ∀ {A} → (A-set : isSet A) → isEmbedding (Seq/∼→⊥ A-set)
 Seq/∼→⊥-isEmbedding {A} A-set = injEmbedding squash/ ⊥-isSet (Seq/∼→⊥-isInjective A-set)
-  
+
 Seq→⊥-isSurjection : ∀ {A : Set} → (A-set : isSet A) → Axiom-of-countable-choice → isSurjection (Seq→⊥ {A})
-Seq→⊥-isSurjection {A} A-set cc =
+Seq→⊥-isSurjection {A} A-set acc =
   elimProp⊥
     (λ y → ∥ (Σ[ x ∈ Seq A ] (Seq→⊥ x ≡ y)) ∥)
     (λ _ → propTruncIsProp)
     ∣ never-seq , const-seq (inr tt) ∣
     (λ a → ∣ now-seq a , const-seq (inl a) ∣)
     λ s p →
-      let temp'3 : ∥ (Σ[ f ∈ (ℕ → Seq A) ] (∀ n → Seq→⊥ (f n) ≡ fst s n)) ∥
-          temp'3 = ∥map∥ (λ x → (λ n → x n .fst) , (λ n → x n .snd)) (cc p) in
-      let temp'4 : ∥ (Σ[ x ∈ Seq A ] (Seq→⊥ x ≡ ⊔ s)) ∥
-          temp'4 = ∥map∥ (uncurry (pointwise-equivalence→upper-bound-equivalence s)) temp'3 in
-      temp'4
+      let temp = acc p in
+      ∥map∥ (uncurry (pointwise-equivalence→upper-bound-equivalence s)) (∥map∥ (λ x → (λ n → x n .fst) , (λ n → x n .snd)) (acc p))
   where
     const-seq : ∀ {A : Set} → (s : A ⊎ Unit) → Seq→⊥ ((λ _ → s) , (λ _ → inl refl)) ≡ Maybe→⊥ s
     const-seq s =
@@ -613,14 +609,14 @@ Seq→⊥-isSurjection {A} A-set cc =
         → Σ[ x ∈ Seq A ] (Seq→⊥ x ≡ ⊔ s)
 
 Seq/∼→⊥-isSurjection : ∀ {A} → (A-set : isSet A) → Axiom-of-countable-choice → isSurjection (Seq/∼→⊥ A-set)
-Seq/∼→⊥-isSurjection A-set cc b =
-  ∥map∥ (λ {(x , y) → [ x ] , y}) (Seq→⊥-isSurjection A-set cc b)
+Seq/∼→⊥-isSurjection A-set acc b =
+  ∥map∥ (λ {(x , y) → [ x ] , y}) (Seq→⊥-isSurjection A-set acc b)
 
 seq/∼→⊥-isEquiv : ∀ {A} → (A-set : isSet A) → Axiom-of-countable-choice → isEquiv (Seq/∼→⊥ A-set)
-seq/∼→⊥-isEquiv A-set cc = isEmbedding×isSurjection→isEquiv ((Seq/∼→⊥-isEmbedding A-set) , (Seq/∼→⊥-isSurjection A-set cc)) 
+seq/∼→⊥-isEquiv A-set acc = isEmbedding×isSurjection→isEquiv ((Seq/∼→⊥-isEmbedding A-set) , (Seq/∼→⊥-isSurjection A-set acc))
 
 seq/∼≃⊥ : ∀ {A} → isSet A → Axiom-of-countable-choice → (Seq A / _∼seq_) ≃ < A >⊥
-seq/∼≃⊥ A-set cc = Seq/∼→⊥ A-set , seq/∼→⊥-isEquiv A-set cc
+seq/∼≃⊥ A-set acc = Seq/∼→⊥ A-set , seq/∼→⊥-isEquiv A-set acc
 
 seq/∼≡⊥ : ∀ {A} → isSet A → Axiom-of-countable-choice → (Seq A / _∼seq_) ≡ < A >⊥
-seq/∼≡⊥ A-set cc = ua (seq/∼≃⊥ A-set cc)
+seq/∼≡⊥ A-set acc = ua (seq/∼≃⊥ A-set acc)

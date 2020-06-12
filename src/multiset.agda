@@ -94,18 +94,18 @@ elimPropMS {X} P Pprop Pleaf Pnode = temp
   where
     temp : (t : MS X) → P t
     temp (leaf x) = Pleaf x
-    temp (node f) = Pnode (λ n → temp (f n))
+    temp (node f) = Pnode (temp ∘ f)
     temp (perm g e i) =
-      isOfHLevel→isOfHLevelDep 1 Pprop (temp (node g)) (temp (node (g ∘ (e .fst)))) (perm g e) i  -- problem here
+      isOfHLevel→isOfHLevelDep 1 Pprop (temp (node g)) (temp (node (g ∘ (e .fst)))) (perm g e) i  -- problem here, but is correct since (node (g ∘ (e .fst))) < perm g e i !
     temp (MS-isSet a b p q i j) =
       isOfHLevel→isOfHLevelDep 2 (isProp→isSet ∘ Pprop) (temp a) (temp b) (cong temp p) (cong temp q) (MS-isSet a b p q) i j
-  
+
 T→MS-isSurjection : {X : Set} → Axiom-of-countable-choice → isSurjection (T→MS {X = X})
 T→MS-isSurjection {X = X} acc = elimPropMS (λ x → ∥ fiber T→MS x ∥) (λ _ → propTruncIsProp) leaf-val node-val
   where
     leaf-val : (x : X) → ∥ fiber T→MS (leaf x) ∥
     leaf-val x = ∣ leaf x , refl ∣
-    
+
     node-val : {f : ℕ → MS X} → ((n : ℕ) → ∥ fiber T→MS (f n) ∥) → ∥ fiber T→MS (node f) ∥
     node-val = ∥map∥ (λ g → (node (fst ∘ g)) , λ i → node (funExt (snd ∘ g) i)) ∘ acc
 
