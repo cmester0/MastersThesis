@@ -32,24 +32,22 @@ open import Cubical.Functions.FunExtEquiv
 open import Cubical.Foundations.HLevels
 open import helper renaming (rec to rec/)
 
-mutual
-  data Delay (R : Type₀) : Type₀ where
-    now : R → Delay R
-    later : Delay R → Delay R
+data Delay (R : Type₀) : Type₀ where
+  now : R → Delay R
+  later : Delay R → Delay R
 
 -- Weak bisimularity for delay monad
-mutual
-  data _∼_ {R : Type₀} : (_ _ : Delay R) → Type₀ where
-    ∼now : ∀ (s r : R) → s ≡ r → now s ∼ now r
-    ∼later-l : ∀ t u → t ∼ u → later t ∼ u
-    ∼later-r : ∀ t u → t ∼ u → t ∼ later u
-    ∼later : ∀ t u → t ∼ u → later t ∼ later u
-
+data _∼_ {R : Type₀} : (_ _ : Delay R) → Type₀ where
+  ∼now : ∀ (s r : R) → s ≡ r → now s ∼ now r
+  ∼later-l : ∀ t u → t ∼ u → later t ∼ u
+  ∼later-r : ∀ t u → t ∼ u → t ∼ later u
+  ∼later : ∀ t u → t ∼ u → later t ∼ later u
+       
 -- Partiality monad (QIIT)
 data <_>⊥ (A : Type₀) : Type₀ where
   now : A → < A >⊥
   later : < A >⊥ → < A >⊥
-  later-l : ∀ t u → t ≡ u → later t ≡ u
+  later-l : ∀ (t : < A >⊥) (u : < A >⊥) → t ≡ u → later t ≡ u
   -- later-r : ∀ t u → t ≡ u → t ≡ later u -- obsolete
   -- later-c : ∀ t u → t ≡ u → later t ≡ later u -- obsolete by embedding of constructors
   ⊥-isSet : isSet (< A >⊥)
@@ -112,12 +110,13 @@ elimProp⊥ {A = A} P Pprop pn = temp
   where
     temp : (x : < A >⊥) → P x
     temp (now a) = pn a
-    temp (later x) = subst P (later-r x x refl) (temp x) -- problem here
-    temp (later-l t u p i) = isOfHLevel→isOfHLevelDep 1 Pprop ((temp) (later t)) ((temp) u) (later-l t u p) i
+    temp (later x) = transport (cong P (later-r x x refl)) (temp x) -- problem here
+    temp (later-l t u p i) = isOfHLevel→isOfHLevelDep 1 Pprop ((temp) (later t)) ((temp) u) (later-l t u p) i -- and here
     temp (⊥-isSet a b p q i j) = isOfHLevel→isOfHLevelDep 2 (isProp→isSet ∘ Pprop) ((temp) a) ((temp) b) (cong (temp) p) (cong (temp) q) (⊥-isSet a b p q) i j
 
-Delay/∼→⊥-isSurjective : ∀ {R} → Axiom-of-countable-choice ℓ-zero → isSurjection (Delay/∼→⊥ {R = R})
-Delay/∼→⊥-isSurjective acc =
+-- Construction does not use axiom of choice !, which means there is something wrong.
+Delay/∼→⊥-isSurjective : ∀ {R} → isSurjection (Delay/∼→⊥ {R = R})
+Delay/∼→⊥-isSurjective =
   elimProp⊥
     (λ y → ∥ fiber Delay/∼→⊥ y ∥)
     (λ _ → propTruncIsProp)

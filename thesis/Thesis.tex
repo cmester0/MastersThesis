@@ -41,77 +41,6 @@
 
 \usepackage{amsthm}
 
-% \DeclareUnicodeCharacter{2080}{_0}
-
-% \usepackage[math-style=TeX,vargreek-shape=unicode]{unicode-math} % loads fontspec -- no-math
-\usepackage{fontspec} 
-
-\usepackage{newunicodechar}
-\newunicodechar{λ}{\ensuremath{\lambda}}
-\newunicodechar{←}{\ensuremath{\from}}
-\newunicodechar{→}{\ensuremath{\to}}
-\newunicodechar{∀}{\ensuremath{\forall}}
-\newunicodechar{ℓ}{\ensuremath{\ell}}
-% \newunicodechar{₀}{~} %TODO?
-\newunicodechar{Σ}{\ensuremath{\Sigma}}
-\newunicodechar{≈}{\ensuremath{\approx}}
-\newunicodechar{⟨}{\ensuremath{\langle}}
-\newunicodechar{⟩}{\ensuremath{\rangle}}
-\newunicodechar{≡}{\ensuremath{\equiv}}
-\newunicodechar{π}{\ensuremath{\pi}}
-\newunicodechar{ℕ}{\ensuremath{\mathbb{N}}}
-\newunicodechar{≅}{\ensuremath{\cong}}
-
-\usepackage{listings} %lstlistings
-\lstset{inputpath=src/}
-% Cubical Agda listing config
-
-\lstdefinelanguage{agda}{
-  sensitive = true,
-  keywords={},
-  % otherkeywords={% Operators
-  %   >, <, ==
-  % },
-  keywords = [2]{module, open, import, where},
-  keywordstyle=\color{green},
-  keywordstyle=[2]\color{blue},% for example
-  keywords = [3]{postulate, private},
-  keywordstyle=[3]\color{magenta},
-  numbers=left,
-  numberstyle=\scriptsize,
-  stepnumber=1,
-  numbersep=8pt,
-  showstringspaces=false,
-  breaklines=true,
-  frame=top,
-  comment=[l]{--},
-  morecomment=[s]{\{-\#}{\#-\}},
-  commentstyle=\color{gray}\ttfamily,
-  stringstyle=\color{red}\ttfamily,
-  % morestring=[b]',
-  % morestring=[b]"
-}
-
-\lstset{
-  language=agda, 
-  basicstyle=\ttfamily\small,
-  numberstyle=\footnotesize,
-  numbers=left,
-  backgroundcolor=\color{gray!10},
-  frame=single,
-  tabsize=2,
-  rulecolor=\color{black!30},
-  title=\lstname,
-  % escapeinside={\%*}{*)},
-  breaklines=true,
-  breakatwhitespace=true,
-  framextopmargin=2pt,
-  framexbottommargin=2pt,
-  inputencoding=utf8,
-  extendedchars=true,
-  % literate={}{!}1,
-}
-
 \theoremstyle{plain} % default
 \newtheorem{thm}{Theorem}[section]
 \newtheorem{lem}[thm]{Lemma}
@@ -528,7 +457,7 @@ We start by introducing containers and polynomial functors,
       &\function{inv}_{\pathterm{\mathcal{L}collapse}}~\term{x}_0 = (\lambda\,n,~\function{\ell}^{(n)}~\term{x}_0)~,~(\lambda\,n,~\mathtt{refl}_{(\function{\ell}^{(n+1)}\,\term{x}_0)}) \\
       &\function{rinv}_{\pathterm{\mathcal{L}collapse}}~\term{x}_0 = \mathtt{refl}_{\term{x}_0}
     \end{align}
-    where \(\function{\ell}^{(n)} = \function{\ell}_n \circ \function{\ell}_{n-1} \circ \dots \circ \function{\ell}_1 \circ \function{\ell}_0\). To define \(\function{linv}_{\pathterm{\mathcal{L}collapse}}~(\term{x} , \pathterm{r})\), we first define a fiber \((\type{X} , \term{z}, \function{\ell})\) over \(\mathbb{N}\) given some \(\term{z} : \type{X}_0\). Then any element of the type \(\sum_{\left(\term{x} : \prod_{(n : \mathbb{N})} \type{X}_n\right)} \term{x}_{n + 1} \equiv \function{\ell}_n~\term{x}_n\) is equal to a section over the fiber we defined. This means \(\term{y}\) is equal to a section. Since the sections are defined over \(\mathbb{N}\), which is an initial algebra for the functor \(\functor{G}\type{Y} = \unit + \type{Y}\), we get that sections are contractible. This means \(\term{y} \equiv \function{inv}_{\pathterm{\mathcal{L}collapse}} (\function{fun}_{\pathterm{\mathcal{L}collapse}}~\term{y})\), since both sites are equal to sections over \(\mathbb{N}\).
+    where \(\function{\ell}^{(n)} = \function{\ell}_n \circ \function{\ell}_{n-1} \circ \dots \circ \function{\ell}_1 \circ \function{\ell}_0\). To define \(\function{linv}_{\pathterm{\mathcal{L}collapse}}~(\term{x} , \pathterm{r})\), we first define a fiber \((\type{X} , \term{z}, \function{\ell})\) over \(\mathbb{N}\) given some \(\term{z} : \type{X}_0\). Then any element of the type \(\sum_{\left(\term{x} : \prod_{(n : \mathbb{N})} \type{X}_n\right)} \term{x}_{n + 1} \equiv \function{\ell}_n~\term{x}_n\) is equal to a section over the fiber we defined. This means \(\term{y}\) is equal to a section. Since the sections are defined over \(\mathbb{N}\), which is an initial algebra for the functor \(\functor{G}\type{Y} = \unit + \type{Y}\), we get that sections are contractible. This means \(\term{y} \equiv \function{inv}_{\pathterm{\mathcal{L}collapse}} (\function{fun}_{\pathterm{\mathcal{L}collapse}}~\term{y})\), since both sides are equal to sections over \(\mathbb{N}\).
 \end{proof}
 \end{lem}
 \begin{lem}\label{lem:function-to-M-type-is-cone}
@@ -896,7 +825,7 @@ We start by defining the recursor and some eliminators for the set truncated quo
 \noindent We can now construct some more interesting data types, by set quotienting \texttt{M}-types, which we call Q\texttt{M}-types, some examples follow in the following section.
 
 \section{Q\texttt{M}-types and Quotient inductive-inductive types (QIITs)}
-In this section we will show some examples of quotiented \texttt{M}-type defined using set truncated quotients. We will construct the same type using quotient inductive-inductive types instead, and show these two construction gives equal types, assuming the axiom of choice. A quotient inductive-inductive type (QIIT) \cite{DBLP:QIIT} is a type that is defined at the same time as a relation over that type and then set truncated. We believe, but do not show, that this equality between the two ways of constructing Q\texttt{M}-types is general.
+In this section we will show some examples of quotiented \texttt{M}-type defined using set truncated quotients. We will also construct the types as a quotient inductive-inductive types instead, and show these two construction gives equal types, assuming the axiom of countable choice. A quotient inductive-inductive type (QIIT) \cite{DBLP:QIIT} is a type that is defined at the same time as a relation over that type and then set truncated. We believe, but do not show, that this equality between the two ways of constructing Q\texttt{M}-types is general.
 % However QIITs are more general than our Q\texttt{M}-types, so we cannot expect every QIIT to have a corresponding Q\texttt{M}-type.
 
 \subsection{Multiset}
@@ -976,13 +905,13 @@ This function takes weakly bisimilar objects to equal once.
 \end{lem}
 \noindent With this lemma, we can lift the function \(\function{T{\rightarrow}MS}\) to the quotient.
 \begin{defn}
-  There is a function \(\function{T/{\sim}{\rightarrow}MS}\) from \(\typeformer{T}\,\type{A}/\relation{\sim_{T}}\) to \(\typeformer{MS}~\type{A}\), defined using the recursor for quotients defined in \defref{quotient-recursor}, with \(\function{f} = \function{T{\rightarrow}MS}\) and \(\function{g} = \function{T{\rightarrow}MS\text{-}{\sim}{\rightarrow}{\equiv}}\), since \(\typeformer{MS}\) is a set by \(\constructor{MS\text{-}isSet}\)
+  There is a function \(\function{T/{\sim}{\rightarrow}MS}\) from \(\typeformer{T}\,\type{A}/\relation{\sim_{T}}\) to \(\typeformer{MS}~\type{A}\) defined using the recursor for quotients, given in \defref{quotient-recursor}, with \(\function{f} = \function{T{\rightarrow}MS}\) and \(\function{g} = \function{T{\rightarrow}MS\text{-}{\sim}{\rightarrow}{\equiv}}\) and using that \(\typeformer{MS}\) is a set by \(\constructor{MS\text{-}isSet}\)
 \end{defn}
 \begin{lem}
   \label{lem:weak-bisim-to-eq-multiset}
   Given an equality \(\function{T{\rightarrow}MS}~\term{x} \equiv \function{T{\rightarrow}MS}~\term{y}\) then \(\term{x}~\relation{\sim_{T}}~\term{y}\).
   \begin{proof}
-    If \(\term{x}\) and \(\term{y}\) are leaves with values \(\term{a}\) and \(\term{b}\) then \(\term{a} \equiv \term{b}\) by the injectivity of the constructor \(\constructor{leaf}_{\typeformer{MS}}\), making a bisimilarity using \(\constructor{\sim_{leaf}}\). If \(\term{x}\) and \(\term{y}\) are nodes defined by functions \(\function{f}\) and \(\function{g}\), then by the injectivity of the constructor \(\constructor{node}_{\typeformer{MS}}\), we get \(\prod_{(n : \mathbb{N})} \function{f}~n \equiv \function{g}~n\) and by induction we get \(\prod_{(n : \mathbb{N})} \function{f}~n~\relation{\sim_{T}}~\function{g}~n\), making us able to use \(\constructor{\sim_{node}}\) to construct the bisimilarity. We do not get any other equalities, since \(\constructor{leaf}_{\typeformer{MS}}\) and \(\constructor{node}_{\typeformer{MS}}\) are disjoint.
+    If \(\term{x}\) and \(\term{y}\) are leaves with values \(\term{a}\) and \(\term{b}\) then \(\term{a} \equiv \term{b}\) by the injectivity of the constructor \(\constructor{leaf}_{\typeformer{MS}}\), giving a bisimilarity by \(\constructor{\sim_{leaf}}\). If \(\term{x}\) and \(\term{y}\) are nodes defined by functions \(\function{f}\) and \(\function{g}\), then by the injectivity of the constructor \(\constructor{node}_{\typeformer{MS}}\), we get \(\prod_{(n : \mathbb{N})} \function{f}~n \equiv \function{g}~n\) and by induction we get \(\prod_{(n : \mathbb{N})} \function{f}~n~\relation{\sim_{T}}~\function{g}~n\), making us able to use \(\constructor{\sim_{node}}\) to construct the bisimilarity. We do not get any other equalities, since \(\constructor{leaf}_{\typeformer{MS}}\) and \(\constructor{node}_{\typeformer{MS}}\) are disjoint.
   \end{proof}
 \end{lem}
 \begin{lem}
@@ -992,7 +921,7 @@ This function takes weakly bisimilar objects to equal once.
     \begin{equation}
       \typeformer{P} = (\lambda\,\term{x},~\function{T/{\sim}{\rightarrow}MS}~\term{x} \equiv \function{T/{\sim}{\rightarrow}MS}~\term{y} \rightarrow \term{x} \equiv \term{y})
     \end{equation}
-    which is a proposition for all \(\term{x}\) by \(\function{P_{prop}} = \lambda\,\term{x},~\function{isProp\Pi}~(\lambda\,\_, \constructor{squash/}~\term{x}~\term{y})\). We do the propositional elimination twice, first for \(\term{x}\) and then for \(\term{y}\), where we define \(\typeformer{P}\) and \(\function{P_{prop}}\) similarly, but with \(\term{x} = \quotientconstructor{\term{a}}\) since it has already been propositionally eliminated. 
+    which is a proposition for all \(\term{x}\) by \(\function{P_{prop}} = \lambda\,\term{x},~\function{isProp\text{$\Pi$}}~(\lambda\,\_, \constructor{squash/}~\term{x}~\term{y})\). We do the propositional elimination twice, first for \(\term{x}\) and then for \(\term{y}\), where we define \(\typeformer{P}\) and \(\function{P_{prop}}\) similarly, but with \(\term{x} = \quotientconstructor{\term{a}}\) since it has already been propositionally eliminated. 
     \begin{equation}
       \begin{aligned}
         &\function{elimProp}~(\lambda\,\term{a},~\function{elimProp} (\lambda\,\term{b},~\constructor{eq/}~\term{a}~\term{b} \circ \function{T{\rightarrow}MS\text{-}{\equiv}{\rightarrow}{\sim}}~\term{a}~\term{b})~\term{y})~\term{x}
@@ -1017,9 +946,9 @@ This function takes weakly bisimilar objects to equal once.
   \end{equation}
 \end{defn}
 \begin{lem}
-  The function \(\function{T/{\sim}{\rightarrow}MS}\) is surjective \((\prod_{(\term{b} : \typeformer{MS}\,\type{X})}, \| \Sigma_{(\term{x} : \typeformer{T}\,\type{X} / \relation{\sim_{T}})}~\function{T/{\sim}{\rightarrow}MS}~\term{x} \equiv \term{b} \|)\), assuming the axiom of countable choice.
+  The function \(\function{T/{\sim}{\rightarrow}MS}\) is surjective, assuming the axiom of countable choice. Being surjective means for all \(\term{b} : \typeformer{MS}\,\type{X}\) we have \(\| \Sigma_{(\term{x} : \typeformer{T}\,\type{X} / \relation{\sim_{T}})}~\function{T/{\sim}{\rightarrow}MS}~\term{x} \equiv \term{b} \|\).
   \begin{proof}
-    We do propositional elimination of \(\typeformer{MS}\), with \(\typeformer{P}~\term{y} = \| \Sigma_{(\term{x} : \typeformer{T}\,\type{X} / \relation{\sim_{T}})}~\function{T/{\sim}{\rightarrow}MS}~\term{x} \equiv \term{y} \| \), which is a proposition by truncation. For the leaf case, we have the simple equality \(\function{T/{\sim}{\rightarrow}MS}~\quotientconstructor{\constructor{leaf}_{\typeformer{T}}~\term{x} / \relation{\sim_{T}}} \equiv \constructor{leaf}_{\typeformer{MS}}~\term{x}\). For the node case with \(\constructor{node}~\function{f}\), where we get the following function by induction
+    We do propositional elimination of \(\typeformer{MS}~\type{X}\), with \(\typeformer{P}~\term{y} = \| \Sigma_{(\term{x} : \typeformer{T}\,\type{X} / \relation{\sim_{T}})}~\function{T/{\sim}{\rightarrow}MS}~\term{x} \equiv \term{y} \| \), which is a proposition by truncation. For the leaf case, we have the simple equality \(\function{T/{\sim}{\rightarrow}MS}~\quotientconstructor{\constructor{leaf}_{\typeformer{T}}~\term{x} / \relation{\sim_{T}}} \equiv \constructor{leaf}_{\typeformer{MS}}~\term{x}\). For the node case with \(\constructor{node}~\function{f}\), we get the following function by induction
     \begin{equation}
       \function{f'} : \prod_{(n : \mathbb{N})} \bigg\| \sum_{(\term{y} : \typeformer{T}\,\type{X} / \relation{\sim_{T}})} \function{T/{\sim}{\rightarrow}MS}~\term{y} \equiv \function{f}\,n \bigg\|
     \end{equation}
@@ -1037,12 +966,11 @@ This function takes weakly bisimilar objects to equal once.
     \end{equation}
     which gives us the equalities
     \begin{align}
-      &\quad~ \function{T/{\sim}{\rightarrow}MS}~\quotientconstructor{\constructor{node}~\function{g}} \\
-      &\equiv \function{T{\rightarrow}MS}~(\constructor{node}~\function{g}) \\
+      \function{T/{\sim}{\rightarrow}MS}~\quotientconstructor{\constructor{node}~\function{g}} &\equiv \function{T{\rightarrow}MS}~(\constructor{node}~\function{g}) \\
       &\equiv \constructor{node}~(\function{T{\rightarrow}MS} \circ \function{g}) \\
       &\equiv \constructor{node}~\function{f}
     \end{align}
-    completing the case for node and the proof.
+    completing the case for the node constructor and thereby the proof.
   \end{proof}
 \end{lem}
 \begin{thm}
@@ -1054,7 +982,7 @@ This function takes weakly bisimilar objects to equal once.
 \end{thm}
 
 \subsection{Partiality monad}
-In this subsection we will define the partiality monad (see below) and show that it is equal to the delay monad quotiented by weak bisimilarity, assuming the axiom of countable choice. We do this proof by defining an intermediate representation of sequences, and then first showing the delay monad equal to this type (\subsectionref{delay-monad-to-sequences}), and then showing that sequences quotiented by weak bisimilarity are equal to the partiality monad (\subsectionref{sequences-to-partiality-monad}). This section draws heavy inspiration from "Partiality, Revisited" \cite{Partiality-Revisited}.
+In this subsection we will define the partiality monad (see below) and show that it is equal to the delay monad quotiented by weak bisimilarity, assuming the axiom of countable choice. We do this proof by defining an intermediate representation as sequences. We then show that the delay monad is equal to sequences (\subsectionref{delay-monad-to-sequences}), followed by showing that sequences quotiented by weak bisimilarity are equal to the partiality monad (\subsectionref{sequences-to-partiality-monad}). This section draws heavy inspiration from "Partiality, Revisited" \cite{Partiality-Revisited}.
 \begin{defn}[Partiality Monad]
   A simple example of a quotient inductive-inductive type is the partiality monad \((-)_\bot\) over a type \(\type{R}\), defined by the constructors\\[-9mm]
   \begin{center}
@@ -1125,7 +1053,7 @@ In this subsection we will define the partiality monad (see below) and show that
       \end{equation}
     \end{minipage}
   \end{center}
-  and finally set truncated
+  and finally set truncated by the following constructor
   \begin{equation}
     \vcenter{\infer[\constructor{(-)_\bot\text{-}isSet}]{\term{p} \equiv \term{q}}{\term{p} , \term{q} : \term{x}~\relation{\sqsubseteq_{\bot}}~\term{y}}}
   \end{equation}
@@ -1143,9 +1071,9 @@ We define sequences, and show they are equal to the delay monad (\thmref{seq-eq-
   \begin{equation}
     \function{isMon}~\function{s} = \prod_{(n : \mathbb{N})} (\function{s}_n \equiv \function{s}_{n+1})  + ((\function{s}_n \equiv \mathtt{inr}~\unitelem) \times (\function{s}_{n+1} \not\equiv \mathtt{inr}~\unitelem))
   \end{equation}
-  meaning a sequences is \(\mathtt{inr}~\unitelem\) until it reaches a point where it switches to \(\mathtt{inl}~\term{r}\) for some value \(\term{r}\). There are also the special cases of already terminated, meaning only \(\mathtt{inl}~\term{r}\) and never teminating meaning only \(\mathtt{inr}~\unitelem\).
+  meaning a sequences is \(\mathtt{inr}~\unitelem\) until it reaches a point where it switches to \(\mathtt{inl}~\term{r}\) for some value \(\term{r}\). There are two special cases, the already terminated sequence meaning only \(\mathtt{inl}~\term{r}\), and the never terminating sequence meaning only \(\mathtt{inr}~\unitelem\).
 \end{defn}
-\noindent For each index in a sequence, the element at that index \(\function{s}_n\) is either not terminated \(\function{s}_n \equiv \mathtt{inr}~\unitelem\), which we denote as \(\function{s}_n \uparrow_{\type{R} + \unit}\), or it is terminated \(\function{s}_n \equiv \mathtt{inl}~\term{r}\) with some value \(r\), denoted by \(\function{s}_n \downarrow_{\type{R} + \unit} \term{r}\) or just \(\function{s}_n \downarrow_{\type{R} + \unit}\) to mean \(\function{s}_n \not\equiv \mathtt{inr}~\unitelem\). Thus we can write \(\function{isMon}\) as
+\noindent For each index in a sequence the element at that index \(\function{s}_n\) is either not terminated \(\function{s}_n \equiv \mathtt{inr}~\unitelem\), which we denote as \(\function{s}_n \uparrow_{\type{R} + \unit}\), or it is terminated \(\function{s}_n \equiv \mathtt{inl}~\term{r}\) with some value \(r\) denoted by \(\function{s}_n \downarrow_{\type{R} + \unit} \term{r}\) or just \(\function{s}_n \downarrow_{\type{R} + \unit}\) if we want to say \(\function{s}_n \not\equiv \mathtt{inr}~\unitelem\). Thus we can write \(\function{isMon}\) as
 \begin{equation}
   \function{isMon}~\function{s} = \prod_{(n : \mathbb{N})} (\function{s}_n \equiv \function{s}_{n+1})  + ((\function{s}_n \uparrow_{\type{R} + \unit}) \times (\function{s}_{n+1} \downarrow_{\type{R} + \unit}))
 \end{equation}
@@ -1157,7 +1085,7 @@ We also introduce notation for the two special cases of sequences given above
   \constant{never}_{\typeformer{Seq}} = (\lambda\,\_, \mathtt{inr}~\unitelem) , (\lambda\,\_, \mathtt{inl}~\mathtt{refl})
 \end{equation}
 \begin{defn}
-  We can shift a sequence \((\function{s},\function{q})\) by inserting an element (and an equality) \((\term{z_s},\term{z_q})\) at \(n = 0\),
+  We can shift a sequence \((\function{s},\function{q})\) by inserting an element and an equality \((\term{z_s},\term{z_q})\) at the front of the sequence,
   \begin{equation}
     \function{shift}~(\function{s} , \function{q})~(\term{z_s} , \term{z_q}) = \begin{cases} \term{z_s} & n = 0 \\ \function{s}_m & n = m + 1 \end{cases} , \begin{cases} \term{z_q} & n = 0\\ \function{q}_m & n = m + 1 \end{cases},
   \end{equation}
@@ -1196,9 +1124,9 @@ We also introduce notation for the two special cases of sequences given above
     The constructors \texttt{inl} and \texttt{inr} are disjoint, so there does not exists a path between them, meaning constructing one is a contradiction.
   \end{proof}
 \end{lem}
-\noindent We now define an equivalence between \(\typeformer{delay}~\type{R}\) and \(\typeformer{Seq}_{\type{R}}\), where \(\constructor{later}\) are equivalent to shifts, and \(\constructor{now}~\term{r}\) is equivalent terminated sequence with value \(\term{r}\). We do this by defining equivalence functions, and the left and right identities.
+\noindent We now define an equivalence between \(\typeformer{Delay}~\type{R}\) and \(\typeformer{Seq}_{\type{R}}\), where \(\constructor{later}\)'s are equivalent to shifts, and \(\constructor{now}~\term{r}\) is equivalent to the terminated sequence \(\function{now}_{\typeformer{Seq}}~\term{r}\). We show the equivalence as an isomorphism, meaning we define functions between the types and show the left and right identities for them.
 \begin{defn}
-  We define a function from \(\typeformer{Delay}~\type{R}\) to \(\typeformer{Seq}_{\type{R}}\)
+  There is a function from \(\typeformer{Delay}~\type{R}\) to \(\typeformer{Seq}_{\type{R}}\)
   \begin{equation}
     \begin{aligned}
       \function{Delay{\rightarrow}Seq}&~(\constructor{now}~\term{r}) = \function{now}_{\typeformer{Seq}}~\term{r} \\
@@ -1219,35 +1147,37 @@ We also introduce notation for the two special cases of sequences given above
   \label{thm:seq-eq-delay}
   The type \(\typeformer{Delay}~\type{R}\) is equal to \(\typeformer{Seq}_{\type{R}}\)
   \begin{proof}  
-    We define right and left identity, saying that for any sequence \((\function{s},\function{q})\), we get
+    We start by defining the right identity, which says that for any sequence \((\function{s},\function{q})\), we get
     \begin{equation}
       \function{Delay{\rightarrow}Seq}~(\function{Seq{\rightarrow}Delay}~(\function{s},\function{q})) \equiv (\function{s},\function{q})
     \end{equation}
-    defined by cases analysis on \(\function{s}_0\), if \(\function{s}_0 = \mathtt{inl}~\term{r}\) then we need to show
+    We show this by cases analysis on \(\function{s}_0\), if \(\function{s}_0 = \mathtt{inl}~\term{r}\) then we need to show
     \begin{equation}
       \function{now}_{\typeformer{Seq}}~\term{r} \equiv (\function{s},\function{q})
     \end{equation}
-    This is true, since \((\function{s},\function{q})\) is a monotone sequence and \(\mathtt{inl}~\term{r}\) is the top element of the order, then all elements of the sequence are \(\mathtt{inl}~\term{r}\). If \(\function{s}_0 = \mathtt{inr}~\unitelem\) then, we need to show
+    This is true, since \((\function{s},\function{q})\) is a monotone sequence and \(\mathtt{inl}~\term{r}\) is the top element of the order, so all elements of the sequence are \(\mathtt{inl}~\term{r}\). If \(\function{s}_0 = \mathtt{inr}~\unitelem\), then we need to show
     \begin{equation}
       \function{shift}~(\function{Delay{\rightarrow}Seq}~(\function{Seq{\rightarrow}Delay}~(\function{unshift}~(\function{s},\function{q}))))~(\mathtt{inr}~\unitelem,\_) \equiv (\function{s},\function{q})
     \end{equation}
-    by the induction hypothesis we get
+    By the induction hypothesis we get
     \begin{equation}
       \function{Delay{\rightarrow}Seq}~(\function{Seq{\rightarrow}Delay}~(\function{unshift}~(\function{s},\function{q}))) \equiv \function{unshift}~(\function{s},\function{q})
     \end{equation}
-    since shift and unshift are inverse, we get the needed equality. For the left identity, we need to show that for any delay monad \(\term{t}\) we get
+    Meaning we are left with showing \(\function{shift}~(\function{unshift}~(\function{s},\function{q}))~(\texttt{inr}~\unitelem,\_) \equiv (\function{s},\function{q})\), which follows from shift and unshift being inverses. For the left identity, we need to show that for any delay monad \(\term{t}\) we get
     \begin{equation}
       \function{Seq{\rightarrow}Delay}~(\function{Delay{\rightarrow}Seq}~\term{t}) \equiv \term{t}
     \end{equation}
-    We do case analysis on \(\term{t}\), if \(\term{t} = \constructor{now}~a\) then the equality is \(\mathtt{refl}\). If \(\term{t} = \constructor{later}~\term{x}\) then we need to show
+    We do case analysis on \(\term{t}\). If \(\term{t} = \constructor{now}~a\), then the equality is \(\mathtt{refl}\). If \(\term{t} = \constructor{later}~\term{x}\), then we need to show
     \begin{equation}
       \constructor{later}~(\function{Seq{\rightarrow}Delay}~(\function{unshift}~(\function{shift}~(\function{Delay{\rightarrow}Seq}~x)))) \equiv \constructor{later}~x
     \end{equation}
-    from unshift and shift being inverse and the induction hypothesis, we get the wanted equality. We have now defined a left and right identity function, so we get the wanted equality.
+    We again get the equality from unshift and shift being inverse and the induction hypothesis. This completes the isomorphism between \(\typeformer{Delay}~\type{R}\) and \(\typeformer{Seq}_{\type{R}}\) and thereby the proof of equality.
   \end{proof}
 \end{thm}
+\noindent We will define weakly bisimilar relations and show the equality extends to the types quotiented by these relations.
 \begin{defn}
-  We define the weak bisimulation relation for the delay monad
+  \label{defn:weak-bisim-delay-monad}
+  Weak bisimilarity for the delay monad is given as
   \begin{center}
     \strut
     \hfill
@@ -1295,7 +1225,7 @@ We also introduce notation for the two special cases of sequences given above
     (\function{s},\function{q})~\relation{\sqsubseteq_{Seq}}~(\function{t},\function{p}) = \prod_{(\term{a} : \type{R})} \left(\|\function{s}~\relation{\downarrow_{Seq}}~\term{a}\| \rightarrow \| \function{t}~\relation{\downarrow_{Seq}}~\term{a}\|\right)
   \end{equation}
 \end{defn}
-\begin{defn} We define weak bisimilarity for sequences as
+\begin{defn} Weak bisimilarity for sequences is given as
   \begin{equation}
     (\function{s},\function{q})~\relation{\sim_{Seq}}~(\function{t},\function{p}) = (\function{s},\function{q})~\relation{\sqsubseteq_{Seq}}~(\function{t},\function{p}) \times (\function{t},\function{p})~\relation{\sqsubseteq_{Seq}}~(\function{s},\function{q})
   \end{equation}
@@ -1304,7 +1234,7 @@ We also introduce notation for the two special cases of sequences given above
   \label{thm:delay-to-seq-quotient}
   The types \(\typeformer{Delay}~\type{R}/\relation{\sim_{Delay}}\) and \(\typeformer{Seq}_{\type{R}}/\relation{\sim_{Seq}}\) are equal.
   \begin{proof}
-    We show that transporting across the equality from \thmref{seq-eq-delay}, respects weak bisimilarity. We start by showing if \(\term{x}~\relation{\sim_{Delay}}~\term{y}\), then \(\function{Delay{\rightarrow}Seq}~\term{x}~\relation{\sim_{Seq}}~\function{Delay{\rightarrow}Seq}~\term{y}\) by case. If the weak bisimilarity is \(\constructor{\sim_{now}}\), then we need to construct \(\function{now}_{\typeformer{Seq}}~\term{a}~\relation{\sim_{Seq}}~\function{now}_{\typeformer{Seq}}~\term{b}\), given a path \(\pathterm{p} : \term{a} \equiv \term{b}\), since \(\relation{\sim_{Seq}}\) is reflexive, we get \(\function{now}_{\typeformer{Seq}}~\term{a}~\relation{\sim_{Seq}}~\function{now}_{\typeformer{Seq}}~\term{a}\), which gives us \(\function{now}_{\typeformer{Seq}}~\term{a}~\relation{\sim_{Seq}}~\function{now}_{\typeformer{Seq}}~\term{b}\) by transporting over \(\pathterm{p}\). If we have \(\constructor{\sim_{later_l}}\)  then by induction we get \(\function{Delay{\rightarrow}Seq}~\term{x}~\relation{\sim_{Seq}}~\function{Delay{\rightarrow}Seq}~y\), we can extend the equality by a shift, which interacts with \(\function{Delay{\rightarrow}Seq}\) to add a \(\constructor{later}\) before the argument that is we get \(\function{Delay{\rightarrow}Seq}~(\constructor{later}~\term{x})~\relation{\sim_{Seq}}~\function{Delay{\rightarrow}Seq}~y\), which is what we needed to show. By a symmetric argument we get \(\relation{\sim_{later_r}}\). To construct \(\constructor{\sim_{later}}\) we add a later to both sites of the bisimilarity.
+    We show that transporting across the equality from \thmref{seq-eq-delay}, respects weak bisimilarity. We start by showing if \(\term{x}~\relation{\sim_{Delay}}~\term{y}\), then \(\function{Delay{\rightarrow}Seq}~\term{x}~\relation{\sim_{Seq}}~\function{Delay{\rightarrow}Seq}~\term{y}\) by case. If the weak bisimilarity is \(\constructor{\sim_{now}}\), then we need to construct \(\function{now}_{\typeformer{Seq}}~\term{a}~\relation{\sim_{Seq}}~\function{now}_{\typeformer{Seq}}~\term{b}\) given a path \(\pathterm{p} : \term{a} \equiv \term{b}\). By reflexivity of \(\relation{\sim_{Seq}}\) we get \(\function{now}_{\typeformer{Seq}}~\term{a}~\relation{\sim_{Seq}}~\function{now}_{\typeformer{Seq}}~\term{a}\). By transporting over \(\pathterm{p}\), we get the wanted term \(\function{now}_{\typeformer{Seq}}~\term{a}~\relation{\sim_{Seq}}~\function{now}_{\typeformer{Seq}}~\term{b}\). If we have \(\constructor{\sim_{later_l}}\), then by induction we get \(\function{Delay{\rightarrow}Seq}~\term{x}~\relation{\sim_{Seq}}~\function{Delay{\rightarrow}Seq}~\term{y}\). Shifting one side will not break the bisimilarity, and a shift interacts with \(\function{Delay{\rightarrow}Seq}\) to add a \(\constructor{later}\) that is we get \(\function{Delay{\rightarrow}Seq}~(\constructor{later}~\term{x})~\relation{\sim_{Seq}}~\function{Delay{\rightarrow}Seq}~y\), which is what we needed to show. By a symmetric argument we get \(\constructor{\sim_{later_r}}\). To construct \(\constructor{\sim_{later}}\) we shift both sides, resulting in a \(\constructor{later}\) being added to both sides of the bisimilarity. 
     \begin{equation}
       \begin{aligned}
         &\function{{\sim}_{Delay}{\rightarrow}{\sim}_{Seq}}~(\constructor{\sim_{now}}~\term{a}~\term{b}~\pathterm{p}) = \mathtt{subst}~(\lambda\,\term{k},~\function{now}_{\typeformer{Seq}}~\term{a}~\relation{\sim_{Seq}}~\term{k})~\pathterm{p}~(\constructor{\sim_{refl}}~\term{a}) \\
@@ -1313,11 +1243,11 @@ We also introduce notation for the two special cases of sequences given above
         &\function{{\sim}_{Delay}{\rightarrow}{\sim}_{Seq}}~(\constructor{\sim_{later}}~\term{x}~\term{y}~\term{r}) = \function{\sim_{sym}}~(\function{\sim_{shift}}~(\function{\sim_{sym}}~(\function{\sim_{shift}}~(\function{{\sim}_{Delay}{\rightarrow}{\sim}_{Seq}}~\term{r})))) \\
       \end{aligned}
     \end{equation}
-    We show if \((\function{s},\function{q})~\relation{\sim_{Seq}}~(\function{t},\function{p})\) then \(\function{Seq{\rightarrow}Delay}~(\function{s},\function{q})~\relation{\sim_{Delay}}~\function{Seq{\rightarrow}Delay}~(\function{t},\function{p})\) by case on \(\function{s}~0\) and \(\function{t}~0\). We know that if \(\function{s}~0 = \mathtt{inl}~\term{r}\), then \((\function{s},\function{q}) = \function{now}_{\mathtt{Seq}}~r\) and \((\function{s},\function{q})~\relation{\downarrow_{Seq}}~\term{r}\). If two sequences are weakly bisimilar and they terminate to different values, then the values are equal, we therefore get
+    Now for the other direction from \((\function{s},\function{q})~\relation{\sim_{Seq}}~(\function{t},\function{p})\) to \(\function{Seq{\rightarrow}Delay}~(\function{s},\function{q})~\relation{\sim_{Delay}}~\function{Seq{\rightarrow}Delay}~(\function{t},\function{p})\). We start with some helpful properties. We know that if \(\function{s}~0 = \mathtt{inl}~\term{r}\), then \((\function{s},\function{q}) = \function{now}_{\mathtt{Seq}}~r\) and \((\function{s},\function{q})~\relation{\downarrow_{Seq}}~\term{r}\). If two sequences are weakly bisimilar and they terminate to different values, then the values are equal, we therefore have
     \begin{equation}
       \function{\sim_{seq\text{-}val}} : \function{now}_{\mathtt{Seq}}~\term{a}~\relation{\sim_{Seq}}~\function{now}_{\mathtt{Seq}}~\term{b} \rightarrow \term{a} \equiv \term{b}
     \end{equation}
-    If both sequences are terminated meaning \((\function{s},\function{q}) = \function{now}_{\typeformer{Seq}}~\term{a}\) and \((\function{t},\function{p}) = \function{now}_{Seq}~\term{b}\), then \(\pathterm{p} : \term{a} \equiv \term{b}\) by \(\function{\sim_{seq\text{-}val}}\), we can therefore construct \(\constructor{\sim_{now}}~\pathterm{p}\) completing the base case. If two sequences are weakly bisimilar, then shifting or unshifting either of them will not break the bisimilarity, which makes the rest of the cases follow by induction.
+    We do the proof by case on \(\function{s}~0\) and \(\function{t}~0\). If both sequences are terminated meaning \((\function{s},\function{q}) = \function{now}_{\typeformer{Seq}}~\term{a}\) and \((\function{t},\function{p}) = \function{now}_{Seq}~\term{b}\), then we can make a term \(\pathterm{p} : \term{a} \equiv \term{b}\) using \(\function{\sim_{seq\text{-}val}}\). The base case is then done by \(\constructor{\sim_{now}}~\pathterm{p}\). If two sequences are weakly bisimilar, then shifting or unshifting either of them will not break the bisimilarity. We can therefore do the rest of the cases by induction.
     \begin{equation}
       \begin{aligned}
         &\function{{\sim}_{Seq}{\rightarrow}{\sim}_{Delay}}~(\function{now}_{\mathtt{Seq}}~\term{a})~(\function{now}_{\mathtt{Seq}}~\term{b})~\term{r} = \constructor{\sim_{now}}~\term{a}~\term{b}~(\function{\sim_{seq\text{-}val}}~\term{r}) \\[1mm]
@@ -1330,13 +1260,14 @@ We also introduce notation for the two special cases of sequences given above
         &\quad\quad~(\function{{\sim}_{Seq}{\rightarrow}{\sim}_{Delay}}~(\function{\sim_{shift}}~r))
     \end{aligned}
   \end{equation}
-  The right and left identity for \(\function{{\sim}_{Delay}{\rightarrow}{\sim}_{Seq}}\) and \(\function{{\sim}_{Seq}{\rightarrow}{\sim}_{Delay}}\) follow from similar arguments. We thereby get that weakly bisimilar relations for the delay monad and sequences respects the equality given in \thmref{seq-eq-delay}, meaning that the quotiented types are also equal.
+  % The right and left identity for \(\function{{\sim}_{Delay}{\rightarrow}{\sim}_{Seq}}\) and \(\function{{\sim}_{Seq}{\rightarrow}{\sim}_{Delay}}\) follow from similar arguments. 
+  We have now given functions in both direction, meaning we get that weakly bisimilar relations for the delay monad and sequences respects the equality given in \thmref{seq-eq-delay} so the quotiented types are also equal.
   \end{proof}
 \end{thm}
 
 \subsubsection{Sequence to Partiality Monad}
 \label{sec:sequences-to-partiality-monad}
-In this section we will show that assuming the axiom of choice, we get an equivalence between sequences quotiented by weak bisimilarity and the partiality monad (\thmref{sequence-partiality-monad-eq}). We start with some useful definitions.
+In this section we will show that assuming the axiom of countable choice, we get an equivalence between sequences quotiented by weak bisimilarity and the partiality monad (\thmref{sequence-partiality-monad-eq}). We start with some useful definitions.
 \begin{defn} There is a function from \(\type{R} + \unit\) to the partiality monad \(\type{R}_\bot\)
   \begin{equation}
     \begin{aligned}
@@ -1352,13 +1283,13 @@ In this section we will show that assuming the axiom of choice, we get an equiva
     \term{x}~\relation{\sqsubseteq_{\type{R} + \unit}}~\term{y} = (\term{x} \equiv \term{y}) + ((\term{x}  \downarrow_{\type{R} + \unit}) \times (\term{y} \uparrow_{\type{R} + \unit}))
   \end{equation}
 \end{defn}
-\noindent This ordering definition is basically \(\function{isMon}\) at a specific index, so we can again rewrite \(\function{isMon}\) as
+\noindent This ordering definition is basically \(\function{isMon}\) at a specific index, so we can rewrite \(\function{isMon}\) to
 \begin{equation}
   \function{isMon}~\function{s} = \prod_{(n : \mathbb{N})} \function{s}_n~\relation{\sqsubseteq_{\type{R} + \unit}}~\function{s}_{n+1}
 \end{equation}
-This rewriting confirms that if \(\function{isMon}~\function{s}\), then \(\function{s}\) is monotone, and therefore a sequence of partial values.
+This confirms the idea that if \(\function{isMon}~\function{s}\), then \(\function{s}\) is monotone and therefore a sequence of partial values.
 \begin{lem}
-  The function \(\function{Maybe{\rightarrow}(-)_\bot}\) is monotone, that is, if \(\term{x}~\relation{\sqsubseteq_{\type{R} + \unit}}~\term{y}\), for some \(\term{x}\) and \(\term{y}\), then \((\function{Maybe{\rightarrow}(-)_\bot}~\term{x})~\relation{\sqsubseteq_{\bot}}~(\function{Maybe{\rightarrow}(-)_\bot}~\term{y})\).
+  The function \(\function{Maybe{\rightarrow}(-)_\bot}\) is monotone, meaning if \(\term{x}~\relation{\sqsubseteq_{\type{R} + \unit}}~\term{y}\) for some \(\term{x}\) and \(\term{y}\), then \((\function{Maybe{\rightarrow}(-)_\bot}~\term{x})~\relation{\sqsubseteq_{\bot}}~(\function{Maybe{\rightarrow}(-)_\bot}~\term{y})\).
   \begin{proof}
     We do the proof by case.
     \begin{equation}
@@ -1374,7 +1305,7 @@ This rewriting confirms that if \(\function{isMon}~\function{s}\), then \(\funct
 \begin{defn}
   There is a function taking a sequence to an increasing sequence of partiality monads
   \begin{equation}
-      \function{Seq{\rightarrow}incSeq}~(\function{s} , \function{q}) = \function{Maybe{\rightarrow}(-)_\bot} \circ \function{s} , \function{Maybe{\rightarrow}(-)_\bot\text{-}mono} \circ \function{q}
+      \function{Seq{\rightarrow}incSeq}~(\function{s} , \function{q}) = \function{Maybe{\rightarrow}(-)_\bot} \circ \function{s}~,~\function{Maybe{\rightarrow}(-)_\bot\text{-}mono} \circ \function{q}
   \end{equation}
 \end{defn}
 \begin{defn}
@@ -1382,14 +1313,14 @@ This rewriting confirms that if \(\function{isMon}~\function{s}\), then \(\funct
   \begin{equation}
     \begin{aligned}
       &\function{Seq{\rightarrow}(-)_\bot} : \typeformer{Seq}_{\type{R}} \rightarrow \type{R}_{\bot} \\
-      &\function{Seq{\rightarrow}(-)_\bot}~(\function{s},\function{q}) = \constructor{\textstyle{\bigsqcup}} (\function{Seq{\rightarrow}incSeq}~(\function{s},\function{q}))
+      &\function{Seq{\rightarrow}(-)_\bot}~(\function{s},\function{q}) = \constructor{\textstyle{\bigsqcup}}\,(\function{Seq{\rightarrow}incSeq}~(\function{s},\function{q}))
     \end{aligned}
   \end{equation}
 \end{defn}
 \begin{lem}
   The function \(\function{Seq{\rightarrow}(-)_\bot}\) is monotone. 
   \begin{equation}
-    \function{Seq{\rightarrow}(-)_\bot\text{-}mono} : (\term{x}~\term{y} : \typeformer{Seq}_{\type{R}}) \rightarrow \term{x}~\relation{\sqsubseteq_{seq}}~\term{y} \rightarrow \function{Seq{\rightarrow}(-)_\bot}~\term{x}~\relation{\sqsubseteq_{\bot}}~\function{Seq{\rightarrow}(-)_\bot}~\term{y}
+    \function{Seq{\rightarrow}(-)_\bot\text{-}mono} : (\term{x}~\term{y} : \typeformer{Seq}_{\type{R}}) \rightarrow \term{x}~\relation{\sqsubseteq_{Seq}}~\term{y} \rightarrow \function{Seq{\rightarrow}(-)_\bot}~\term{x}~\relation{\sqsubseteq_{\bot}}~\function{Seq{\rightarrow}(-)_\bot}~\term{y}
 \end{equation}
   \begin{proof}
     Given two sequences, where one is smaller than the other, then taking the least upper bounds of each sequence respects the ordering. % \todo{should this be formalized entirely (There is alot of work here.. but not interesting.)} \todo{removed "isSet A", where is it used?}
@@ -1397,60 +1328,58 @@ This rewriting confirms that if \(\function{isMon}~\function{s}\), then \(\funct
 \end{lem}
 \begin{lem}
   If two sequences \(\term{x},\term{y}\) are weakly bisimular, then \(\function{Seq{\rightarrow}(-)_\bot}~\term{x} \equiv \function{Seq{\rightarrow}(-)_\bot}~\term{y}\)
-  \begin{proof} We know that the \(\function{Seq{\rightarrow}(-)_{\bot}}\) is monotone, so we can use this monotonicity principle on \(p : \term{x}~\relation{\sqsubseteq_{seq}}~\term{y}\) and \(q : \term{y}~\relation{\sqsubseteq_{seq}}~\term{x}\) given by the bisimilarity, to get \(\function{Seq{\rightarrow}(-)_\bot}~\term{x}~\relation{\sqsubseteq_{\bot}}~\function{Seq{\rightarrow}(-)_\bot}~\term{y}\) and \(\function{Seq{\rightarrow}(-)_\bot}~\term{y}~\relation{\sqsubseteq_{\bot}}~\function{Seq{\rightarrow}(-)_\bot}~\term{x}\) by using \(\constructor{\alpha_{\bot}}\) we get the equality \(\function{Seq{\rightarrow}(-)_\bot}~\term{x} \equiv \function{Seq{\rightarrow}(-)_\bot}~\term{y}\). We denote this construction as the function \(\function{Seq{\rightarrow}(-)_\bot\text{-}{\approx}{\rightarrow}{\equiv}}\)
+  \begin{proof}
+    By the definition of bisimilarity for sequences we get \(\term{x}~\relation{\sqsubseteq_{Seq}}~\term{y}\) and \(\term{y}~\relation{\sqsubseteq_{Seq}}~\term{x}\) from the bisimilarity of \(\term{x}\) and \(\term{y}\). By monotonicity of \(\function{Seq{\rightarrow}(-)_{\bot}}\) we get \(\function{Seq{\rightarrow}(-)_\bot}~\term{x}~\relation{\sqsubseteq_{\bot}}~\function{Seq{\rightarrow}(-)_\bot}~\term{y}\) and \(\function{Seq{\rightarrow}(-)_\bot}~\term{y}~\relation{\sqsubseteq_{\bot}}~\function{Seq{\rightarrow}(-)_\bot}~\term{x}\). We then use \(\constructor{\alpha_{\bot}}\) to get the equality \(\function{Seq{\rightarrow}(-)_\bot}~\term{x} \equiv \function{Seq{\rightarrow}(-)_\bot}~\term{y}\). We denote this construction as the function \(\function{Seq{\rightarrow}(-)_\bot\text{-}{\sim}{\rightarrow}{\equiv}}\).
   \end{proof}
 \end{lem}
-\noindent The recursor for quotients \defref{quotient-recursor} allows us to lift the function \(\function{Seq{\rightarrow}(-)_\bot}\) to the quotient
+\noindent The recursor for quotients \defref{quotient-recursor} allows us to lift the function \(\function{Seq{\rightarrow}(-)_\bot}\) to the quotient.
 \begin{defn}
   \label{eq:QuotientedSeqToPartialityMonad}
-  We define a function \(\function{Seq/{\sim}{\rightarrow}(-)_\bot}\) from \(\typeformer{Seq}_{\type{R}}\) to \(\type{R}_{\bot}\)
+  We define a function \(\function{Seq/{\sim}{\rightarrow}(-)_\bot}\) from \(\typeformer{Seq}_{\type{R}} / \relation{\sim_{Seq}}\) to \(\type{R}_{\bot}\)
   \begin{equation}
-    \function{Seq/{\sim}{\rightarrow}(-)_\bot} = \function{rec}~\function{Seq{\rightarrow}(-)_\bot}~(\function{Seq{\rightarrow}(-)_\bot\text{-}{\approx}{\rightarrow}{\equiv}})~\constructor{(-)_\bot\text{-}isSet}
+    \function{Seq/{\sim}{\rightarrow}(-)_\bot} = \function{rec}~\function{Seq{\rightarrow}(-)_\bot}~\function{Seq{\rightarrow}(-)_\bot\text{-}{\sim}{\rightarrow}{\equiv}}~\constructor{(-)_\bot\text{-}isSet}
   \end{equation} 
 \end{defn}
 \begin{lem}
-  \label{eq:injectivity-lemma}
-  Given two sequences \(\term{s}\) and \(\term{t}\), if \(\function{Seq{\rightarrow}(-)_\bot}~\term{s} \equiv \function{Seq{\rightarrow}(-)_\bot}~\term{t}\), then \(\term{s}~\relation{\sim_{seq}}~\term{t}\).
+  \label{lem:injectivity-lemma}
+  Given two sequences \(\term{s}\) and \(\term{t}\), if \(\function{Seq{\rightarrow}(-)_\bot}~\term{s} \equiv \function{Seq{\rightarrow}(-)_\bot}~\term{t}\), then \(\term{s}~\relation{\sim_{Seq}}~\term{t}\).
   \begin{proof}
     We can reduce the burden of the proof, since
     \begin{equation}
-      \term{s}~\relation{\sim_{seq}}~\term{t} = \left(\prod_{(\term{r} : \type{R})} \| \term{x}~\relation{\downarrow_{seq}}~\term{r} \| \rightarrow \| \term{y}~\relation{\downarrow_{seq}}~\term{r} \|\right) \times \left(\prod_{(\term{r} : \type{R})} \| \term{y}~\relation{\downarrow_{seq}}~\term{r} \| \rightarrow \| \term{x}~\relation{\downarrow_{seq}}~\term{r} \|\right)
+      \term{s}~\relation{\sim_{Seq}}~\term{t} = \left(\prod_{(\term{r} : \type{R})} \| \term{x}~\relation{\downarrow_{Seq}}~\term{r} \| \rightarrow \| \term{y}~\relation{\downarrow_{Seq}}~\term{r} \|\right) \times \left(\prod_{(\term{r} : \type{R})} \| \term{y}~\relation{\downarrow_{Seq}}~\term{r} \| \rightarrow \| \term{x}~\relation{\downarrow_{Seq}}~\term{r} \|\right)
     \end{equation}
-    meaning we can show one part and get the other for free by symmetry. We assume \(\| \term{x}~\relation{\downarrow_{seq}}~\term{r} \|\), to show \(\| \term{y}~\relation{\downarrow_{seq}}~\term{r} \|\). By the mapping property of propositional truncation, we reduce the proof to defining a function \(\term{x}~\relation{\downarrow_{seq}}~\term{r} \rightarrow \term{y}~\relation{\downarrow_{seq}}~\term{r}\). Since \(\term{x}~\relation{\downarrow_{seq}}~\term{r}\), then \(\constructor{\eta}~\term{r}~\relation{\sqsubseteq_{\bot}}~\function{Seq{\rightarrow}(-)_\bot}~\term{x}\), but we have assumed \(\function{Seq{\rightarrow}(-)_\bot}~\term{x} \equiv \function{Seq{\rightarrow}(-)_\bot}~\term{y}\), so we get \(\constructor{\eta}~\term{r}~\relation{\sqsubseteq_{\bot}}~\function{Seq{\rightarrow}(-)_\bot}~\term{y}\), and thereby \(\term{y}~\relation{\downarrow_{seq}}~\term{r}\).
+    meaning we can show one part and get the other for free by symmetry. We assume \(\| \term{x}~\relation{\downarrow_{Seq}}~\term{r} \|\), to show \(\| \term{y}~\relation{\downarrow_{Seq}}~\term{r} \|\). By the mapping property of propositional truncation, we reduce the proof to defining a function from \(\term{x}~\relation{\downarrow_{Seq}}~\term{r}\) to \(\term{y}~\relation{\downarrow_{Seq}}~\term{r}\). Since \(\term{x}~\relation{\downarrow_{Seq}}~\term{r}\), then \(\constructor{\eta}~\term{r}~\relation{\sqsubseteq_{\bot}}~\function{Seq{\rightarrow}(-)_\bot}~\term{x}\), but we have assumed \(\function{Seq{\rightarrow}(-)_\bot}~\term{x} \equiv \function{Seq{\rightarrow}(-)_\bot}~\term{y}\), so we get \(\constructor{\eta}~\term{r}~\relation{\sqsubseteq_{\bot}}~\function{Seq{\rightarrow}(-)_\bot}~\term{y}\) and thereby \(\term{y}~\relation{\downarrow_{Seq}}~\term{r}\).
   \end{proof}
 \end{lem}
 \begin{lem}
   \label{lem:sequence-to-partiality-monad-injectivity}
-  The function \(\function{Seq/{\sim}{\rightarrow}(-)_\bot}\) is injective.
+  The function \(\function{Seq/{\sim}{\rightarrow}(-)_\bot}\) is injective, meaning \(\function{Seq/{\sim}{\rightarrow}(-)_\bot}~\term{x} \equiv \function{Seq/{\sim}{\rightarrow}(-)_\bot}~\term{y}\) implies \(\term{x} \equiv \term{y}\).
   \begin{proof}
-    We use propositional elimination of quotients (see \defref{propositional-elimination-quotient}) to show injectivity, meaning for all \(\term{x}, \term{y} : \typeformer{Seq}_{\type{R}} / \relation{\sim_{seq}}\) we get \(\function{Seq/{\sim}{\rightarrow}(-)_\bot}~\term{x} \equiv \function{Seq/{\sim}{\rightarrow}(-)_\bot}~\term{y} \rightarrow \term{x} \equiv \term{y}\). We do propositional eliminating of \(\term{x}\), followed by propositional elimination of \(y\). We use \defref{propositional-elimination-quotient}, with
+    We use propositional elimination of quotients (see \defref{propositional-elimination-quotient}) to show injectivity. We let
     \begin{equation}
-\typeformer{P} = \function{Seq/{\sim}{\rightarrow}(-)_\bot}~\term{x} \equiv \function{Seq/{\sim}{\rightarrow}(-)_\bot}~\term{y} \rightarrow \term{x} \equiv \term{y}
-\end{equation}
-\begin{equation}
-\function{P_{prop}} = \function{isProp\Pi}~(\lambda\,\_, \constructor{squash/}~\term{x}~\term{y})
-\end{equation}
-where we index by \(\term{x}\) for the first elimination, and by \(\term{y}\) for the second with \(\term{x} = \quotientconstructor{a}\). The proof is then completed by
-    \begin{equation}
-      \function{elimProp}~(\lambda\,\term{a},~\function{elimProp}~(\lambda\,\term{b},~(\constructor{eq/}~\term{a}~\term{b}) \circ (\function{Seq{\rightarrow}(-)_\bot\text{-}{\equiv}{\rightarrow}{\sim}}~\term{a}~\term{b}))~\term{y})~\term{x}
+      \typeformer{P} = \function{Seq/{\sim}{\rightarrow}(-)_\bot}~\term{x} \equiv \function{Seq/{\sim}{\rightarrow}(-)_\bot}~\term{y} \rightarrow \term{x} \equiv \term{y}
     \end{equation}
-    where \(\function{Seq{\rightarrow}(-)_\bot\text{-}{\equiv}{\rightarrow}{\sim}}\) is \eqref{eq:injectivity-lemma}, 
+    which is a proposition by \(\function{P_{prop}} = \function{isProp\text{$\Pi$}}~(\lambda\,\_, \constructor{squash/}~\term{x}~\term{y})\). We do the propositional elimination twice, first we index by \(\term{x}\), and then by \(\term{y}\) for the second elimination with \(\term{x} = \quotientconstructor{a}\). The proof is then given as
+    \begin{equation}
+      \function{elimProp}~(\lambda\,\term{a},~\function{elimProp}~(\lambda\,\term{b},~\constructor{eq/}~\term{a}~\term{b} \circ \function{Seq{\rightarrow}(-)_\bot\text{-}{\equiv}{\rightarrow}{\sim}}~\term{a}~\term{b})~\term{y})~\term{x}
+    \end{equation}
+    where \(\function{Seq{\rightarrow}(-)_\bot\text{-}{\equiv}{\rightarrow}{\sim}}\) is \lemref{injectivity-lemma}.
   \end{proof}
 \end{lem}
 \begin{lem}
-  \label{eq:constant-sequence-equality}
+  \label{lem:constant-sequence-equality}
   For all constant sequences \(\term{s}\), where all elements have the same value \(\term{v}\), we get \(\function{Seq{\rightarrow}(-)_\bot}~\term{s} \equiv \function{Maybe{\rightarrow}(-)_\bot}~\term{v}\).
   \begin{proof}
     The left side of the equality reduces to \(\function{Maybe{\rightarrow}(-)_\bot}\) applied on the least upper bound of the constant sequence, which is exactly the right hand side of the equality.
   \end{proof}
 \end{lem}
 \begin{defn}[Propositional eliminator for \((-)_{\bot}\)]
-  Given a dependent type \(\typeformer{P} : \type{R}_{\bot} \rightarrow \universe{\mathcal{U}}\) that is a proposition at all points \(\function{P_{prop}} : \prod_{(\term{x} : \type{R}_{\bot})} \mathtt{isProp}~(\typeformer{P}~\term{x})\), then given a proof for the base cases \(\term{P_{\bot}} : \typeformer{P}~\constructor{\bot}\) and \(\function{P_{\eta}} : \prod_{(a : \type{R})}\typeformer{P}~(\constructor{\eta}~a)\), and a proof \(\function{P_{\sqcup}}\) that for all \((\function{s},\function{q}) : \sum_{(\function{s} : \mathbb{N} \rightarrow \type{R}_{\bot})} \prod_{(n : \mathbb{N})} \function{s}\,n\,\relation{\sqsubseteq_{\bot}}\,\function{s}\,(n+1)\) we get \(\big( \prod_{(n : \mathbb{N})} \typeformer{P}~(\function{s}~n)\big) \rightarrow \typeformer{P}~\constructor{\bigsqcup} (\function{s},\function{q})\). Then we get a function from any \(\term{x} : \type{R}_{\bot}\) to \(\typeformer{P}~\term{x}\)
+  Given a dependent type \(\typeformer{P} : \type{R}_{\bot} \rightarrow \universe{\mathcal{U}}\) that is a proposition at all points \(\function{P_{prop}} : \prod_{(\term{x} : \type{R}_{\bot})} \mathtt{isProp}~(\typeformer{P}~\term{x})\), and given a proof for the base cases \(\term{P_{\bot}} : \typeformer{P}~\constructor{\bot}\) and \(\function{P_{\eta}} : \prod_{(a : \type{R})}\typeformer{P}~(\constructor{\eta}~a)\), and a proof \(\function{P_{\sqcup}}\) that for all \((\function{s},\function{q}) : \sum_{(\function{s} : \mathbb{N} \rightarrow \type{R}_{\bot})} \prod_{(n : \mathbb{N})} \function{s}_n~\relation{\sqsubseteq_{\bot}}~\function{s}_{n+1}\) we get \(\big( \prod_{(n : \mathbb{N})} \typeformer{P}~\function{s}_n\big) \rightarrow \typeformer{P}~\constructor{\bigsqcup}\,(\function{s},\function{q})\). Then we can define a function \(\function{elimProp_{\bot}} : \prod_{(\term{x} : \type{R}_{\bot})} \typeformer{P}~\term{x}\), as
   \begin{equation}
     \begin{aligned}
       &\function{elimProp_{\bot}}~\constructor{\bot} = \term{P_{\bot}} \\
       &\function{elimProp_{\bot}}~(\constructor{\eta}~\term{a}) = \function{P_{\eta}}~\term{a} \\
-      &\function{elimProp_{\bot}}~\constructor{\sqcup~(\function{s},\function{q})} = \term{P_{\sqcup}} (\function{s},\function{q})~(\function{elimProp_{\bot}} \circ s) \\[1mm]
+      &\function{elimProp_{\bot}}~\constructor{\sqcup~(\function{s},\function{q})} = \function{P_{\sqcup}}~(\function{s},\function{q})~(\function{elimProp_{\bot}} \circ \function{s}) \\[1mm]
       &\function{elimProp_{\bot}}~(\constructor{\alpha}~\pathterm{p}~\pathterm{q}~i) = \\
       &\quad\function{isProp{\rightarrow}isDepProp}~\function{P_{prop}}~(\function{elimProp_{\bot}}~\term{x})~(\function{elimProp_{\bot}}~\term{y})~(\constructor{\alpha}~\pathterm{p}~\pathterm{q})~i \\[1mm]
       &\function{elimProp_{\bot}}~(\constructor{\bot\text{-}isSet}~\term{x}~\term{y}~\pathterm{p}~\pathterm{q}~i~j) = \\
@@ -1461,13 +1390,13 @@ where we index by \(\term{x}\) for the first elimination, and by \(\term{y}\) fo
   where \(\term{x}\) and \(\term{y}\) in the \(\constructor{\alpha}\) case are the endpoints of the paths \(\pathterm{p}\) and \(\pathterm{q}\).
 \end{defn}
 \begin{lem}
-  The function \(\function{Seq{\rightarrow}(-)_{\bot}}\) is surjective, assuming the axiom of countable choice.
+  The function \(\function{Seq{\rightarrow}(-)_{\bot}}\) is surjective, assuming the axiom of countable choice. This means that for all \(\term{b} : \type{R}_{\bot}\) we have \(\| \Sigma_{(\term{x} : \typeformer{Seq}_{\type{R}})}~\function{Seq{\rightarrow}(-)_{\bot}}~\term{x} \equiv \term{b} \|\).
   \begin{proof}
     We do the proof by using the propositional eliminator for the partiality monad, with
     \begin{equation}
-      \typeformer{P} = \lambda \term{y}, \bigg\| \sum_{(\term{x} : \typeformer{Seq}_{\type{R}})} \function{Seq{\rightarrow}(-)_{\bot}}~\term{x} \equiv \term{y} \bigg\|
+      \typeformer{P} = \lambda \term{b}, \bigg\| \sum_{(\term{x} : \typeformer{Seq}_{\type{R}})} \function{Seq{\rightarrow}(-)_{\bot}}~\term{x} \equiv \term{b} \bigg\|
     \end{equation}
-    and \(\function{P_{prop}}\) follows from the propositional truncation. For \(\constructor{\bot}\) and \(\constructor{\eta}~\term{a}\), we use \(\function{now}_{\typeformer{Seq}}~\term{a}\) and \(\constant{never}_{\typeformer{Seq}}\) respectively, and by \eqref{eq:constant-sequence-equality} we get \(\typeformer{P}~\constructor{\bot}\) and \(\typeformer{P}~(\constructor{\eta}~\term{a})\). For the least upper bound \(\constructor{\bigsqcup} (\function{s},\function{q})\), we may assume \(\prod_{(n : \mathbb{N})}~\typeformer{P}~(\function{s}~n)\) which gives us a pointwise equivalence
+    and \(\function{P_{prop}}\) follows from the propositional truncation. For \(\constructor{\bot}\) and \(\constructor{\eta}~\term{a}\), we use \(\function{now}_{\typeformer{Seq}}~\term{a}\) and \(\constant{never}_{\typeformer{Seq}}\) respectively, and by \lemref{constant-sequence-equality} we get \(\typeformer{P}~\constructor{\bot}\) and \(\typeformer{P}~(\constructor{\eta}~\term{a})\). For the least upper bound \(\constructor{\bigsqcup} (\function{s},\function{q})\), we may assume \(\prod_{(n : \mathbb{N})}~\typeformer{P}~\function{s}_n\), which unfolds to the expression
     \begin{equation}
     \prod_{(n : \mathbb{N})} \bigg\| \sum_{(\term{x} : \typeformer{Seq}_{\type{R}})} \function{Seq{\rightarrow}(-)_{\bot}}~\term{x} \equiv \function{s}~n \bigg\|
   \end{equation}
@@ -1479,15 +1408,9 @@ where we index by \(\term{x}\) for the first elimination, and by \(\term{y}\) fo
     \begin{equation}
     \bigg\| \sum_{(\function{f} : \mathbb{N} \rightarrow \typeformer{Seq}_{\type{R}})} \function{Seq{\rightarrow}(-)_{\bot}} \circ \function{f} \equiv \function{s} \bigg\|
   \end{equation}
-  which is a pointwise equivalence, which gives us an equivalence for the upper bound
-  \begin{align} 
-    &\quad~ {\textstyle{\bigsqcup}}(\function{s},\function{q}) \\
-    &\equiv \function{Maybe{\rightarrow}(-)_{\bot}} \circ \pi_1 \circ \function{f} , \function{Maybe{\rightarrow}(-)_{\bot}\text{-}mono} \circ \pi_2 \circ \function{f} \\
-    &\equiv \function{Maybe{\rightarrow}(-)_{\bot}} \circ \pi_1 \circ \function{f} , \function{Maybe{\rightarrow}(-)_{\bot}\text{-}mono} \circ \pi_2 \circ \function{f} \\
-    &\equiv \function{Seq{\rightarrow}(-)_{\bot}} \circ \function{f}
-  \end{align}
+  which is a pointwise equivalence, which implies an equivalence for the upper bounds, giving us
   \begin{equation}
-    \bigg\| \sum_{(\function{x} : \typeformer{Seq}_{\type{R}})} \function{Seq{\rightarrow}(-)_{\bot}}~\term{x} \equiv {\textstyle{\bigsqcup}}(\function{s},\function{q})) \bigg\|
+    \bigg\| \sum_{(\term{x} : \typeformer{Seq}_{\type{R}})} \function{Seq{\rightarrow}(-)_{\bot}}~\term{x} \equiv {\textstyle{\bigsqcup}}(\function{s},\function{q}) \bigg\|
   \end{equation}
   Thus we have shown all the cases needed to invoke the propositional eliminator for the partiality monad, completing the proof of surjectivity.
   \end{proof}
@@ -1501,24 +1424,17 @@ where we index by \(\term{x}\) for the first elimination, and by \(\term{y}\) fo
 \end{cor}
 \begin{thm}
   \label{thm:sequence-partiality-monad-eq}
-  Sequences quotiented by weak bisimilarity is equivalent to the partiality monad \(Seq_{\type{R}} / \relation{\sim_{seq}} \equiv \type{R}_{\bot}\), assuming the axiom of countable choice.
+  Sequences quotiented by weak bisimilarity is equivalent to the partiality monad, that is \(\typeformer{Seq}_{\type{R}} / \relation{\sim_{Seq}} \equiv \type{R}_{\bot}\), assuming the axiom of countable choice.
   \begin{proof}
  The function \(\function{Seq/{\sim}{\rightarrow}(-)_\bot}\) is injective (\lemref{sequence-to-partiality-monad-injectivity}) and surjective (\corref{sequence-partiality-monad-surjective}) assuming the axiom of countable choice, meaning we get an equivalence.
 \end{proof}
 \end{thm}
 
 \section{How should Q\texttt{M}-types be defined}
-We want to define what a Q\texttt{M}-type means in general, we draw inspiration from Q\texttt{W}-types \cite{DBLP:Constructing-QIITs}, quotient containers \cite{DBLP:quotient-container} and quotient polynomial functors (QPF) \cite{DBLP:QM-lean}. From what we have seen as examples in the previous section, equality construction between Set Quotiented \texttt{M}-types and QIITs are given as
-\begin{itemize}
-\item A function \function{QM{\rightarrow}QIIT} from QM to QIIT
-\item A proof \(\function{QM{\rightarrow}QIIT\text{-}{\sim}{\rightarrow}{\equiv}}\) that \(\term{x}~\relation{\sim_{QM}}~\term{y}\) implies \(\function{QM{\rightarrow}QIIT}~\term{x} \equiv \function{QM{\rightarrow}QIIT}~\term{y}\)
-\item Lifting \(\function{QM{\rightarrow}QIIT}\) to \(\function{QM/{\sim}{\rightarrow}QIIT}\) using the quotient recursor with \(\function{QM{\rightarrow}QIIT\text{-}{\sim}{\rightarrow}{\equiv}}\) and \(\constructor{QIIT\text{-}isSet}\)
-\item Showing injectivity by using propositional elimination of the quotient together with the inverse of \(\function{QM{\rightarrow}QIIT\text{-}{\sim}{\rightarrow}{\equiv}}\), namely \(\function{QM{\rightarrow}QIIT\text{-}injective}\) saying that \(\function{QM{\rightarrow}QIIT}~\term{x} \equiv \function{QM{\rightarrow}QIIT}~\term{y}\) implies \(\term{x}~\relation{\sim_{QM}}~\term{y}\).
-\item Lastly we show surjectivity by induction using the eliminator of QIIT and the axiom of choice and the surjectivity of \(\quotientconstructor{{\cdot}}\) \cite[6.10.2]{hottbook}.
-\end{itemize}
+We want to define quotient \texttt{M}-type with a good semantic, we draw inspiration from Q\texttt{W}-types \cite{DBLP:Constructing-QIITs}, quotient containers \cite{DBLP:quotient-container} and quotient polynomial functors (QPF) \cite{DBLP:QM-lean}. We start by looking at an alternative way of defining the Q\texttt{M}-types.
 
 \subsection{Lifting Quotient Construction from Containers}
-An alternative to directly set quotienting the \texttt{M}-types we have defined, is to do the quotienting on the underlying container \cite{DBLP:quotient-container} / polynomial functor \cite{DBLP:QM-lean}, and then do the fixed point construction we did for polynomial functors, but on the quotiented functor instead. We start by defining quotiented polynomial functors
+An alternative to directly set quotienting the \texttt{M}-types is to do the quotienting on the underlying container \cite{DBLP:quotient-container} / polynomial functor \cite{DBLP:QM-lean}, and then do the same fixed point construction we did for polynomial functors, but on the quotiented functor instead. We start by defining quotiented polynomial functors
 % quotients on containers.
 % \begin{defn}
 %   Given a container \(\containerpair{\type{A}}{\typeformer{B}}\), and a relation \(\relation{R} : \prod_{(\term{a} : \type{A})} {\typeformer{B}~\term{a}} \rightarrow \typeformer{B}~\term{a} \rightarrow \universe{\mathcal{U}}\), \todo{...} we can form a quotiented container \(\containerpair{\type{A}}{\typeformer{B} / \relation{R}}\) as
@@ -1529,11 +1445,11 @@ An alternative to directly set quotienting the \texttt{M}-types we have defined,
 % \end{defn}
 % \noindent Which gives us the following definition of a polynomial functor.
 \begin{defn}
-  Given a container \(\containerpair{\type{A}}{\typeformer{B}}\) and for all \(\type{X}\) a family of relations \(\relation{\sim}_{\term{a}} : (\typeformer{B}\,\term{a} \rightarrow \type{X}) \rightarrow (\typeformer{B}\,\term{a} \rightarrow \type{X}) \rightarrow \universe{\mathcal{U}}\) indexed by \(\type{A}\), we can define a quotiented polynomial functor (QPF). We define it for types as
+  Given a container \(\containerpair{\type{A}}{\typeformer{B}}\) and any type \(\type{X}\) a family of relations \(\relation{\sim}_{\term{a}} : (\typeformer{B}\,\term{a} \rightarrow \type{X}) \rightarrow (\typeformer{B}\,\term{a} \rightarrow \type{X}) \rightarrow \universe{\mathcal{U}}\) indexed by \(\type{A}\), we define a quotiented polynomial functor (QPF), for types as
   \begin{equation}
     \functor{F}\,\type{X} =  \sum_{(\term{a} : \type{A})} ((\typeformer{B}\,\term{a} \rightarrow \type{X}) / \relation{\sim}_{\term{a}})
   \end{equation}
-  and for a function \(\function{f} : \type{X} \rightarrow \type{Y}\), we use the quotient eliminator from \defref{quotient-eliminator}, with \(\typeformer{P} = \lambda\,\_, (\typeformer{B}\,\term{a} \rightarrow \type{Y})/\relation{\sim}_{\term{a}}\) which is a set \(\constructor{squash/}\), since we are using set truncated quotients. The base case \(\function{f} = \lambda\,\_,\quotientconstructor{\function{f} \circ \function{g}}\) and equality case \(\function{f_{eq}} = \lambda\,\function{x}\,\function{y}\,\term{r},~\constructor{eq/}~(\function{f} \circ \function{x})~(\function{f} \circ \function{y})~(\function{\sim_{ap}}~\function{f}~\term{r})\), where \(\function{\sim_{ap}}\) says that given \(\function{x}~\relation{\sim}_{\term{a}}~\function{y}\) and a function \(\function{f}\) then \(\function{f} \circ \function{x}~\relation{\sim}_{\term{a}}~\function{g} \circ \function{y}\). With this the definition for the quotient polynomial functor for functions is
+  and for a function \(\function{f} : \type{X} \rightarrow \type{Y}\), we use the quotient eliminator from \defref{quotient-eliminator} with \(\typeformer{P} = \lambda\,\_, (\typeformer{B}\,\term{a} \rightarrow \type{Y})/\relation{\sim}_{\term{a}}\) which is a set by \(\constructor{squash/}\), since we are using set truncated quotients. The base case is \(\function{f} = \lambda\,\_,\quotientconstructor{\function{f} \circ \function{g}}\) and equality case is \(\function{f_{eq}} = \lambda\,\function{x}\,\function{y}\,\term{r},~\constructor{eq/}~(\function{f} \circ \function{x})~(\function{f} \circ \function{y})~(\function{\sim_{ap}}~\function{f}~\term{r})\), where \(\function{\sim_{ap}}\) says that given a function \(\function{f}\) and \(\function{x}~\relation{\sim}_{\term{a}}~\function{y}\) then \(\function{f} \circ \function{x}~\relation{\sim}_{\term{a}}~\function{f} \circ \function{y}\). With this the definition for the quotient polynomial functor for functions is
   \begin{equation}
     \begin{aligned}
       &\functor{F}\,\function{f}~(\term{a} , \function{g}) = (\term{a} , \function{elim}~\function{g})
@@ -1541,7 +1457,7 @@ An alternative to directly set quotienting the \texttt{M}-types we have defined,
   \end{equation}
   completing the definition of a quotiented polynomial functor.
 \end{defn}
-\noindent If there is a function \(\function{abs}_{\type{X}} : \functor{P}\,\type{X} \rightarrow \functor{F}\,\type{X}\) that makes the diagram in \figref{QPF-diagram} commute (as in \cite{DBLP:QM-lean}), then we can construct the final \(\functor{F}\)-coalgebra, to get another notion of quotiented \texttt{M}-type.
+\noindent If there is a function \(\function{abs}_{\type{X}} : \functor{P}\,\type{X} \rightarrow \functor{F}\,\type{X}\) that makes the diagram in \figref{QPF-diagram} commute (as in \cite{DBLP:QM-lean}), then we can construct the final \(\functor{F}\)-coalgebra, to get another notion of quotiented \texttt{M}-type. The construction is done by taking the limit of the repeated application of \(\functor{P}\) and \(\functor{F}\) to the unit type \(\unit\). The proof that this limit exists and that it makes a final coalgebra is left as future research.
 \begin{figure}[h]
   \centering
   \begin{tikzcd}
@@ -1551,24 +1467,24 @@ An alternative to directly set quotienting the \texttt{M}-types we have defined,
   \caption{Quotiented polynomial function}
   \label{fig:QPF-diagram}
 \end{figure}
-If \(\function{abs}\) is surjective, then the square will commute, so we just have to define a relation that has the \function{\sim_{ap}} property, and a surjective function \(\function{abs}_{\type{X}}\) to construct a quotient \texttt{M}-type. The quotiented \texttt{M}-type has a surjective function \(\function{QM\text{-}intro} : \typeformer{M}_{\container{S}} \rightarrow \typeformer{M}_{\container{S}} / \relation{\sim}\), given as \(\functor{F}^{\infty} \circ \function{abs}_{\typeformer{M}}\), where \(\functor{F}^\infty\) is the function into the limit. As an example, lets try and construct the Q\texttt{M}-type and the QPF for multisets, with this alternative approach
+If \(\function{abs}\) is surjective, then the square will commute. We therefore just have to define a relation that has the \function{\sim_{ap}} property together with a surjective function \(\function{abs}_{\type{X}}\) to construct a quotient \texttt{M}-type. We get a surjective function \(\function{QM\text{-}intro} : \typeformer{M}_{\container{S}} \rightarrow \typeformer{M}_{\container{S}} / \relation{\sim}\) from this construction. The function is given as \(\function{abs}_{\typeformer{M}}\), which is the version of \(\function{abs}\) between the limits of the two sequences. As an example of this alternative construction, lets try and construct the Q\texttt{M}-type and the QPF for multisets,
 \begin{exmp}
   We have the following polynomial functor for \(\type{A}\)-valued \(\mathbb{N}\)-branching trees
   \begin{equation}
     \functor{P}\,\type{X} = \sum_{(\term{a} : \type{A} + \unit)} \begin{cases} \empt \rightarrow \type{X} & \term{a} = \mathtt{inl}~\term{r} \\ \mathbb{N} \rightarrow \type{X} & \term{a} = \mathtt{inr}~\unitelem \end{cases}
   \end{equation}
-  for which we define the family of relations \((\relation{\sim_{PT}})_{(\term{a} : \type{A} + \unit)}\), if \(\term{a} = \mathtt{inl}~\term{r}\) then the equality relations is just the trivial equalities, since the relation is between elements of type \(\empt \rightarrow \type{X}\), which is contractive. On the other hand if \(\term{a} = \mathtt{inr}~\unitelem\), then we define the relation as
+  for which we define the family of relations \((\relation{\sim_{PT}})_{(\term{a} : \type{A} + \unit)}\), if \(\term{a} = \mathtt{inl}~\term{r}\), then the equality relations is just the trivial equalities, since the relation is between elements of a contractive type \(\empt \rightarrow \type{X}\). On the other hand if \(\term{a} = \mathtt{inr}~\unitelem\), then we define the relation as
   \begin{equation}
     \vcenter{\infer{\function{f}~\relation{\sim_{PT}}~\function{h}}{\function{f}, \function{h} : \mathbb{N} \rightarrow \type{X} & \function{g} : \mathbb{N} \rightarrow \mathbb{N} & \function{isIso}~\function{g} & \function{f} \circ \function{g} \equiv \function{h}}}
   \end{equation}
-  we can see with this approach, we only need to define the non-trival equalities, meaning those that are not just reflexivity. This relations fulfills the \(\function{\sim_{ap}}\) property, since if \(\term{a} = \mathtt{inl}~\term{r}\) then it holds trivially, and if \(\term{a} = \mathtt{inr}~\unitelem\) then we have \(f~\relation{\sim_{PT}}~h\) and want to show \(\function{k} \circ \function{f}~\relation{\sim_{PT}}~\function{k} \circ \function{h}\) for any function \(\function{k}\), which just boils down to showing \(\function{k} \circ \function{f} \circ \function{g} \equiv \function{k} \circ \function{h}\) given \(\pathterm{p} : \function{f} \circ \function{g} \equiv \function{h}\), which is done by \(\mathtt{ap}~\function{k}~\pathterm{p}\). We therefore have a QPF \(\functor{F}\). Now we want to define \(\function{abs}\),
+  With this approach, we only need to define the non-trival equalities, meaning those that are not just reflexivity. This relations fulfills the \(\function{\sim_{ap}}\) property. We can see this by case. If \(\term{a} = \mathtt{inl}~\term{r}\), then it holds trivially. If \(\term{a} = \mathtt{inr}~\unitelem\), then we have \(\function{f}~\relation{\sim_{PT}}~\function{h}\) and want to show \(\function{k} \circ \function{f}~\relation{\sim_{PT}}~\function{k} \circ \function{h}\) for any function \(\function{k}\), which just boils down to showing \(\function{k} \circ \function{f} \circ \function{g} \equiv \function{k} \circ \function{h}\) given the path \(\pathterm{p} : \function{f} \circ \function{g} \equiv \function{h}\), which is done by \(\mathtt{ap}~\function{k}~\pathterm{p}\). We therefore have a quotient polynomial functor \(\functor{F}\). We then define \(\function{abs}\) as
   \begin{equation}
     \begin{aligned}
       &\function{abs}~(\mathtt{inl}~\term{r}~,~\lambda\,(\,)) = (\mathtt{inl}~\term{r}~,~\quotientconstructor{\lambda\,(\,)}) \\
       &\function{abs}~(\mathtt{inr}~\unitelem~,~\function{f}) = (\mathtt{inr}~\unitelem~,~\quotientconstructor{\function{f}})
     \end{aligned}
   \end{equation}
-  and show that it is surjective, which follows directly from the surjectivity of \(\quotientconstructor{{\cdot}}\). Taking the limit we get the commuting square in \figref{QPF-limit-multiset}.
+  which is surjective, because of the surjectivity of \(\quotientconstructor{{\cdot}}\). Taking the limit we get the commuting square in \figref{QPF-limit-multiset}.
   \begin{figure}[h]
   \centering
   \begin{tikzcd}
@@ -1580,8 +1496,104 @@ If \(\function{abs}\) is surjective, then the square will commute, so we just ha
 \end{figure}
 \end{exmp}
 \noindent We have just postulated that the quotiented \texttt{M}-type, is a final \(\functor{F}\)-coalgebra, however this is not necessarily the case. When trying to proof this we need to show that given \(\function{fq} : (\typeformer{B}~\term{a} \rightarrow \type{X}) / \relation{R}\) then we can construct a function \((\typeformer{B}~\term{a} \rightarrow \type{X})\), however this requires the axiom of choice in general. We therefore does not get around the axiom of choice with this construction, however it is an alternative way of defining the quotient, and we get some more structure using it.
-\\ \\
-The construction of Q\texttt{W}-types in \cite{DBLP:Constructing-QIITs} got around using the axiom of choice by using QIIT, that is defining the type and the relation to quotient it by at the same time. As we have seen in the examples in this thesis, using QIITs gets around the use of the axiom of choice without adding much complexity, and if we use another construction and assume the axiom of choice, that construction will be equal to the QIIT \todo{Complete construction of Q\texttt{W} inspired Q\texttt{M}-types?}
+
+\subsection{Constructing QIITs from \texttt{M}-types and Relations}
+The construction of Q\texttt{W}-types in \cite{DBLP:Constructing-QIITs} got around using the axiom of choice by using QIIT, that is defining the type and the relation to quotient it by at the same time. As we have seen in the examples in this thesis, using QIITs gets around the use of the axiom of choice without adding much complexity, and if we use another construction and assume the axiom of choice, that construction will be equal to the QIIT. We still need to show that the type defined by the QIIT is a final coalgebra, however this is left at future research. We will however describe how to construct QIITs from an \texttt{M}-type and a relation. You simply take all the constructors/destructors of the \texttt{M}-type, and define them as the type forming rules for the quotient. Then for all constructors of the relations, we replace the relation with equality and add those rules as well. This will give us an higher inductive-inductive type (HIIT), so we add a set truncation constructor to get a QIIT. 
+
+The structure for translating between the set quotiented M-type and this construction of a QIIT is rather simple
+\begin{itemize}
+\item A function \function{QM{\rightarrow}QIIT} from Q\texttt{M} to QIIT, taking the Q\texttt{M} constructors to their corresponding QIIT constructor.
+\item A proof \(\function{QM{\rightarrow}QIIT\text{-}{\sim}{\rightarrow}{\equiv}}\) that \(\term{x}~\relation{\sim_{QM}}~\term{y}\) implies \(\function{QM{\rightarrow}QIIT}~\term{x} \equiv \function{QM{\rightarrow}QIIT}~\term{y}\), which should follow by the constructors we added to the QIIT for the relation.
+\item Lifting \(\function{QM{\rightarrow}QIIT}\) to \(\function{QM/{\sim}{\rightarrow}QIIT}\) using the quotient recursor with \(\function{QM{\rightarrow}QIIT\text{-}{\sim}{\rightarrow}{\equiv}}\) and \(\constructor{QIIT\text{-}isSet}\)
+\item Showing injectivity by using propositional elimination of the quotient together with the inverse of \(\function{QM{\rightarrow}QIIT\text{-}{\sim}{\rightarrow}{\equiv}}\), namely \(\function{QM{\rightarrow}QIIT\text{-}injective}\) saying that \(\function{QM{\rightarrow}QIIT}~\term{x} \equiv \function{QM{\rightarrow}QIIT}~\term{y}\) implies \(\term{x}~\relation{\sim_{QM}}~\term{y}\), which again should follow from how the relations constructors were defined.
+\item Lastly we show surjectivity by induction using the eliminator of QIIT and the axiom of choice and the surjectivity of \(\quotientconstructor{{\cdot}}\).
+\end{itemize}
+That this translation exists enforces the idea that QIITs have the right semantic, while behaving better than set quotiented \texttt{M}-types. As an example of this construction, lets try and look at the partiality monad again.
+\begin{exmp}
+  We combine the constructors from \figref{delay-monad} and \defref{weak-bisim-delay-monad} but leave to get the QIIT defined by
+  \begin{center}
+    \strut
+    \hfill
+    \begin{minipage}[h]{0.35\linewidth}
+      \begin{equation}
+        \vcenter{\infer{\constructor{now}~\term{x} : \type{R}_{\bot}}{\term{x} : \type{R}}}
+      \end{equation}
+    \end{minipage}
+    \hfill
+    \begin{minipage}[h]{0.35\linewidth}
+      \begin{equation}
+        \vcenter{\infer{\constructor{later}~\term{t} : \type{R}_{\bot}}{\term{t} : \type{R}_{\bot}}}
+      \end{equation}
+    \end{minipage}
+    \hfill
+    \strut
+  \end{center}
+  \begin{center}
+    \strut
+    \hfill
+    \begin{minipage}[h]{0.35\linewidth}
+      \begin{equation}
+        \vcenter{\infer[\constructor{later\text{-}l_{\bot}}]{\constructor{later}~\term{x}~\equiv~\term{y}}{\term{x}~\equiv~\term{y}}}
+      \end{equation}
+    \end{minipage}
+    \hfill
+    \begin{minipage}[h]{0.35\linewidth}
+      \begin{equation}
+        \vcenter{\infer[\constructor{later\text{-}r_{\bot}}]{\term{x}~\equiv~\constructor{later}~\term{y}}{\term{x}~\equiv~\term{y}}}
+      \end{equation}
+    \end{minipage}
+    \hfill
+    \strut
+  \end{center}
+  \begin{equation}
+    \vcenter{\infer[\constructor{(-)_{\bot}\text{-}isSet}]{\mathtt{isSet}~\type{R}_{\bot}}{\type{R} : \universe{\mathcal{U}}}}
+  \end{equation}
+  The function from \(\typeformer{Delay}~\type{R}\) to \(\type{R}_{\bot}\) is given as
+  \begin{equation}
+    \begin{aligned}
+      &\function{Delay{\rightarrow}(-)_{\bot}} (\constructor{now}_{\typeformer{Delay}}~\term{x}) = \constructor{now}_{\bot}~\term{x} \\
+      &\function{Delay{\rightarrow}(-)_{\bot}} (\constructor{later}_{\typeformer{Delay}}~\term{t}) = \constructor{later}_{\bot}~(\function{Delay{\rightarrow}(-)_{\bot}}~\term{t})
+    \end{aligned}
+  \end{equation}
+  we get \(\term{x}~\relation{\sim_{Delay}}~\term{y}\) implies \(\function{Delay{\rightarrow}(-)_{\bot}}~\term{x} \equiv \function{Delay{\rightarrow}(-)_{\bot}}~\term{y}\) by case on the constructors of the weak bisimulation
+  \begin{equation}
+    \begin{aligned}
+      &\function{Delay{\rightarrow}(-)_{\bot}\text{-}{\sim}{\rightarrow}{\equiv}}~(\constructor{\sim_{now}}~\_~\_~\pathterm{p}) = \mathtt{ap}~\constructor{now}_{\bot}~\pathterm{p} \\
+      &\function{Delay{\rightarrow}(-)_{\bot}\text{-}{\sim}{\rightarrow}{\equiv}}~(\constructor{\sim_{later_l}}~\term{x}~\term{y}~\term{r}) = \constructor{later\text{-}l_{\bot}}~\term{x}~\term{y}~(\function{Delay{\rightarrow}(-)_{\bot}\text{-}{\sim}{\rightarrow}{\equiv}}~\term{r}) \\
+      &\function{Delay{\rightarrow}(-)_{\bot}\text{-}{\sim}{\rightarrow}{\equiv}}~(\constructor{\sim_{later_r}}~\term{x}~\term{y}~\term{r}) = \constructor{later\text{-}r_{\bot}}~\term{x}~\term{y}~(\function{Delay{\rightarrow}(-)_{\bot}\text{-}{\sim}{\rightarrow}{\equiv}}~\term{r}) \\
+      &\function{Delay{\rightarrow}(-)_{\bot}\text{-}{\sim}{\rightarrow}{\equiv}}~(\constructor{\sim_{later}}~\_~\_~\term{r}) = \mathtt{ap}~\constructor{later}_{\bot}~(\function{Delay{\rightarrow}(-)_{\bot}\text{-}{\sim}{\rightarrow}{\equiv}}~\term{r})
+    \end{aligned}
+  \end{equation}
+  we then lift the function \(\function{Delay{\rightarrow}(-)_{\bot}}\) to the quotient using the quotient recursor given in \defref{quotient-recursor}. We denote this function as \(\function{Delay/{\sim}{\rightarrow}(-)_{\bot}}\). We show \(\function{Delay{\rightarrow}(-)_{\bot}}~\term{x} \equiv \function{Delay{\rightarrow}(-)_{\bot}}~\term{y}\) implies \(\term{x}~\relation{\sim_{Delay}}~\term{y}\) by case. If \(\term{x}\) and \(\term{y}\) are \(\constructor{now}_{\typeformer{Delay}}\) with values \(a\) and \(b\), we get an equality between \(a\) and \(b\) by the injectivity of the \(\constructor{now}_{\typeformer{Delay}}\) constructor, giving us a bisimilarity by \(\constructor{\sim_{now}}\). By \(\constructor{later\text{-}l_{\bot}}~\term{x}~\term{x}~\mathtt{refl}\) we get \(\constructor{later}_{\bot}~\term{x} \equiv \term{x}\), and by the property \(\function{Delay{\rightarrow}(-)_{\bot}}~(\constructor{later}_{\typeformer{Delay}}~\term{t}) \equiv \constructor{later}_{\bot}~(\function{Delay{\rightarrow}(-)_{\bot}}~\term{t})\), we can strip away a later from the equality meaning we are done by induction. We denote this conversion as \(\function{Delay{\rightarrow}(-)_{\bot}\text{-}{\equiv}{\rightarrow}{\sim}}\). The function \(\function{Delay/{\sim}{\rightarrow}(-)_{\bot}}\) is injective by using the propositional elimination for quotients twice
+  \begin{equation}
+    \function{elimProp}~(\lambda\,\term{a}, \function{elimProp}~(\lambda\,\term{b}, \constructor{eq/}~\term{a}~\term{b} \circ \function{Delay{\rightarrow}(-)_{\bot}\text{-}{\equiv}{\rightarrow}{\sim}}\)~\term{a}~\term{b}))
+  \end{equation}
+  Given a dependent type \(\typeformer{P} : \type{R}_{\bot} \rightarrow \universe{\mathcal{U}}\) that is a proposition at all points \(\function{P_{prop}} : \prod_{(\term{x} : \type{R}_{\bot})} \mathtt{isProp}~(\typeformer{P}~\term{x})\), and given a proof for the base case \(\function{P_{now}} : \prod_{(\term{x} : \type{R})} \typeformer{P}
+  ~(\constructor{now}~\term{x})\), we can define the propositional eliminator for \(\type{R}_{\bot}\) as
+  \begin{equation}
+    \begin{aligned}
+      &\function{elimProp_{\bot}}~(\constructor{now}~\term{x}) = \function{P_{now}}~\term{x} \\
+      &\function{elimProp_{\bot}}~(\constructor{later}~\term{t}) = \mathtt{subst}~\typeformer{P}~\pathterm{later\text{-}{\equiv}}~(\function{elimProp_{\bot}}~\term{t}) \\
+      &\function{elimProp_{\bot}}~(\constructor{later\text{-}l_{\bot}}~\term{x}~\term{y}~\pathterm{p}~i) = \\
+      &\quad\function{isProp{\rightarrow}isDepProp}~\function{P_{prop}}~(\function{elimProp_{\bot}}~(\constructor{later}~\term{x})~(\function{elimProp_{\bot}}~\term{y})~(\constructor{later\text{-}l_{\bot}}~\term{x}~\term{y}~\pathterm{p})~i \\
+      &\function{elimProp_{\bot}}~(\constructor{later\text{-}r_{\bot}}~\term{x}~\term{y}~\pathterm{p}~i) = \\
+      &\quad\function{isProp{\rightarrow}isDepProp}~\function{P_{prop}}~(\function{elimProp_{\bot}}~\term{x})~(\function{elimProp_{\bot}}~(\constructor{later}~\term{y}))~(\constructor{later\text{-}r_{\bot}}~\term{x}~\term{y}~\pathterm{p})~i \\
+      &\function{elimProp_{\bot}}~(\constructor{(-)_{\bot}\text{-}isSet}~\term{a}~\term{b}~\pathterm{p}~\pathterm{q}~i~j) = \\
+      &\quad\function{isSet{\rightarrow}isDepSet}~(\function{isProp{\rightarrow}isSet} \circ \function{P_{prop}})~(\function{elimProp_{\bot}}~\term{a})~(\function{elimProp_{\bot}}~\term{b}) \\
+      &\quad\qquad(\mathtt{ap}~\function{elimProp_{\bot}}~\pathterm{p})~(\mathtt{ap}~\function{elimProp_{\bot}}~\pathterm{q}))~(\constructor{(-)_{\bot}\text{-}isSet}~\term{a}~\term{b}~\pathterm{p}~\pathterm{q})~i~j
+    \end{aligned}
+  \end{equation}
+  where \(\pathterm{later\text{-}{\equiv}}\) is the equality \(\term{x} \equiv \constructor{later}_{\bot}~\term{x}\).
+  We can show the function \(\function{Delay{\rightarrow}(-)_{\bot}}\) is surjective, by instantiating the propositional elimination with
+  \begin{equation}
+    \typeformer{P} = \lambda\,\term{y}, \bigg\| \sum_{(\term{x} : \typeformer{Delay}~\type{R})} \function{Delay{\rightarrow}(-)_{\bot}}~\term{x} \equiv \term{y} \bigg\|
+  \end{equation}
+  which is a proposition by truncation, and then show the following base case given some \(\term{a} : \type{R}\)
+  \begin{equation}
+    \bigg\| \sum_{(\term{x} : \typeformer{Delay}~\type{R})} \function{Delay{\rightarrow}(-)_{\bot}}~\term{x} \equiv \constructor{now}_{\bot}~\term{a} \bigg\|
+  \end{equation}
+  If we let \(\term{x} = \constructor{now}_{\typeformer{Delay}}~\term{a}\), then the term is true. We then get surjectivity of \(\function{Delay/{\sim}{\rightarrow}(-)_{\bot}}\), using the surjectivity of \(\quotientconstructor{{\cdot}}\). Which completes the equality since \(\function{Delay/{\sim}{\rightarrow}(-)_{\bot}}\) is injective and surjective. This construction does not seem to use the axiom of choice, however when construction the propositional eliminator, we
+\end{exmp}
 
 \chapter{Conclusion}
 \label{ch:conclusion}
