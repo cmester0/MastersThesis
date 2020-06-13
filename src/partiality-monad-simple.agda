@@ -100,24 +100,30 @@ Delay/∼→⊥-isInjective {R = R} {x} {y} =
       y)
     x
 
-{-# NON_TERMINATING #-}
 elimProp⊥ :
   ∀ {A : Set} (P : < A >⊥ → Set)
   → (∀ a → isProp (P a))
   → ((a : A) → P (now a))
+  → (∀ t → P t → P (later t))
   → (x : < A >⊥) → P x
-elimProp⊥ {A = A} P Pprop pn = temp
+elimProp⊥ {A = A} P Pprop pn Pl = temp
   where
     temp : (x : < A >⊥) → P x
     temp (now a) = pn a
-    temp (later x) = transport (cong P (later-r x x refl)) (temp x) -- problem here
-    temp (later-l t u p i) = isOfHLevel→isOfHLevelDep 1 Pprop ((temp) (later t)) ((temp) u) (later-l t u p) i -- and here
+    temp (later x) = Pl x (temp x)
+    temp (later-l t u p i) =
+      isOfHLevel→isOfHLevelDep 1 Pprop (Pl t (temp t)) (temp u) (later-l t u p) i
     temp (⊥-isSet a b p q i j) = isOfHLevel→isOfHLevelDep 2 (isProp→isSet ∘ Pprop) ((temp) a) ((temp) b) (cong (temp) p) (cong (temp) q) (⊥-isSet a b p q) i j
+
+Delay→⊥-isSurjective : ∀ {R} → isSurjection (Delay→⊥ {R = R})
+Delay→⊥-isSurjective =
+  elimProp⊥
+    (λ y → ∥ fiber Delay→⊥ y ∥)
+    (λ _ → propTruncIsProp)
+    (λ a → ∣ now a , refl ∣)
+    (λ t x → ∥map∥ (λ y → (later (y .fst)) , cong later (y .snd)) x)
 
 -- Construction does not use axiom of choice !, which means there is something wrong.
 Delay/∼→⊥-isSurjective : ∀ {R} → isSurjection (Delay/∼→⊥ {R = R})
-Delay/∼→⊥-isSurjective =
-  elimProp⊥
-    (λ y → ∥ fiber Delay/∼→⊥ y ∥)
-    (λ _ → propTruncIsProp)
-    λ a → ∣ [ now a ] , refl ∣
+Delay/∼→⊥-isSurjective x =
+  ∥map∥ (λ {(x , y) → [ x ] , y}) (Delay→⊥-isSurjective x)

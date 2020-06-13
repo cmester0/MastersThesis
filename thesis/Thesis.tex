@@ -829,6 +829,7 @@ In this section we will show some examples of quotiented \texttt{M}-type defined
 % However QIITs are more general than our Q\texttt{M}-types, so we cannot expect every QIIT to have a corresponding Q\texttt{M}-type.
 
 \subsection{Multiset}
+\label{sec:multiset}
 In this subsection we define infinite trees, where the order of subtrees does not matter also known as multisets. We draw inspiration from similar equality given in \cite{DBLP:QIIT}, \cite{DBLP:tt-in-tt} and \cite{DBLP:Constructing-QIITs} for the dual case of finite multisets. We construct the type of multisets as a Q\texttt{M}-type and as a QIIT and show these are equal (\thmref{QM-QIIT-eq-multiset}). We start by defining the tree type we want to quotient to get the multiset.
 \begin{defn}
   We define \(\type{A}\)-valued \(\mathbb{N}\)-branching trees \(\typeformer{T}\,\type{A}\) as the \texttt{M}-type defined by the container
@@ -982,6 +983,7 @@ This function takes weakly bisimilar objects to equal once.
 \end{thm}
 
 \subsection{Partiality monad}
+\label{sec:partiality-monad}
 In this subsection we will define the partiality monad (see below) and show that it is equal to the delay monad quotiented by weak bisimilarity, assuming the axiom of countable choice. We do this proof by defining an intermediate representation as sequences. We then show that the delay monad is equal to sequences (\subsectionref{delay-monad-to-sequences}), followed by showing that sequences quotiented by weak bisimilarity are equal to the partiality monad (\subsectionref{sequences-to-partiality-monad}). This section draws heavy inspiration from "Partiality, Revisited" \cite{Partiality-Revisited}.
 \begin{defn}[Partiality Monad]
   A simple example of a quotient inductive-inductive type is the partiality monad \((-)_\bot\) over a type \(\type{R}\), defined by the constructors\\[-9mm]
@@ -1508,9 +1510,9 @@ The structure for translating between the set quotiented M-type and this constru
 \item Showing injectivity by using propositional elimination of the quotient together with the inverse of \(\function{QM{\rightarrow}QIIT\text{-}{\sim}{\rightarrow}{\equiv}}\), namely \(\function{QM{\rightarrow}QIIT\text{-}injective}\) saying that \(\function{QM{\rightarrow}QIIT}~\term{x} \equiv \function{QM{\rightarrow}QIIT}~\term{y}\) implies \(\term{x}~\relation{\sim_{QM}}~\term{y}\), which again should follow from how the relations constructors were defined.
 \item Lastly we show surjectivity by induction using the eliminator of QIIT and the axiom of choice and the surjectivity of \(\quotientconstructor{{\cdot}}\).
 \end{itemize}
-That this translation exists enforces the idea that QIITs have the right semantic, while behaving better than set quotiented \texttt{M}-types. As an example of this construction, lets try and look at the partiality monad again.
+That this translation exists enforces the idea that QIITs have the right semantic, while behaving better than the Q\texttt{M}-types. We followed this construction in \subsectionref{multiset} on multisets, however in \subsectionref{partiality-monad} on the partiality monad, we constructed a more advanced QIIT. Lets look at why we did this, by constructing the partiality monad again, but with this simple method instead.
 \begin{exmp}
-  We combine the constructors from \figref{delay-monad} and \defref{weak-bisim-delay-monad} but leave to get the QIIT defined by
+  We combine the constructors for the delay monad given in \figref{delay-monad} and the weak bisimilarity relation given in \defref{weak-bisim-delay-monad} to get a QIIT defined by
   \begin{center}
     \strut
     \hfill
@@ -1527,8 +1529,7 @@ That this translation exists enforces the idea that QIITs have the right semanti
     \end{minipage}
     \hfill
     \strut
-  \end{center}
-  \begin{center}
+    \\
     \strut
     \hfill
     \begin{minipage}[h]{0.35\linewidth}
@@ -1548,51 +1549,7 @@ That this translation exists enforces the idea that QIITs have the right semanti
   \begin{equation}
     \vcenter{\infer[\constructor{(-)_{\bot}\text{-}isSet}]{\mathtt{isSet}~\type{R}_{\bot}}{\type{R} : \universe{\mathcal{U}}}}
   \end{equation}
-  The function from \(\typeformer{Delay}~\type{R}\) to \(\type{R}_{\bot}\) is given as
-  \begin{equation}
-    \begin{aligned}
-      &\function{Delay{\rightarrow}(-)_{\bot}} (\constructor{now}_{\typeformer{Delay}}~\term{x}) = \constructor{now}_{\bot}~\term{x} \\
-      &\function{Delay{\rightarrow}(-)_{\bot}} (\constructor{later}_{\typeformer{Delay}}~\term{t}) = \constructor{later}_{\bot}~(\function{Delay{\rightarrow}(-)_{\bot}}~\term{t})
-    \end{aligned}
-  \end{equation}
-  we get \(\term{x}~\relation{\sim_{Delay}}~\term{y}\) implies \(\function{Delay{\rightarrow}(-)_{\bot}}~\term{x} \equiv \function{Delay{\rightarrow}(-)_{\bot}}~\term{y}\) by case on the constructors of the weak bisimulation
-  \begin{equation}
-    \begin{aligned}
-      &\function{Delay{\rightarrow}(-)_{\bot}\text{-}{\sim}{\rightarrow}{\equiv}}~(\constructor{\sim_{now}}~\_~\_~\pathterm{p}) = \mathtt{ap}~\constructor{now}_{\bot}~\pathterm{p} \\
-      &\function{Delay{\rightarrow}(-)_{\bot}\text{-}{\sim}{\rightarrow}{\equiv}}~(\constructor{\sim_{later_l}}~\term{x}~\term{y}~\term{r}) = \constructor{later\text{-}l_{\bot}}~\term{x}~\term{y}~(\function{Delay{\rightarrow}(-)_{\bot}\text{-}{\sim}{\rightarrow}{\equiv}}~\term{r}) \\
-      &\function{Delay{\rightarrow}(-)_{\bot}\text{-}{\sim}{\rightarrow}{\equiv}}~(\constructor{\sim_{later_r}}~\term{x}~\term{y}~\term{r}) = \constructor{later\text{-}r_{\bot}}~\term{x}~\term{y}~(\function{Delay{\rightarrow}(-)_{\bot}\text{-}{\sim}{\rightarrow}{\equiv}}~\term{r}) \\
-      &\function{Delay{\rightarrow}(-)_{\bot}\text{-}{\sim}{\rightarrow}{\equiv}}~(\constructor{\sim_{later}}~\_~\_~\term{r}) = \mathtt{ap}~\constructor{later}_{\bot}~(\function{Delay{\rightarrow}(-)_{\bot}\text{-}{\sim}{\rightarrow}{\equiv}}~\term{r})
-    \end{aligned}
-  \end{equation}
-  we then lift the function \(\function{Delay{\rightarrow}(-)_{\bot}}\) to the quotient using the quotient recursor given in \defref{quotient-recursor}. We denote this function as \(\function{Delay/{\sim}{\rightarrow}(-)_{\bot}}\). We show \(\function{Delay{\rightarrow}(-)_{\bot}}~\term{x} \equiv \function{Delay{\rightarrow}(-)_{\bot}}~\term{y}\) implies \(\term{x}~\relation{\sim_{Delay}}~\term{y}\) by case. If \(\term{x}\) and \(\term{y}\) are \(\constructor{now}_{\typeformer{Delay}}\) with values \(a\) and \(b\), we get an equality between \(a\) and \(b\) by the injectivity of the \(\constructor{now}_{\typeformer{Delay}}\) constructor, giving us a bisimilarity by \(\constructor{\sim_{now}}\). By \(\constructor{later\text{-}l_{\bot}}~\term{x}~\term{x}~\mathtt{refl}\) we get \(\constructor{later}_{\bot}~\term{x} \equiv \term{x}\), and by the property \(\function{Delay{\rightarrow}(-)_{\bot}}~(\constructor{later}_{\typeformer{Delay}}~\term{t}) \equiv \constructor{later}_{\bot}~(\function{Delay{\rightarrow}(-)_{\bot}}~\term{t})\), we can strip away a later from the equality meaning we are done by induction. We denote this conversion as \(\function{Delay{\rightarrow}(-)_{\bot}\text{-}{\equiv}{\rightarrow}{\sim}}\). The function \(\function{Delay/{\sim}{\rightarrow}(-)_{\bot}}\) is injective by using the propositional elimination for quotients twice
-  \begin{equation}
-    \function{elimProp}~(\lambda\,\term{a}, \function{elimProp}~(\lambda\,\term{b}, \constructor{eq/}~\term{a}~\term{b} \circ \function{Delay{\rightarrow}(-)_{\bot}\text{-}{\equiv}{\rightarrow}{\sim}}\)~\term{a}~\term{b}))
-  \end{equation}
-  Given a dependent type \(\typeformer{P} : \type{R}_{\bot} \rightarrow \universe{\mathcal{U}}\) that is a proposition at all points \(\function{P_{prop}} : \prod_{(\term{x} : \type{R}_{\bot})} \mathtt{isProp}~(\typeformer{P}~\term{x})\), and given a proof for the base case \(\function{P_{now}} : \prod_{(\term{x} : \type{R})} \typeformer{P}
-  ~(\constructor{now}~\term{x})\), we can define the propositional eliminator for \(\type{R}_{\bot}\) as
-  \begin{equation}
-    \begin{aligned}
-      &\function{elimProp_{\bot}}~(\constructor{now}~\term{x}) = \function{P_{now}}~\term{x} \\
-      &\function{elimProp_{\bot}}~(\constructor{later}~\term{t}) = \mathtt{subst}~\typeformer{P}~\pathterm{later\text{-}{\equiv}}~(\function{elimProp_{\bot}}~\term{t}) \\
-      &\function{elimProp_{\bot}}~(\constructor{later\text{-}l_{\bot}}~\term{x}~\term{y}~\pathterm{p}~i) = \\
-      &\quad\function{isProp{\rightarrow}isDepProp}~\function{P_{prop}}~(\function{elimProp_{\bot}}~(\constructor{later}~\term{x})~(\function{elimProp_{\bot}}~\term{y})~(\constructor{later\text{-}l_{\bot}}~\term{x}~\term{y}~\pathterm{p})~i \\
-      &\function{elimProp_{\bot}}~(\constructor{later\text{-}r_{\bot}}~\term{x}~\term{y}~\pathterm{p}~i) = \\
-      &\quad\function{isProp{\rightarrow}isDepProp}~\function{P_{prop}}~(\function{elimProp_{\bot}}~\term{x})~(\function{elimProp_{\bot}}~(\constructor{later}~\term{y}))~(\constructor{later\text{-}r_{\bot}}~\term{x}~\term{y}~\pathterm{p})~i \\
-      &\function{elimProp_{\bot}}~(\constructor{(-)_{\bot}\text{-}isSet}~\term{a}~\term{b}~\pathterm{p}~\pathterm{q}~i~j) = \\
-      &\quad\function{isSet{\rightarrow}isDepSet}~(\function{isProp{\rightarrow}isSet} \circ \function{P_{prop}})~(\function{elimProp_{\bot}}~\term{a})~(\function{elimProp_{\bot}}~\term{b}) \\
-      &\quad\qquad(\mathtt{ap}~\function{elimProp_{\bot}}~\pathterm{p})~(\mathtt{ap}~\function{elimProp_{\bot}}~\pathterm{q}))~(\constructor{(-)_{\bot}\text{-}isSet}~\term{a}~\term{b}~\pathterm{p}~\pathterm{q})~i~j
-    \end{aligned}
-  \end{equation}
-  where \(\pathterm{later\text{-}{\equiv}}\) is the equality \(\term{x} \equiv \constructor{later}_{\bot}~\term{x}\).
-  We can show the function \(\function{Delay{\rightarrow}(-)_{\bot}}\) is surjective, by instantiating the propositional elimination with
-  \begin{equation}
-    \typeformer{P} = \lambda\,\term{y}, \bigg\| \sum_{(\term{x} : \typeformer{Delay}~\type{R})} \function{Delay{\rightarrow}(-)_{\bot}}~\term{x} \equiv \term{y} \bigg\|
-  \end{equation}
-  which is a proposition by truncation, and then show the following base case given some \(\term{a} : \type{R}\)
-  \begin{equation}
-    \bigg\| \sum_{(\term{x} : \typeformer{Delay}~\type{R})} \function{Delay{\rightarrow}(-)_{\bot}}~\term{x} \equiv \constructor{now}_{\bot}~\term{a} \bigg\|
-  \end{equation}
-  If we let \(\term{x} = \constructor{now}_{\typeformer{Delay}}~\term{a}\), then the term is true. We then get surjectivity of \(\function{Delay/{\sim}{\rightarrow}(-)_{\bot}}\), using the surjectivity of \(\quotientconstructor{{\cdot}}\). Which completes the equality since \(\function{Delay/{\sim}{\rightarrow}(-)_{\bot}}\) is injective and surjective. This construction does not seem to use the axiom of choice, however when construction the propositional eliminator, we
+  Constructing a function from the Q\texttt{M}-type to this QIIT and showing it is injective is easy, however showing surjectivity is harder.
 \end{exmp}
 
 \chapter{Conclusion}
