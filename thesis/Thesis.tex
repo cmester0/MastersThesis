@@ -188,7 +188,7 @@ We are using \textbf{type theory} \cite{nlab:type_theory} as the basis for mathe
 \end{center}
 with base case 0, and inductive case \(\constructor{succ}~n\), which says that \(n+1\) is a natural number if \(n\) is. If we take the type defined coinductively over the same set of constructors, we get the largest type with these constructors, meaning we get an element from applying \(\constructor{succ}\) infinitely, namely \(\infty = \constructor{succ}~\infty\). This coinductive type is also know as \(\mathtt{co}\mathtt{N}\) and differs from \(\mathbb{N}\). A way to look at inductive definitions is that the rules describe the structure of the type, while for a coinduction definition, the rules describe the observable behavior of the type.
 
-We will now describe how equality differs for inductive and coinductive types. We can make a inductively defined equivalence relation \(\relation{\sim_{\mathbb{N}}}\) on the natural numbers, since the natural numbers are defined inductively. Meaning equivalence on the natural numbers follows the structure defined by the constructors. The equivalence relation is given as \todo{= or \(\equiv\)}\\[-10mm]
+We will now describe how equality differs for inductive and coinductive types. We can make a inductively defined equivalence relation \(\relation{\sim_{\mathbb{N}}}\) on the natural numbers, since the natural numbers are defined inductively. Meaning equivalence on the natural numbers follows the structure defined by the constructors. The equivalence relation is given as\\[-10mm]
 \begin{center}
   \strut
   \hfill
@@ -772,7 +772,7 @@ where \(\typeformer{F}_2\) has been moved to the last part of the container. We 
 \begin{equation}
   \containerpair{\sum_{(\type{f}_1 : \universe{\mathcal{U}})} \sum_{(\term{f}_3 : \typeformer{F_3})} \cdots \sum_{(\term{f}_{n-1} : \typeformer{F_{n-1}})}\typeformer{F_n}}{\lambda\,(\type{f}_1,\term{f}_3,\dots),\sum_{(\term{x} : \type{f}_1)} (\typeformer{B}\,\term{x})}
 \end{equation}
-so we would expect that a type defined as a (coinductive) record is equal to the version defined as a \texttt{M}-type. However this has not been shown formally, though the equality between streams as records and \texttt{M}-types have almost been completed. We have also formalized some of the equality between \texttt{M}-types as described here, and \texttt{M}-types defined as a record. \todo{take another look at this}
+so we would expect that a type defined as a (coinductive) record is equal to the version defined as a \texttt{M}-type. However this has not been shown formally. We have explored examples of these equalities, and they seem doable on paper, but issues with the termination checker for Cubical Agda has hindered the formalization. A solution might be to use sized-types or switch to a guarded cubical type theory.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
 
@@ -1561,11 +1561,11 @@ We have described the construction of \texttt{M}-types as the limit of a sequenc
 \section{Future Work}
 We would like to formally show that the construction of quotiented \texttt{M}-types presented in this paper, will result in a type that is a final-coalgebra. We would also like to do closer comparison between the constructions. We would also like to get a formal description/proof of how to construct the quotient inductive-inductive types representing the quotient of a given \texttt{M}-type over a given relation.
 \\ \\
-In this work we have described \texttt{M}-types, however we have not looked at the notion of indexed \texttt{M}-types, which are coinductive types indexed by another type. \todo{cite indexed types} We hope that what is done in this thesis can be generalized to work for indexed \texttt{M}-types, but formally showing this is future work.
+In this work we have described \texttt{M}-types, however we have not looked at the notion of indexed \texttt{M}-types, which are coinductive types indexed by another type. We hope that what is done in this thesis can be generalized to work for indexed \texttt{M}-types, but formally showing this is future work.
 
-We similarly only discussed that types defined as (coinductive) records should be equal to types defined as \texttt{M}-types, but we did not discuss how exactly to formulate this equality and proof it. One thing to do is should the construction of \texttt{M}-types equal to a construction of \texttt{M}-types as a record. This would give us the external interpretation of constructors in records, to be able to use more features of the termination checker and the likes in the Cubical Agda proof assistant.
+We similarly only discussed that types defined as (coinductive) records should be equal to types defined as \texttt{M}-types, but we did not discuss how exactly to formulate this equality and proof it. We would like to show that the construction of \texttt{M}-types is equal to the construction of \texttt{M}-types as a record. This would give us the external interpretation of constructors in records, to be able to use more features of the termination checker and the likes in the Cubical Agda proof assistant.
 \\ \\
-We would also like to explore how these constructions behave in a guarded cubical type theory (GCTT), and whether there are any improvements to gain from using a GCTT in this regard.
+We would also like to explore how these constructions behave in a guarded cubical type theory (GCTT), and whether there are any improvements to gain from using a GCTT in this regard, since most of the issues in the Cubical Agda formalization stem from the termination checker.
 
 % \todo[inline]{Remove red text}
 % \textcolor{red}{
@@ -1598,7 +1598,10 @@ We would also like to explore how these constructions behave in a guarded cubica
 \appendix
 
 \chapter{The Technical Details}
-Part of the formalization of this work has been accepted to the Cubical Agda github in the pull request \url{https://github.com/agda/cubical/pull/245}. The rest can be accessed at \url{https://github.com/cmester0/MastersThesis/tree/master/src}. \todo{add commit tag!}
+Most of the work presented has been formalized in Cubical Agda. Part of the formalization of this work has been accepted to the Cubical Agda github in the pull request:\\
+\url{https://github.com/agda/cubical/pull/245}\\
+The rest can be accessed at:\\
+{\small\url{https://github.com/cmester0/MastersThesis/tree/a05099b2e433d5002c1151749aa3b65e1eb18b3d/src}}
 \end{document}
 
 % read / cite : QUOTIENT INDUCTIVE-INDUCTIVE TYPES (https://arxiv.org/pdf/1612.02346.pdf)
