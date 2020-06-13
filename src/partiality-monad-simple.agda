@@ -24,6 +24,7 @@ open import Cubical.Foundations.Prelude
 open import Cubical.Foundations.Isomorphism
 open import Cubical.Foundations.Function
 open import Cubical.Foundations.Equiv
+open import Cubical.Foundations.Transport
 
 open import Cubical.Functions.Embedding
 open import Cubical.Functions.Surjection
@@ -53,14 +54,21 @@ data <_>⊥ (A : Type₀) : Type₀ where
   ⊥-isSet : isSet (< A >⊥)
 
 postulate
-  now-embedding : ∀ {R : Set} {a b : R} → Iso (<_>⊥.now a ≡ now b) (a ≡ b)
-  later-embedding : ∀ {R : Set} {a b : < R >⊥} → (<_>⊥.later a ≡ later b) ≡ (a ≡ b)
+  now-embedding-fun : ∀ {R : Set} {a b : R} → (<_>⊥.now a ≡ now b) → (a ≡ b)
+
+later-embedding : ∀ {R : Set} {a b : < R >⊥} → (<_>⊥.later a ≡ later b) ≡ (a ≡ b)
+later-embedding {a = a} {b} =
+  (later a ≡ later b)
+    ≡⟨ cong (λ k → k ≡ later b) (later-l a a refl) ⟩
+  (a ≡ later b)
+    ≡⟨ cong (λ k → a ≡ k) (later-l b b refl) ⟩
+  a ≡ b ∎
 
 later-r : ∀ {A : Type₀} (t u : < A >⊥) → t ≡ u → t ≡ later u
 later-r  t u p = sym (later-l u t (sym p))
 
 later-c : ∀ {A : Type₀} (t u : < A >⊥) → t ≡ u → later t ≡ later u
-later-c t u p = transport (sym later-embedding) p
+later-c t u p = transport⁻ later-embedding p
 
 Delay→⊥ : ∀ {R} → Delay R → < R >⊥
 Delay→⊥ (now a) = now a
@@ -76,7 +84,7 @@ Delay/∼→⊥ : ∀ {R} → Delay R / _∼_ → < R >⊥
 Delay/∼→⊥ = rec/ Delay→⊥ (λ _ _ → Delay→⊥-∼→≡) ⊥-isSet
 
 Delay→⊥-≡→∼ : ∀ {R} → {x y : Delay R} → Delay→⊥ x ≡ Delay→⊥ y → x ∼ y
-Delay→⊥-≡→∼ {x = now a} {y = now b} p = ∼now a b (Iso.fun (now-embedding {a = a} {b = b}) p)
+Delay→⊥-≡→∼ {x = now a} {y = now b} p = ∼now a b (now-embedding-fun p)
 Delay→⊥-≡→∼ {x = later a} {y = now b} p =
   ∼later-l a (now b) (Delay→⊥-≡→∼ (subst (λ k → k ≡ now b) (later-l (Delay→⊥ a) (Delay→⊥ a) refl) p))
 Delay→⊥-≡→∼ {x = now a} {y = later b} p =
