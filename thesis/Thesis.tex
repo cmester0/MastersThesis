@@ -133,16 +133,16 @@
 
  % The formalization in this thesis is done in a cubical type theory (CTT), to get good computational behavior for univalence in homotopy type theory. We use Cubical Agda as the proof assistant / programming languge for the instrumentation of the formalization. We then introduce the notion of a Q\texttt{M}-type, as quotiented \texttt{M}-types. We discuss three options for how to construct these, first we use set
 
-This work builds on homotopy type theory (HoTT) and is formalized in a cubical type theory (CTT). We give a construction of coinductive- / \texttt{M}-types. Given a container, we construct a polynomial functor, which by repeated application to the unit type, produces a sequence. Taking the limit of this sequence gives us the \texttt{M}-type as a final coalgebra. Since the \texttt{M}-type is a final coalgebra, we get a coinduction principle, making strong bisimulation for \texttt{M}-types imply equality. Next we give some example \texttt{M}-types, and describe how to construct \texttt{M}-types from a set of constructors/destructors. We introduce quotiented \texttt{M}-types (Q\texttt{M}-types), defined as set truncated quotients. However, this way of constructing Q\texttt{M}-types suffers the problem that we need to lift constructors of the \texttt{M}-type to the quotient, which requires the use of the axiom of countable choice \cite{DBLP:tt-in-tt}. We remedy this problem by defining the quotienting relation and the type at the same time as a quotient inductive-inductive type (QIIT), which is equal to the Q\texttt{M}-type, assuming the axiom of (countable) choice. We construct multisets and the partiality monad as some examples of quotiented \texttt{M}-types and show the equivalence between the two constructions of these examples. We then discuss the pros and cons of the two constructions, and relate them to an alternative construction. This alternative construction is done by taking the final coalgebra for a quotient polynomial functor (QPF). However, this construction again requires the axiom of (countable) choice. All work is formalized in Cubical Agda, and the work on defining \texttt{M}-types has been accepted to the Cubical Agda Github repository (pull request: \url{https://github.com/agda/cubical/pull/245}).
+This work builds on homotopy type theory (HoTT) and is formalized in a cubical type theory (CTT). We give a construction of coinductive types / \texttt{M}-types. Given a container, we construct a polynomial functor, which by repeated application to the unit type, produces a sequence. Taking the limit of this sequence gives us the \texttt{M}-type as a final coalgebra. Since the \texttt{M}-type is a final coalgebra, we get a coinduction principle, making strong bisimulation for \texttt{M}-types imply equality. Next we give some example \texttt{M}-types, and describe how to construct \texttt{M}-types from a set of constructors/destructors. We introduce quotiented \texttt{M}-types (Q\texttt{M}-types), defined as set truncated quotients. However, this way of constructing Q\texttt{M}-types suffers the problem that we need to lift constructors of the \texttt{M}-type to the quotient, which requires the use of the axiom of countable choice \cite{DBLP:tt-in-tt}. We remedy this problem by defining the quotienting relation and the type at the same time as a quotient inductive-inductive type (QIIT), which is equal to the Q\texttt{M}-type, assuming the axiom of (countable) choice. We construct multisets and the partiality monad as some examples of quotiented \texttt{M}-types and show the equivalence between the two constructions of these examples. We then discuss the pros and cons of the two constructions, and relate them to an alternative construction. This alternative construction is done by taking the final coalgebra for a quotient polynomial functor (QPF). However, this construction again requires the axiom of (countable) choice. All work is formalized in Cubical Agda, and the work on defining \texttt{M}-types has been accepted to the Cubical Agda Github repository (pull request: \url{https://github.com/agda/cubical/pull/245}).
 
 \chapter*{Resum\'e}
 \addcontentsline{toc}{chapter}{Resum\'e}
 
-I denne afhandling bygger vi på homotopisk typeteori (HoTT) formaliseret i en kubisk typeteori (CTT). Vi giver en konstruktion af \texttt{M}-typer ved brug af "containers". Given en "conatiner" kan vi konstruere en polynomisk funktor, og ved gentaget anvendelse af denne på enhedstypen, får vi en sekvens af typer. Grænsen af denne sekvens giver os en \texttt{M}-type som en endelig coalgebra. Vi giver nogle eksempler på \texttt{M}-typer, hvorefter vi beskriver konstruktionen af kvotient \texttt{M}-typer, kaldet en Q\texttt{M}-type. Denne konstruktion bruger set trunkeret kvotienter. Dog kræver denne konstruktion at vi kan løfte konstruktørerne for en \texttt{M}-type til kvotienten, hvilket kræver det tællelige udvalgsaksiom. For at undgå dette definere vi kvotient typen som en kvotient inductive-inductive type (QIIT), hvor typen og relationen defineres samtidig. Vi giver nogle eksempler på ækvivalence mellem de to konstruktioner, under antagelse af det tællelige udvalgsaksiom. Vi diskuttere fordele og ulemper ved disse konstruktioner, og introducere en tredje konstruktion, hvor kvotient typen er given som grænsen / den endelige coalgebra for en kvotient polynomisk functor. Denne konstruktion kræver dog stadig det endelige udvalgsaksiomet.
+I denne afhandling bygger vi på homotopisk typeteori (HoTT) formaliseret i en kubisk typeteori (CTT). Vi giver en konstruktion af \texttt{M}-typer ved brug af "containers". Given en "conatiner" kan vi konstruere en polynomisk funktor, og ved gentaget anvendelse af denne på enhedstypen, får vi en sekvens af typer. Grænsen af denne sekvens giver os en \texttt{M}-type som en endelig coalgebra. Vi giver nogle eksempler på \texttt{M}-typer, hvorefter vi beskriver konstruktionen af kvotient \texttt{M}-typer, kaldet en Q\texttt{M}-type. Denne konstruktion bruger set trunkeret kvotienter. Dog kræver denne konstruktion at vi kan løfte konstruktørerne for en \texttt{M}-type til kvotienten, hvilket kræver det tællelige udvalgsaksiom. For at undgå dette definere vi kvotient typen som en kvotient inductive-inductive type (QIIT), hvor typen og relationen defineres samtidig. Vi giver nogle eksempler på ækvivalence mellem de to konstruktioner, under antagelse af det tællelige udvalgsaksiom. Vi diskuttere fordele og ulemper ved disse konstruktioner, og introducere en tredje konstruktion, hvor kvotient typen er given som grænsen / den endelige coalgebra for en kvotient polynomisk funktor. Denne konstruktion kræver dog stadig det endelige udvalgsaksiomet.
 
 \chapter*{Acknowledgments}
 \addcontentsline{toc}{chapter}{Acknowledgments}
-I would like to thank my supervisor Bas Spitters for some enlightening discussions and quick responses and for taking the time to meet weekly. I would also like to thank my fellow students and friends, who made this challenging, but fun, time less lonely despite the Corona pandemic.
+I would like to thank my supervisor Bas Spitters for some enlightening discussions and quick responses and for taking the time to meet weekly. I would also like to thank my fellow students and friends, who made this challenging but fun time less lonely, despite the Corona pandemic.
 \vspace{2ex}
 \begin{flushright}
   \emph{Lasse Letager Hansen,}\\
@@ -167,7 +167,7 @@ In the rest of this chapter, we will introduce some of the background theory and
 \section{Background Theory}
 We give some background theory and summarize core concepts used in the rest of this thesis. 
 \\ \\
-We are using \textbf{type theory} \cite{nlab:type_theory} as the basis for mathematics. In type theory every term \(\term{x}\) is an element of some type \(\type{A}\), written \(\term{x} : \type{A}\). A paradigm in type theory is the idea "propositions as types" \cite{nlab:propositions_as_types}, meaning proofs boils down to showing the existence of an element of the type representing the proposition. Specifically proofs of equality is done like a construction of an element of the equality type. The type theory we are working in is build on \textbf{Martin L\"of Type Theory (MLTT)} / Intuitionistic type Theory (ITT) \cite{nlab:martin-loef_dependent_type_theory}, which is designed on the principles of mathematical constructivism, where any existence proof must contain a witness. Meaning a proof of existence can be converted into an algorithm that finds the element making the statement true. MLTT is built from the three finite types \(\empt\), \(\unit\) and \(\type{\mathbf{2}}\) and type constructors \(\Sigma\), \(\Pi\) and \(=\). The types \(\Sigma\) and \(\Pi\) can be read as exists and for all. There is only a single way to make terms of \(=\)-type, and that is \(\mathtt{refl} : \prod_{a : A} (a = a)\). MLTT also has universes \(\universe{\mathcal{U}}_0, \universe{\mathcal{U}}_1, \dots\), however we will leave the index implicit and write \(\universe{\mathcal{U}}\).  We will say that a type is given inductively (coinductively) from a set of constructors and/or destructors, meaning we take the smallest (largest) type for which these rules are true. A constructor for a type \(\type{A}\) is a rule, we can construct an element \(\term{a} : \type{A}\) given some arguments. Dually a destructor of \(\type{A}\) is a rule that says given an element \(\term{a} : \type{A}\) we can construct some result. Inductive types can be defined by giving rules for the base cases and then the inductive cases. An example is the natural numbers, defined as\\[-10mm]
+We are using \textbf{type theory} \cite{nlab:type_theory} as the basis for mathematics. In type theory every term \(\term{x}\) is an element of some type \(\type{A}\), written \(\term{x} : \type{A}\). A paradigm in type theory is the idea "propositions as types" \cite{nlab:propositions_as_types}, meaning proofs boils down to showing the existence of an element of the type representing the proposition. Specifically proofs of equality is done like a construction of an element of the equality type. The type theory we are working in is build on \textbf{Martin L\"of Type Theory (MLTT)} / Intuitionistic type Theory (ITT) \cite{nlab:martin-loef_dependent_type_theory}, which is designed on the principles of mathematical constructivism, where any existence proof must contain a witness. Meaning a proof of existence can be converted into an algorithm that finds the element making the statement true. MLTT is built from the three finite types \(\empt\), \(\unit\) and \(\type{\mathbf{2}}\) and type constructors \(\Sigma\), \(\Pi\) and \(=\). The types \(\Sigma\) and \(\Pi\) can be read as exists and for all in this thesis. There is only a single way to make terms of \(=\)-type, and that is \(\mathtt{refl} : \prod_{\term{a} : \type{A}} (\term{a} = \term{a})\). MLTT also has universes \(\universe{\mathcal{U}}_0, \universe{\mathcal{U}}_1, \dots\), however we will leave the index implicit and write \(\universe{\mathcal{U}}\).  We will say that a type is given inductively (coinductively) from a set of constructors and/or destructors, meaning we take the smallest (largest) type for which these rules are true. A constructor for a type \(\type{A}\) is a rule, that says we can construct an element \(\term{a} : \type{A}\) given some arguments. Dually a destructor of \(\type{A}\) is a rule, that says given an element \(\term{a} : \type{A}\) we can construct some result. Inductive types can be defined by giving rules for the base cases and then the inductive cases. An example is the natural numbers, defined as\\[-10mm]
 \begin{center}
   \strut
   \hfill
@@ -185,7 +185,7 @@ We are using \textbf{type theory} \cite{nlab:type_theory} as the basis for mathe
   \hfill
   \strut
 \end{center}
-with base case 0 and inductive case \(\constructor{succ}~n\), which says that \(n+1\) is a natural number if \(n\) is. If we take the type defined coinductively over the same set of constructors, we get the largest type with these constructors. This means that we get an element from applying \(\constructor{succ}\) infinitely, namely \(\infty = \constructor{succ}~\infty\). This coinductive type is also know as \(\mathtt{co}\mathtt{N}\) and differs from \(\mathbb{N}\). A way to look at inductive definitions is that the rules describe the structure of the type. For a coinduction definition the rules can be seen as describe the observable behavior of the type.
+with base case 0 and inductive case \(\constructor{succ}~n\), which says that \(n+1\) is a natural number if \(n\) is. If we take the type defined coinductively over the same set of constructors, we get the largest type with these constructors. This means that we get an element from applying \(\constructor{succ}\) infinitely, namely \(\infty = \constructor{succ}~\infty\). This coinductive type is also know as \(\mathtt{co}\mathbb{N}\) and differs from \(\mathbb{N}\). A way to look at inductive definitions is that the rules describe the structure of the type. For a coinduction definition the rules can be seen as describing the observable behavior of the type.
 
 We will now describe how equality differs for inductive and coinductive types. We can make an inductively defined equivalence relation \(\relation{\sim_{\mathbb{N}}}\) on the natural numbers, since the natural numbers are defined inductively. Meaning equivalence on the natural numbers follows the structure defined by the constructors. The equivalence relation is given as\\[-10mm]
 \begin{center}
@@ -205,7 +205,7 @@ We will now describe how equality differs for inductive and coinductive types. W
   \hfill
   \strut
 \end{center}
-where two natural numbers are equal if they both are zero or if they are equal when we subtract one from each of them. Equivalence relations for inductive types imply equality, so if two elements are related, then they are equal. We do a similar construction for the coinductive type of streams. A stream is an infinite sequence of elements. Streams can be defined from the two destructors head (\(\destructor{hd}\)) and tail (\(\destructor{tl}\)), where head represents the first element, and tail represents the rest of the sequence\\[-10mm]
+where two natural numbers are equal if they both are zero or if they are equal, when we subtract one from each of them. Equivalence relations for inductive types imply equality, so if two elements are related, then they are equal. We do a similar construction for the coinductive type of streams. A stream is an infinite sequence of elements. Streams can be defined from the two destructors head (\(\destructor{hd}\)) and tail (\(\destructor{tl}\)), where head represents the first element, and tail represents the rest of the sequence\\[-10mm]
 \begin{center}
   \strut
   \hfill
@@ -232,18 +232,18 @@ This equivalence relation does not give an equality in MLTT; we just get bisimil
 \begin{equation}
   (\type{A} = \type{B}) \simeq (\type{A} \simeq \type{B})
 \end{equation}
-meaning if two types are equivalent, then there is an equality between them. This makes (strong) bisimilarity imply equality, solving the problem described for \(\relation{\sim_{stream}}\). The univalent foundation we will be using is \textbf{Homotopy type theory (HoTT)} \cite{hottbook}. HoTT is an intensional dependent type theory (built on MLTT) with the univalence axiom and higher inductive types. In HoTT the identity types form path spaces, so proofs of identity are not merely \texttt{refl} which was the case in MLTT. Types are seen as spaces and we think of \(\term{a} : \type{A}\) as \(\term{a}\) being a point in the space \(\type{A}\). Functions are similarly regarded as continuous maps from one space to another \cite{nlab:homotopy_type_theory}. As such we can construct higher inductive types, with point constructors as well as equality constructors. One of the problems with "plain" HoTT is that the univalence axiom is just postulated, meaning it is not constructive. To remedy this, we will be working in a \textbf{cubical type theory (CTT)} \cite{DBLP:CTT}, where the univalence axiom is a provable statement. This means we get constructivity of univalence axiom and application thereof \cite{nlab:cubical_type_theory}.  The reason for the name cubical type theory, is because composition is defined by squares. We can provide three sides of a square to get the last one, see \figref{cubical-composition-square}.
+meaning if two types are equivalent, then there is an equality between them. This makes (strong) bisimilarity imply equality, solving the problem described for \(\relation{\sim_{stream}}\). The univalent foundation we will be using is \textbf{Homotopy type theory (HoTT)} \cite{hottbook}. HoTT is an intensional dependent type theory (built on MLTT) with the univalence axiom and higher inductive types. In HoTT the identity types form path spaces, so proofs of identity are not merely \texttt{refl} which was the case in MLTT. Types are seen as spaces and we think of \(\term{a} : \type{A}\) as \(\term{a}\) being a point in the space \(\type{A}\). Functions are similarly regarded as continuous maps from one space to another \cite{nlab:homotopy_type_theory}. As such we can construct higher inductive types, with point constructors as well as equality constructors. One of the problems with "plain" HoTT is that the univalence axiom is just postulated, meaning it is not constructive. To remedy this, we will be working in a \textbf{cubical type theory (CTT)} \cite{DBLP:CTT}, where the univalence axiom is a provable statement. This means we get constructivity of univalence axiom and application thereof \cite{nlab:cubical_type_theory}.  The reason for the name cubical type theory is that composition is defined by squares. We can provide three sides of a square to get the last one, see \figref{cubical-composition-square}.
 \begin{figure}[h]
   \centering
   \begin{tikzcd}
-    A \ar[r,"p \ct q \ct r",dashed] & B \\
-    C \ar[u,"p^{-1}"] \ar[r,"q"'] & D \ar[u,"r"']
+    \type{A} \ar[r,"\pathterm{p} \ct \pathterm{q} \ct \pathterm{r}",dashed] & \type{B} \\
+    \type{C} \ar[u,"\pathterm{p}^{-1}"] \ar[r,"\pathterm{q}"'] & \type{D} \ar[u,"\pathterm{r}"']
   \end{tikzcd}
   \caption{Composition square}
   \label{fig:cubical-composition-square}
 \end{figure}
 \\ 
-Homotopy type theory is proof relevant, which means that there might be multiple proofs of one statement, and these proofs might not be interchangeable / equal. This can be explained by the use of H-level in HoTT, which describes how equality behaves. We start from H-level (-2) which are contractible types, meaning inhabited types where all element are equal. Then there is \((-1)\)-types which are mere propositions or hProps, where all elements of the type are equal, but the type might not be inhabited. If the type is inhabited, then we say the proposition is true. The 0-types are the hSets, where all equalities between two elements \(x,y\) are equal, an example is the natural numbers. For 1-types (1-groupoids) we get equalities of equalities are equal and so on for homotopy \(n\)-types. Any \(n\)-type is also a \((n+1)\)-type, but with trivial equalities at the \((n+1)\)th level. If we do not want to do proof relevant mathematics, we can do propositional truncation (denoted \(\|{\cdot}\|\)), which converts a \(n\)-type to a \((-1)\)-type. This construction can be thought of as ignoring the difference in proofs and just look at whether a type is inhabited or not. However doing propositional truncation makes us loose some of the reasoning power of HoTT, so it should not be used unless there is a need for it. One useful tool in HoTT is \textbf{Higher order inductive types (HITs)}, where a type is defined by point constructors and equality constructors. An example is the propositional truncation we just described, with point constructor taking any element to it its truncated version, and equality constructor defined between all propositional truncated elements\\[-9mm]
+Homotopy type theory is proof relevant, which means that there might be multiple proofs of one statement, and these proofs might not be interchangeable / equal. This can be explained by the use of H-level in HoTT, which describes how equality behaves. We start from H-level \((-2)\) which are contractible types, meaning inhabited types where all element are equal. Then there is \((-1)\)-types which are mere propositions or hProps, where all elements of the type are equal, but the type might not be inhabited. If the type is inhabited, then we say the proposition is true. The 0-types are the hSets, where all equalities between two elements \(\term{x},\term{y}\) are equal, an example is the natural numbers. For 1-types (1-groupoids) we get equalities of equalities are equal and so on for homotopy \(n\)-types. Any \(n\)-type is also a \((n+1)\)-type, but with trivial equalities at the \((n+1)\)th level. If we do not want to do proof relevant mathematics, we can do propositional truncation (denoted \(\|{\cdot}\|\)), which converts a \(n\)-type to a \((-1)\)-type. This construction can be thought of as ignoring the difference in proofs and just look at whether a type is inhabited or not. However doing propositional truncation makes us loose some of the reasoning power of HoTT, so it should not be used unless there is a need for it. One useful tool in HoTT is \textbf{higher inductive types (HITs)}, where a type is defined by point constructors and equality constructors. An example is the propositional truncation we just described, with point constructor taking any element to it its truncated version, and equality constructor defined between all propositional truncated elements\\[-9mm]
 \begin{center}
   \strut
   \hfill
@@ -298,7 +298,7 @@ Using the axiom of choice is problematic in a constructive type theory, since it
 We have formalized most of \chapterref{M-types}\footnote{Accepted to the Cubical Agda Github, pull request: \url{https://github.com/agda/cubical/pull/245}}, the examples in \chapterref{M-types-examples} and some of \chapterref{QM-types} in the proof assistant / programming language Cubical Agda. A \textbf{proof assistant} verifies proof and helps with the interactive process of making a proof. \textbf{Cubical Agda}\footnote{Cubical Agda commit: e8d22a50079df1186b111c1f096eb29a1e3daa20, Agda Version: Agda-2.6.1} \cite{cubicalagda} is an implementation of a cubical type theory (inspired by CCHM \cite{DBLP:CCHM}) made by extending the proof assistant Agda. One of the main additions is the interval. The \textbf{interval} \(\mathbb{I}\) can be thought of as the continuous unit interval \([0,1]\). When working with the interval, we can only access the left and right endpoint \(\constant{i0}\) and \(\constant{i1}\) or some unspecified point in the middle \(i\), keeping with the intuition of a continuous interval. Cubical Agda also generalizes transporting, given a type line \(\typeformer{A} : \mathbb{I} \rightarrow \universe{\mathcal{U}}\), and the endpoint \(\typeformer{A}\,\constant{i0}\) you get a line from \(\typeformer{A}\,\constant{i0}\) to \(\typeformer{A}\,\constant{i1}\).
 
 \section{Notation}
-The notation and fonts used in the rest of the report are described in \tableref{notation}.
+The notation and fonts used in the rest of the thesis are described in \tableref{notation}.
 \begin{table}[h]
   % \centering
   \begin{tabular}[h]{ll}
@@ -313,7 +313,7 @@ The notation and fonts used in the rest of the report are described in \tableref
     \(\constructor{f}\) & Constructor \\
     \(\destructor{f}\) & Destructor \\
     \(\pathterm{p} : \type{A} \equiv \type{C}\) & Homogeneous path \\
-    \(\pathterm{q} : \type{A} \equiv_{p} \type{C}\) & Heterogeneous path, denoted \(\equiv_{*}\) if \(p\) is clear from context \\
+    \(\pathterm{q} : \type{A} \equiv_{\pathterm{p}} \type{C}\) & Heterogeneous path, denoted \(\equiv_{*}\) if \(\pathterm{p}\) is clear from context \\
     \(\relation{R} : \type{A} \rightarrow \type{A} \rightarrow \universe{\mathcal{U}}\) & Relation, elements denoted \(\term{x}~\relation{R}~\term{y}\)\\
     \(\unit\) & Unit type \\
     \(\empt\) & Empty / Zero / Bottom type \\
@@ -330,16 +330,16 @@ We do a lot of casing on the natural numbers, so we will also introduce some not
     \natcases{\term{x}}{\function{f}} = \lambda\,n, \begin{cases} \term{x} & n = 0 \\ \function{f}~m & n = m + 1 \end{cases}
   \end{equation}
 \end{defn}
-\noindent We define the isomorphism \(Iso~\type{A}~\type{B}\), by defining functions \(\function{fun} : \type{A} \rightarrow \type{B}\) and \(\function{inv} : \type{B} \rightarrow \type{A}\), and show there is a right identity \(\function{rinv} : \function{fun} \circ \function{inv} \equiv \function{id}_{\type{B}}\) and a left identity \(\function{linv} : \function{inv} \circ \function{fun} \equiv \function{id}_{\type{A}}\). This is enough to define an equivalence between \(\type{A}\) and \(\type{B}\), so sometimes we will give the equality as an isomorphism. We will introduce further notation as we go.
+\noindent Defining an Isomorphism is enough to define an equivalence between \(\type{A}\) and \(\type{B}\), so sometimes we will give the equality as an isomorphism. We define the isomorphism \(\mathtt{Iso}~\type{A}~\type{B}\), by defining functions \(\function{fun} : \type{A} \rightarrow \type{B}\) and \(\function{inv} : \type{B} \rightarrow \type{A}\), and show there is a right identity \(\function{rinv} : \function{fun} \circ \function{inv} \equiv \function{id}_{\type{B}}\) and a left identity \(\function{linv} : \function{inv} \circ \function{fun} \equiv \function{id}_{\type{A}}\).  We will introduce further notation as we go.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
 
 \chapter{\texttt{M}-types}
 \label{ch:M-types}
-In this chapter we will introduce containers (aka signatures) for the construction of \texttt{M}-types and the operations \(\function{in}\) and \(\function{out}\) on \texttt{M}-types (\thmref{M-shift}). We will show that \(\coalg{\typeformer{M}}{\function{out}}\) is a final coalgebra (\thmref{M-type-final}) for the polynomial functor defined from the container. We then prove a coinduction principle for \texttt{M}-types (\thmref{M-coinduction-principle}). This first half of the chapter draws heavy inspiration from the "Non-Wellfounded Trees in Homotopy Type Theory" \cite{DBLP:non-wellfounded}. We attempt to make this work more accessibly. To that end this work is formalized in Cubical Agda and we go into more detail on how to construct the \(\function{in}\) and \(\function{out}\) functions. We conclude this chapter with some examples of \texttt{M}-types, namely the delay monad, infinite \(\type{R}\)-valued \(\typeformer{E}\)-event trees and interaction tree (ITrees \cite{DBLP:itrees}).
+In this chapter we will introduce containers (aka signatures) and the construction of \texttt{M}-types and the operations \(\function{in}\) and \(\function{out}\) on \texttt{M}-types (\thmref{M-shift}). We will show that \(\coalg{\typeformer{M}}{\function{out}}\) is a final coalgebra (\thmref{M-type-final}) for the polynomial functor defined from the container. We then prove a coinduction principle for \texttt{M}-types (\thmref{M-coinduction-principle}). This first half of the chapter draws heavy inspiration from the paper "Non-Wellfounded Trees in Homotopy Type Theory" \cite{DBLP:non-wellfounded}. We attempt to make this work more accessibly. To that end this work is formalized in Cubical Agda and we go into more detail on how to construct the \(\function{in}\) and \(\function{out}\) functions. We conclude this chapter with some examples of \texttt{M}-types, namely the delay monad, infinite \(\type{R}\)-valued \(\typeformer{E}\)-event trees and interaction tree (ITrees \cite{DBLP:itrees}).
 
 \section{Construction of \texttt{M}-types}
-We start by introducing containers and polynomial functors
+We start by introducing containers and polynomial functors.
 \begin{defn}
   A Container (or signature) is a dependent pair \(\container{S} = \containerpair{\type{A}}{\typeformer{B}}\) for the types \(\type{A} : \universe{\mathcal{U}}\) and \(\typeformer{B} : \type{A} \rightarrow \universe{\mathcal{U}}\). 
 \end{defn}
@@ -400,8 +400,8 @@ We start by introducing containers and polynomial functors
   \begin{figure}[h]
     \centering
     \begin{tikzcd}[row sep=large,column sep=large]
-      \type{A} & \type{A} \times \typeformer{M}_{\containerpair{A}{\lambda\,\_,\unit}} \ar[d,shift right,"\function{in}"'] \ar[l,"\pi_1"'] \ar[r,"\pi_2"] & \typeformer{M}_{\containerpair{A}{\lambda\,\_,\unit}} \\
-      & \typeformer{M}_{\containerpair{A}{\lambda\,\_,\unit}} \ar[ul,"\destructor{hd}"] \ar[u,shift right,"\function{out}"'] \ar[ur,"\destructor{tl}"']
+      \type{A} & \type{A} \times \typeformer{M}_{\containerpair{\type{A}}{\lambda\,\_,\unit}} \ar[d,shift right,"\function{in}"'] \ar[l,"\pi_1"'] \ar[r,"\pi_2"] & \typeformer{M}_{\containerpair{\type{A}}{\lambda\,\_,\unit}} \\
+      & \typeformer{M}_{\containerpair{\type{A}}{\lambda\,\_,\unit}} \ar[ul,"\destructor{hd}"] \ar[u,shift right,"\function{out}"'] \ar[ur,"\destructor{tl}"']
     \end{tikzcd}
     \caption{\texttt{M}-types of streams}
     \label{fig:stream-M-type}
@@ -448,15 +448,15 @@ We start by introducing containers and polynomial functors
   \end{equation}
 \end{defn}
 \begin{lem}\label{lem:limit-collapse}
-  Given \(\function{\ell} : \prod_{(n : \mathbb{N})} (\type{X}_{n} \rightarrow \type{X}_{n+1})\) and \(\term{y} : \sum_{\left(\term{x} : \prod_{(n : \mathbb{N})} \type{X}_n\right)} \term{x}_{n + 1} \equiv \function{\ell}_n~\term{x}_n\) makes the chain collapse, giving us the equality \(\type{\mathcal{L}} \equiv \type{X}_0\).
+  Given \(\function{\ell} : \prod_{(n : \mathbb{N})} (\type{X}_{n} \rightarrow \type{X}_{n+1})\) and \(\term{y} : \sum_{\left(\term{x} : \prod_{(n : \mathbb{N})} \type{X}_n\right)} \term{x}_{n + 1} \equiv \function{\ell}_n~\term{x}_n\) we get the equality \(\type{\mathcal{L}} \equiv \type{X}_0\).
   \begin{proof}
-    We define the equality by the isomorphism
+    We define the equality by the following isomorphism
     \begin{align}
       &\function{fun}_{\pathterm{\mathcal{L}collapse}}~(\term{x} , \pathterm{r}) = \term{x}_0 \\
       &\function{inv}_{\pathterm{\mathcal{L}collapse}}~\term{x}_0 = (\lambda\,n,~\function{\ell}^{(n)}~\term{x}_0)~,~(\lambda\,n,~\mathtt{refl}_{(\function{\ell}^{(n+1)}\,\term{x}_0)}) \\
       &\function{rinv}_{\pathterm{\mathcal{L}collapse}}~\term{x}_0 = \mathtt{refl}_{\term{x}_0}
     \end{align}
-    where \(\function{\ell}^{(n)} = \function{\ell}_n \circ \function{\ell}_{n-1} \circ \dots \circ \function{\ell}_1 \circ \function{\ell}_0\). To define \(\function{linv}_{\pathterm{\mathcal{L}collapse}}~(\term{x} , \pathterm{r})\), we first define a fiber \((\type{X} , \term{z}, \function{\ell})\) over \(\mathbb{N}\) given some \(\term{z} : \type{X}_0\). Then any element of the type \(\sum_{\left(\term{x} : \prod_{(n : \mathbb{N})} \type{X}_n\right)} \term{x}_{n + 1} \equiv \function{\ell}_n~\term{x}_n\) is equal to a section over the fiber we defined. This means \(\term{y}\) is equal to a section. Since the sections are defined over \(\mathbb{N}\), which is an initial algebra for the functor \(\functor{G}\type{Y} = \unit + \type{Y}\), we get that sections are contractible. This means \(\term{y} \equiv \function{inv}_{\pathterm{\mathcal{L}collapse}} (\function{fun}_{\pathterm{\mathcal{L}collapse}}~\term{y})\), since both sides are equal to sections over \(\mathbb{N}\).
+    where \(\function{\ell}^{(n)} = \function{\ell}_n \circ \function{\ell}_{n-1} \circ \dots \circ \function{\ell}_1 \circ \function{\ell}_0\). To define \(\function{linv}_{\pathterm{\mathcal{L}collapse}}~(\term{x} , \pathterm{r})\), we first define a fiber \((\type{X} , \term{z}, \function{\ell})\) over \(\mathbb{N}\) given some \(\term{z} : \type{X}_0\). Then any element of the type \(\sum_{\left(\term{x} : \prod_{(n : \mathbb{N})} \type{X}_n\right)} \term{x}_{n + 1} \equiv \function{\ell}_n~\term{x}_n\) is equal to a section over the fiber we defined. This means \(\term{y}\) is equal to a section. Since the sections are defined over \(\mathbb{N}\), which is an initial algebra for the functor \(\functor{G}\type{Y} = \unit + \type{Y}\), we get the sections are contractible. This means \(\term{y} \equiv \function{inv}_{\pathterm{\mathcal{L}collapse}} (\function{fun}_{\pathterm{\mathcal{L}collapse}}~\term{y})\) by uniqueness argument, since both sides of the equality are equal to sections over \(\mathbb{N}\).
 \end{proof}
 \end{lem}
 \begin{lem}\label{lem:function-to-M-type-is-cone}
@@ -471,7 +471,7 @@ We start by introducing containers and polynomial functors
     \label{fig:M-seq-cone}
   \end{figure}  
   \begin{proof}
-    We show this equality between \(\type{C} \rightarrow \typeformer{M}_{\container{S}}\) to \(\typeformer{Cone}_{\coalg{\type{C}}{\function{\gamma}}}\) by defining the isomorphism
+    We show this equality between \(\type{C} \rightarrow \typeformer{M}_{\container{S}}\) and \(\typeformer{Cone}_{\coalg{\type{C}}{\function{\gamma}}}\) by defining the isomorphism
     \begin{align}
       &\function{fun}_{\pathterm{collapse}}~\function{f} = (\lambda\,n\,\term{z},\pi_1~(\function{f}~\term{z})~n),(\lambda\,n~i~\term{a},~\pi_2~(\function{f}~\term{a})~n~i) \\
       &\function{inv}_{\pathterm{collapse}}~(\function{u},\function{q})~\term{z} = (\lambda\,n,~\function{u}~n~\term{z}),(\lambda\,n\,i,~\function{q}~n~i~\term{z}) \\
@@ -536,7 +536,7 @@ We start by introducing containers and polynomial functors
     \end{align}
     since \(\function{in}\) and \(\function{out}\) are each others inverse. Furthermore \(\function{in}\) is part of an equality, which implies \((\function{in} \circ \function{a} \equiv \function{in} \circ \function{b}) \equiv (\function{a} \equiv \function{b})\), since functions that are part of an equality are embeddings. We now let \(\function{\psi} = \function{in} \circ \functor{P}\function{f} \circ \function{\gamma}\), which simplifies the expression to \(\sum_{(\function{f} : \type{C} \rightarrow \type{\mathcal{L}})} (\function{f} \equiv \function{\psi}~\function{f})\). We then define \(\function{e}\) to be the function from right to left for the equality in \lemref{function-to-M-type-is-cone}, this gives us the equality
     \begin{equation}
-      \sum_{(\function{f} : \type{C} \rightarrow \type{\mathcal{L}})} (\function{f} \equiv \function{\psi}~\function{f}) \quad \equiv \quad \sum_{(\term{c} : \typeformer{Cone}_{\coalg{C}{\gamma}})} (\function{e}~\term{c} \equiv \function{\psi}~(\function{e}~\term{c}))
+      \sum_{(\function{f} : \type{C} \rightarrow \type{\mathcal{L}})} (\function{f} \equiv \function{\psi}~\function{f}) \quad \equiv \quad \sum_{(\term{c} : \typeformer{Cone}_{\coalg{\type{C}}{\function{\gamma}}})} (\function{e}~\term{c} \equiv \function{\psi}~(\function{e}~\term{c}))
   \end{equation}
   By defining a function \(\function{\phi} : \typeformer{Cone}_{\coalg{\type{C}}{\function{\gamma}}} \rightarrow \typeformer{Cone}_{\coalg{\type{C}}{\function{\gamma}}}\) as \(\function{\phi}~(\function{u},\function{g}) = (\function{\phi}_0~\function{u},\function{\phi}_1~\function{u}~\function{g})\) where
   \begin{align}
@@ -555,11 +555,11 @@ We start by introducing containers and polynomial functors
   \end{figure}
   which says \(\function{\psi}~(\function{e}~\term{c}) = \function{e}~(\function{\phi}~\term{c})\). We can then simplify to
   \begin{equation}
-    \sum_{(\term{c} : \typeformer{Cone}_{\coalg{\type{C}}{\function{\gamma}}})} (\function{e}~\function{c} \equiv \function{e}~(\function{\phi}~\function{c}))
+    \sum_{(\term{c} : \typeformer{Cone}_{\coalg{\type{C}}{\function{\gamma}}})} (\function{e}~\term{c} \equiv \function{e}~(\function{\phi}~\term{c}))
   \end{equation}
   We know that \(\function{e}\) is part of an equality (namely \lemref{function-to-M-type-is-cone}), so it is an embedding. We use this and unfolding the definition of \(\function{\phi}\), to get the equalities
   \begin{align}
-    &\quad~\sum_{(\term{c} : \typeformer{Cone}_{\coalg{\type{C}}{\function{\gamma}}})} (\function{c} \equiv \function{\phi}~\function{c}) \\
+    &\quad~\sum_{(\term{c} : \typeformer{Cone}_{\coalg{\type{C}}{\function{\gamma}}})} (\term{c} \equiv \function{\phi}~\term{c}) \\
     &\equiv \sum_{(\term{(\function{u},\function{g})} : \typeformer{Cone}_{\coalg{\type{C}}{\function{\gamma}}})} ((\function{u},\function{g}) \equiv (\function{\phi}_0~\function{u},\function{\phi}_1~\function{u}~\function{g})) \\
     &\equiv \sum_{(\term{(\function{u},\function{g})} : \typeformer{Cone}_{\coalg{\type{C}}{\function{\gamma}}})} \sum_{(\pathterm{p} : \function{u} \equiv \function{\phi}_0\,\function{u})} \function{g} \equiv_{*} \function{\phi}_1~\function{u}~\function{g}
   \end{align}
@@ -593,7 +593,7 @@ We can now construct a coinduction principle for \texttt{M}-types, which gives e
   \label{thm:M-coinduction-principle}
   Given a relation \(\relation{\mathcal{R}}\), that is a bisimulation for a \texttt{M}-type, then (strongly) bisimilar elements \(\term{x}~\relation{\mathcal{R}}~\term{y}\) are equal \(\term{x} \equiv \term{y}\).  
   \begin{proof}
-    Given a relation \(\relation{\mathcal{R}}\), that is part of a bisimulation over a final \(\functor{P}\)-coalgebra \(\coalg{\typeformer{M}}{\function{out}}:\mathtt{Coalg}_{\container{S}}\) we get the diagram in \figref{final-coalgebra-coinduction}.
+    Given a relation \(\relation{\mathcal{R}}\) that is bisimulation relation over a final \(\functor{P}\)-coalgebra \(\coalg{\typeformer{M}}{\function{out}}:\mathtt{Coalg}_{\container{S}}\) we get the diagram in \figref{final-coalgebra-coinduction}.
     \begin{figure}[h]
       \centering
       \begin{tikzcd}[row sep=huge,column sep=huge]
@@ -602,7 +602,7 @@ We can now construct a coinduction principle for \texttt{M}-types, which gives e
       \caption{Bisimulation principle for final coalgebra}
       \label{fig:final-coalgebra-coinduction}
     \end{figure}
-    By the finality of \(\coalg{\typeformer{M}}{\function{out}}\), we get a function \(\constant{!}\) from \(\typeformer{M}\) to \(\type{\overline{R}}\), which is unique meaning \(\pi_1^{\type{\overline{\mathcal{R}}}} \equiv ~\constant{!} \equiv \pi_2^{\type{\overline{\mathcal{R}}}}\). Now if we are given \(\term{r} : \term{x}~\relation{\mathcal{R}}~\term{y}\), we can construct the equality
+    By the finality of \(\coalg{\typeformer{M}}{\function{out}}\), we get a function \(\constant{!}\) from \(\typeformer{M}\) to \(\type{\overline{R}}\), which is unique, meaning \(\pi_1^{\type{\overline{\mathcal{R}}}} \equiv ~\constant{!} \equiv \pi_2^{\type{\overline{\mathcal{R}}}}\). Now if we are given \(\term{r} : \term{x}~\relation{\mathcal{R}}~\term{y}\), we can construct the equality
     \begin{equation}
       \term{x} \equiv \pi_1^{\type{\overline{\mathcal{R}}}} (\term{x}, \term{y}, \term{r}) \equiv \pi_2^{\type{\overline{\mathcal{R}}}} (\term{x}, \term{y}, \term{r}) \equiv \term{y}.
     \end{equation}
@@ -615,14 +615,14 @@ We can now construct a coinduction principle for \texttt{M}-types, which gives e
 
 \section{Examples of \texttt{M}-types}
 \label{ch:M-types-examples}
-In this section we show some examples of coinductive types constructed as \texttt{M}-types. We show how to define the constructors/destructors of these types, and give some intuition for the construction.
+In this section we show some examples of coinductive types constructed as \texttt{M}-types. We show how to define the constructors/destructors of these types and give some intuition for the constructions.
 
 \subsection{Delay Monad}
 The delay monad is used to model delayed computations, either returning immediately or delayed some (possibly infinite) number of steps.
 \begin{thm}
-  The delay monad can be defined as the \texttt{M}-type.
+  The delay monad can be defined as a \texttt{M}-type.
   \begin{proof}
-    We want to construct a container, that will give us two constructors, one that returns immediately (\(\constructor{now}\)) and one that delays the computation (\(\constructor{later}\)). We do this with the container
+    We want to define a container, that will give us two constructors, one that returns immediately (\(\constructor{now}\)) and one that delays the computation (\(\constructor{later}\)). We do this with the container
     \begin{equation}
       \container{S} = \containerpair{\type{R} +\unit}{\begin{cases} \empt & \mathtt{inl}~\term{r} \\ \unit & \mathtt{inr}~\unitelem \end{cases}}
     \end{equation}
@@ -638,7 +638,7 @@ The delay monad is used to model delayed computations, either returning immediat
     \begin{equation}
       \functor{P}_{\container{S}}\,\type{X} = \type{R} + \type{X}
     \end{equation}
-    We get diagram in \figref{delay-monad}, by applying \(\functor{P}_{\container{S}}\) to \(\typeformer{M}_{\container{S}}\).
+    We get the diagram in \figref{delay-monad}, by applying \(\functor{P}_{\container{S}}\) to \(\typeformer{M}_{\container{S}}\).
     \begin{figure}[h]
       \centering
       \begin{tikzcd}[row sep=large,column sep=large]
@@ -653,11 +653,11 @@ The delay monad is used to model delayed computations, either returning immediat
 \end{thm}
 
 \subsection{Infinite \(\type{R}\)-valued \(\typeformer{E}\)-event Trees}
-We will look at a type of tree where the values of leaves are given by the type \(\type{R}\) and branching is indexed by events \(\typeformer{E}\,\type{A}\) given some type \(\type{A}\).
+We will look at a type of trees where the values of leaves are given by the type \(\type{R}\) and branching is indexed by events \(\typeformer{E}\,\type{A}\) given some type \(\type{A}\).
 \begin{thm}
   We can define \(\type{R}\)-valued \(\typeformer{E}\)-event trees as a \texttt{M}-type
   \begin{proof}
-    We want a container, with a leaf constructor (\constructor{leaf}) returning immediately with a value and a node constructor (\constructor{node}) that branches on events. We defined the container
+    We want a container with a leaf constructor (\constructor{leaf}) returning immediately with a value and a node constructor (\constructor{node}) that branches on events. We defined the container
   \begin{equation}
     \container{S} = \containerpair{\type{R} + \sum_{(\type{A} : \universe{\mathcal{U}})} \typeformer{E}\,\type{A}}{\begin{cases}\empt & \mathtt{inl}~\term{r} \\ \type{A} & \mathtt{inr}~(\type{A},\term{e})\end{cases}}.
   \end{equation}
@@ -686,7 +686,7 @@ By applying the polynomial functor to the \texttt{M}-type, we get the diagram in
 We can define \(\constructor{leaf}\) and \(\constructor{node}\) using the \(\function{in}\) function together with injections making the diagram commute. 
 \end{proof}
 \end{thm}
-\noindent We can see that the \constructor{now} and \constructor{leaf} constructors have the same definitional structure in the container and diagrammatic structure.
+\noindent We can see that the \constructor{now} and \constructor{leaf} constructors have the same definitional structure in the container and the same diagrammatic structure.
 
 \subsection{ITrees}
 Interaction trees (ITrees) \cite{DBLP:itrees} are used to model effectful behavior, where computations can interact with an external environment by events. ITrees are defined by the following constructors
@@ -699,11 +699,11 @@ Interaction trees (ITrees) \cite{DBLP:itrees} are used to model effectful behavi
 \begin{equation}
   \vcenter{\infer[\mathtt{E}_{\constructor{Tau}}]{\constructor{Tau}~\term{t} : \typeformer{itree}~\typeformer{E}\,\type{R}}{\term{t} : \typeformer{itree}~\typeformer{E}\,\type{R}}}.
 \end{equation}
-where \(\type{R}\) is the type for returned values, while \(\typeformer{E}\) is a dependent type for events representing external interactions. ITrees without the \(\constructor{Vis}\) constructor is the delay monad. If we remove the \(\constructor{Tau}\) constructor, then we get infinite \(\type{R}\)-valued \(\typeformer{E}\)-event trees. So it should just be a matter of combining the definitions for the previous two examples to construct ITrees.
+where \(\type{R}\) is the type for returned values, while \(\typeformer{E}\) is a dependent type for events representing external interactions. The ITree type without the \(\constructor{Vis}\) constructor is the delay monad. If we remove the \(\constructor{Tau}\) constructor, then we get infinite \(\type{R}\)-valued \(\typeformer{E}\)-event trees. So it should just be a matter of combining the definitions for the previous two examples to construct ITrees.
 \begin{thm}
   We can define the type of ITrees as a \texttt{M}-type
   \begin{proof}
-    We combine the constructions of the delay monad and \(\type{R}\)-valued \(\typeformer{E}\)-event Trees, into the container
+    We combine the constructions of the delay monad and \(\type{R}\)-valued \(\typeformer{E}\)-event trees into the container
     \begin{equation}
       \container{S} = \containerpair{\type{R}+\unit+\sum_{(\type{A}:\universe{\mathcal{U}})} (\typeformer{E}\,\type{A})}{\begin{cases} \empt & \texttt{inl}~r \\ \unit & \texttt{inl}~(\texttt{inl}~\unitelem) \\ \type{A} & \texttt{inr}~(\texttt{inr}~(\type{A},\term{e})) \end{cases}}.
     \end{equation}
@@ -727,7 +727,7 @@ where \(\type{R}\) is the type for returned values, while \(\typeformer{E}\) is 
 \end{thm}
 
 \section{General rules for constructing \texttt{M}-types}
-We want to create a rule set for how to define coinductive types as \texttt{M}-types, we take inspiration from the rules for containers \cite{DBLP:DiffContainer}\cite{ContainerRules}. We would like to be able to define a type from a given set of constructors / destructors. If we for example are given the rule
+We want to create a rule set for how to define coinductive types as \texttt{M}-types. We take inspiration from the rules for containers \cite{DBLP:DiffContainer}\cite{ContainerRules}. We would like to be able to define a type from a given set of constructors / destructors. If we for example are given the rule
 \begin{equation}
   \vcenter{\infer{\constructor{ret}~a : \type{T}}{\term{a} : \type{A}}}
 \end{equation}
@@ -747,7 +747,7 @@ has container \(\containerpair{\unit}{\type{A}}\). We can see that the arguments
 \begin{equation}
   \vcenter{\infer{\destructor{hd}~\term{a} : \type{A}}{\term{a} : \type{T}}}
 \end{equation}
-can be constructed by the container \(\containerpairsimple{\type{A}}{\empt}\), but this container is the same as the one for \(\constructor{ret}\), so do we get both? The answer is yes, if we look at it isolated. Whether we get a constructor or destructor depends on how we combine the containers with the containers for other constructors / destructors. In general adding containers \(\containerpair{\type{A}}{\typeformer{B}}\) and \(\containerpair{\type{C}}{\typeformer{D}}\) for two constructors together is done by
+can be constructed by the container \(\containerpairsimple{\type{A}}{\empt}\), but this container is the same as the one for \(\constructor{ret}\), so do we get both? The answer is yes if we look at it isolated. Whether we get a constructor or destructor depends on how we combine the container with the containers for other constructors / destructors. In general adding containers \(\containerpair{\type{A}}{\typeformer{B}}\) and \(\containerpair{\type{C}}{\typeformer{D}}\) for two constructors together is done by
 \begin{equation}
   \containerpair{\type{A} + \type{C}}{ \begin{cases} \typeformer{B}\,\term{a} & \mathtt{inl}~\term{a} \\ \typeformer{D}\,\term{c} & \mathtt{inr}~\term{c} \end{cases}}
 \end{equation}
@@ -755,7 +755,7 @@ whereas adding containers for two destructors is done by
 \begin{equation}
   \containerpairsimple{\type{A} \times \type{C}}{\lambda\,(\term{a},\term{c}),~\typeformer{B}\,\term{a} + \typeformer{D}\,\term{c}}  
 \end{equation}
-However combining destructors and constructors is not as simple, which is also the case if we use records or other constructions to define such types. We argue that any type \(\type{T}\) that can be defined using a (coinductive) record (except for higher inductive types), will also be definable as a \texttt{M}-type, with the following construction. Given a record, which is a list of fields \(\term{f}_1 : \type{F}_1,\term{f}_2 : \type{F}_2,\dots,\term{f}_n : \type{F}_n\), we can construct the \texttt{M}-types by the container
+However combining both destructors and constructors is not as simple, which is also the case if we use records or other constructions to define such types. We argue that any type \(\type{T}\) that can be defined using a (coinductive) record, will also be definable as a \texttt{M}-type, with the following construction. Given a record, which is a list of fields \(\term{f}_1 : \type{F}_1,\term{f}_2 : \type{F}_2,\dots,\term{f}_n : \type{F}_n\), we can construct the \texttt{M}-types by the container
 \begin{equation}
   \containerpairsimple{\type{F}_1 \times \type{F}_2 \times \dots \times \type{F}_n}{\empt}
 \end{equation}
@@ -763,7 +763,7 @@ where each destructor \(\destructor{d_n} : \type{T} \rightarrow \type{F_n}\) for
 \begin{equation}
   \containerpairsimple{\sum_{(\term{f}_1 : \type{F}_1)} \sum_{(\term{f_2} : \typeformer{F}_2)} \cdots \sum_{(\term{f}_{n-1} : \typeformer{F}_{n-1})}\typeformer{F}_n}{\empt}
 \end{equation}
-however, if any of the fields are non dependent, then they can be added as a product (\(\times\)) instead of a dependent sum (\(\Sigma\)). Fields can also coinductively define an element of the record \(\type{T}\) itself, however other fields may not refer to such a field, since it will break the strictness requirements of the record / coinductive type. As an example of a coinductive field let \(\type{f}_1\) be a type and \(\function{f_2}\) be the function with type \(\typeformer{F}_2 = \type{f}_1 \rightarrow (\type{f}_1 \rightarrow \type{A}) \rightarrow \typeformer{M}\), which can be curried to \(\type{f}_1 \times (\type{f}_1 \rightarrow \type{A}) \rightarrow \typeformer{M}\). This can be defined by the container
+however, if any of the fields are non dependent, then they can be added as a product (\(\times\)) instead of a dependent sum (\(\Sigma\)). Fields can also coinductively define an element of the record \(\type{T}\) itself, but other fields may not refer to such a field, since it will break the strictness requirements of the record / coinductive type. As an example of a coinductive field let \(\type{f}_1\) be a type and \(\function{f_2}\) be the function with type \(\typeformer{F}_2 = \type{f}_1 \rightarrow (\type{f}_1 \rightarrow \type{A}) \rightarrow \typeformer{M}\), which can be curried to \(\type{f}_1 \times (\type{f}_1 \rightarrow \type{A}) \rightarrow \typeformer{M}\). This example can then be defined by the container
 \begin{equation}
   \containerpair{\sum_{(\type{f}_1 : \universe{\mathcal{U}})} \left(\unit \times \sum_{(\term{f}_3 : \typeformer{F}_3)} \cdots \sum_{(\term{f}_{n-1} : \typeformer{F}_{n-1})}\typeformer{F}_n\right)}{\lambda\,(\type{f}_1,\unitelem,\term{f}_3,\dots),\typeformer{F}_2}
 \end{equation}
@@ -821,10 +821,10 @@ We start by defining the recursor and some eliminators for the set truncated quo
   \end{equation}
   which is the eliminator for the set truncated quotient.
 \end{defn}
-\noindent We can now construct some more interesting data types, by set quotienting \texttt{M}-types, which we call Q\texttt{M}-types, some examples follow in the following section.
+\noindent We can now construct some more interesting data types by set quotienting \texttt{M}-types, which we call Q\texttt{M}-types. Some examples follow in the next section.
 
 \section{Q\texttt{M}-types and Quotient inductive-inductive types (QIITs)}
-In this section we will show some examples of quotiented \texttt{M}-type defined using set truncated quotients. We will also construct the types as a quotient inductive-inductive types instead, and show these two construction gives equal types, assuming the axiom of countable choice. A quotient inductive-inductive type (QIIT) \cite{DBLP:QIIT} is a type that is defined at the same time as a relation over that type and then set truncated. We believe, but do not show, that this equality between the two ways of constructing Q\texttt{M}-types is general.
+In this section we will show some examples of quotiented \texttt{M}-type defined using set truncated quotients. We will also construct the types as a quotient inductive-inductive types instead, and show these two construction give equal types, assuming the axiom of countable choice. A quotient inductive-inductive type (QIIT) \cite{DBLP:QIIT} is a type that is defined at the same time as a relation over that type and then set truncated. We believe, but do not show, that this equality between the two ways of constructing Q\texttt{M}-types is general.
 % However QIITs are more general than our Q\texttt{M}-types, so we cannot expect every QIIT to have a corresponding Q\texttt{M}-type.
 
 \subsection{Multiset}
@@ -934,14 +934,14 @@ This function takes weakly bisimilar objects to equal once.
   We define the propositional eliminator for \(\typeformer{MS}\). Given a dependent type \(\typeformer{P} : \typeformer{MS}~\type{X} \rightarrow \universe{\mathcal{U}}\) which is a proposition at all points \(\function{P_{prop}} : \prod_{(\term{x} : \typeformer{MS}\,\type{X})} \mathtt{isProp}~(\typeformer{P}~\term{x})\), and given leaf case \(\function{P_{leaf}} : \prod_{\term{x} : \type{X}} \typeformer{P}~(\constructor{leaf}~\term{x})\) and node case \(\function{P_{node}}~\prod_{(\function{f} : \mathbb{N} \rightarrow \typeformer{MS}\,\type{X})}\prod_{(\function{f'} : \prod_{(n : \mathbb{N})} \typeformer{P}\,(\function{f}\,n))} \typeformer{P}~(\constructor{node}~\function{f})\), we get a function \(\function{elimProp_{MS}} : \prod_{(\term{t} : \typeformer{MS}\,\type{X})} \typeformer{P}~\term{t}\), defined as
   \begin{equation}
     \begin{aligned}
-      &\function{elimProp}~(\constructor{leaf}~\term{x}) = \function{P_{leaf}}~\term{x} \\
-      &\function{elimProp}~(\constructor{node}~\term{f}) = \function{P_{node}}~(\function{elimProp} \circ f) \\[1mm]
-      &\function{elimProp}~(\constructor{perm}~\function{f}~\function{g}~\term{e}~i) = \\[-1mm]
-      &\quad\function{isProp{\rightarrow}isDepProp}~\function{P_{prop}}~(\function{elimProp}~(\constructor{node}~\function{f}))~(\function{elimProp}~(\constructor{node}~(\function{f} \circ \function{g})))\\[-1mm]
+      &\function{elimProp_{MS}}~(\constructor{leaf}~\term{x}) = \function{P_{leaf}}~\term{x} \\
+      &\function{elimProp_{MS}}~(\constructor{node}~\term{f}) = \function{P_{node}}~(\function{elimProp_{MS}} \circ f) \\[1mm]
+      &\function{elimProp_{MS}}~(\constructor{perm}~\function{f}~\function{g}~\term{e}~i) = \\[-1mm]
+      &\quad\function{isProp{\rightarrow}isDepProp}~\function{P_{prop}}~(\function{elimProp_{MS}}~(\constructor{node}~\function{f}))~(\function{elimProp_{MS}}~(\constructor{node}~(\function{f} \circ \function{g})))\\[-1mm]
       &\quad\qquad(\constructor{perm}~\function{f}~\function{g}~\term{e})~i \\[1mm]
-      &\function{elimProp}~(\constructor{MS\text{-}isSet}~\term{a}~\term{b}~\pathterm{p}~\pathterm{q}~i~j) = \\[-1mm]
-      &\quad\function{isSet{\rightarrow}isDepSet}~(\function{isProp{\rightarrow}isSet} \circ \function{P_{prop}})~(\function{elimProp}~\term{a})~(\function{elimProp}~\term{b})\\[-1mm]
-      &\quad\qquad(\mathtt{ap}~\function{elimProp}~\pathterm{p})~(\mathtt{ap}~\function{elimProp}~\pathterm{q})~(\constructor{MS\text{-}isSet}~\term{a}~\term{b}~\pathterm{p}~\pathterm{q})~i~j \\
+      &\function{elimProp_{MS}}~(\constructor{MS\text{-}isSet}~\term{a}~\term{b}~\pathterm{p}~\pathterm{q}~i~j) = \\[-1mm]
+      &\quad\function{isSet{\rightarrow}isDepSet}~(\function{isProp{\rightarrow}isSet} \circ \function{P_{prop}})~(\function{elimProp_{MS}}~\term{a})~(\function{elimProp_{MS}}~\term{b})\\[-1mm]
+      &\quad\qquad(\mathtt{ap}~\function{elimProp_{MS}}~\pathterm{p})~(\mathtt{ap}~\function{elimProp_{MS}}~\pathterm{q})~(\constructor{MS\text{-}isSet}~\term{a}~\term{b}~\pathterm{p}~\pathterm{q})~i~j \\
     \end{aligned}
   \end{equation}
 \end{defn}
@@ -983,7 +983,7 @@ This function takes weakly bisimilar objects to equal once.
 
 \subsection{Partiality monad}
 \label{sec:partiality-monad}
-In this subsection we will define the partiality monad (see below) and show that it is equal to the delay monad quotiented by weak bisimilarity, assuming the axiom of countable choice. We do this proof by defining an intermediate representation as sequences. We then show that the delay monad is equal to sequences (\subsectionref{delay-monad-to-sequences}), followed by showing that sequences quotiented by weak bisimilarity are equal to the partiality monad (\subsectionref{sequences-to-partiality-monad}). This section draws heavy inspiration from "Partiality, Revisited" \cite{Partiality-Revisited}.
+In this subsection we will define the partiality monad and show that it is equal to the delay monad quotiented by weak bisimilarity assuming the axiom of countable choice. We do this proof by defining an intermediate representation as sequences. We then show that the delay monad is equal to sequences (\subsectionref{delay-monad-to-sequences}), followed by showing that sequences quotiented by weak bisimilarity are equal to the partiality monad (\subsectionref{sequences-to-partiality-monad}). This section draws heavy inspiration from "Partiality, Revisited" \cite{Partiality-Revisited}.
 \begin{defn}[Partiality Monad]
   A simple example of a quotient inductive-inductive type is the partiality monad \((-)_\bot\) over a type \(\type{R}\), defined by the constructors\\[-9mm]
   \begin{center}
@@ -1072,7 +1072,7 @@ We define sequences and show they are equal to the delay monad (\thmref{seq-eq-d
   \begin{equation}
     \function{isMon}~\function{s} = \prod_{(n : \mathbb{N})} (\function{s}_n \equiv \function{s}_{n+1})  + ((\function{s}_n \equiv \mathtt{inr}~\unitelem) \times (\function{s}_{n+1} \not\equiv \mathtt{inr}~\unitelem))
   \end{equation}
-  meaning a sequences is \(\mathtt{inr}~\unitelem\) until it reaches a point where it switches to \(\mathtt{inl}~\term{r}\) for some value \(\term{r}\). There are two special cases, the already terminated sequence meaning only \(\mathtt{inl}~\term{r}\), and the never terminating sequence meaning only \(\mathtt{inr}~\unitelem\).
+  meaning a sequences is \(\mathtt{inr}~\unitelem\) until it reaches a point, where it switches to \(\mathtt{inl}~\term{r}\) for some value \(\term{r}\). There are two special cases, the already terminated sequence meaning only \(\mathtt{inl}~\term{r}\), and the never terminating sequence meaning only \(\mathtt{inr}~\unitelem\).
 \end{defn}
 \noindent For each index in a sequence the element at that index \(\function{s}_n\) is either not terminated \(\function{s}_n \equiv \mathtt{inr}~\unitelem\), which we denote as \(\function{s}_n \uparrow_{\type{R} + \unit}\), or it is terminated \(\function{s}_n \equiv \mathtt{inl}~\term{r}\) with some value \(r\) denoted by \(\function{s}_n \downarrow_{\type{R} + \unit} \term{r}\) or just \(\function{s}_n \downarrow_{\type{R} + \unit}\) if we want to say \(\function{s}_n \not\equiv \mathtt{inr}~\unitelem\). Thus, we can write \(\function{isMon}\) as
 \begin{equation}
@@ -1152,7 +1152,7 @@ We also introduce notation for the two special cases of sequences given above
     \begin{equation}
       \function{Delay{\rightarrow}Seq}~(\function{Seq{\rightarrow}Delay}~(\function{s},\function{q})) \equiv (\function{s},\function{q})
     \end{equation}
-    We show this by cases analysis on \(\function{s}_0\), if \(\function{s}_0 = \mathtt{inl}~\term{r}\) then we need to show
+    We show this by case analysis on \(\function{s}_0\). If \(\function{s}_0 = \mathtt{inl}~\term{r}\) then we need to show
     \begin{equation}
       \function{now}_{\typeformer{Seq}}~\term{r} \equiv (\function{s},\function{q})
     \end{equation}
@@ -1172,7 +1172,7 @@ We also introduce notation for the two special cases of sequences given above
     \begin{equation}
       \constructor{later}~(\function{Seq{\rightarrow}Delay}~(\function{unshift}~(\function{shift}~(\function{Delay{\rightarrow}Seq}~x)))) \equiv \constructor{later}~x
     \end{equation}
-    We again get the equality from unshift and shift being inverse and the induction hypothesis. This completes the isomorphism between \(\typeformer{Delay}~\type{R}\) and \(\typeformer{Seq}_{\type{R}}\) which concludes the proof of equality
+    We again get the equality from unshift and shift being inverse and the induction hypothesis. This completes the isomorphism between \(\typeformer{Delay}~\type{R}\) and \(\typeformer{Seq}_{\type{R}}\) which concludes the proof of equality.
   \end{proof}
 \end{thm}
 \noindent We will define weakly bisimilar relations and show the equality extends to the types quotiented by these relations.
@@ -1216,7 +1216,7 @@ We also introduce notation for the two special cases of sequences given above
 \end{defn}
 \noindent We define weak bisimulation for sequences from the following definitions.
 \begin{defn}[Sequence Termination]
-  The following relation says that a sequence \((\function{s},\function{q}) : \typeformer{Seq}_{\type{R}}\) terminates with a given value \(\term{r} : \type{R}\),
+  We denote that a sequence \((\function{s},\function{q}) : \typeformer{Seq}_{\type{R}}\) terminates with a given value \(\term{r} : \type{R}\) as
   \begin{equation}
     (\function{s},\function{q})~\relation{\downarrow_{Seq}}~\term{r} = \sum_{(n : \mathbb{N})} \function{s}_n~\relation{\downarrow_{\type{R} + \unit}}~\term{r}.
   \end{equation}
@@ -1235,7 +1235,7 @@ We also introduce notation for the two special cases of sequences given above
   \label{thm:delay-to-seq-quotient}
   The types \(\typeformer{Delay}~\type{R}/\relation{\sim_{Delay}}\) and \(\typeformer{Seq}_{\type{R}}/\relation{\sim_{Seq}}\) are equal.
   \begin{proof}
-    We show that transporting across the equality from \thmref{seq-eq-delay}, respects weak bisimilarity. We start by showing if \(\term{x}~\relation{\sim_{Delay}}~\term{y}\), then \(\function{Delay{\rightarrow}Seq}~\term{x}~\relation{\sim_{Seq}}~\function{Delay{\rightarrow}Seq}~\term{y}\) by case. If the weak bisimilarity is \(\constructor{\sim_{now}}\), then we need to construct \(\function{now}_{\typeformer{Seq}}~\term{a}~\relation{\sim_{Seq}}~\function{now}_{\typeformer{Seq}}~\term{b}\) given a path \(\pathterm{p} : \term{a} \equiv \term{b}\). By reflexivity of \(\relation{\sim_{Seq}}\) we get \(\function{now}_{\typeformer{Seq}}~\term{a}~\relation{\sim_{Seq}}~\function{now}_{\typeformer{Seq}}~\term{a}\). By transporting over \(\pathterm{p}\), we get the wanted term \(\function{now}_{\typeformer{Seq}}~\term{a}~\relation{\sim_{Seq}}~\function{now}_{\typeformer{Seq}}~\term{b}\). If we have \(\constructor{\sim_{later_l}}\), then by induction we get \(\function{Delay{\rightarrow}Seq}~\term{x}~\relation{\sim_{Seq}}~\function{Delay{\rightarrow}Seq}~\term{y}\). Shifting one side will not break the bisimilarity, and a shift interacts with \(\function{Delay{\rightarrow}Seq}\) to add a \(\constructor{later}\) that is we get \(\function{Delay{\rightarrow}Seq}~(\constructor{later}~\term{x})~\relation{\sim_{Seq}}~\function{Delay{\rightarrow}Seq}~y\), which is what we needed to show. By a symmetric argument we get \(\constructor{\sim_{later_r}}\). To construct \(\constructor{\sim_{later}}\) we shift both sides, resulting in a \(\constructor{later}\) being added to both sides of the bisimilarity. 
+    We show that transporting across the equality from \thmref{seq-eq-delay}, respects weak bisimilarity. We start by showing if \(\term{x}~\relation{\sim_{Delay}}~\term{y}\), then \(\function{Delay{\rightarrow}Seq}~\term{x}~\relation{\sim_{Seq}}~\function{Delay{\rightarrow}Seq}~\term{y}\) by case. If the weak bisimilarity is \(\constructor{\sim_{now}}\), then we need to construct \(\function{now}_{\typeformer{Seq}}~\term{a}~\relation{\sim_{Seq}}~\function{now}_{\typeformer{Seq}}~\term{b}\) given a path \(\pathterm{p} : \term{a} \equiv \term{b}\). By reflexivity of \(\relation{\sim_{Seq}}\) we get \(\function{now}_{\typeformer{Seq}}~\term{a}~\relation{\sim_{Seq}}~\function{now}_{\typeformer{Seq}}~\term{a}\). By transporting over \(\pathterm{p}\), we get the wanted term \(\function{now}_{\typeformer{Seq}}~\term{a}~\relation{\sim_{Seq}}~\function{now}_{\typeformer{Seq}}~\term{b}\). If we have \(\constructor{\sim_{later_l}}\), then by induction we get \(\function{Delay{\rightarrow}Seq}~\term{x}~\relation{\sim_{Seq}}~\function{Delay{\rightarrow}Seq}~\term{y}\). Shifting one side will not break the bisimilarity, and a shift interacts with \(\function{Delay{\rightarrow}Seq}\) to add a \(\constructor{later}\) that is we get \(\function{Delay{\rightarrow}Seq}~(\constructor{later}~\term{x})~\relation{\sim_{Seq}}~\function{Delay{\rightarrow}Seq}~\term{y}\), which is what we needed to show. By a symmetric argument we get \(\constructor{\sim_{later_r}}\). To construct \(\constructor{\sim_{later}}\) we shift both sides, resulting in a \(\constructor{later}\) being added to both sides of the bisimilarity. 
     \begin{equation}
       \begin{aligned}
         &\function{{\sim}_{Delay}{\rightarrow}{\sim}_{Seq}}~(\constructor{\sim_{now}}~\term{a}~\term{b}~\pathterm{p}) = \mathtt{subst}~(\lambda\,\term{k},~\function{now}_{\typeformer{Seq}}~\term{a}~\relation{\sim_{Seq}}~\term{k})~\pathterm{p}~(\constructor{\sim_{refl}}~\term{a}) \\
@@ -1244,25 +1244,25 @@ We also introduce notation for the two special cases of sequences given above
         &\function{{\sim}_{Delay}{\rightarrow}{\sim}_{Seq}}~(\constructor{\sim_{later}}~\term{x}~\term{y}~\term{r}) = \function{\sim_{sym}}~(\function{\sim_{shift}}~(\function{\sim_{sym}}~(\function{\sim_{shift}}~(\function{{\sim}_{Delay}{\rightarrow}{\sim}_{Seq}}~\term{r})))) \\
       \end{aligned}
     \end{equation}
-    Now for the other direction from \((\function{s},\function{q})~\relation{\sim_{Seq}}~(\function{t},\function{p})\) to \(\function{Seq{\rightarrow}Delay}~(\function{s},\function{q})~\relation{\sim_{Delay}}~\function{Seq{\rightarrow}Delay}~(\function{t},\function{p})\). We start with some helpful properties. We know that if \(\function{s}~0 = \mathtt{inl}~\term{r}\), then \((\function{s},\function{q}) = \function{now}_{\mathtt{Seq}}~r\) and \((\function{s},\function{q})~\relation{\downarrow_{Seq}}~\term{r}\). If two sequences are weakly bisimilar and they terminate to different values, then the values are equal, we therefore have
+    Now for the other direction from \((\function{s},\function{q})~\relation{\sim_{Seq}}~(\function{t},\function{p})\) to \(\function{Seq{\rightarrow}Delay}~(\function{s},\function{q})~\relation{\sim_{Delay}}~\function{Seq{\rightarrow}Delay}~(\function{t},\function{p})\). We start with some helpful properties. We know that if \(\function{s}_0 = \mathtt{inl}~\term{r}\), then \((\function{s},\function{q}) = \function{now}_{\mathtt{Seq}}~\term{r}\) and \((\function{s},\function{q})~\relation{\downarrow_{Seq}}~\term{r}\). If two sequences are weakly bisimilar and they terminate to different values, then the values are equal, meaning
     \begin{equation}
       \function{\sim_{seq\text{-}val}} : \function{now}_{\mathtt{Seq}}~\term{a}~\relation{\sim_{Seq}}~\function{now}_{\mathtt{Seq}}~\term{b} \rightarrow \term{a} \equiv \term{b}
     \end{equation}
-    We do the proof by case on \(\function{s}~0\) and \(\function{t}~0\). If both sequences are terminated meaning \((\function{s},\function{q}) = \function{now}_{\typeformer{Seq}}~\term{a}\) and \((\function{t},\function{p}) = \function{now}_{Seq}~\term{b}\), then we can make a term \(\pathterm{p} : \term{a} \equiv \term{b}\) using \(\function{\sim_{seq\text{-}val}}\). The base case is then done by \(\constructor{\sim_{now}}~\pathterm{p}\). If two sequences are weakly bisimilar, then shifting or unshifting either of them will not break the bisimilarity. We can therefore do the rest of the cases by induction.
+    We do the proof by case on \(\function{s}_0\) and \(\function{t}_0\). If both sequences are terminated, meaning \((\function{s},\function{q}) = \function{now}_{\typeformer{Seq}}~\term{a}\) and \((\function{t},\function{p}) = \function{now}_{\typeformer{Seq}}~\term{b}\), then we can make a term \(\pathterm{p} : \term{a} \equiv \term{b}\) using \(\function{\sim_{seq\text{-}val}}\). The base case is then done by \(\constructor{\sim_{now}}~\pathterm{p}\). If two sequences are weakly bisimilar, then shifting or unshifting either of them will not break the bisimilarity. We can therefore do the rest of the cases by induction.
     \begin{equation}
       \begin{aligned}
         &\function{{\sim}_{Seq}{\rightarrow}{\sim}_{Delay}}~(\function{now}_{\mathtt{Seq}}~\term{a})~(\function{now}_{\mathtt{Seq}}~\term{b})~\term{r} = \constructor{\sim_{now}}~\term{a}~\term{b}~(\function{\sim_{seq\text{-}val}}~\term{r}) \\[1mm]
         &\function{{\sim}_{Seq}{\rightarrow}{\sim}_{Delay}}~(\function{now}_{\mathtt{Seq}}~\term{a})~(\function{t},\function{p})~\term{r} = \\[-1mm]
-        &\quad\constructor{\sim_{later_r}}~(\function{Seq{\rightarrow}Delay}~(\function{s},\function{q}))~(\function{Seq{\rightarrow}Delay}~(\function{shift}~(\function{t},\function{p})~\_))~(\function{{\sim}_{Seq}{\rightarrow}{\sim}_{Delay}}~(\function{\sim_{shift_r}}~r)) \\[1mm]
+        &\quad\constructor{\sim_{later_r}}~(\function{Seq{\rightarrow}Delay}~(\function{s},\function{q}))~(\function{Seq{\rightarrow}Delay}~(\function{shift}~(\function{t},\function{p})~\_))~(\function{{\sim}_{Seq}{\rightarrow}{\sim}_{Delay}}~(\function{\sim_{shift_r}}~\term{r})) \\[1mm]
         &\function{{\sim}_{Seq}{\rightarrow}{\sim}_{Delay}}~(\function{s},\function{q})~(\function{now}_{\mathtt{Seq}}~\term{b})~\term{r} = \\[-1mm]
-        &\quad\constructor{\sim_{later_l}}~(\function{Seq{\rightarrow}Delay}~(\function{shift}~(\function{s},\function{q})~\_))~(\function{Seq{\rightarrow}Delay}~(\function{t},\function{p}))~(\function{{\sim}_{Seq}{\rightarrow}{\sim}_{Delay}}~(\function{\sim_{shift_l}}~r)) \\[1mm]
+        &\quad\constructor{\sim_{later_l}}~(\function{Seq{\rightarrow}Delay}~(\function{shift}~(\function{s},\function{q})~\_))~(\function{Seq{\rightarrow}Delay}~(\function{t},\function{p}))~(\function{{\sim}_{Seq}{\rightarrow}{\sim}_{Delay}}~(\function{\sim_{shift_l}}~\term{r})) \\[1mm]
         &\function{{\sim}_{Seq}{\rightarrow}{\sim}_{Delay}}~(\function{s},\function{q})~(\function{p},\function{t})~\term{r} = \\[-1mm]
         &\quad\constructor{\sim_{later}}~(\function{Seq{\rightarrow}Delay}~(\function{shift}~(\function{s},\function{q})~\_))~(\function{Seq{\rightarrow}Delay}~(\function{shift}~(\function{t},\function{p})~\_))\\[-1mm]
-        &\quad\quad~(\function{{\sim}_{Seq}{\rightarrow}{\sim}_{Delay}}~(\function{\sim_{shift}}~r))
+        &\quad\quad~(\function{{\sim}_{Seq}{\rightarrow}{\sim}_{Delay}}~(\function{\sim_{shift}}~\term{r}))
     \end{aligned}
   \end{equation}
   % The right and left identity for \(\function{{\sim}_{Delay}{\rightarrow}{\sim}_{Seq}}\) and \(\function{{\sim}_{Seq}{\rightarrow}{\sim}_{Delay}}\) follow from similar arguments. 
-  We have now given functions in both direction, meaning we get that weakly bisimilar relations for the delay monad and sequences respects the equality given in \thmref{seq-eq-delay} so the quotiented types are also equal.
+  We have now given functions in both direction, meaning we get that weakly bisimilar relations for the delay monad and sequences respects the equality given in \thmref{seq-eq-delay}, so the quotiented types are also equal.
   \end{proof}
 \end{thm}
 
@@ -1288,7 +1288,7 @@ In this section we will show that assuming the axiom of countable choice, we get
 \begin{equation}
   \function{isMon}~\function{s} = \prod_{(n : \mathbb{N})} \function{s}_n~\relation{\sqsubseteq_{\type{R} + \unit}}~\function{s}_{n+1}
 \end{equation}
-This confirms the idea that if \(\function{isMon}~\function{s}\), then \(\function{s}\) is monotone and therefore a sequence of partial values.
+This confirms the idea that if \(\function{isMon}~\function{s}\), then \(\function{s}\) is monotone sequence of partial values.
 \begin{lem}
   The function \(\function{Maybe{\rightarrow}(-)_\bot}\) is monotone, meaning if \(\term{x}~\relation{\sqsubseteq_{\type{R} + \unit}}~\term{y}\) for some \(\term{x}\) and \(\term{y}\), then \((\function{Maybe{\rightarrow}(-)_\bot}~\term{x})~\relation{\sqsubseteq_{\bot}}~(\function{Maybe{\rightarrow}(-)_\bot}~\term{y})\).
   \begin{proof}
@@ -1330,7 +1330,7 @@ This confirms the idea that if \(\function{isMon}~\function{s}\), then \(\functi
 \begin{lem}
   If two sequences \(\term{x},\term{y}\) are weakly bisimular, then \(\function{Seq{\rightarrow}(-)_\bot}~\term{x} \equiv \function{Seq{\rightarrow}(-)_\bot}~\term{y}\)
   \begin{proof}
-    By the definition of bisimilarity for sequences, we get \(\term{x}~\relation{\sqsubseteq_{Seq}}~\term{y}\) and \(\term{y}~\relation{\sqsubseteq_{Seq}}~\term{x}\) from the bisimilarity of \(\term{x}\) and \(\term{y}\). By monotonicity of \(\function{Seq{\rightarrow}(-)_{\bot}}\) we get \(\function{Seq{\rightarrow}(-)_\bot}~\term{x}~\relation{\sqsubseteq_{\bot}}~\function{Seq{\rightarrow}(-)_\bot}~\term{y}\) and \(\function{Seq{\rightarrow}(-)_\bot}~\term{y}~\relation{\sqsubseteq_{\bot}}~\function{Seq{\rightarrow}(-)_\bot}~\term{x}\). We then use \(\constructor{\alpha_{\bot}}\) to get the equality \(\function{Seq{\rightarrow}(-)_\bot}~\term{x} \equiv \function{Seq{\rightarrow}(-)_\bot}~\term{y}\). We denote this construction as the function \(\function{Seq{\rightarrow}(-)_\bot\text{-}{\sim}{\rightarrow}{\equiv}}\).
+    By the definition of bisimilarity for sequences, we get \(\term{x}~\relation{\sqsubseteq_{Seq}}~\term{y}\) and \(\term{y}~\relation{\sqsubseteq_{Seq}}~\term{x}\). By monotonicity of \(\function{Seq{\rightarrow}(-)_{\bot}}\) we get \(\function{Seq{\rightarrow}(-)_\bot}~\term{x}~\relation{\sqsubseteq_{\bot}}~\function{Seq{\rightarrow}(-)_\bot}~\term{y}\) and \(\function{Seq{\rightarrow}(-)_\bot}~\term{y}~\relation{\sqsubseteq_{\bot}}~\function{Seq{\rightarrow}(-)_\bot}~\term{x}\). We then use \(\constructor{\alpha_{\bot}}\) to get the equality \(\function{Seq{\rightarrow}(-)_\bot}~\term{x} \equiv \function{Seq{\rightarrow}(-)_\bot}~\term{y}\). We denote this construction as the function \(\function{Seq{\rightarrow}(-)_\bot\text{-}{\sim}{\rightarrow}{\equiv}}\).
   \end{proof}
 \end{lem}
 \noindent The recursor for quotients \defref{quotient-recursor} allows us to lift the function \(\function{Seq{\rightarrow}(-)_\bot}\) to the quotient.
@@ -1354,7 +1354,7 @@ This confirms the idea that if \(\function{isMon}~\function{s}\), then \(\functi
 \end{lem}
 \begin{lem}
   \label{lem:sequence-to-partiality-monad-injectivity}
-  The function \(\function{Seq/{\sim}{\rightarrow}(-)_\bot}\) is injective, meaning \(\function{Seq/{\sim}{\rightarrow}(-)_\bot}~\term{x} \equiv \function{Seq/{\sim}{\rightarrow}(-)_\bot}~\term{y}\) implies \(\term{x} \equiv \term{y}\).
+  The function \(\function{Seq/{\sim}{\rightarrow}(-)_\bot}\) is injective. That is \(\function{Seq/{\sim}{\rightarrow}(-)_\bot}~\term{x} \equiv \function{Seq/{\sim}{\rightarrow}(-)_\bot}~\term{y}\) implies \(\term{x} \equiv \term{y}\).
   \begin{proof}
     We use propositional elimination of quotients (see \defref{propositional-elimination-quotient}) to show injectivity. We let
     \begin{equation}
@@ -1432,10 +1432,10 @@ This confirms the idea that if \(\function{isMon}~\function{s}\), then \(\functi
 \end{thm}
 
 \section{How should Q\texttt{M}-types be defined}
-We want to define quotient \texttt{M}-type with a good semantic, we draw inspiration from Q\texttt{W}-types \cite{DBLP:Constructing-QIITs}, quotient containers \cite{DBLP:quotient-container} and quotient polynomial functors (QPF) \cite{DBLP:QM-lean}. We start by looking at an alternative way of defining the Q\texttt{M}-types.
+We want to define quotient \texttt{M}-type with a good semantic. We draw inspiration from Q\texttt{W}-types \cite{DBLP:Constructing-QIITs}, quotient containers \cite{DBLP:quotient-container} and quotient polynomial functors (QPF) \cite{DBLP:QM-lean}. We start by looking at an alternative way of defining the Q\texttt{M}-types.
 
 \subsection{Lifting Quotient Construction from Containers}
-An alternative to directly set quotienting the \texttt{M}-types is to do the quotienting on the underlying container \cite{DBLP:quotient-container} / polynomial functor \cite{DBLP:QM-lean}, and then do the same fixed point construction we did for polynomial functors, but on the quotiented functor instead. We start by defining quotiented polynomial functors
+An alternative to directly set quotienting the \texttt{M}-types is to do the quotienting on the underlying container \cite{DBLP:quotient-container} / polynomial functor \cite{DBLP:QM-lean}, and then do the same fixed point construction, we did for polynomial functors, but on the quotiented functor instead. We start by defining quotiented polynomial functors
 % quotients on containers.
 % \begin{defn}
 %   Given a container \(\containerpair{\type{A}}{\typeformer{B}}\), and a relation \(\relation{R} : \prod_{(\term{a} : \type{A})} {\typeformer{B}~\term{a}} \rightarrow \typeformer{B}~\term{a} \rightarrow \universe{\mathcal{U}}\), \todo{...} we can form a quotiented container \(\containerpair{\type{A}}{\typeformer{B} / \relation{R}}\) as
@@ -1446,7 +1446,7 @@ An alternative to directly set quotienting the \texttt{M}-types is to do the quo
 % \end{defn}
 % \noindent Which gives us the following definition of a polynomial functor.
 \begin{defn}
-  Given a container \(\containerpair{\type{A}}{\typeformer{B}}\) and any type \(\type{X}\) a family of relations \(\relation{\sim}_{\term{a}} : (\typeformer{B}\,\term{a} \rightarrow \type{X}) \rightarrow (\typeformer{B}\,\term{a} \rightarrow \type{X}) \rightarrow \universe{\mathcal{U}}\) indexed by \(\type{A}\), we define a quotiented polynomial functor (QPF), for types as
+  Given a container \(\containerpair{\type{A}}{\typeformer{B}}\), a type \(\type{X}\) and a family of relations \(\relation{\sim}_{\term{a}} : (\typeformer{B}\,\term{a} \rightarrow \type{X}) \rightarrow (\typeformer{B}\,\term{a} \rightarrow \type{X}) \rightarrow \universe{\mathcal{U}}\) indexed by \(\type{A}\), we define a quotiented polynomial functor (QPF), for types as
   \begin{equation}
     \functor{F}\,\type{X} =  \sum_{(\term{a} : \type{A})} ((\typeformer{B}\,\term{a} \rightarrow \type{X}) / \relation{\sim}_{\term{a}})
   \end{equation}
@@ -1458,7 +1458,7 @@ An alternative to directly set quotienting the \texttt{M}-types is to do the quo
   \end{equation}
   completing the definition of a quotiented polynomial functor.
 \end{defn}
-\noindent If there is a function \(\function{abs}_{\type{X}} : \functor{P}\,\type{X} \rightarrow \functor{F}\,\type{X}\) that makes the diagram in \figref{QPF-diagram} commute (as in \cite{DBLP:QM-lean}), then we can construct the final \(\functor{F}\)-coalgebra, to get another notion of quotiented \texttt{M}-type. The construction is done by taking the limit of the repeated application of \(\functor{P}\) and \(\functor{F}\) to the unit type \(\unit\). The proof that this limit exists and that it makes a final coalgebra is left as future research.
+\noindent If there is a function \(\function{abs}_{\type{X}} : \functor{P}\,\type{X} \rightarrow \functor{F}\,\type{X}\) that makes the diagram in \figref{QPF-diagram} commute \cite{DBLP:QM-lean}, then we can construct the final \(\functor{F}\)-coalgebra, to get another notion of quotiented \texttt{M}-type. The construction is done by taking the limit of the repeated application of \(\functor{P}\) and \(\functor{F}\) to the unit type \(\unit\). The proof that this limit exists and that it makes a final coalgebra is left as future research.
 \begin{figure}[h]
   \centering
   \begin{tikzcd}
@@ -1468,17 +1468,17 @@ An alternative to directly set quotienting the \texttt{M}-types is to do the quo
   \caption{Quotiented polynomial function}
   \label{fig:QPF-diagram}
 \end{figure}
-If \(\function{abs}\) is surjective, then the square will commute. We therefore just have to define a relation that has the \function{\sim_{ap}} property together with a surjective function \(\function{abs}_{\type{X}}\) to construct a quotient \texttt{M}-type. We get a surjective function \(\function{QM\text{-}intro} : \typeformer{M}_{\container{S}} \rightarrow \typeformer{M}_{\container{S}} / \relation{\sim}\) from this construction. The function is given as \(\function{abs}_{\typeformer{M}}\), which is the version of \(\function{abs}\) between the limits of the two sequences. As an example of this alternative construction, let us try and construct the Q\texttt{M}-type and the QPF for multisets,
+If \(\function{abs}\) is surjective, then the square will commute. We therefore just have to define a relation that has the \function{\sim_{ap}} property together with a surjective function \(\function{abs}_{\type{X}}\) to construct a quotient \texttt{M}-type. We get a surjective function \(\function{QM\text{-}intro} : \typeformer{M}_{\container{S}} \rightarrow \typeformer{M}_{\container{S}} / \relation{\sim}\) from this construction. The function is given as \(\function{abs}_{\typeformer{M}}\), which is the instantiation of \(\function{abs}\) between the limits of the two sequences. As an example of this alternative construction, let us construct the QPF for multisets.
 \begin{exmp}
   We have the following polynomial functor for \(\type{A}\)-valued \(\mathbb{N}\)-branching trees
   \begin{equation}
     \functor{P}\,\type{X} = \sum_{(\term{a} : \type{A} + \unit)} \begin{cases} \empt \rightarrow \type{X} & \term{a} = \mathtt{inl}~\term{r} \\ \mathbb{N} \rightarrow \type{X} & \term{a} = \mathtt{inr}~\unitelem \end{cases}
   \end{equation}
-  for which we define the family of relations \((\relation{\sim_{PT}})_{(\term{a} : \type{A} + \unit)}\), if \(\term{a} = \mathtt{inl}~\term{r}\), then the equality relations is just the trivial equalities, since the relation is between elements of a contractive type \(\empt \rightarrow \type{X}\). On the other hand if \(\term{a} = \mathtt{inr}~\unitelem\), then we define the relation as
+  for which we define the family of relations \((\relation{\sim_{PT}})_{(\term{a} : \type{A} + \unit)}\). If \(\term{a} = \mathtt{inl}~\term{r}\), then the equality relations is just the trivial equalities, since the relation is between elements of a contractive type \(\empt \rightarrow \type{X}\). On the other hand if \(\term{a} = \mathtt{inr}~\unitelem\), then we define the relation as
   \begin{equation}
     \vcenter{\infer{\function{f}~\relation{\sim_{PT}}~\function{h}}{\function{f}, \function{h} : \mathbb{N} \rightarrow \type{X} & \function{g} : \mathbb{N} \rightarrow \mathbb{N} & \function{isIso}~\function{g} & \function{f} \circ \function{g} \equiv \function{h}}}
   \end{equation}
-  With this approach, we only need to define the non-trivial equalities, meaning those that are not just reflexivity. This relation fulfills the \(\function{\sim_{ap}}\) property. We can see this by case. If \(\term{a} = \mathtt{inl}~\term{r}\), then it holds trivially. If \(\term{a} = \mathtt{inr}~\unitelem\), then we have \(\function{f}~\relation{\sim_{PT}}~\function{h}\) and want to show \(\function{k} \circ \function{f}~\relation{\sim_{PT}}~\function{k} \circ \function{h}\) for any function \(\function{k}\), which just boils down to showing \(\function{k} \circ \function{f} \circ \function{g} \equiv \function{k} \circ \function{h}\) given the path \(\pathterm{p} : \function{f} \circ \function{g} \equiv \function{h}\), which is done by \(\mathtt{ap}~\function{k}~\pathterm{p}\). We therefore have a quotient polynomial functor \(\functor{F}\). We then define \(\function{abs}\) as
+  This relation fulfills the \(\function{\sim_{ap}}\) property. We can see this by case. If \(\term{a} = \mathtt{inl}~\term{r}\), then it holds trivially. If \(\term{a} = \mathtt{inr}~\unitelem\), then we have \(\function{f}~\relation{\sim_{PT}}~\function{h}\) and want to show \(\function{k} \circ \function{f}~\relation{\sim_{PT}}~\function{k} \circ \function{h}\) for any function \(\function{k}\), which just boils down to showing \(\function{k} \circ \function{f} \circ \function{g} \equiv \function{k} \circ \function{h}\) given the path \(\pathterm{p} : \function{f} \circ \function{g} \equiv \function{h}\), which can be done by \(\mathtt{ap}~\function{k}~\pathterm{p}\). We therefore have a quotient polynomial functor \(\functor{F}\) for multisets with the \(\function{\sim_{ap}}\) property. We then define \(\function{abs}\) as
   \begin{equation}
     \begin{aligned}
       &\function{abs}~(\mathtt{inl}~\term{r}~,~\lambda\,(\,)) = (\mathtt{inl}~\term{r}~,~\quotientconstructor{\lambda\,(\,)}) \\
@@ -1496,12 +1496,10 @@ If \(\function{abs}\) is surjective, then the square will commute. We therefore 
   \label{fig:QPF-limit-multiset}
 \end{figure}
 \end{exmp}
-\noindent We have just postulated that the quotiented \texttt{M}-type, is a final \(\functor{F}\)-coalgebra, however this is not necessarily the case. When trying to proof this, we need to show that given \(\function{fq} : (\typeformer{B}~\term{a} \rightarrow \type{X}) / \relation{R}\) then we can construct a function \((\typeformer{B}~\term{a} \rightarrow \type{X})\), however this requires the axiom of choice in general. We therefore do not get around the axiom of choice with this construction, however it is an alternative way of defining the quotient, and we get some more structure using it.
+\noindent We have just postulated that the quotiented \texttt{M}-type, is a final \(\functor{F}\)-coalgebra, however this is not necessarily the case. When trying to proof this, we need to show that given \(\function{fq} : (\typeformer{B}~\term{a} \rightarrow \type{X}) / \relation{R}\), we can construct a function \((\typeformer{B}~\term{a} \rightarrow \type{X})\), however this requires the axiom of choice in general. We therefore do not get around the axiom of choice with this construction, but it is an alternative way of defining the quotient, and we get some more structure using it.
 
 \subsection{Constructing QIITs from \texttt{M}-types and Relations}
-The construction of Q\texttt{W}-types in \cite{DBLP:Constructing-QIITs} got around using the axiom of choice by using QIIT, that is defining the type and the relation to quotient it by at the same time. As we have seen in the examples in this thesis using QIITs gets around the use of the axiom of choice without adding much complexity. If we use another construction and assume the axiom of choice, that construction will be equal to the QIIT. We still need to show that the type defined by the QIIT is a final coalgebra, however this is left at future research. We will however describe how to construct QIITs from a \texttt{M}-type and a relation. You simply take all the constructors/destructors of the \texttt{M}-type, and define them as the type forming rules for the quotient. Then for all constructors of the relations, we replace the relation with equality and add those rules as well. This will give us a higher inductive-inductive type (HIIT), so we add a set truncation constructor to get a QIIT. 
-
-The structure for translating between the set quotiented M-type and this construction of a QIIT is rather simple
+The construction of Q\texttt{W}-types in \cite{DBLP:Constructing-QIITs} got around using the axiom of choice by using QIIT, that is defining the type and the relation to quotient it by at the same time. As we have seen in the examples in this thesis using QIITs gets around the use of the axiom of choice without adding much complexity. If we use another construction and assume the axiom of choice, that construction will be equal to the QIIT. We still need to show that the type defined by the QIIT is a final coalgebra, however this is left at future research. We will however describe how to construct QIITs from a \texttt{M}-type and a relation. You simply take all the constructors/destructors of the \texttt{M}-type, and define them as the type forming rules for the quotient. Then for all constructors of the relations, we replace the relation with equality and add those rules as well. This will give us a higher inductive-inductive type (HIIT), so we add a set truncation constructor to get a QIIT. The structure for translating between the set quotiented M-type and this construction of a QIIT is rather simple
 \begin{itemize}
 \item A function \function{QM{\rightarrow}QIIT} from Q\texttt{M} to QIIT, taking the Q\texttt{M} constructors to their corresponding QIIT constructor.
 \item A proof \(\function{QM{\rightarrow}QIIT\text{-}{\sim}{\rightarrow}{\equiv}}\) that \(\term{x}~\relation{\sim_{QM}}~\term{y}\) implies \(\function{QM{\rightarrow}QIIT}~\term{x} \equiv \function{QM{\rightarrow}QIIT}~\term{y}\), which should follow by the constructors we added to the QIIT for the relation.
@@ -1509,7 +1507,7 @@ The structure for translating between the set quotiented M-type and this constru
 \item Showing injectivity by using propositional elimination of the quotient together with the inverse of \(\function{QM{\rightarrow}QIIT\text{-}{\sim}{\rightarrow}{\equiv}}\), namely \(\function{QM{\rightarrow}QIIT\text{-}injective}\) saying that \(\function{QM{\rightarrow}QIIT}~\term{x} \equiv \function{QM{\rightarrow}QIIT}~\term{y}\) implies \(\term{x}~\relation{\sim_{QM}}~\term{y}\), which again should follow from how the relations constructors were defined.
 \item Lastly we show surjectivity by induction using the eliminator of QIIT and the axiom of choice and the surjectivity of \(\quotientconstructor{{\cdot}}\).
 \end{itemize}
-That this translation exists enforces the idea that QIITs have the right semantic, while behaving better than the Q\texttt{M}-types. We followed this construction in \subsectionref{multiset} on multisets, however in \subsectionref{partiality-monad} on the partiality monad, we constructed a more advanced QIIT. Let us look at the reason for constructing more advanced QIITs, by looking at a use of the simple method.
+When such a translation exists it enforces, that QIITs have the right semantic, while behaving better than the Q\texttt{M}-types. We followed this construction in \subsectionref{multiset} on multisets, however in \subsectionref{partiality-monad} on the partiality monad, we constructed a more advanced QIIT. Let us look at the reason for constructing more advanced QIITs, by looking at a use of the simple method.
 \begin{exmp}
   We combine the constructors for the delay monad given in \figref{delay-monad} and the weak bisimilarity relation given in \defref{weak-bisim-delay-monad} to get a QIIT defined by
   \begin{center}
@@ -1550,12 +1548,12 @@ That this translation exists enforces the idea that QIITs have the right semanti
   \end{equation}
   Constructing a function from the Q\texttt{M}-type to this QIIT, we can show the equality to this QIIT without the use of the axiom of countable choice. The reason is that this type is not as expressive as the partiality monad, that is we quotient away too much information. In the partiality monad we have an ordering, however this ordering is not present here. 
 \end{exmp}
-\noindent We can see that doing set truncated quotients probably removes more information than we would want. We would like to quantify this loss of information, however this is left at future research.
+\noindent We can see that doing set truncated quotients probably removes more information than we would want. We would like to quantify this loss of information, however this is left as future research.
 
 \chapter{Conclusion}
 \label{ch:conclusion}
 
-We have described the construction of \texttt{M}-types as the limit of a sequence defined from repeated application of a polynomial functor for a container. We have showed that \texttt{M}-types are a final coalgebra and used this to define a coinduction principle for \texttt{M}-types, giving us an equality relation from (strong) bisimulation. This work has been formalized in the Cubical Agda proof assistant, and part of the formalization has been accepted to the Cubical Agda GitHub repository. We have used this formalization to construct a couple of examples of \texttt{M}-types, to make the theory of \texttt{M}-types more accessible. We have given some guidelines for how to construct a container, that will give a \texttt{M}-type with the wanted set of constructors/destructors. We have also explored the concept of quotiented \texttt{M}-types (Q\texttt{M}-types), and shown examples where we need the axiom of choice, to lift the constructor to the quotient. We have shown this problem can be solved by using quotient inductive-inductive types (QIITs), and that the type that arise from this construction is equal to the quotiented \texttt{M}-type if we assume the axiom of choice. We have shown an alternative construction of Q\texttt{M}-types, where we quotient the polynomial functor before taking the limit, however this construction also encounters the same problem as quotienting the \texttt{M}-type directly, namely it needs the axiom of choice to work. We have seen that constructing QIITs are not easy, however sometimes a simple construction is enough.
+We have described the construction of \texttt{M}-types as the limit of a chain defined from repeated application of a polynomial functor for a container. We have shown that \texttt{M}-types are a final coalgebra and used this to define a coinduction principle for \texttt{M}-types, giving us an equality relation from (strong) bisimulation. This work has been formalized in the Cubical Agda proof assistant, and part of the formalization has been accepted to the Cubical Agda GitHub repository. We have used this formalization to construct a couple of examples of \texttt{M}-types, to make the theory of \texttt{M}-types more accessible. We have given some guidelines for how to construct a container, that will give a \texttt{M}-type for a set of constructors/destructors. We have also explored the concept of quotiented \texttt{M}-types (Q\texttt{M}-types) and shown examples, where we need the axiom of choice to lift the constructor to the quotient. We have shown this problem can be solved by using quotient inductive-inductive types (QIITs), and that the type that arise from this construction is equal to the quotiented \texttt{M}-type if we assume the axiom of choice. We have shown an alternative construction of Q\texttt{M}-types, where we quotient the polynomial functor before taking the limit, however this construction also encounters the same problem as quotienting the \texttt{M}-type directly, namely it needs the axiom of choice to work. We have seen that constructing QIITs are not easy, however sometimes a simple construction is enough.
 
 \section{Future Work}
 We would like to formally show that the construction of quotiented \texttt{M}-types presented in this paper, will result in a type that is a final-coalgebra. We would also like to do a closer comparison between the constructions. We would also like to get a formal description/proof of how to construct the quotient inductive-inductive types representing the quotient of a given \texttt{M}-type over a given relation.
@@ -1596,7 +1594,7 @@ We would also like to explore how these constructions behave in a guarded cubica
 \cleardoublepage
 \appendix
 
-\chapter{The Technical Details}
+\chapter{Formalization}
 Most of the work presented has been formalized in Cubical Agda. Part of the formalization of this work has been accepted to the Cubical Agda GitHub in the pull request:\\
 \url{https://github.com/agda/cubical/pull/245}\\
 The rest can be accessed at:\\
