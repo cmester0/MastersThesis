@@ -1,0 +1,134 @@
+\documentclass{beamer}
+\mode<presentation>{
+  %% BEAMER CONFIG %%
+  \usetheme{Madrid}
+  \setbeamertemplate{navigation symbols}{}
+  \setbeamersize{text margin left=0.5cm,text margin right=0.5cm}
+}
+
+% \usepackage[latin1]{inputenc}
+\usepackage[english]{babel}
+% \usepackage{a4}
+\usepackage{latexsym}
+\usepackage{amssymb}
+\usepackage{amsmath}
+\usepackage{epsfig}
+\usepackage[T1]{fontenc}
+% \usepackage{mathptmx} % Use Times New Romans as font?
+\usepackage{color}
+\usepackage{epstopdf}
+\usepackage{microtype}
+% \usepackage[hidelinks]{hyperref}
+\usepackage[useregional]{datetime2}
+\DTMlangsetup[en-US]{showdayofmonth=false}
+\usepackage{lipsum}
+
+\usepackage{marvosym}
+
+\renewcommand*\sfdefault{lmss}
+\renewcommand*\ttdefault{txtt}
+
+%Information to be included in the title page:
+\title{(Q)\texttt{M}-types and Coinduction in HoTT / CTT}
+\subtitle{Master's Thesis, Computer Science}
+\author{\large Lasse Letager Hansen, 201508114\\[1ex]{\small Supervisor: Bas Spitters}}
+\institute{Aarhus University}
+\date{\today}
+
+\renewcommand{\insertshortauthor}{Lasse Letager Hansen}
+\titlegraphic{
+  \epsfig{file=logo.eps}
+}
+
+% Custom packages added:
+
+% \usepackage{fullpage}
+% \setlength\marginparwidth{0.7in}
+
+\usepackage{todonotes} % \todo command
+
+\usepackage{proof} % \infer command
+
+\usepackage{tikz-cd}
+\usepackage{xfrac} % \sfrac - sideways fraction
+
+% allow breaks in align and equation (a new page for example) 
+\allowdisplaybreaks
+
+\renewcommand{\thefootnote}{\fnsymbol{footnote}} %footnote style
+
+\usepackage{amsthm}
+
+\theoremstyle{plain} % default
+\newtheorem{thm}{Theorem}[section]
+\newtheorem{lem}[thm]{Lemma}
+\newtheorem{prop}[thm]{Proposition}
+\newtheorem{cor}{Corollary}
+
+\theoremstyle{definition}
+\newtheorem{defn}[thm]{Definition}% [section] 
+\newtheorem{conj}{Conjecture}[section]
+\newtheorem{exmp}{Example} % [section]
+
+\theoremstyle{remark}
+\newtheorem*{rem}{Remark}
+% \newtheorem*{note}{Note} % Not used?
+\newtheorem{case}{Case}
+
+% Custom commands
+
+\newcommand*{\thmref}[1]{\hyperref[thm:#1]{Theorem~\ref*{thm:#1}}} % Theorem~\ref
+\newcommand*{\lemref}[1]{\hyperref[lem:#1]{Lemma~\ref*{lem:#1}}}
+\newcommand*{\corref}[1]{\hyperref[cor:#1]{Corollary~\ref*{cor:#1}}}
+\newcommand*{\defref}[1]{\hyperref[defn:#1]{Definition~\ref*{defn:#1}}}
+\newcommand*{\figref}[1]{\hyperref[fig:#1]{Figure~\ref*{fig:#1}}}
+\newcommand*{\tableref}[1]{\hyperref[table:#1]{Table~\ref*{table:#1}}}
+\newcommand*{\exmpref}[1]{\hyperref[exmp:#1]{Example~\ref*{exmp:#1}}}
+\newcommand*{\sectionref}[1]{\hyperref[sec:#1]{Section~\ref*{sec:#1}}}
+\newcommand*{\subsectionref}[1]{\hyperref[sec:#1]{Subsection~\ref*{sec:#1}}}
+\newcommand*{\chapterref}[1]{\hyperref[ch:#1]{Chapter~\ref*{ch:#1}}}
+
+\newcommand*{\set}[1]{\left\{#1\right\}}
+\newcommand*{\term}[1]{\textcolor{green!30!black}{#1}} % \textcolor{green!70!black} \textcolor{blue!80!black}
+\newcommand*{\pathterm}[1]{\textcolor{green!65!red!75!black}{#1}}
+\newcommand*{\type}[1]{\textcolor{magenta!90!black}{#1}}
+% \newcommand*{\dependenttype}[1]{\textcolor{magenta!70!black}{#1}}
+\newcommand*{\container}[1]{\textcolor{orange}{#1}}
+\newcommand*{\containerpair}[2]{\ensuremath{\colorlet{savedleftcolor}{.}\color{orange}\left(\color{savedleftcolor}#1\,\textcolor{orange}{\mathbf{,}}\,#2\color{orange}\right)\color{savedleftcolor}}}
+\newcommand*{\containerpairsimple}[2]{\containerpair{#1}{\lambda\,\_,\,#2}}
+\newcommand*{\universe}[1]{\textcolor{orange!80!black}{#1}}
+\newcommand*{\unit}{\type{\textbf{1}}}
+\newcommand*{\empt}{\type{\textbf{0}}}
+\newcommand*{\coalg}[2]{#1\texttt{-}#2}
+
+\newcommand*{\relation}[1]{\textcolor{gray!75!black}{\ensuremath{\mathtt{#1}}}}
+\newcommand*{\constant}[1]{\textcolor{orange!60!black}{\ensuremath{\mathtt{#1}}}}
+
+\newcommand*{\function}[1]{\textcolor{blue!60!black}{\ensuremath{\mathtt{#1}}}}
+\newcommand*{\constructor}[1]{\textcolor{purple!60!black}{\ensuremath{\mathtt{#1}}}}
+\newcommand*{\destructor}[1]{\textcolor{yellow!60!black}{\ensuremath{\mathtt{#1}}}}
+\newcommand*{\typeformer}[1]{\ensuremath{\mathtt{#1}}}
+\newcommand*{\functor}[1]{\ensuremath{\mathbf{\mathtt{#1}}}}
+
+\newcommand*{\unitelem}{\constant{\star}} % \constant{tt}
+\newcommand*{\quotientconstructor}[1]{\constructor{[}\,#1\,\constructor{]}}
+
+\newcommand*{\ssfrac}[2]{ {\LARGE \text{\sfrac{\ensuremath{#1}}{\ensuremath{#2}}}}}
+
+\newcommand*{\natcases}[2]{\ensuremath{\mathbb{[\hspace{-.5mm}\rangle}~\ensuremath{#1}~,~\ensuremath{#2}~\mathbb{\langle\hspace{-.5mm}]}}}
+
+% Concatenation of paths taken from HoTT book
+\newcommand{\ct}{%
+  \mathchoice{\mathbin{\raisebox{0.5ex}{$\displaystyle\centerdot$}}}%
+             {\mathbin{\raisebox{0.5ex}{$\centerdot$}}}%
+             {\mathbin{\raisebox{0.25ex}{$\scriptstyle\,\centerdot\,$}}}%
+             {\mathbin{\raisebox{0.1ex}{$\scriptscriptstyle\,\centerdot\,$}}}
+}
+
+\newcommand*{\sym}[1]{\ensuremath{#1^{-1}}}
+
+\begin{document}
+
+\frame{\titlepage}
+
+\end{document}
