@@ -268,8 +268,6 @@
       \type{A} \ar[r,"\pathterm{p} \ct \pathterm{q} \ct \pathterm{r}",dashed] & \type{B} \\
       \type{C} \ar[u,"\pathterm{p}^{-1}"] \ar[r,"\pathterm{q}"'] & \type{D} \ar[u,"\pathterm{r}"']
     \end{tikzcd}
-    \caption{Composition square}
-    \label{fig:cubical-composition-square}
   \end{figure}
   This work has been formalized using the Cubical Agda proof assistant.
 \end{frame}
@@ -431,8 +429,6 @@
     \begin{tikzcd}[row sep=large,column sep=large]
       \type{X}_0 & \type{X}_1 \ar[l,"\function{\pi}_{(0)}"] & \cdots \ar[l,"\function{\pi}_{(1)}"] & \type{X}_n \ar[l,"\function{\pi}_{(n-1)}"] & \type{X}_{n + 1} \ar[l,"\function{\pi}_{(n)}"] & \cdots \ar[l,"\function{\pi}_{(n+1)}"]
     \end{tikzcd}
-    \caption{Chain of types / functions}
-    \label{fig:x-chain}
   \end{figure}
   \begin{defn}\setlengths
     The limit of a chain is given as
@@ -458,8 +454,6 @@
       \type{X}_0 & \type{X}_1 \ar[l,"\function{\pi}_{(0)}"] & \cdots \ar[l,"\function{\pi}_{(1)}"] & \type{X}_n \ar[l,"\function{\pi}_{(n-1)}"] & \type{X}_{n + 1} \ar[l,"\function{\pi}_{(n)}"] & \cdots \ar[l,"\function{\pi}_{(n+1)}"] \\
       & & \type{C} \ar[ull,"\function{f}_0"] \ar[ul,"\function{f}_1"'] \ar[u,draw=none,"\cdots" description] \ar[ur,"\function{f}_n"] \ar[urr,"\function{f}_{n+1}"'] \ar[urrr,draw=none,"\cdots"'] & 
     \end{tikzcd}
-    \caption{Cone}
-    \label{fig:M-seq-cone}
   \end{figure}
 \end{frame}
 
@@ -559,7 +553,6 @@
       \functor{P}\,\typeformer{M}_{\container{S}} \ar[d,shift left,"\function{in}"] \\
       \typeformer{M}_{\container{S}} \ar[u,shift left,"\function{out}"]
     \end{tikzcd}
-    \caption{\texttt{M}-type diagram}
   \end{figure}
 \end{frame}
 
@@ -587,7 +580,6 @@
       \type{A} \ar[dr,"\destructor{hd}"'] & \type{A} \times \typeformer{Stream}~\type{A} \ar[d,shift left,"\function{in}"] \ar[l,"\pi_1"'] \ar[r,"\pi_2"] & \typeformer{Stream}~\type{A} \ar[dl,"\destructor{tl}"] \\
       & \typeformer{Stream}~\type{A} \ar[u,shift left,"\function{out}"]
     \end{tikzcd}
-    \caption{Streams}
   \end{figure}
 \end{frame}
 
@@ -795,7 +787,40 @@
 \subsection{Rules for Construction M-types}
 \begin{frame}
   \frametitle{Rules for Constructing \texttt{M}-types}
-  
+  Adding containers \(\containerpair{\type{A}}{\typeformer{B}}\) and \(\containerpair{\type{C}}{\typeformer{D}}\) for two constructors together is done by
+\begin{equation}
+  \containerpair{\type{A} + \type{C}}{ \begin{cases} \typeformer{B}\,\term{a} & \mathtt{inl}~\term{a} \\ \typeformer{D}\,\term{c} & \mathtt{inr}~\term{c} \end{cases}}
+\end{equation}
+whereas adding containers for two destructors is done by
+\begin{equation}
+  \containerpairsimple{\type{A} \times \type{C}}{\lambda\,(\term{a},\term{c}),~\typeformer{B}\,\term{a} + \typeformer{D}\,\term{c}}  
+\end{equation}
+However combining both destructors and constructors is not as simple, which is also the case if we use records or other constructions to define such types.
+\end{frame}
+
+\begin{frame}
+  \frametitle{Rules for Constructing \texttt{M}-types}
+  Given a record, which is a list of fields \(\term{f}_1 : \type{F}_1,\term{f}_2 : \type{F}_2,\dots,\term{f}_n : \type{F}_n\), we can construct the \texttt{M}-types by the container
+\begin{equation}
+  \containerpairsimple{\type{F}_1 \times \type{F}_2 \times \dots \times \type{F}_n}{\empt}
+\end{equation}
+where each destructor \(\destructor{d_n} : \type{T} \rightarrow \type{F_n}\) for the field \(\term{f}_n\) will be defined as \(\destructor{d_n}~\term{t} = \pi_n~(\function{out}~\term{t})\). However fields in a coinductive record may depend on previous defined fields.
+\begin{equation}
+  \containerpairsimple{\sum_{(\term{f}_1 : \type{F}_1)} \sum_{(\term{f_2} : \typeformer{F}_2)} \cdots \sum_{(\term{f}_{n-1} : \typeformer{F}_{n-1})}\typeformer{F}_n}{\empt}
+\end{equation}
+even in a dependent way
+\begin{equation}
+  \containerpair{\sum_{(\type{f}_1 : \universe{\mathcal{U}})} \left(\unit \times \sum_{(\term{f}_3 : \typeformer{F}_3)} \cdots \sum_{(\term{f}_{n-1} : \typeformer{F}_{n-1})}\typeformer{F}_n\right)}{\lambda\,(\type{f}_1,\unitelem,\term{f}_3,\dots),\typeformer{F}_2}
+\end{equation}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Rules for Constructing \texttt{M}-types}
+  Another case is that the type of a field is dependent, but by currying we get
+  \begin{equation}
+    \containerpair{\sum_{(\type{f}_1 : \universe{\mathcal{U}})} \sum_{(\term{f}_3 : \typeformer{F_3})} \cdots \sum_{(\term{f}_{n-1} : \typeformer{F_{n-1}})}\typeformer{F_n}}{\lambda\,(\type{f}_1,\term{f}_3,\dots),\sum_{(\term{x} : \type{f}_1)} (\typeformer{B}\,\term{x})}
+  \end{equation}
+  so we expect that a type defined as a (coinductive) record is equal to the version defined as a \texttt{M}-type. However, this has not been shown formally.
 \end{frame}
 
 \section{Q\texttt{M}-types}
@@ -803,6 +828,245 @@
 \begin{frame}
   \frametitle{Overview}
   \tableofcontents[currentsection,subsubsectionstyle=hide]
+\end{frame}
+
+\begin{frame}
+  \frametitle{Q\texttt{M}-types}
+  We will start by looking at two ways of quotienting \texttt{M}-types. \\
+  Set truncated quotients and  quotient inductive-inductive type (QIIT). A QIIT is a type that is defined at the same time as a relation over that type and then set truncated.
+\end{frame}
+
+\begin{frame}
+  \frametitle{Multiset}
+  We construct the type of multisets as a Q\texttt{M}-type and as a QIIT and show these are equal. The base type is given by
+  \begin{defn}\setlengths
+    We define \(\type{A}\)-valued \(\mathbb{N}\)-branching trees \(\typeformer{T}\,\type{A}\) as the \texttt{M}-type defined by the container
+    \begin{equation}
+      \containerpair{\type{A}+\unit}{[\empt , \mathbb{N}]}
+    \end{equation}
+    For which we get the constructors\\
+      \strut
+      \hfill
+      \begin{minipage}[b]{0.30\linewidth}
+        \begin{equation}
+          \vcenter{\infer{\constructor{leaf}~\term{a} : \typeformer{T}\,\type{A}}{\term{a} : \type{A}}}
+        \end{equation}
+      \end{minipage}
+      \hfill
+      \begin{minipage}[b]{0.30\linewidth}
+        \begin{equation}
+          \vcenter{\infer{\constructor{node}~\function{f} : \typeformer{T}\,\type{A}}{\function{f} : \mathbb{N} \rightarrow \typeformer{T}\,\type{A}}}
+        \end{equation}
+      \end{minipage}
+      \hfill
+      \strut
+    \end{defn}
+    The QIIT is defined by the point constructors \(\constructor{leaf}\) and \(\constructor{node}\), and equality constructors
+    \begin{equation}
+      \vcenter{\infer[\constructor{perm}]{\constructor{node}~\function{f}~\equiv~\constructor{node}~(\function{f} \circ \function{g})}{\function{f} : \mathbb{N} \rightarrow \typeformer{T}\,\type{A} & \function{g} : \mathbb{N} \rightarrow \mathbb{N} & \mathtt{isIso}~\function{g}}}
+    \end{equation}
+    and \(\constructor{MS\text{-}isSet}\) which set truncates the type.    
+\end{frame}
+
+\subsection{Multisets}
+\begin{frame}
+  \frametitle{Multisets}
+  We get the Q\texttt{M}-type for multisets by quotienting the tree type by the relation defined by the constructors\\
+  \strut
+  \hfill
+  \begin{minipage}{0.35\linewidth}
+    \begin{equation}
+      \vcenter{\infer[\constructor{\sim_{leaf}}]{\constructor{leaf}~\term{x}~\relation{\sim_{T}}~\constructor{leaf}~\term{y}}{\term{x} \equiv \term{y}}}
+    \end{equation}
+  \end{minipage}
+  \hfill
+  \begin{minipage}{0.35\linewidth}
+    \begin{equation}
+      \vcenter{\infer[\constructor{\sim_{node}}]{\constructor{node}~\function{f}~\relation{\sim_T}~\constructor{node}~\function{g}}{\prod_{(n : \mathbb{N})} \function{f}~n~\relation{\sim_T}~\function{g}~n}}
+    \end{equation}
+  \end{minipage}
+  \hfill
+  \strut
+  \begin{equation}
+    \vcenter{\infer[\constructor{\sim_{perm}}]{\constructor{node}~\function{f}~\relation{\sim_T}~\constructor{node}~(\function{f} \circ \function{g})}{\function{f} : \mathbb{N} \rightarrow \typeformer{T}\,\type{A} & \function{g} : \mathbb{N} \rightarrow \mathbb{N} & \mathtt{isIso}~\function{g}}}
+  \end{equation}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Multisets}
+  We define a function between the two definitions
+    \begin{equation}
+    \begin{aligned}
+      &\function{T{\rightarrow}MS}~(\constructor{leaf}_{\typeformer{T}}~\term{x}) = \constructor{leaf}_{\typeformer{MS}}~\term{x} \\
+      &\function{T{\rightarrow}MS}~(\constructor{node}_{\typeformer{T}}~\function{f}) = \constructor{node}_{\typeformer{MS}}~(\function{T{\rightarrow}MS} \circ \function{f})
+    \end{aligned}
+  \end{equation}
+  \begin{lem}
+    If \(\term{x}, \term{y} : \typeformer{T}\,\type{A}\) are weakly bisimilar \(\term{p} : \term{x}~\relation{\sim_{T}}~\term{y}\) then \(\function{T{\rightarrow}MS}~\term{x} \equiv \function{T{\rightarrow}MS}~\term{y}\).
+  \end{lem}
+  \begin{proof}\setlengths
+    We do the proof by casing on the constructor for the weak bisimilarity.
+    \begin{equation}
+      \begin{aligned}
+        &\function{T{\rightarrow}MS\text{-}{\sim}{\rightarrow}{\equiv}}~(\constructor{\sim_{leaf}}~\pathterm{p}) = \mathtt{ap}~\constructor{leaf}_{\typeformer{MS}}~\pathterm{p} \\
+        &\function{T{\rightarrow}MS\text{-}{\sim}{\rightarrow}{\equiv}}~(\constructor{\sim_{node}}~\function{k}) = \mathtt{ap}~\constructor{node}_{\typeformer{MS}}~(\mathtt{funExt}~(\function{T{\rightarrow}MS\text{-}{\sim}{\rightarrow}{\equiv}} \circ \function{k})) \\
+        &\function{T{\rightarrow}MS\text{-}{\sim}{\rightarrow}{\equiv}}~(\constructor{\sim_{perm}}~\function{f}~\function{g}~\term{e}) = \constructor{perm}~(\function{T{\rightarrow}MS} \circ \function{f})~\function{g}~\term{e}
+      \end{aligned}
+    \end{equation}
+  \end{proof}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Multisets}
+  With this lemma, we can lift the function \(\function{T{\rightarrow}MS}\) to the quotient, using the recursor for quotients. We now show that this function is injective and surjective. We start with a helper lemma.
+  \\ \\
+  \begin{lem}
+    Given an equality \(\function{T{\rightarrow}MS}~\term{x} \equiv \function{T{\rightarrow}MS}~\term{y}\) then \(\term{x}~\relation{\sim_{T}}~\term{y}\).
+  \end{lem}
+  \begin{proof}
+    If \(\term{x}\) and \(\term{y}\) are leaves with values \(\term{a}\) and \(\term{b}\) then \(\term{a} \equiv \term{b}\) by the injectivity of the constructor \(\constructor{leaf}_{\typeformer{MS}}\), giving us the wanted bisimilarity by \(\constructor{\sim_{leaf}}\). If \(\term{x}\) and \(\term{y}\) are nodes defined by functions \(\function{f}\) and \(\function{g}\), then by the injectivity of the constructor \(\constructor{node}_{\typeformer{MS}}\), we get \(\prod_{(n : \mathbb{N})} \function{f}~n \equiv \function{g}~n\) and by induction we get \(\prod_{(n : \mathbb{N})} \function{f}~n~\relation{\sim_{T}}~\function{g}~n\), making us able to use \(\constructor{\sim_{node}}\) to construct the bisimilarity. We do not get any other equalities, since \(\constructor{leaf}_{\typeformer{MS}}\) and \(\constructor{node}_{\typeformer{MS}}\) are disjoint.
+  \end{proof}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Multiset}
+  \begin{lem}
+    The function \(\function{T/{\sim}{\rightarrow}MS}\) is injective, meaning \\
+    \(\function{T/{\sim}{\rightarrow}MS}~\term{x} \equiv \function{T/{\sim}{\rightarrow}MS}~\term{y}\) implies \(\term{x} \equiv \term{y}\).
+  \end{lem}\setlengths
+  \begin{proof}
+    We show injectivity by doing propositional elimination, with
+    \begin{equation}
+      \typeformer{P} = (\lambda\,\term{x},~\function{T/{\sim}{\rightarrow}MS}~\term{x} \equiv \function{T/{\sim}{\rightarrow}MS}~\term{y} \rightarrow \term{x} \equiv \term{y})
+    \end{equation}
+    then
+    \begin{equation}
+      \function{elimProp}~(\lambda\,\term{a},~\function{elimProp} (\lambda\,\term{b},~\constructor{eq/}~\term{a}~\term{b} \circ \function{T{\rightarrow}MS\text{-}{\equiv}{\rightarrow}{\sim}}~\term{a}~\term{b})~\term{y})~\term{x}
+    \end{equation}
+  \end{proof}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Multiset}
+  \begin{defn}
+    We define the propositional eliminator for \(\typeformer{MS}\).
+    \begin{equation}
+      \begin{aligned}
+        &\function{elimProp_{MS}}~(\constructor{leaf}~\term{x}) = \function{P_{leaf}}~\term{x} \\
+        &\function{elimProp_{MS}}~(\constructor{node}~\term{f}) = \function{P_{node}}~(\function{elimProp_{MS}} \circ f) \\[1mm]
+        &\function{elimProp_{MS}}~(\constructor{perm}~\function{f}~\function{g}~\term{e}~i) = \\[-1mm]
+        &\quad\function{isProp{\rightarrow}isDepProp}~\function{P_{prop}}~\\
+        &\quad\qquad(\function{elimProp_{MS}}~(\constructor{node}~\function{f}))~(\function{elimProp_{MS}}~(\constructor{node}~(\function{f} \circ \function{g})))\\[-1mm]
+        &\quad\qquad(\constructor{perm}~\function{f}~\function{g}~\term{e})~i \\[1mm]
+        &\function{elimProp_{MS}}~(\constructor{MS\text{-}isSet}~\term{a}~\term{b}~\pathterm{p}~\pathterm{q}~i~j) = \\[-1mm]
+        &\quad\function{isSet{\rightarrow}isDepSet}~(\function{isProp{\rightarrow}isSet} \circ \function{P_{prop}})~\\
+        &\quad\qquad(\function{elimProp_{MS}}~\term{a})~(\function{elimProp_{MS}}~\term{b})\\[-1mm]
+        &\quad\qquad(\mathtt{ap}~\function{elimProp_{MS}}~\pathterm{p})~(\mathtt{ap}~\function{elimProp_{MS}}~\pathterm{q})\\
+        &\quad\qquad(\constructor{MS\text{-}isSet}~\term{a}~\term{b}~\pathterm{p}~\pathterm{q})~i~j \\
+      \end{aligned}
+    \end{equation}
+  \end{defn}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Multiset}
+  \begin{lem}
+    The function \(\function{T/{\sim}{\rightarrow}MS}\) is surjective, assuming the axiom of countable choice. Being surjective means for all \(\term{b} : \typeformer{MS}\,\type{X}\) we have \(\| \Sigma_{(\term{x} : \typeformer{T}\,\type{X} / \relation{\sim_{T}})}~\function{T/{\sim}{\rightarrow}MS}~\term{x} \equiv \term{b} \|\).
+  \end{lem}
+    \begin{block}{Proof.}\setlengths
+      We do propositional elimination of \(\typeformer{MS}~\type{X}\), with
+      \begin{equation}
+        \typeformer{P}~\term{y} = \| \Sigma_{(\term{x} : \typeformer{T}\,\type{X} / \relation{\sim_{T}})}~\function{T/{\sim}{\rightarrow}MS}~\term{x} \equiv \term{y} \|
+      \end{equation}
+      For the leaf case, we have the simple equality
+      \begin{equation}
+        \function{T/{\sim}{\rightarrow}MS}~\quotientconstructor{\constructor{leaf}_{\typeformer{T}}~\term{x} / \relation{\sim_{T}}} \equiv \constructor{leaf}_{\typeformer{MS}}~\term{x}
+      \end{equation}
+      For the node case with \(\constructor{node}~\function{f}\), we get the following function by induction
+    \begin{equation}
+      \function{f'} : \prod_{(n : \mathbb{N})} \bigg\| \sum_{(\term{y} : \typeformer{T}\,\type{X} / \relation{\sim_{T}})} \function{T/{\sim}{\rightarrow}MS}~\term{y} \equiv \function{f}\,n \bigg\|
+    \end{equation}
+  \end{block}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Multiset}
+  \begin{block}{Proof. (cont.)}\setlengths
+    Using the axiom of countable choice, we get
+    \begin{equation}
+      \bigg\| \prod_{(n : \mathbb{N})} \sum_{(\term{y} : \typeformer{T}\,\type{X} / \relation{\sim_{T}})} \function{T/{\sim}{\rightarrow}MS}~\term{y} \equiv \function{f}\,n \bigg\|
+    \end{equation}
+    By the surjectivity of \(\quotientconstructor{{\cdot}}\) we get
+    \begin{equation}
+      \bigg\| \prod_{(n : \mathbb{N})} \sum_{(\term{y} : \typeformer{T}\,\type{X})} \function{T{\rightarrow}MS}~\term{y} \equiv \function{f}\,n \bigg\|
+    \end{equation}
+    By swapping \(\Pi\) and \(\Sigma\) and functional extensionality we get
+    \begin{equation}
+      \bigg\| \sum_{(\term{g} : \mathbb{N} \rightarrow \typeformer{T}\,\type{X})} \function{T{\rightarrow}MS} \circ \function{g} \equiv \function{f} \bigg\|
+    \end{equation}
+    which gives us the equalities
+    \begin{equation}
+      \function{T/{\sim}{\rightarrow}MS}~\quotientconstructor{\constructor{node}~\function{g}} \equiv \constructor{node}~\function{f}
+    \end{equation}
+    completing the case for the node constructor and thereby the proof. \qed
+  \end{block}
+\end{frame}
+
+\subsection{Partiality Monad}
+\begin{frame}
+  \frametitle{Partiality Monad}
+  \textcolor{red}{TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO}
+\end{frame}
+
+\subsection{Alternative Quotient \texttt{M}-type (QPF)}
+\begin{frame}
+  \frametitle{Quotient Polynomial Functor (QPF)}
+  We can define quotiented \texttt{M}-types from a quotient polynomial functor.
+  \begin{defn}[Quotient Polynomial Functor]\setlengths
+    We define a quotient polynomial functor (QPF), for types as
+    \begin{equation}
+      \functor{F}\,\type{X} =  \sum_{(\term{a} : \type{A})} ((\typeformer{B}\,\term{a} \rightarrow \type{X}) / \relation{\sim}_{\term{a}})
+    \end{equation}
+    and for a function \(\function{f} : \type{X} \rightarrow \type{Y}\), we use the quotient eliminator with
+    \begin{equation}
+      \typeformer{P} = \lambda\,\_, (\typeformer{B}\,\term{a} \rightarrow \type{Y})/\relation{\sim}_{\term{a}}
+    \end{equation}
+    The base case is \(\function{f} = \lambda\,\_,\quotientconstructor{\function{f} \circ \function{g}}\) and equality case is \(\function{f_{eq}} = \lambda\,\function{x}\,\function{y}\,\term{r},~\constructor{eq/}~(\function{f} \circ \function{x})~(\function{f} \circ \function{y})~(\function{\sim_{ap}}~\function{f}~\term{r})\), where \(\function{\sim_{ap}}\) says that given a function \(\function{f}\) and \(\function{x}~\relation{\sim}_{\term{a}}~\function{y}\) then \(\function{f} \circ \function{x}~\relation{\sim}_{\term{a}}~\function{f} \circ \function{y}\). With this the definition for the quotient polynomial functor for functions is
+    \begin{equation}
+      \functor{F}\,\function{f}~(\term{a} , \function{g}) = (\term{a} , \function{elim}~\function{g})
+    \end{equation}
+    completing the definition of a quotiented polynomial functor.
+  \end{defn}
+\end{frame}
+
+\begin{frame}[fragile]
+  \frametitle{Alternative Construction of Q\texttt{M}-types}
+  If there is a function \(\function{abs}_{\type{X}} : \functor{P}\,\type{X} \rightarrow \functor{F}\,\type{X}\) that makes the diagram bellow commute, then we can construct the final \(\functor{F}\)-coalgebra, to get another notion of quotiented \texttt{M}-type.
+  \begin{figure}[h]
+    \centering
+    \begin{tikzcd}
+      \functor{P}\,\type{X} \ar[r,"\functor{P}\,\function{f}"] \ar[d,"\function{abs}_{\type{X}}"'] & \functor{P}\,\type{Y} \ar[d,"\function{abs}_{\type{Y}}"] \\
+      \functor{F}\,\type{X} \ar[r,"\functor{F}\,\function{f}"] & \functor{F}\,\type{Y}
+    \end{tikzcd}
+  \end{figure}
+  % If \(\function{abs}\) is surjective, then the square will commute. % TODO: <- NOTE
+  We get a surjective function \(\function{QM\text{-}intro} : \typeformer{M}_{\container{S}} \rightarrow \typeformer{M}_{\container{S}} / \relation{\sim}\) from this construction. The function is given as \(\function{abs}_{\typeformer{M}}\), which is the instantiation of \(\function{abs}\) between the limits of the two sequences. 
+\end{frame}
+
+\begin{frame}
+  \frametitle{Construction QIITs}
+  We can construct a QIIT from a M-type and a relation, by defining them simultanouosly, and we can then show, it equal to the Q\texttt{M}-type by giving
+  \begin{itemize}
+  \item A function \function{QM{\rightarrow}QIIT} from Q\texttt{M} to QIIT, taking the Q\texttt{M} constructors to their corresponding QIIT constructor.
+  \item A proof \(\function{QM{\rightarrow}QIIT\text{-}{\sim}{\rightarrow}{\equiv}}\) that \(\term{x}~\relation{\sim_{QM}}~\term{y}\) implies \(\function{QM{\rightarrow}QIIT}~\term{x} \equiv \function{QM{\rightarrow}QIIT}~\term{y}\), which should follow by the constructors we added to the QIIT for the relation.
+  \item Lifting \(\function{QM{\rightarrow}QIIT}\) to \(\function{QM/{\sim}{\rightarrow}QIIT}\) using the quotient recursor with \(\function{QM{\rightarrow}QIIT\text{-}{\sim}{\rightarrow}{\equiv}}\) and \(\constructor{QIIT\text{-}isSet}\)
+  \item Showing injectivity by using propositional elimination of the quotient together with the inverse of \(\function{QM{\rightarrow}QIIT\text{-}{\sim}{\rightarrow}{\equiv}}\), namely \(\function{QM{\rightarrow}QIIT\text{-}injective}\) saying that \(\function{QM{\rightarrow}QIIT}~\term{x} \equiv \function{QM{\rightarrow}QIIT}~\term{y}\) implies \(\term{x}~\relation{\sim_{QM}}~\term{y}\), which again should follow from how the relations constructors were defined.
+  \item Lastly we show surjectivity by induction using the eliminator of QIIT and the axiom of choice and the surjectivity of \(\quotientconstructor{{\cdot}}\).
+  \end{itemize}  
+\end{frame}
+
+\begin{frame}
+  However this is not enough...
 \end{frame}
 
 \section{Conclusion}
