@@ -232,7 +232,7 @@ This equivalence relation does not give an equality in MLTT; we just get bisimil
 \begin{equation}
   (\type{A} = \type{B}) \simeq (\type{A} \simeq \type{B})
 \end{equation}
-meaning if two types are equivalent, then there is an equality between them. This makes (strong) bisimilarity imply equality, solving the problem described for \(\relation{\sim_{stream}}\). The univalent foundation we will be using is \textbf{Homotopy type theory (HoTT)} \cite{hottbook}. HoTT is an intensional dependent type theory (built on MLTT) with the univalence axiom and higher inductive types. In HoTT the identity types form path spaces, so proofs of identity are not merely \texttt{refl} which was the case in MLTT. Types are seen as spaces and we think of \(\term{a} : \type{A}\) as \(\term{a}\) being a point in the space \(\type{A}\). Functions are similarly regarded as continuous maps from one space to another \cite{nlab:homotopy_type_theory}. As such we can construct higher inductive types, with point constructors as well as equality constructors. One of the problems with "plain" HoTT is that the univalence axiom is just postulated, meaning it is not constructive. To remedy this, we will be working in a \textbf{cubical type theory (CTT)} \cite{DBLP:CTT}, where the univalence axiom is a provable statement. This means we get constructivity of univalence axiom and application thereof \cite{nlab:cubical_type_theory}.  The reason for the name cubical type theory is that composition is defined by squares. We can provide three sides of a square to get the last one, see \figref{cubical-composition-square}.
+meaning if two types are equivalent, then there is an equality between them. This makes (strong) bisimilarity imply equality, solving the problem described for \(\relation{\sim_{stream}}\). The univalent foundation we will be using is \textbf{Homotopy type theory (HoTT)} \cite{hottbook}. HoTT is an intensional dependent type theory (built on MLTT) with the univalence axiom and higher inductive types. In HoTT the identity types form path spaces, so proofs of identity are not merely \texttt{refl} which was the case in MLTT. Types are seen as spaces and we think of \(\term{a} : \type{A}\) as \(\term{a}\) being a point in the space \(\type{A}\). Functions are similarly regarded as continuous maps from one space to another \cite{nlab:homotopy_type_theory}. As such we can construct higher inductive types, with point constructors as well as equality constructors. One of the problems with "plain" HoTT is that the univalence axiom is just postulated, meaning it is not constructive. To remedy this, we will be working in a \textbf{cubical type theory (CTT)} \cite{DBLP:CTT}, where the univalence axiom is a provable statement. This means we get constructivity of the univalence axiom and application thereof \cite{nlab:cubical_type_theory}.  The reason for the name cubical type theory is that composition is defined by squares. We can provide three sides of a square to get the last one, see \figref{cubical-composition-square}.
 \begin{figure}[h]
   \centering
   \begin{tikzcd}
@@ -348,7 +348,7 @@ We start by introducing containers and polynomial functors.
   \begin{equation}
     \begin{aligned}
       &\functor{P}_{\container{S}} : \universe{\mathcal{U}} \rightarrow \universe{\mathcal{U}} \\
-      &\functor{P}_{\container{S}}\,\type{X} = \sum_{(\term{a} : \type{A})} \typeformer{B}(\term{a}) \rightarrow \type{X}
+      &\functor{P}_{\container{S}}\,\type{X} = \sum_{(\term{a} : \type{A})} \typeformer{B}~\term{a} \rightarrow \type{X}
     \end{aligned}
   \end{equation}
   and for a function \(\function{f} : \type{X} \rightarrow \type{Y}\) as
@@ -447,7 +447,8 @@ We start by introducing containers and polynomial functors.
     \type{\mathcal{L}} = \sum_{(\term{x} : \prod_{(n : \mathbb{N})} \type{X}_n)} \prod_{(n : \mathbb{N})} (\function{\pi}_{(n)}~\term{x}_{n+1} \equiv \term{x}_n)
   \end{equation}
 \end{defn}
-\begin{lem}\label{lem:limit-collapse}
+\begin{lem}
+  \label{lem:limit-collapse}
   Given \(\function{\ell} : \prod_{(n : \mathbb{N})} (\type{X}_{n} \rightarrow \type{X}_{n+1})\) and \(\term{y} : \sum_{\left(\term{x} : \prod_{(n : \mathbb{N})} \type{X}_n\right)} \term{x}_{n + 1} \equiv \function{\ell}_n~\term{x}_n\) we get the equality \(\type{\mathcal{L}} \equiv \type{X}_0\).
   \begin{proof}
     We define the equality by the following isomorphism
@@ -459,7 +460,8 @@ We start by introducing containers and polynomial functors.
     where \(\function{\ell}^{(n)} = \function{\ell}_n \circ \function{\ell}_{n-1} \circ \dots \circ \function{\ell}_1 \circ \function{\ell}_0\). To define \(\function{linv}_{\pathterm{\mathcal{L}collapse}}~(\term{x} , \pathterm{r})\), we first define a fiber \((\type{X} , \term{z}, \function{\ell})\) over \(\mathbb{N}\) given some \(\term{z} : \type{X}_0\). Then any element of the type \(\sum_{\left(\term{x} : \prod_{(n : \mathbb{N})} \type{X}_n\right)} \term{x}_{n + 1} \equiv \function{\ell}_n~\term{x}_n\) is equal to a section over the fiber we defined. This means \(\term{y}\) is equal to a section. Since the sections are defined over \(\mathbb{N}\), which is an initial algebra for the functor \(\functor{G}\type{Y} = \unit + \type{Y}\), we get the sections are contractible. This means \(\term{y} \equiv \function{inv}_{\pathterm{\mathcal{L}collapse}} (\function{fun}_{\pathterm{\mathcal{L}collapse}}~\term{y})\) by uniqueness argument, since both sides of the equality are equal to sections over \(\mathbb{N}\).
 \end{proof}
 \end{lem}
-\begin{lem}\label{lem:function-to-M-type-is-cone}
+\begin{lem}
+  \label{lem:function-to-M-type-is-cone}
   For all coalgebras \(\coalg{\type{C}}{\function{\gamma}}\) defined over the container \(\container{S}\), we get \(\type{C} \rightarrow \typeformer{M}_{\container{S}} \equiv \typeformer{Cone}_{\coalg{\type{C}}{\function{\gamma}}}\), where \(\typeformer{Cone} = \sum_{(\function{f} : \prod_{(n : \mathbb{N})} \type{C} \rightarrow \type{X}_n)} \prod_{(n : \mathbb{N})} \function{\pi}_{(n)} \circ \function{f}_{n+1} \equiv \function{f}_n\) (illustrated in \figref{M-seq-cone}).
   \begin{figure}[h]
     \centering
@@ -541,7 +543,7 @@ We start by introducing containers and polynomial functors.
   By defining a function \(\function{\phi} : \typeformer{Cone}_{\coalg{\type{C}}{\function{\gamma}}} \rightarrow \typeformer{Cone}_{\coalg{\type{C}}{\function{\gamma}}}\) as \(\function{\phi}~(\function{u},\function{g}) = (\function{\phi}_0~\function{u},\function{\phi}_1~\function{u}~\function{g})\) where
   \begin{align}
     \function{\phi}_0~\function{u} &= \natcases{(\lambda\,\_, \unitelem)}{\functor{P}\function{f} \circ \function{\gamma} \circ \function{u}} \\
-    \function{\phi}_1~\function{u}~\function{g} &= \natcases{\mathtt{funExt}~\lambda\,\_, \mathtt{refl}_{\unitelem}}{\mathtt{ap}~(\functor{P}\function{f} \circ \function{\gamma}) \circ \function{g}}
+    \function{\phi}_1~\function{u}~\function{g} &= \natcases{\mathtt{funExt}~(\lambda\,\_, \mathtt{refl}_{\unitelem})}{\mathtt{ap}~(\functor{P}\function{f} \circ \function{\gamma}) \circ \function{g}}
   \end{align}
   we get the commuting square in \figref{commuting-square},
     \begin{figure}[b]
@@ -602,7 +604,7 @@ We can now construct a coinduction principle for \texttt{M}-types, which gives e
       \caption{Bisimulation principle for final coalgebra}
       \label{fig:final-coalgebra-coinduction}
     \end{figure}
-    By the finality of \(\coalg{\typeformer{M}}{\function{out}}\), we get a function \(\constant{!}\) from \(\typeformer{M}\) to \(\type{\overline{R}}\), which is unique, meaning \(\pi_1^{\type{\overline{\mathcal{R}}}} \equiv ~\constant{!} \equiv \pi_2^{\type{\overline{\mathcal{R}}}}\). Now if we are given \(\term{r} : \term{x}~\relation{\mathcal{R}}~\term{y}\), we can construct the equality
+    By the finality of \(\coalg{\typeformer{M}}{\function{out}}\), we get a function \(\constant{!}\) from \(\type{\overline{R}}\) to \(\typeformer{M}\), which is unique, meaning \(\pi_1^{\type{\overline{\mathcal{R}}}} \equiv ~\constant{!} \equiv \pi_2^{\type{\overline{\mathcal{R}}}}\). Now if we are given \(\term{r} : \term{x}~\relation{\mathcal{R}}~\term{y}\), we can construct the equality
     \begin{equation}
       \term{x} \equiv \pi_1^{\type{\overline{\mathcal{R}}}} (\term{x}, \term{y}, \term{r}) \equiv \pi_2^{\type{\overline{\mathcal{R}}}} (\term{x}, \term{y}, \term{r}) \equiv \term{y}.
     \end{equation}
@@ -705,7 +707,7 @@ where \(\type{R}\) is the type for returned values, while \(\typeformer{E}\) is 
   \begin{proof}
     We combine the constructions of the delay monad and \(\type{R}\)-valued \(\typeformer{E}\)-event trees into the container
     \begin{equation}
-      \container{S} = \containerpair{\type{R}+\unit+\sum_{(\type{A}:\universe{\mathcal{U}})} (\typeformer{E}\,\type{A})}{\begin{cases} \empt & \texttt{inl}~r \\ \unit & \texttt{inl}~(\texttt{inl}~\unitelem) \\ \type{A} & \texttt{inr}~(\texttt{inr}~(\type{A},\term{e})) \end{cases}}.
+      \container{S} = \containerpair{\type{R}+\unit+\sum_{(\type{A}:\universe{\mathcal{U}})} (\typeformer{E}\,\type{A})}{\begin{cases} \empt & \texttt{inl}~\term{r} \\ \unit & \texttt{inl}~(\texttt{inl}~\unitelem) \\ \type{A} & \texttt{inr}~(\texttt{inr}~(\type{A},\term{e})) \end{cases}}.
     \end{equation}
     \noindent for which the reduced polynomial functor is
     \begin{equation}
