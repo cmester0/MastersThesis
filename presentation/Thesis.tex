@@ -1,0 +1,701 @@
+\documentclass[xelatex,mathserif,serif,notheorems]{beamer} % ,notheorems
+\mode<presentation>{
+  %% BEAMER CONFIG %%
+  \usetheme{Madrid}
+  \setbeamertemplate{navigation symbols}{}
+  \setbeamersize{text margin left=0.5cm,text margin right=0.5cm}
+  \usefonttheme[onlymath]{serif}
+}
+
+% \usepackage[latin1]{inputenc}
+\usepackage[english]{babel}
+% \usepackage{a4}
+\usepackage{latexsym}
+\usepackage{amssymb}
+\usepackage{amsmath}
+\usepackage{epsfig}
+\usepackage[T1]{fontenc}
+% \usepackage{mathptmx} % Use Times New Romans as font?
+\usepackage{color}
+\usepackage{epstopdf}
+\usepackage{microtype}
+\usepackage{hyperref}
+\usepackage[useregional]{datetime2}
+\DTMlangsetup[en-US]{showdayofmonth=false}
+\usepackage{lipsum}
+
+\usepackage{marvosym}
+
+\renewcommand*\sfdefault{lmss}
+\renewcommand*\ttdefault{txtt}
+
+% Information to be included in the title page:
+\title{(Q)\texttt{M}-types and Coinduction in HoTT / CTT}
+\subtitle{Master's Thesis, Computer Science}
+\author{\large Lasse Letager Hansen, 201508114\\[1ex]{\small Supervisor: Bas Spitters}}
+\institute{Aarhus University}
+\date{\today}
+
+\renewcommand{\insertshortauthor}{Lasse Letager Hansen}
+\titlegraphic{
+  \epsfig{file=logo.eps}
+}
+
+% Custom packages added:
+
+% \usepackage{fullpage}
+% \setlength\marginparwidth{0.7in}
+
+\usepackage{todonotes} % \todo command
+
+\usepackage{proof} % \infer command
+
+\usepackage{tikz-cd}
+\usepackage{xfrac} % \sfrac - sideways fraction
+
+
+% \usepackage{mathtools} % multlined
+
+% allow breaks in align and equation (a new page for example)
+\allowdisplaybreaks
+
+\renewcommand{\thefootnote}{\fnsymbol{footnote}} %footnote style
+
+\usepackage{amsthm}
+
+% \newtheoremstyle{plain}
+% {\abovedisplayskip}   % ABOVESPACE
+% {\belowdisplayskip}   % BELOWSPACE
+% {\itshape}  % BODYFONT
+% {0pt}       % INDENT (empty value is the same as 0pt)
+% {\bfseries} % HEADFONT
+% {.}         % HEADPUNCT
+% {5pt plus 1pt minus 1pt} % HEADSPACE
+% {}          % CUSTOM-HEAD-SPEC
+\theoremstyle{plain} % default
+\newtheorem{thm}{Theorem}[section]
+\newtheorem{lem}[thm]{Lemma}
+\newtheorem{prop}[thm]{Proposition}
+\newtheorem{cor}{Corollary}
+
+\theoremstyle{definition}
+\newtheorem{defn}[thm]{Definition}% [section]
+\newtheorem{conj}{Conjecture}[section]
+\newtheorem{exmp}{Example} % [section]
+
+\theoremstyle{remark}
+\newtheorem*{rem}{Remark}
+% \newtheorem*{note}{Note} % Not used?
+\newtheorem{case}{Case}
+
+% Custom commands
+
+\newcommand*{\thmref}[1]{\hyperref[thm:#1]{Theorem~\ref*{thm:#1}}} % Theorem~\ref
+\newcommand*{\lemref}[1]{\hyperref[lem:#1]{Lemma~\ref*{lem:#1}}}
+\newcommand*{\corref}[1]{\hyperref[cor:#1]{Corollary~\ref*{cor:#1}}}
+\newcommand*{\defref}[1]{\hyperref[defn:#1]{Definition~\ref*{defn:#1}}}
+\newcommand*{\figref}[1]{\hyperref[fig:#1]{Figure~\ref*{fig:#1}}}
+\newcommand*{\tableref}[1]{\hyperref[table:#1]{Table~\ref*{table:#1}}}
+\newcommand*{\exmpref}[1]{\hyperref[exmp:#1]{Example~\ref*{exmp:#1}}}
+\newcommand*{\sectionref}[1]{\hyperref[sec:#1]{Section~\ref*{sec:#1}}}
+\newcommand*{\subsectionref}[1]{\hyperref[sec:#1]{Subsection~\ref*{sec:#1}}}
+\newcommand*{\chapterref}[1]{\hyperref[ch:#1]{Chapter~\ref*{ch:#1}}}
+
+\newcommand*{\set}[1]{\left\{#1\right\}}
+\newcommand*{\term}[1]{\textcolor{green!30!black}{#1}} % \textcolor{green!70!black} \textcolor{blue!80!black}
+\newcommand*{\pathterm}[1]{\textcolor{green!65!red!75!black}{#1}}
+\newcommand*{\type}[1]{\textcolor{magenta!90!black}{#1}}
+% \newcommand*{\dependenttype}[1]{\textcolor{magenta!70!black}{#1}}
+\newcommand*{\container}[1]{\textcolor{orange}{#1}}
+\newcommand*{\containerpair}[2]{\ensuremath{\colorlet{savedleftcolor}{.}\color{orange}\left(\color{savedleftcolor}#1\,\textcolor{orange}{\mathbf{,}}\,#2\color{orange}\right)\color{savedleftcolor}}}
+\newcommand*{\containerpairsimple}[2]{\containerpair{#1}{\lambda\,\_,\,#2}}
+\newcommand*{\universe}[1]{\textcolor{orange!80!black}{#1}}
+\newcommand*{\unit}{\type{\textbf{1}}}
+\newcommand*{\empt}{\type{\textbf{0}}}
+\newcommand*{\coalg}[2]{#1\texttt{-}#2}
+
+\newcommand*{\relation}[1]{\textcolor{gray!75!black}{\ensuremath{\mathtt{#1}}}}
+\newcommand*{\constant}[1]{\textcolor{orange!60!black}{\ensuremath{\mathtt{#1}}}}
+
+\newcommand*{\function}[1]{\textcolor{blue!60!black}{\ensuremath{\mathtt{#1}}}}
+\newcommand*{\constructor}[1]{\textcolor{purple!60!black}{\ensuremath{\mathtt{#1}}}}
+\newcommand*{\destructor}[1]{\textcolor{yellow!60!black}{\ensuremath{\mathtt{#1}}}}
+\newcommand*{\typeformer}[1]{\ensuremath{\mathtt{#1}}}
+\newcommand*{\functor}[1]{\ensuremath{\mathbf{\mathtt{#1}}}}
+
+\newcommand*{\unitelem}{\constant{\star}} % \constant{tt}
+\newcommand*{\quotientconstructor}[1]{\constructor{[}\,#1\,\constructor{]}}
+
+\newcommand*{\ssfrac}[2]{ {\LARGE \text{\sfrac{\ensuremath{#1}}{\ensuremath{#2}}}}}
+
+\newcommand*{\natcases}[2]{\ensuremath{\mathbb{[\hspace{-.5mm}\rangle}~\ensuremath{#1}~,~\ensuremath{#2}~\mathbb{\langle\hspace{-.5mm}]}}}
+
+% Concatenation of paths taken from HoTT book
+\newcommand{\ct}{%
+  \mathchoice{\mathbin{\raisebox{0.5ex}{$\displaystyle\centerdot$}}}%
+  {\mathbin{\raisebox{0.5ex}{$\centerdot$}}}%
+  {\mathbin{\raisebox{0.25ex}{$\scriptstyle\,\centerdot\,$}}}%
+  {\mathbin{\raisebox{0.1ex}{$\scriptscriptstyle\,\centerdot\,$}}}
+}
+
+\newcommand*{\sym}[1]{\ensuremath{#1^{-1}}}
+
+\newcommand{\setlengths}{
+  \setlength{\abovedisplayskip}{4pt}
+  \setlength{\belowdisplayskip}{4pt}
+  \setlength{\abovedisplayshortskip}{2pt}
+  \setlength{\belowdisplayshortskip}{2pt}
+}
+\newcommand{\startwitheq}{\vspace{-2.5mm}} % -\baselineskip
+
+\begin{document}
+
+\frame{\titlepage}
+
+\section{Introduction}
+
+\begin{frame}
+  \frametitle{Overview}
+  \tableofcontents[subsubsectionstyle=hide]
+\end{frame}
+
+\subsection{Goals}
+\begin{frame}
+  \frametitle{Goals}
+  \begin{itemize}
+  \item Formalize coinductive types as \texttt{M}-types
+  \item Define equality for coinductive types % given a bisimulation relation
+  \item Explore ways to define quotiented \texttt{M}-types
+  \end{itemize}
+\end{frame}
+
+\section{\texttt{M}-types}
+\subsection{Definition of \texttt{M}-types}
+\begin{frame}[fragile]
+  \frametitle{\texttt{M}-types}
+  \begin{itemize}
+  \item \texttt{M}-types are non-wellfounded trees
+  \item \texttt{M}-types are final coalgebras
+    \begin{figure}[h]
+      \centering
+      \begin{tikzcd}[row sep=large,column sep=large]
+        \type{C} \ar[d] \ar[r,dashed,"\function{f}"] & \typeformer{M} \ar[d,"\function{out}"] \\
+        \functor{P}\,\type{C} \ar[r,"\functor{P}\,\function{f}"] & \functor{P}\typeformer{M}
+      \end{tikzcd}
+      \caption{Final \functor{P}-Coalgebra}
+    \end{figure}
+  \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+  \frametitle{Containers and Polynomial functors}
+  \begin{defn}\setlengths
+    A Container (or signature) is a dependent pair \(\container{S} = \containerpair{\type{A}}{\typeformer{B}}\) for the types \(\type{A} : \universe{\mathcal{U}}\) and \(\typeformer{B} : \type{A} \rightarrow \universe{\mathcal{U}}\). 
+  \end{defn}
+  \begin{figure}
+    \centering
+    \begin{tikzcd}[row sep=large]
+      \type{C} & \type{D} & \type{E} \\
+      & \type{A} \ar[ul,"\typeformer{B}~\term{a}_0" description] \ar[u,"\typeformer{B}~\term{a}_1" description] \ar[ur,"\typeformer{B}~\term{a}_2" description]
+    \end{tikzcd}
+  \end{figure}
+\end{frame}
+
+\begin{frame}[fragile]
+  \frametitle{Containers and Polynomial functors}
+  \begin{defn}\setlengths
+    A polynomial functor \(\functor{P}_{\container{S}}\) (or extension) for a container \(\container{S} = \containerpair{\type{A}}{\typeformer{B}}\) is defined, for types as
+    \begin{equation}
+      \functor{P}_{\container{S}}\,\type{X} = \sum_{(\term{a} : \type{A})} \typeformer{B}\term{a} \rightarrow \type{X}
+    \end{equation}
+    and for a function \(\function{f} : \type{X} \rightarrow \type{Y}\) as
+    \begin{equation}
+      \begin{aligned}
+        \functor{P}_{\container{S}}\,\function{f}~(\term{a},\function{g}) = (\term{a}, \function{f} \circ \function{g}).
+      \end{aligned}
+    \end{equation}
+  \end{defn}
+\end{frame}
+
+\begin{frame}[fragile]
+  \frametitle{Chain}
+  \begin{defn}[Chain]\setlengths
+    We define a chain as a family of morphisms \(\function{\pi}_{(n)} : \type{X}_{n+1} \rightarrow \type{X}_{n}\), over a family of types \(\type{X}_{n}\). See figure.
+  \end{defn}
+  \begin{figure}[h]
+    \centering
+    \begin{tikzcd}[row sep=large,column sep=large]
+      \type{X}_0 & \type{X}_1 \ar[l,"\function{\pi}_{(0)}"] & \cdots \ar[l,"\function{\pi}_{(1)}"] & \type{X}_n \ar[l,"\function{\pi}_{(n-1)}"] & \type{X}_{n + 1} \ar[l,"\function{\pi}_{(n)}"] & \cdots \ar[l,"\function{\pi}_{(n+1)}"]
+    \end{tikzcd}
+  \end{figure}
+  \begin{defn}\setlengths
+    The limit of a chain is given as
+    \begin{equation}
+      \type{\mathcal{L}} = \sum_{(\term{x} : \prod_{(n : \mathbb{N})} \type{X}_n)} \prod_{(n : \mathbb{N})} (\function{\pi}_{(n)}~\term{x}_{n+1} \equiv \term{x}_n)
+    \end{equation}
+  \end{defn}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Equality between \(\type{\mathcal{L}}\) and \(\functor{P}\,\type{\mathcal{L}}\)}
+  \begin{thm}\setlengths
+    Given a container \(\containerpair{\type{A}}{\typeformer{B}}\), we define a chain as the repeated application of \(\functor{P}\) to the unit element \(\type{X}_n = \functor{P}^n\,\unit\), and \(\function{\pi}_{(n)} = \functor{P}^n\,\constant{!}\) where \(\constant{!} : A \rightarrow \unit\) is the unique function into the unit type. Then there is an equality
+    \begin{equation}
+      \pathterm{shift} : \type{\mathcal{L}} \equiv \functor{P}\type{\mathcal{L}}
+    \end{equation}
+    where \(\type{\mathcal{L}}\) is the limit of this chain.
+  \end{thm}
+  \begin{block}{Proof structure}\setlengths
+    The proof is done using the two helper lemmas
+    \begin{align}
+      \pathterm{\alpha} : \type{\mathcal{L}}^{\functor{P}} \equiv \functor{P}\,\type{\mathcal{L}} \\
+      \pathterm{\mathcal{L}unique} : \type{\mathcal{L}} \equiv \type{\mathcal{L}}^{\functor{P}}
+    \end{align}
+    where \(\type{\mathcal{L}}^{\functor{P}}\) is the limit of the shifted chain defined as \(\type{X'}_n = \type{X}_{n+1}\) and \(\function{\pi'}_{(n)} = \function{\pi}_{(n+1)}\). With these two lemmas we get \(\pathterm{shift} = \pathterm{\alpha} \ct \pathterm{\mathcal{L}unique}\).
+  \end{block}
+\end{frame}
+
+\begin{frame}
+  \frametitle{\texttt{M}-types are final}
+  \begin{thm}\setlengths
+    The \texttt{M}-type \(\typeformer{M}_{\container{S}}\) is defined as the limit for a polynomial functor \(\functor{P}_{\container{S}}\). This definition fulfills the requirement that \(\typeformer{Final}_{\container{S}}~\type{\mathcal{L}}\).
+  \end{thm}
+  \begin{block}{Proof.}\setlengths
+    By unfolding the definition, we need to show
+    \begin{equation}
+      \prod_{(\coalg{\type{C}}{\function{\gamma}} : \mathtt{Coalg}_{\container{S}})} \mathtt{isContr}~(\coalg{\type{C}}{\function{\gamma}} \Rightarrow \coalg{\type{\mathcal{L}}}{\function{out}})
+    \end{equation}
+    We do this by showing \((\coalg{\type{C}}{\function{\gamma}} \Rightarrow \coalg{\type{\mathcal{L}}}{\function{out}}) \equiv \unit\).
+  \end{block}
+\end{frame}
+
+\subsection{Construction of \texttt{M}-types and Examples}
+\begin{frame}
+  \frametitle{Overview}
+  \tableofcontents[currentsubsection]
+\end{frame}
+
+\begin{frame}[fragile]
+  \frametitle{Example: Delay Monad}
+  We define a container
+  \begin{equation}
+    \containerpair{\type{R} + \unit}{[\empt, \unit]}
+  \end{equation}
+  and a polynomial functor
+  \begin{equation}
+    \functor{P}\,\type{X} = \sum_{(\term{x} : \type{R} + \unit)} \begin{cases} \empt & \term{x} = \mathtt{inl}~\term{r} \\ \unit & \term{x} = \mathtt{inr}~\unitelem \end{cases} \rightarrow \type{X},
+  \end{equation}
+  which simplifies to
+  \begin{equation}
+    \functor{P}_{\container{S}}\,\type{X} = \type{R} + \type{X}
+  \end{equation}
+  such that we get the diagram
+  \begin{figure}[h]
+    \centering
+    \begin{tikzcd}[row sep=large,column sep=large]
+      \type{R} \ar[dr,"\constructor{now}"'] \ar[r,"\texttt{inl}"] & \type{R} + \typeformer{Delay}~\type{R} \ar[d,shift left,"\function{in}"] & \typeformer{Delay}~\type{R} \ar[l,"\texttt{inr}"'] \ar[dl,"\constructor{later}"] \\
+      & \typeformer{Delay}~\type{R} \ar[u,shift left,"\function{out}"]
+    \end{tikzcd}
+  \end{figure}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Rules for Constructing \texttt{M}-types}
+  Adding containers \(\containerpair{\type{A}}{\typeformer{B}}\) and \(\containerpair{\type{C}}{\typeformer{D}}\) for two constructors together is done by
+  \begin{equation}
+    \containerpair{\type{A} + \type{C}}{ \begin{cases} \typeformer{B}\,\term{a} & \mathtt{inl}~\term{a} \\ \typeformer{D}\,\term{c} & \mathtt{inr}~\term{c} \end{cases}}
+  \end{equation}
+  whereas adding containers for two destructors is done by
+  \begin{equation}
+    \containerpair{\type{A} \times \type{C}}{\lambda\,(\term{a},\term{c}),~\typeformer{B}\,\term{a} + \typeformer{D}\,\term{c}}  
+  \end{equation}
+  However combining both destructors and constructors is not as simple, which is also the case if we use records or other constructions to define such types.
+\end{frame}
+
+\begin{frame}
+  \frametitle{\texttt{M}-types and Records}
+  We can take a coinductive record and transform it to an \texttt{M}-type by
+  \begin{itemize}
+  \item Adding all fields that are not a dependent \(\term{f}_1 : \type{F}_1,\term{f}_2 : \type{F}_2,\dots\) to the first part of the container as a product
+  \item Adding all fields that are a dependent \(\term{d}_1 : \type{D}_1, \term{d}_2 : \type{D}_2, \dots\) to the first part of the container as a dependent product
+  \item Adding all the fields that depend on other fields that depends on previously defined fields \(\term{b}_1 : \typeformer{B}_1~\term{d}_1, \dots\)
+  \item Converting all recursive fields to the last part of the container \(\term{r}_1 : \type{R}_1 \rightarrow \typeformer{M},\dots\)
+  \item Converting all dependent recursive fields to the last part of the container \(\term{z}_1 : \prod_{\term{v}_1 : \type{V}_1} \typeformer{Z}_1~\term{v}_1 \rightarrow \typeformer{M},\dots\)
+  \end{itemize}
+  \begin{equation}
+    \containerpair{\type{F}_1 \times .. \times \sum_{\term{d}_1 : \type{D}_1} \typeformer{B}_1~\term{d}_1 \times \sum_{\term{d}_2 : \type{D}_2} ..}{\lambda\,\_,\type{R}_1 \times .. \times \sum_{\term{v}_1 : \type{V_1}} \typeformer{Z}_1~\term{v_1} \times ..}
+  \end{equation}
+\end{frame}
+
+% \begin{frame}[fragile]
+%   \frametitle{\texttt{M}-types and Records}
+%   \begin{figure}
+%     \centering
+%     \begin{tikzcd}[row sep=large,column sep=large]
+%       &  & \type{F}_1 \ar[dl] \ar[d]  \\
+%       \sum_{\term{d}_1 : \type{D}_1} \typeformer{B}_1 \term{d}_1 \ar[r] \ar[d] & \functor{P}\,\typeformer{M} & \dots \ar[d] \ar[l,draw=none,near start,"\vdots" description] \\
+%       \type{D}_1 \ar[ur] & \typeformer{M}  & \type{F}_n \ar[ul]
+%     \end{tikzcd}
+%   \end{figure}
+% \end{frame}
+
+\subsection{Equality for Coinductive types}
+\begin{frame}
+  \frametitle{Overview}
+  \tableofcontents[currentsubsection]
+\end{frame}
+
+\begin{frame}[fragile]
+  \frametitle{Example: Streams}
+  We can now define streams for a given type \(\type{A}\). We start with a container
+  \begin{equation}
+    \containerpair{\type{A}}{\unit}
+  \end{equation}
+  For which we get the polynomial functor
+  \begin{equation}
+    \functor{P}\,\type{X} = \type{A} \times \type{X}
+  \end{equation}
+  For which the we get the \texttt{M}-type for stream
+  \begin{equation}
+    \typeformer{Stream}~\type{A} = \type{A} \times \typeformer{Stream}~\type{A}
+  \end{equation}
+  \begin{figure}[h]
+    \centering
+    \begin{tikzcd}
+      \type{A} \ar[dr,"\destructor{hd}"'] & \type{A} \times \typeformer{Stream}~\type{A} \ar[d,shift left,"\function{in}"] \ar[l,"\pi_1"'] \ar[r,"\pi_2"] & \typeformer{Stream}~\type{A} \ar[dl,"\destructor{tl}"] \\
+      & \typeformer{Stream}~\type{A} \ar[u,shift left,"\function{out}"]
+    \end{tikzcd}
+  \end{figure}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Bisimulation for Streams}
+  We can define an equivalence relation
+  \begin{equation}
+    \vcenter{\infer{\term{s}~\relation{\sim_{stream}}~\term{t}}{\destructor{hd}~\term{s} \equiv \destructor{hd}~\term{t} & \destructor{tl}~\term{s}~\relation{\sim_{stream}}~\destructor{tl}~\term{t}}}
+  \end{equation}
+  We can convert this to an equality 
+\end{frame}
+
+\begin{frame}[fragile]
+  \frametitle{Bisimulation}
+  \begin{defn}\setlengths
+    A relation \(\relation{\mathcal{R}} : \type{C} \rightarrow \type{C} \rightarrow \universe{\mathcal{U}}\) for a coalgebra \(\coalg{\type{C}}{\function{\gamma}} : \typeformer{Coalg}_{\container{S}}\), is a (strong) bisimulation relation if the type \(\type{\overline{\mathcal{R}}} = \sum_{(\term{a} : \type{C})} \sum_{(\term{b} : \type{C})} \term{a}~\relation{\mathcal{R}}~\term{b}\) and the function \(\function{\alpha}_{\relation{\mathcal{R}}} : \type{\overline{\mathcal{R}}} \rightarrow \functor{P}_{\container{S}}\,\type{\overline{\mathcal{R}}}\) forms a \(\functor{P}_{\container{S}}\)-coalgebra \(\coalg{\type{\overline{\mathcal{R}}}}{\function{\alpha}_{\relation{\mathcal{R}}}} : \mathtt{Coalg}_{\container{S}}\), making the diagram bellow commute (\(\Longrightarrow\) represents \(\functor{P}_{\container{S}}\)-coalgebra morphisms). That is
+    \begin{equation}
+      \function{\gamma} \circ \pi_1^{\type{\overline{\mathcal{R}}}} \equiv \functor{P}_{\container{S}}\,\pi_1^{\type{\overline{\mathcal{R}}}} \circ \function{\alpha}_{\relation{R}}
+    \end{equation}
+    and similarly for \(\pi_2^{\type{\overline{\mathcal{R}}}}\).
+  \end{defn}
+  \begin{figure}[h]
+    \centering
+    \begin{tikzcd}[row sep=huge,column sep=huge]
+      \coalg{\type{C}}{\function{\gamma}} & \coalg{\type{\overline{\mathcal{R}}}}{\function{\alpha}_{\relation{\mathcal{R}}}} \ar[l,Rightarrow,"{\pi_1}^{\type{\overline{\mathcal{R}}}}"'] \ar[r,Rightarrow,"{\pi_2}^{\type{\overline{\mathcal{R}}}}"] & \coalg{\type{C}}{\function{\gamma}}
+    \end{tikzcd}
+  \end{figure}
+\end{frame}
+
+\begin{frame}[fragile]
+  \frametitle{Coinduction Principle}
+  \begin{thm}[Coinduction principle]\setlengths
+    Given a relation \(\relation{\mathcal{R}}\), that is a bisimulation for a \texttt{M}-type, then (strongly) bisimilar elements \(\term{x}~\relation{\mathcal{R}}~\term{y}\) are equal \(\term{x} \equiv \term{y}\).
+  \end{thm}
+  \begin{proof}\setlengths
+    Given a relation \(\relation{\mathcal{R}}\) that is bisimulation relation over a final \(\functor{P}\)-coalgebra \(\coalg{\typeformer{M}}{\function{out}}:\mathtt{Coalg}_{\container{S}}\) we get the diagram
+    \begin{figure}[h]
+      \centering
+      \begin{tikzcd}[row sep=huge,column sep=huge]
+        \coalg{\typeformer{M}}{\function{out}} & \coalg{\type{\overline{\mathcal{R}}}}{\function{\alpha}_{\relation{\mathcal{R}}}} \ar[l,Rightarrow,"{\pi_1}^{\type{\overline{\mathcal{R}}}}"'] \ar[r,Rightarrow,"{\pi_2}^{\type{\overline{\mathcal{R}}}}"] & \coalg{\typeformer{M}}{\function{out}}
+      \end{tikzcd}
+    \end{figure}
+    By the finality of \(\coalg{\typeformer{M}}{\function{out}}\), we get a function \(\constant{!}\) from \(\typeformer{M}\) to \(\type{\overline{R}}\), which is unique, meaning \(\pi_1^{\type{\overline{\mathcal{R}}}} \equiv ~\constant{!} \equiv \pi_2^{\type{\overline{\mathcal{R}}}}\). Now given \(\term{r} : \term{x}~\relation{\mathcal{R}}~\term{y}\), we can construct the equality
+    \begin{equation}
+      \term{x} \equiv \pi_1^{\type{\overline{\mathcal{R}}}} (\term{x}, \term{y}, \term{r}) \equiv \pi_2^{\type{\overline{\mathcal{R}}}} (\term{x}, \term{y}, \term{r}) \equiv \term{y},
+    \end{equation}
+    giving us the coinduction principle for \texttt{M}-types.
+  \end{proof}  
+\end{frame}
+
+\section{Quotient \texttt{M}-types}
+\begin{frame}
+  \frametitle{Overview}
+  \tableofcontents[currentsection]
+\end{frame}
+
+\begin{frame}
+  \frametitle{Propositional Truncation and Set Truncated Quotient}
+  A Higher Inductive Type (HIT) is a type defined by point constructors as well as equality constructors. We define propositional truncation by
+  \begin{defn}[Propositional Truncation]\setlengths\startwitheq
+    \strut
+    \hfill
+    \begin{minipage}[b]{0.25\linewidth}
+      \begin{equation}
+        \vcenter{\infer{\constructor{|}\,\term{x}\,\constructor{|} : \| \type{A} \|}{\term{x} : \type{A}}}
+      \end{equation}
+    \end{minipage}
+    \hfill
+    \begin{minipage}[b]{0.4\linewidth}
+      \begin{equation}
+        \vcenter{\infer{\constructor{squash}~\term{x}~\term{y} : \term{x} \equiv \term{y}}{\term{x}, \term{y} : \|\type{A}\|}}
+      \end{equation}
+    \end{minipage}
+    \hfill
+    \strut
+  \end{defn}
+  We can define set truncated quotients as the following HIT.
+  \begin{defn}[Set Truncated Quotient]\setlengths \startwitheq
+    \strut
+    \hfill
+    \begin{minipage}[b]{0.25\linewidth}
+      \begin{equation}
+        \vcenter{\infer{\quotientconstructor{\term{x}} : \type{A} / \relation{\mathcal{R}}}{\term{x} : \type{A}}}
+      \end{equation}
+    \end{minipage}
+    \hfill
+    \begin{minipage}[b]{0.4\linewidth}
+      \begin{equation}
+        \vcenter{\infer{\constructor{eq/}~\term{x}~\term{y}~\term{r} : \term{x} \equiv \term{y}}{\term{x}, \term{y} : \type{A} / \relation{\mathcal{R}} & \term{r} : \term{x}~\relation{\mathcal{R}}~\term{y}}}
+      \end{equation}
+    \end{minipage}
+    \hfill
+    \strut
+    \begin{equation}
+      \vcenter{\infer{\constructor{squash/} :\texttt{isSet}~(\type{A} / \relation{R})}{\strut}}
+    \end{equation}
+  \end{defn}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Quotient Inductive-Inductive Type (QIIT)}
+  A QIIT is a type that is defined at the same time as a relation. That is
+  \begin{itemize}
+  \item Constructors may refer to previously defined constructors (recursive).
+  \item Constructors can be a point constructor or equality constructor.
+  \item Constructors may refer to constructors of the relation.
+  \item The type is set truncated.
+  \end{itemize}
+  And similarly for the constructors of the relation.
+\end{frame}
+
+\begin{frame}
+  \frametitle{Partiality monad}
+  \framesubtitle{Q\texttt{M}-type}
+  We would like to model equality of programs as two programs being equal if one terminates with a value then the other also terminates with the same value a finite number of steps later. This is model by quotienting the delay monad by a relation defined by the constructors
+  \strut
+  \hfill
+  \begin{minipage}{0.4\linewidth}
+    \begin{equation}
+      \vcenter{\infer[{\constructor{\sim_{later_l}}}]{\constructor{later}~\term{x}~\relation{\sim}~\term{y}}{\term{x}~\relation{\sim}~\term{y}}}
+    \end{equation}
+  \end{minipage}
+  \hfill
+    \begin{minipage}{0.4\linewidth}
+    \begin{equation}
+      \vcenter{\infer[{\constructor{\sim_{later_r}}}]{\term{x}~\relation{\sim}~\constructor{later}~\term{y}}{\term{x}~\relation{\sim}~\term{y}}}
+    \end{equation}
+  \end{minipage}
+  \hfill
+  \strut
+  \\
+  \strut
+  \hfill
+  \begin{minipage}{0.4\linewidth}
+    \begin{equation}
+      \vcenter{\infer[{\constructor{\sim_{now}}}]{\constructor{now}~\term{a}~\relation{\sim}~\constructor{now}~\term{b}}{\term{a}~\equiv~\term{b}}}
+    \end{equation}
+  \end{minipage}
+  \hfill
+  \begin{minipage}{0.5\linewidth}
+    \begin{equation}
+      \vcenter{\infer[{\constructor{\sim_{later}}}]{\constructor{later}~\term{x}~\relation{\sim}~\constructor{later}~\term{y}}{\term{x}~\relation{\sim}~\term{y}}}
+    \end{equation}
+  \end{minipage}
+  \hfill
+  \strut
+  \\[5mm]
+  This gives us a construction for a Q\texttt{M}-types.
+  \begin{equation}
+    \typeformer{Delay}~\type{R}/\relation{\sim}
+  \end{equation}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Partiality Monad}
+  \framesubtitle{QIIT}
+  We can define it by type constructors\\[-4mm]
+  \strut
+  \hfill
+  \begin{minipage}{0.25\linewidth}
+    \begin{equation}
+      \vcenter{\infer{\type{R}_\bot : \universe{\mathcal{U}}}{\strut}}
+    \end{equation}
+  \end{minipage}
+  \hfill
+  \begin{minipage}{0.25\linewidth}
+    \begin{equation}
+      \vcenter{\infer{\constructor{\bot} : \type{R}_\bot}{\strut}}
+    \end{equation}
+  \end{minipage}
+  \hfill
+  \begin{minipage}{0.25\linewidth}
+    \begin{equation}
+      \vcenter{\infer{\constructor{\eta}~\term{a} : \type{R}_\bot}{\term{a} : \type{R}}}
+    \end{equation}
+  \end{minipage}
+  \hfill
+  \strut
+  \\[3mm]
+  and an ordering relation \((\cdot~\relation{\sqsubseteq_{\bot}}~\cdot)\) indexed twice over \(\type{R}_\bot\) \\
+  \strut
+  \hfill
+  \begin{minipage}{0.3\linewidth}
+    \begin{equation}
+      \vcenter{\infer[\constructor{\sqsubseteq_{refl}}]{\term{x}~\relation{\sqsubseteq_{\bot}}~\term{x}}{\term{x} : \type{R}_\bot}}
+    \end{equation}
+  \end{minipage}
+  \hfill
+  \begin{minipage}{0.45\linewidth}
+    \begin{equation}
+      \vcenter{\infer[\constructor{\sqsubseteq_{trans}}]{\term{x}~\relation{\sqsubseteq_{\bot}}~\term{z}}{\term{x}~\relation{\sqsubseteq_{\bot}}~\term{y} & \term{y}~\relation{\sqsubseteq_{\bot}}~\term{z}}}
+    \end{equation}
+  \end{minipage}
+  \hfill
+  \strut
+  \\[4mm]
+  \begin{equation}
+    \vcenter{\infer{\constructor{\alpha_{\bot}}~\term{p}~\term{q} : \term{x} \equiv \term{y}}{\term{x},\term{y} : \type{R}_\bot & \term{p} : \term{x}~\relation{\sqsubseteq_{\bot}}~\term{y} & \term{q} : \term{y}~\relation{\sqsubseteq_{\bot}}~\term{x}}}
+  \end{equation}
+  where \(\constructor{\bot}\) is lowest in the order
+  \begin{equation}
+    \vcenter{\infer[\constructor{\sqsubseteq_{never}}]{\constructor{\bot}~\relation{\sqsubseteq_{\bot}}~\term{x}}{\term{x} : \type{R}_\bot}}
+  \end{equation}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Partiality Monad}
+  \framesubtitle{QIIT}
+  with an upper bound
+  \begin{equation}
+    \vcenter{\infer{\constructor{\bigsqcup}~(\function{s},\function{b}) : \type{R}_\bot}{\function{s} : \mathbb{N} \rightarrow \type{R}_\bot & \function{b} : \prod_{(n : \mathbb{N})} \function{s}_n~\relation{\sqsubseteq_{\bot}}~\function{s}_{n+1} }}
+  \end{equation}
+  which gives a bound for a sequence
+  \begin{equation}
+    \vcenter{\infer{\prod_{(n : \mathbb{N})} \function{s}_n~\relation{\sqsubseteq_{\bot}}~\bigsqcup(\function{s},\function{b})}{\function{s} : \mathbb{N} \rightarrow \type{R}_\bot & \function{b} : \prod_{(n : \mathbb{N})} \function{s}_n~\relation{\sqsubseteq_{\bot}}~\function{s}_{n+1} }}
+  \end{equation}
+  and which is a least upper bound
+  \begin{equation}
+    \vcenter{\infer{\constructor{\bigsqcup}(\function{s},\function{b})~\relation{\sqsubseteq_{\bot}}~\term{x}}{\prod_{(n:\mathbb{N})} \function{s}_n~\relation{\sqsubseteq_{\bot}}~\term{x}}}
+  \end{equation}
+  and finally set truncated by the constructor \(\constructor{(-)_\bot\text{-}isSet}\)
+\end{frame}
+
+\begin{frame}
+  \frametitle{Partiality Monad}
+  \framesubtitle{Equality}
+  To show these two definitions are equal we
+  \begin{itemize}
+  \item Define an intermediate type of sequences
+    \begin{equation}
+      \typeformer{Seq}~\type{A} = \sum_{(\function{s} : \mathbb{N} \rightarrow \type{A} + \unit)}  \prod_{(n : \mathbb{N})} \function{s}_n~\relation{\sqsubseteq_{\type{R} + \unit}}~\function{s}_{n+1}
+    \end{equation}
+  \item Show that the Delay monad is equal to this intermediate type
+  \item Define weak bisimilarty for sequences, and show it respects the equality to the Delay monad
+  \item Show that \(\typeformer{Seq}_{\type{R}}/\relation{\sim}\) is equal to the partiality monad, by
+    \begin{itemize}
+    \item Defining a function from \(\typeformer{Seq}_{\type{R}}/\relation{\sim}\) to \(\type{R}_{\bot}\)
+    \item Show this function is injective and surjective
+    \end{itemize}
+  \end{itemize}
+  However the proof for surjectivity requires the axiom of countable choice!
+\end{frame}
+
+\begin{frame}
+  We can see that the QIIT for the partiality monad is not trivial, however we can define quotients as QIITs rather trivially, however this would \emph{only} give us the constructors
+  \begin{equation}
+    \vcenter{\infer{\constructor{now}~\term{a}}{}}
+  \end{equation}
+  \begin{equation}
+    \vcenter{\infer{\constructor{later}~\term{x}}{\term{x}}}
+  \end{equation}
+  \begin{equation}
+    \vcenter{\infer[\constructor{later_{\equiv}}]{\constructor{later}~\term{x} \equiv \term{y}}{\term{x} \equiv \term{y}}}
+  \end{equation}
+\end{frame}
+
+\begin{frame}
+  \frametitle{What do we want from a quotient \texttt{M}-type?}
+  \begin{itemize}
+  \item We would like to be able to construct a quotient from an \texttt{M}-type and a relation.
+  \item We should be able to take an element to its equality class without the axiom of choice
+  \item It should be equal to the set truncated quotient, if we assume the axiom of choice?
+  \end{itemize}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Alternative: Quotient Polynomial Functor (QPF)}
+  We can define quotiented \texttt{M}-types from a quotient polynomial functor.
+  \begin{defn}[Quotient Polynomial Functor]\setlengths
+    We define a quotient polynomial functor (QPF), for types as
+    \begin{equation}
+      \functor{F}\,\type{X} =  \sum_{(\term{a} : \type{A})} ((\typeformer{B}\,\term{a} \rightarrow \type{X}) / \relation{\sim}_{\term{a}})
+    \end{equation}
+    and for a function \(\function{f} : \type{X} \rightarrow \type{Y}\), we use the quotient eliminator with
+    \begin{equation}
+      \typeformer{P} = \lambda\,\_, (\typeformer{B}\,\term{a} \rightarrow \type{Y})/\relation{\sim}_{\term{a}}
+    \end{equation}
+    for which we need \(\function{\sim_{ap}}\), which says that given a function \(\function{f}\) and \(\function{x}~\relation{\sim}_{\term{a}}~\function{y}\) then \(\function{f} \circ \function{x}~\relation{\sim}_{\term{a}}~\function{f} \circ \function{y}\).
+    \begin{equation}
+      \functor{F}\,\function{f}~(\term{a} , \function{g}) = (\term{a} , \function{elim}~\function{g})
+    \end{equation}
+  \end{defn}
+\end{frame}
+
+\begin{frame}[fragile]
+  \frametitle{Alternative: Quotient Polynomial Functor (QPF)}
+  We get the diagram
+  \begin{figure}
+    \centering
+    \begin{tikzcd}
+      \unit \ar[d] & \functor{P}\,\unit \ar[l,"\function{\pi}_{(1)}"'] \ar[d] & \dots \ar[l,"\function{\pi}_{(2)}"'] & \typeformer{M} \ar[d] \ar[l] & \functor{P}\,\typeformer{M}  \ar[d] \ar[l] \\
+      \unit & \functor{F}\,\unit \ar[l,"\function{\pi'}_{(1)}"] & \dots \ar[l,"\function{\pi'}_{(2)}"] & \typeformer{QM} \ar[l] & \functor{F}\,\typeformer{QM} \ar[l]
+    \end{tikzcd}
+  \end{figure}
+  For which \(\typeformer{M} \equiv \functor{P}\,\typeformer{M}\) and we would hope \(\typeformer{QM} \equiv \functor{F}\,\typeformer{QM}\), however this requires the axiom of choice.
+\end{frame}
+
+\section{Conclusion}
+\begin{frame}
+  \frametitle{Conclusion}
+  We have
+  \begin{itemize}
+  \item given a formalization/semantic of \texttt{M}-types % TODO: formalized
+  \item shown examples of and rules for how to construct \texttt{M}-types
+  \item given a coinduction principle for \texttt{M}-types
+  \item described the construction of the partiality monad as a QIIT
+  \item discussed ways of constructing quotient \texttt{M}-types
+  \end{itemize}
+  Contribution
+  \begin{itemize}
+  \item Formalization in Cubical Agda
+  \item Introducing Q\texttt{M}-types
+  \end{itemize}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Future Work}
+  \begin{itemize}
+  \item Indexed \texttt{M}-types
+  \item Showing finality of Q\texttt{M}-types and fully formalizing the constructions % TODO: (not just rules)
+  \item 
+  \end{itemize}
+\end{frame}
+
+\end{document}
+
+  % \begin{figure}
+  %   \centering
+  %   \begin{tikzcd}[row sep=large]
+  %     & & \type{C} & \type{A} & \type{A} & \type{C} & \dots \\
+  %     & \type{C} & & \type{A} \ar[ul,"\typeformer{B}~\term{a}_0" description] \ar[u,"\typeformer{B}~\term{a}_1" description] \ar[ur,"\typeformer{B}~\term{a}_2" description] & & \type{A} \ar[u,"\typeformer{B}~\term{a}_0" description] \ar[ur,"\dots" description] \\
+  %     & & & \type{A} \ar[ull,"\typeformer{B}~\term{a}_0" description] \ar[u,"\typeformer{B}~\term{a}_1" description] \ar[urr,"\typeformer{B}~\term{a}_2" description]
+  %   \end{tikzcd}
+  % \end{figure}

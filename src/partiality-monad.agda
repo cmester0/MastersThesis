@@ -1,4 +1,4 @@
-{-# OPTIONS --cubical --guardedness #-} --safe
+{-# OPTIONS --cubical --guardedness #-} 
 
 module partiality-monad where
 

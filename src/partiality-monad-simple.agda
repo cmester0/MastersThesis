@@ -1,4 +1,4 @@
-{-# OPTIONS --cubical --guardedness #-} --safe
+{-# OPTIONS --cubical --safe #-} 
 
 module partiality-monad-simple where
 
@@ -13,7 +13,7 @@ open import Cubical.Data.Nat
 open import Cubical.Data.Nat.Order
 open import Cubical.Data.Sum
 open import Cubical.Data.Prod
-open import Cubical.Data.Empty
+open import Cubical.Data.Empty renaming (rec to empty-rec)
 open import Cubical.Data.Bool
 open import Cubical.Data.Sigma hiding (_×_)
 

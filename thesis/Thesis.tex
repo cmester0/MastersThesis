@@ -755,7 +755,7 @@ can be constructed by the container \(\containerpairsimple{\type{A}}{\empt}\), b
 \end{equation}
 whereas adding containers for two destructors is done by
 \begin{equation}
-  \containerpairsimple{\type{A} \times \type{C}}{\lambda\,(\term{a},\term{c}),~\typeformer{B}\,\term{a} + \typeformer{D}\,\term{c}}  
+  \containerpair{\type{A} \times \type{C}}{\lambda\,(\term{a},\term{c}),~\typeformer{B}\,\term{a} + \typeformer{D}\,\term{c}}  
 \end{equation}
 However combining both destructors and constructors is not as simple, which is also the case if we use records or other constructions to define such types. We argue that any type \(\type{T}\) that can be defined using a (coinductive) record, will also be definable as a \texttt{M}-type, with the following construction. Given a record, which is a list of fields \(\term{f}_1 : \type{F}_1,\term{f}_2 : \type{F}_2,\dots,\term{f}_n : \type{F}_n\), we can construct the \texttt{M}-types by the container
 \begin{equation}
@@ -1044,13 +1044,13 @@ In this subsection we will define the partiality monad and show that it is equal
     \hfill
     \begin{minipage}{0.50\linewidth}
       \begin{equation}
-        \vcenter{\infer{\prod_{(n : \mathbb{N})} \function{s}_n~\relation{\sqsubseteq_{\bot}}~\bigsqcup(\function{s},\function{b})}{\function{s} : \mathbb{N} \rightarrow \type{R}_\bot & \function{b} : \prod_{(n : \mathbb{N})} \function{s}_n~\relation{\sqsubseteq_{\bot}}~\function{s}_{n+1} }}
+        \vcenter{\infer{\prod_{(n : \mathbb{N})} \function{s}_n~\relation{\sqsubseteq_{\bot}}~\constructor{\bigsqcup}(\function{s},\function{b})}{\function{s} : \mathbb{N} \rightarrow \type{R}_\bot & \function{b} : \prod_{(n : \mathbb{N})} \function{s}_n~\relation{\sqsubseteq_{\bot}}~\function{s}_{n+1} }}
       \end{equation}
     \end{minipage}
     \hfill
     \begin{minipage}{0.3\linewidth}
       \begin{equation}
-        \vcenter{\infer{\bigsqcup(\function{s},\function{b})~\relation{\sqsubseteq_{\bot}}~\term{x}}{\prod_{(n:\mathbb{N})} \function{s}_n~\relation{\sqsubseteq_{\bot}}~\term{x}}}
+        \vcenter{\infer{\constructor{\bigsqcup}(\function{s},\function{b})~\relation{\sqsubseteq_{\bot}}~\term{x}}{\prod_{(n:\mathbb{N})} \function{s}_n~\relation{\sqsubseteq_{\bot}}~\term{x}}}
       \end{equation}
     \end{minipage}
   \end{center}

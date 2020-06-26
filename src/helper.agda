@@ -1,4 +1,4 @@
-{-# OPTIONS --cubical --guardedness #-} --safe
+{-# OPTIONS --cubical --safe #-}
 module helper where
 
 open import Cubical.Data.Nat

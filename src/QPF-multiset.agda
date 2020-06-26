@@ -49,7 +49,6 @@ data _∼_ {R : Type₀} : (_ _ : tree R) → Type₀ where
 
 ∼perm'-comm :  {R : Type₀} {X Y : Type₀} (f : X → Y) {a : tree-S R .fst} → {x y : tree-S R .snd a → X} → ∼perm' x y → ∼perm' (f ∘ x) (f ∘ y)
 ∼perm'-comm f {a = inr tt} p = (p .fst) , ((proj₁ (p .snd)) , cong (λ a → f ∘ a) (proj₂ (p .snd)))
-
 ∼perm'-comm f {a = inl r} tt = tt
 
 multiset : ∀ {R} → poly-quot (tree-S R) ∼perm' ∼perm'-comm
