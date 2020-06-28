@@ -446,7 +446,6 @@ mutual
   -- Upper bounds.
   Is-upper-bound : ∀ {ℓ} → {A : Type ℓ} → Increasing-sequence A → < A >⊥ → Set ℓ
   Is-upper-bound s x = ∀ n → (fst s n) ⊑ x
-
   -- An ordering relation.
 
   data _⊑_ {ℓ} {A : Set ℓ} : < A >⊥ → < A >⊥ → Set ℓ where

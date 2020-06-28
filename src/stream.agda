@@ -18,6 +18,30 @@ open import Cubical.Codata.M.AsLimit.Container
 
 open import Cubical.Codata.M.AsLimit.stream
 open Cubical.Codata.M.AsLimit.stream public -- Re-xport
+open import Coalg.Coinduction
+open import Coalg.Properties
+
+-----------------
+-- Coinduction --
+-----------------
+
+open bisimulation
+
+record _∼stream_ {A} (x y : stream A) : Set where
+  coinductive
+  field
+    ∼hd : (hd x) ≡ (hd y)
+    ∼tl : (tl x) ∼stream (tl y)
+  
+open _∼stream_
+
+stream-bisim : ∀ {A} → bisimulation (stream-S A) M-coalg _∼stream_
+αᵣ (stream-bisim) (x , y , r) = hd x , (λ {tt → tl x , (tl y) , ∼tl r})
+rel₁ (stream-bisim) = refl
+rel₂ (stream-bisim) = funExt λ {(x , y , r) → ΣPathP (sym (∼hd r) , refl)}
+
+stream-coinduction : ∀ {A} {m m' : stream A} → m ∼stream m' → m ≡ m'
+stream-coinduction = coinduction _∼stream_ stream-bisim
 
 ------------------------------
 -- Equality of stream types --

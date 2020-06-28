@@ -171,21 +171,29 @@
 
 \section{\texttt{M}-types}
 \subsection{Definition of \texttt{M}-types}
-\begin{frame}[fragile]
-  \frametitle{\texttt{M}-types}
-  \begin{itemize}
-  \item \texttt{M}-types are non-wellfounded trees
-  \item \texttt{M}-types are final coalgebras
-    \begin{figure}[h]
-      \centering
-      \begin{tikzcd}[row sep=large,column sep=large]
-        \type{C} \ar[d] \ar[r,dashed,"\function{f}"] & \typeformer{M} \ar[d,"\function{out}"] \\
-        \functor{P}\,\type{C} \ar[r,"\functor{P}\,\function{f}"] & \functor{P}\typeformer{M}
-      \end{tikzcd}
-      \caption{Final \functor{P}-Coalgebra}
-    \end{figure}
-  \end{itemize}
-\end{frame}
+% \begin{frame}[fragile]
+%   \frametitle{\texttt{M}-types}
+%   \begin{itemize}
+%   \item \texttt{M}-types are non-wellfounded trees
+%     \begin{figure}
+%       \centering
+%       \begin{tikzcd}[row sep=large]
+%         & & \type{C} & \type{A} & \type{A} & \type{C} & \dots \\
+%         & \type{C} & & \type{A} \ar[ul,"\typeformer{B}~\term{a}_0" description] \ar[u,"\typeformer{B}~\term{a}_1" description] \ar[ur,"\typeformer{B}~\term{a}_2" description] & & \type{A} \ar[u,"\typeformer{B}~\term{a}_0" description] \ar[ur,"\dots" description] \\
+%         & & & \type{A} \ar[ull,"\typeformer{B}~\term{a}_0" description] \ar[u,"\typeformer{B}~\term{a}_1" description] \ar[urr,"\typeformer{B}~\term{a}_2" description]
+%       \end{tikzcd}
+%     \end{figure}
+%   \item \texttt{M}-types are final coalgebras
+%     \begin{figure}[h]
+%       \centering
+%       \begin{tikzcd}[row sep=large,column sep=large]
+%         \type{C} \ar[d] \ar[r,dashed,"\function{f}"] & \typeformer{M} \ar[d,"\function{out}"] \\
+%         \functor{P}\,\type{C} \ar[r,"\functor{P}\,\function{f}"] & \functor{P}\typeformer{M}
+%       \end{tikzcd}
+%       \caption{Final \functor{P}-Coalgebra}
+%     \end{figure}
+%   \end{itemize}
+% \end{frame}
 
 \begin{frame}[fragile]
   \frametitle{Containers and Polynomial functors}
@@ -234,16 +242,20 @@
       \type{\mathcal{L}} = \sum_{(\term{x} : \prod_{(n : \mathbb{N})} \type{X}_n)} \prod_{(n : \mathbb{N})} (\function{\pi}_{(n)}~\term{x}_{n+1} \equiv \term{x}_n)
     \end{equation}
   \end{defn}
+  We let \(\typeformer{M}_{\container{S}}\) be the limit, for a chain defined by \(\type{X}_n = \functor{P}^n\,\unit\), and \(\function{\pi}_{(n)} = \functor{P}^n\,\constant{!}\)
 \end{frame}
 
 \begin{frame}
-  \frametitle{Equality between \(\type{\mathcal{L}}\) and \(\functor{P}\,\type{\mathcal{L}}\)}
+  \frametitle{Equality between \(\mathcal{L}\) and \(\functor{P}\,\mathcal{L}\)}
   \begin{thm}\setlengths
-    Given a container \(\containerpair{\type{A}}{\typeformer{B}}\), we define a chain as the repeated application of \(\functor{P}\) to the unit element \(\type{X}_n = \functor{P}^n\,\unit\), and \(\function{\pi}_{(n)} = \functor{P}^n\,\constant{!}\) where \(\constant{!} : A \rightarrow \unit\) is the unique function into the unit type. Then there is an equality
+    There is an equality
     \begin{equation}
-      \pathterm{shift} : \type{\mathcal{L}} \equiv \functor{P}\type{\mathcal{L}}
+      \pathterm{shift} : \typeformer{M} \equiv \functor{P}\,\typeformer{M}
     \end{equation}
-    where \(\type{\mathcal{L}}\) is the limit of this chain.
+    from which we can define helper functions
+    \begin{equation}
+      \function{in} : \functor{P}\,\typeformer{M} \rightarrow \typeformer{M} \qquad \function{out} : \typeformer{M} \rightarrow \functor{P}\,\typeformer{M}
+    \end{equation}    
   \end{thm}
   \begin{block}{Proof structure}\setlengths
     The proof is done using the two helper lemmas
@@ -256,16 +268,35 @@
 \end{frame}
 
 \begin{frame}
-  \frametitle{\texttt{M}-types are final}
+  \frametitle{Coalgebra}
+  \framesubtitle{\texttt{M}-types are final coalgebras}
+  \begin{defn}\setlengths
+    We define a \(\functor{P}\)-coalgebra as
+    \begin{equation}
+      \sum_{(\type{C} : \universe{\mathcal{U}})} \type{C} \rightarrow \functor{P}\,\type{C}
+    \end{equation}
+    which we denote \(\coalg{\type{C}}{\function{\gamma}}\). We define \(\functor{P}\)-coalgebra morphisms as
+    \begin{equation}
+      \coalg{\type{C}}{\function{\gamma}} \Rightarrow \coalg{\type{D}}{\function{\delta}} = \sum_{(\function{f} : \type{C} \rightarrow \type{D})} \function{\delta} \circ \function{f} \equiv \functor{P} \function{f} \circ \function{\gamma}
+    \end{equation}
+  \end{defn}
+  A coalgebra is final, if the following is true
+  \begin{equation}
+    \sum_{(\coalg{\type{D}}{\function{\rho}})}\prod_{(\coalg{\type{C}}{\function{\gamma}})} \mathtt{isContr}~(\coalg{\type{C}}{\function{\gamma}} \Rightarrow \coalg{\type{D}}{\function{\rho}})    
+  \end{equation}
+\end{frame}
+
+\begin{frame}
+  \frametitle{\texttt{M}-types are final coalgebras}
   \begin{thm}\setlengths
     The \texttt{M}-type \(\typeformer{M}_{\container{S}}\) is defined as the limit for a polynomial functor \(\functor{P}_{\container{S}}\). This definition fulfills the requirement that \(\typeformer{Final}_{\container{S}}~\type{\mathcal{L}}\).
   \end{thm}
-  \begin{block}{Proof.}\setlengths
-    By unfolding the definition, we need to show
+  \begin{block}{Proof structure}\setlengths
+    The definition of finality is
     \begin{equation}
       \prod_{(\coalg{\type{C}}{\function{\gamma}} : \mathtt{Coalg}_{\container{S}})} \mathtt{isContr}~(\coalg{\type{C}}{\function{\gamma}} \Rightarrow \coalg{\type{\mathcal{L}}}{\function{out}})
     \end{equation}
-    We do this by showing \((\coalg{\type{C}}{\function{\gamma}} \Rightarrow \coalg{\type{\mathcal{L}}}{\function{out}}) \equiv \unit\).
+    which we show by \((\coalg{\type{C}}{\function{\gamma}} \Rightarrow \coalg{\type{\mathcal{L}}}{\function{out}}) \equiv \unit\).
   \end{block}
 \end{frame}
 
@@ -277,17 +308,30 @@
 
 \begin{frame}[fragile]
   \frametitle{Example: Delay Monad}
+  A delay monad is defined by the two constructors\\
+  \strut
+  \hfill
+  \begin{minipage}[h]{0.35\linewidth}
+    \begin{equation}
+      \vcenter{\infer{\constructor{now}~\term{r} : \typeformer{Delay}~\type{R}}{\term{r} : \type{R}}}
+    \end{equation}
+  \end{minipage}
+  \hfill
+  \begin{minipage}[h]{0.4\linewidth}
+    \begin{equation}
+      \vcenter{\infer{\constructor{later}~\term{t} : \typeformer{Delay}~\type{R}}{\term{t} : \typeformer{Delay}~\type{R}}}
+    \end{equation}
+  \end{minipage}
+  \hfill
+  \strut
+  \\[2mm]
   We define a container
   \begin{equation}
     \containerpair{\type{R} + \unit}{[\empt, \unit]}
   \end{equation}
   and a polynomial functor
   \begin{equation}
-    \functor{P}\,\type{X} = \sum_{(\term{x} : \type{R} + \unit)} \begin{cases} \empt & \term{x} = \mathtt{inl}~\term{r} \\ \unit & \term{x} = \mathtt{inr}~\unitelem \end{cases} \rightarrow \type{X},
-  \end{equation}
-  which simplifies to
-  \begin{equation}
-    \functor{P}_{\container{S}}\,\type{X} = \type{R} + \type{X}
+    \functor{P}\,\type{X} = \quad \sum_{(\term{x} : \type{R} + \unit)} \begin{cases} \empt & \term{x} = \mathtt{inl}~\term{r} \\ \unit & \term{x} = \mathtt{inr}~\unitelem \end{cases} \rightarrow \type{X} \quad = \type{R} + \type{X},
   \end{equation}
   such that we get the diagram
   \begin{figure}[h]
@@ -309,23 +353,90 @@
   \begin{equation}
     \containerpair{\type{A} \times \type{C}}{\lambda\,(\term{a},\term{c}),~\typeformer{B}\,\term{a} + \typeformer{D}\,\term{c}}  
   \end{equation}
-  However combining both destructors and constructors is not as simple, which is also the case if we use records or other constructions to define such types.
+  However combining both destructors and constructors is not as simple. Which is similar to rules for coinductive records.
 \end{frame}
 
 \begin{frame}
   \frametitle{\texttt{M}-types and Records}
-  We can take a coinductive record and transform it to an \texttt{M}-type by
+  We can take a coinductive record and transform it to an \texttt{M}-type. The types of fields in a coinductive records are
   \begin{itemize}
-  \item Adding all fields that are not a dependent \(\term{f}_1 : \type{F}_1,\term{f}_2 : \type{F}_2,\dots\) to the first part of the container as a product
-  \item Adding all fields that are a dependent \(\term{d}_1 : \type{D}_1, \term{d}_2 : \type{D}_2, \dots\) to the first part of the container as a dependent product
-  \item Adding all the fields that depend on other fields that depends on previously defined fields \(\term{b}_1 : \typeformer{B}_1~\term{d}_1, \dots\)
-  \item Converting all recursive fields to the last part of the container \(\term{r}_1 : \type{R}_1 \rightarrow \typeformer{M},\dots\)
-  \item Converting all dependent recursive fields to the last part of the container \(\term{z}_1 : \prod_{\term{v}_1 : \type{V}_1} \typeformer{Z}_1~\term{v}_1 \rightarrow \typeformer{M},\dots\)
+  \item non-dependent fields
+  \item dependent fields
+  \item recursive fields
+  \item dependent and recursive fields
   \end{itemize}
+  We will give some examples of these.
+\end{frame}
+
+\begin{frame}
+  \frametitle{\texttt{M}-types and Records}
+  \framesubtitle{Example: Record to M-type}
+  Lets try and convert the record
   \begin{equation}
-    \containerpair{\type{F}_1 \times .. \times \sum_{\term{d}_1 : \type{D}_1} \typeformer{B}_1~\term{d}_1 \times \sum_{\term{d}_2 : \type{D}_2} ..}{\lambda\,\_,\type{R}_1 \times .. \times \sum_{\term{v}_1 : \type{V_1}} \typeformer{Z}_1~\term{v_1} \times ..}
+    \begin{aligned}
+      &\mathtt{record}~\type{tree} : \universe{\mathcal{U} }~\mathtt{where} \\
+      &\qquad \term{value} : \mathbb{N} \\
+      &\qquad \term{left\text{-}child} : \type{tree} \\
+      &\qquad \term{right\text{-}child} : \type{tree}
+    \end{aligned}
+  \end{equation}
+  To an \texttt{M}-type defined by the container
+  \begin{equation}
+    \containerpair{\mathbb{N}}{\type{tree} \times \type{tree}}
   \end{equation}
 \end{frame}
+
+\begin{frame}
+  \frametitle{\texttt{M}-types and Records}
+  \framesubtitle{Example: Record to M-type}
+  Lets try and convert the record
+  \begin{equation}
+    \begin{aligned}
+      &\mathtt{record}~\type{bet} : \universe{\mathcal{U} }~\mathtt{where} \\
+      &\qquad \term{value_a} : \mathbb{N} \\
+      &\qquad \term{value_a} : \mathbb{N} \\
+      &\qquad \term{total} : \term{value_a} \leq \term{value_b} \rightarrow \type{bool} \\
+    \end{aligned}
+  \end{equation}
+  To an \texttt{M}-type defined by the container
+  \begin{equation}
+    \containerpair{\sum_{(\term{value_a} : \mathbb{N})} \sum_{(\term{value_b} : \mathbb{N})} \term{value_a} \leq \term{value_b} \rightarrow \type{bool}}{\empt}
+  \end{equation}
+\end{frame}
+
+
+\begin{frame}
+  \frametitle{\texttt{M}-types and Records}
+  \framesubtitle{Example: Record to M-type}
+  Lets try and convert the record
+  \begin{equation}
+    \begin{aligned}
+      &\mathtt{record}~\typeformer{example}~\type{A} : \universe{\mathcal{U} }~\mathtt{where} \\
+      &\qquad \term{value} : \type{A} \\
+      &\qquad \type{index\text{-}type} : \universe{\mathcal{U}} \\
+      &\qquad \term{continue} : \type{index\text{-}type} \rightarrow \typeformer{example}~\type{A} \\
+    \end{aligned}
+  \end{equation}
+  To an \texttt{M}-type defined by the container
+  \begin{equation}
+    \containerpair{\type{A} \times \universe{\mathcal{U}}}{\lambda\,(\_,\type{index\text{-}type}), \type{index\text{-}type}}
+  \end{equation}
+\end{frame}
+
+% \begin{frame}
+%   \frametitle{\texttt{M}-types and Records}
+%   We can take a coinductive record and transform it to an \texttt{M}-type by
+%   \begin{itemize}
+%   \item Adding all fields that are not a dependent \(\term{f}_1 : \type{F}_1,\term{f}_2 : \type{F}_2,\dots\) to the first part of the container as a product
+%   \item Adding all fields that are a dependent \(\term{d}_1 : \type{D}_1, \term{d}_2 : \type{D}_2, \dots\) to the first part of the container as a dependent product
+%   \item Adding all the fields that depend on other fields that depends on previously defined fields \(\term{b}_1 : \typeformer{B}_1~\term{d}_1, \dots\)
+%   \item Converting all recursive fields to the last part of the container \(\term{r}_1 : \type{R}_1 \rightarrow \typeformer{M},\dots\)
+%   \item Converting all dependent recursive fields to the last part of the container \(\term{z}_1 : \prod_{\term{v}_1 : \type{V}_1} \typeformer{Z}_1~\term{v}_1 \rightarrow \typeformer{M},\dots\)
+%   \end{itemize}
+%   \begin{equation}
+%     \containerpair{\type{F}_1 \times .. \times \sum_{\term{d}_1 : \type{D}_1} \typeformer{B}_1~\term{d}_1 \times \sum_{\term{d}_2 : \type{D}_2} ..}{\lambda\,\_,\type{R}_1 \times .. \times \sum_{\term{v}_1 : \type{V_1}} \typeformer{Z}_1~\term{v_1} \times ..}
+%   \end{equation}
+% \end{frame}
 
 % \begin{frame}[fragile]
 %   \frametitle{\texttt{M}-types and Records}
@@ -347,51 +458,52 @@
 
 \begin{frame}[fragile]
   \frametitle{Example: Streams}
-  We can now define streams for a given type \(\type{A}\). We start with a container
+  We can now define streams for a given type \(\type{A}\), as a records
+  \begin{equation}
+    \begin{aligned}
+      &\mathtt{record}~\typeformer{Stream}~\type{A} : \universe{\mathcal{U} }~\mathtt{where} \\
+      &\qquad \term{hd} : \type{A} \\
+      &\qquad \term{tl} : \typeformer{Stream}~\type{A} \\
+    \end{aligned}
+  \end{equation}  
+  corresponding to the container
   \begin{equation}
     \containerpair{\type{A}}{\unit}
   \end{equation}
-  For which we get the polynomial functor
+  for which we get the polynomial functor
   \begin{equation}
     \functor{P}\,\type{X} = \type{A} \times \type{X}
   \end{equation}
   For which the we get the \texttt{M}-type for stream
-  \begin{equation}
-    \typeformer{Stream}~\type{A} = \type{A} \times \typeformer{Stream}~\type{A}
-  \end{equation}
   \begin{figure}[h]
     \centering
     \begin{tikzcd}
-      \type{A} \ar[dr,"\destructor{hd}"'] & \type{A} \times \typeformer{Stream}~\type{A} \ar[d,shift left,"\function{in}"] \ar[l,"\pi_1"'] \ar[r,"\pi_2"] & \typeformer{Stream}~\type{A} \ar[dl,"\destructor{tl}"] \\
-      & \typeformer{Stream}~\type{A} \ar[u,shift left,"\function{out}"]
+      \type{A} & \type{A} \times \typeformer{Stream}~\type{A} \ar[d,shift left,"\function{in}"] \ar[l,"\pi_1"'] \ar[r,"\pi_2"] & \typeformer{Stream}~\type{A} \\
+      & \typeformer{Stream}~\type{A} \ar[u,shift left,"\function{out}"] \ar[ul,"\destructor{hd}"] \ar[ur,"\destructor{tl}"']
     \end{tikzcd}
   \end{figure}
 \end{frame}
 
-\begin{frame}
+\begin{frame}[fragile]
   \frametitle{Bisimulation for Streams}
   We can define an equivalence relation
   \begin{equation}
     \vcenter{\infer{\term{s}~\relation{\sim_{stream}}~\term{t}}{\destructor{hd}~\term{s} \equiv \destructor{hd}~\term{t} & \destructor{tl}~\term{s}~\relation{\sim_{stream}}~\destructor{tl}~\term{t}}}
   \end{equation}
-  We can convert this to an equality 
-\end{frame}
-
-\begin{frame}[fragile]
-  \frametitle{Bisimulation}
-  \begin{defn}\setlengths
-    A relation \(\relation{\mathcal{R}} : \type{C} \rightarrow \type{C} \rightarrow \universe{\mathcal{U}}\) for a coalgebra \(\coalg{\type{C}}{\function{\gamma}} : \typeformer{Coalg}_{\container{S}}\), is a (strong) bisimulation relation if the type \(\type{\overline{\mathcal{R}}} = \sum_{(\term{a} : \type{C})} \sum_{(\term{b} : \type{C})} \term{a}~\relation{\mathcal{R}}~\term{b}\) and the function \(\function{\alpha}_{\relation{\mathcal{R}}} : \type{\overline{\mathcal{R}}} \rightarrow \functor{P}_{\container{S}}\,\type{\overline{\mathcal{R}}}\) forms a \(\functor{P}_{\container{S}}\)-coalgebra \(\coalg{\type{\overline{\mathcal{R}}}}{\function{\alpha}_{\relation{\mathcal{R}}}} : \mathtt{Coalg}_{\container{S}}\), making the diagram bellow commute (\(\Longrightarrow\) represents \(\functor{P}_{\container{S}}\)-coalgebra morphisms). That is
-    \begin{equation}
-      \function{\gamma} \circ \pi_1^{\type{\overline{\mathcal{R}}}} \equiv \functor{P}_{\container{S}}\,\pi_1^{\type{\overline{\mathcal{R}}}} \circ \function{\alpha}_{\relation{R}}
-    \end{equation}
-    and similarly for \(\pi_2^{\type{\overline{\mathcal{R}}}}\).
-  \end{defn}
+  We can formalize this as a bisimulation. A (strong) bisimulation for a \(\functor{P}\)-coalgebra \(\coalg{\type{C}}{\function{\gamma}}\) is given by
+  \begin{itemize}
+  \item a relation \(\relation{\mathcal{R}} : \type{C} \rightarrow \type{C} \rightarrow \universe{\mathcal{U}}\)
+  \item a type \(\type{\overline{\mathcal{R}}} = \sum_{(\term{a} : \type{C})} \sum_{(\term{b} : \type{C})} \term{a}~\relation{\mathcal{R}}~\term{b}\)
+  \item and a function \(\function{\alpha}_{\relation{\mathcal{R}}} : \type{\overline{\mathcal{R}}} \rightarrow \functor{P}_{\container{S}}\,\type{\overline{\mathcal{R}}}\)
+  \end{itemize}
+  Such that \(\coalg{\type{\overline{\mathcal{R}}}}{\function{\alpha}_{\relation{\mathcal{R}}}}\) is a \(\functor{P}\)-coalg, making the following diagram commute.
   \begin{figure}[h]
     \centering
     \begin{tikzcd}[row sep=huge,column sep=huge]
       \coalg{\type{C}}{\function{\gamma}} & \coalg{\type{\overline{\mathcal{R}}}}{\function{\alpha}_{\relation{\mathcal{R}}}} \ar[l,Rightarrow,"{\pi_1}^{\type{\overline{\mathcal{R}}}}"'] \ar[r,Rightarrow,"{\pi_2}^{\type{\overline{\mathcal{R}}}}"] & \coalg{\type{C}}{\function{\gamma}}
     \end{tikzcd}
   \end{figure}
+  In MLTT this is not enough to define an equality, however in HoTT and CTT it is.
 \end{frame}
 
 \begin{frame}[fragile]
@@ -400,18 +512,21 @@
     Given a relation \(\relation{\mathcal{R}}\), that is a bisimulation for a \texttt{M}-type, then (strongly) bisimilar elements \(\term{x}~\relation{\mathcal{R}}~\term{y}\) are equal \(\term{x} \equiv \term{y}\).
   \end{thm}
   \begin{proof}\setlengths
-    Given a relation \(\relation{\mathcal{R}}\) that is bisimulation relation over a final \(\functor{P}\)-coalgebra \(\coalg{\typeformer{M}}{\function{out}}:\mathtt{Coalg}_{\container{S}}\) we get the diagram
+    We get the diagram
     \begin{figure}[h]
       \centering
       \begin{tikzcd}[row sep=huge,column sep=huge]
         \coalg{\typeformer{M}}{\function{out}} & \coalg{\type{\overline{\mathcal{R}}}}{\function{\alpha}_{\relation{\mathcal{R}}}} \ar[l,Rightarrow,"{\pi_1}^{\type{\overline{\mathcal{R}}}}"'] \ar[r,Rightarrow,"{\pi_2}^{\type{\overline{\mathcal{R}}}}"] & \coalg{\typeformer{M}}{\function{out}}
       \end{tikzcd}
     \end{figure}
-    By the finality of \(\coalg{\typeformer{M}}{\function{out}}\), we get a function \(\constant{!}\) from \(\typeformer{M}\) to \(\type{\overline{R}}\), which is unique, meaning \(\pi_1^{\type{\overline{\mathcal{R}}}} \equiv ~\constant{!} \equiv \pi_2^{\type{\overline{\mathcal{R}}}}\). Now given \(\term{r} : \term{x}~\relation{\mathcal{R}}~\term{y}\), we can construct the equality
+    Since \(\coalg{\typeformer{M}}{\function{out}}\) is a final coalgebra, functions into it are unique, meaning
     \begin{equation}
-      \term{x} \equiv \pi_1^{\type{\overline{\mathcal{R}}}} (\term{x}, \term{y}, \term{r}) \equiv \pi_2^{\type{\overline{\mathcal{R}}}} (\term{x}, \term{y}, \term{r}) \equiv \term{y},
+    \pi_1^{\type{\overline{\mathcal{R}}}} \equiv \pi_2^{\type{\overline{\mathcal{R}}}} % \equiv ~\constant{!}
+  \end{equation}
+    therefore given \(\term{r} : \term{x}~\relation{\mathcal{R}}~\term{y}\), we can construct the equality
+    \begin{equation}
+      \term{x} \equiv \pi_1^{\type{\overline{\mathcal{R}}}} (\term{x}, \term{y}, \term{r}) \equiv \pi_2^{\type{\overline{\mathcal{R}}}} (\term{x}, \term{y}, \term{r}) \equiv \term{y}.
     \end{equation}
-    giving us the coinduction principle for \texttt{M}-types.
   \end{proof}  
 \end{frame}
 
@@ -465,18 +580,6 @@
 \end{frame}
 
 \begin{frame}
-  \frametitle{Quotient Inductive-Inductive Type (QIIT)}
-  A QIIT is a type that is defined at the same time as a relation. That is
-  \begin{itemize}
-  \item Constructors may refer to previously defined constructors (recursive).
-  \item Constructors can be a point constructor or equality constructor.
-  \item Constructors may refer to constructors of the relation.
-  \item The type is set truncated.
-  \end{itemize}
-  And similarly for the constructors of the relation.
-\end{frame}
-
-\begin{frame}
   \frametitle{Partiality monad}
   \framesubtitle{Q\texttt{M}-type}
   We would like to model equality of programs as two programs being equal if one terminates with a value then the other also terminates with the same value a finite number of steps later. This is model by quotienting the delay monad by a relation defined by the constructors
@@ -516,6 +619,18 @@
   \begin{equation}
     \typeformer{Delay}~\type{R}/\relation{\sim}
   \end{equation}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Quotient Inductive-Inductive Type (QIIT)}
+  A QIIT is a type that is defined at the same time as a relation. That is
+  \begin{itemize}
+  \item Constructors may refer to previously defined constructors (recursive).
+  \item Constructors can be a point constructor or equality constructor.
+  \item Constructors may refer to constructors of the relation.
+  \item The type is set truncated.
+  \end{itemize}
+  And similarly for the constructors of the relation.
 \end{frame}
 
 \begin{frame}
@@ -609,6 +724,7 @@
 \end{frame}
 
 \begin{frame}
+  \frametitle{Simple Partialty Monad QIIT}
   We can see that the QIIT for the partiality monad is not trivial, however we can define quotients as QIITs rather trivially, however this would \emph{only} give us the constructors
   \begin{equation}
     \vcenter{\infer{\constructor{now}~\term{a}}{}}
@@ -685,17 +801,12 @@
   \begin{itemize}
   \item Indexed \texttt{M}-types
   \item Showing finality of Q\texttt{M}-types and fully formalizing the constructions % TODO: (not just rules)
-  \item 
+  \item Equality between Coinductive records and \texttt{M}-types
+  \item Explore Guarded Cubical Type Theory
   \end{itemize}
 \end{frame}
 
 \end{document}
 
-  % \begin{figure}
-  %   \centering
-  %   \begin{tikzcd}[row sep=large]
-  %     & & \type{C} & \type{A} & \type{A} & \type{C} & \dots \\
-  %     & \type{C} & & \type{A} \ar[ul,"\typeformer{B}~\term{a}_0" description] \ar[u,"\typeformer{B}~\term{a}_1" description] \ar[ur,"\typeformer{B}~\term{a}_2" description] & & \type{A} \ar[u,"\typeformer{B}~\term{a}_0" description] \ar[ur,"\dots" description] \\
-  %     & & & \type{A} \ar[ull,"\typeformer{B}~\term{a}_0" description] \ar[u,"\typeformer{B}~\term{a}_1" description] \ar[urr,"\typeformer{B}~\term{a}_2" description]
-  %   \end{tikzcd}
-  % \end{figure}
+% TODO: What cannot be done with M-type, but need Indexed M-type (example)
+% TODO: Where would GCTT be needed / might be better ?
