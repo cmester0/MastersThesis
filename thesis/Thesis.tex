@@ -273,7 +273,7 @@ Another useful example is set truncated quotients. Given some free type, we can 
   \hfill
   \begin{minipage}[b]{0.325\linewidth}
     \begin{equation}
-      \vcenter{\infer{\constructor{eq/}~\term{x}~\term{y}~\term{r} : \term{x} \equiv \term{y}}{\term{x}, \term{y} : \type{A} / \relation{\mathcal{R}} & \term{r} : \term{x}~\relation{\mathcal{R}}~\term{y}}}
+      \vcenter{\infer{\constructor{eq/}~\term{x}~\term{y}~\term{r} : \quotientconstructor{\term{x}} \equiv \quotientconstructor{\term{y}}}{\term{x}, \term{y} : \type{A} & \term{r} : \term{x}~\relation{\mathcal{R}}~\term{y}}}
     \end{equation}
   \end{minipage}
   \hfill

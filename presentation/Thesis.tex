@@ -257,6 +257,7 @@
       \function{in} : \functor{P}\,\typeformer{M} \rightarrow \typeformer{M} \qquad \function{out} : \typeformer{M} \rightarrow \functor{P}\,\typeformer{M}
     \end{equation}    
   \end{thm}
+  \pause
   \begin{block}{Proof structure}\setlengths
     The proof is done using the two helper lemmas
     \begin{align}
@@ -270,8 +271,9 @@
 \begin{frame}
   \frametitle{Coalgebra}
   \framesubtitle{\texttt{M}-types are final coalgebras}
+  We want to show that \texttt{M}-types are final coalgebras.
   \begin{defn}\setlengths
-    We define a \(\functor{P}\)-coalgebra as
+    A \(\functor{P}\)-coalgebra is defined as
     \begin{equation}
       \sum_{(\type{C} : \universe{\mathcal{U}})} \type{C} \rightarrow \functor{P}\,\type{C}
     \end{equation}
@@ -289,14 +291,15 @@
 \begin{frame}
   \frametitle{\texttt{M}-types are final coalgebras}
   \begin{thm}\setlengths
-    The \texttt{M}-type \(\typeformer{M}_{\container{S}}\) is defined as the limit for a polynomial functor \(\functor{P}_{\container{S}}\). This definition fulfills the requirement that \(\typeformer{Final}_{\container{S}}~\type{\mathcal{L}}\).
+    \texttt{M}-types are final coalgebras. That is \(\typeformer{Final}_{\container{S}}~\typeformer{M}\).
   \end{thm}
+  \pause
   \begin{block}{Proof structure}\setlengths
     The definition of finality is
     \begin{equation}
-      \prod_{(\coalg{\type{C}}{\function{\gamma}} : \mathtt{Coalg}_{\container{S}})} \mathtt{isContr}~(\coalg{\type{C}}{\function{\gamma}} \Rightarrow \coalg{\type{\mathcal{L}}}{\function{out}})
+      \prod_{(\coalg{\type{C}}{\function{\gamma}} : \mathtt{Coalg}_{\container{S}})} \mathtt{isContr}~(\coalg{\type{C}}{\function{\gamma}} \Rightarrow \coalg{\typeformer{M}}{\function{out}})
     \end{equation}
-    which we show by \((\coalg{\type{C}}{\function{\gamma}} \Rightarrow \coalg{\type{\mathcal{L}}}{\function{out}}) \equiv \unit\).
+    which we show by \((\coalg{\type{C}}{\function{\gamma}} \Rightarrow \coalg{\typeformer{M}}{\function{out}}) \equiv \unit\).
   \end{block}
 \end{frame}
 
@@ -382,7 +385,7 @@
   \end{equation}
   To an \texttt{M}-type defined by the container
   \begin{equation}
-    \containerpair{\mathbb{N}}{\type{tree} \times \type{tree}}
+    \containerpair{\mathbb{N}}{\unit + \unit}
   \end{equation}
 \end{frame}
 
@@ -394,8 +397,8 @@
     \begin{aligned}
       &\mathtt{record}~\type{bet} : \universe{\mathcal{U} }~\mathtt{where} \\
       &\qquad \term{value_a} : \mathbb{N} \\
-      &\qquad \term{value_a} : \mathbb{N} \\
-      &\qquad \term{total} : \term{value_a} \leq \term{value_b} \rightarrow \type{bool} \\
+      &\qquad \term{value_b} : \mathbb{N} \\
+      &\qquad \term{winner} : \term{value_a} \leq \term{value_b} \rightarrow \type{bool} \\
     \end{aligned}
   \end{equation}
   To an \texttt{M}-type defined by the container
@@ -511,6 +514,7 @@
   \begin{thm}[Coinduction principle]\setlengths
     Given a relation \(\relation{\mathcal{R}}\), that is a bisimulation for a \texttt{M}-type, then (strongly) bisimilar elements \(\term{x}~\relation{\mathcal{R}}~\term{y}\) are equal \(\term{x} \equiv \term{y}\).
   \end{thm}
+  \pause
   \begin{proof}\setlengths
     We get the diagram
     \begin{figure}[h]
@@ -536,26 +540,28 @@
   \tableofcontents[currentsection]
 \end{frame}
 
+\subsection{Propositional Truncation and Set Truncated Quotient}
 \begin{frame}
   \frametitle{Propositional Truncation and Set Truncated Quotient}
-  A Higher Inductive Type (HIT) is a type defined by point constructors as well as equality constructors. We define propositional truncation by
-  \begin{defn}[Propositional Truncation]\setlengths\startwitheq
-    \strut
-    \hfill
-    \begin{minipage}[b]{0.25\linewidth}
-      \begin{equation}
-        \vcenter{\infer{\constructor{|}\,\term{x}\,\constructor{|} : \| \type{A} \|}{\term{x} : \type{A}}}
-      \end{equation}
-    \end{minipage}
-    \hfill
-    \begin{minipage}[b]{0.4\linewidth}
-      \begin{equation}
-        \vcenter{\infer{\constructor{squash}~\term{x}~\term{y} : \term{x} \equiv \term{y}}{\term{x}, \term{y} : \|\type{A}\|}}
-      \end{equation}
-    \end{minipage}
-    \hfill
-    \strut
-  \end{defn}
+  A Higher Inductive Type (HIT) is a type defined by point constructors as well as equality constructors. \pause % We define propositional truncation by
+  % \begin{defn}[Propositional Truncation]\setlengths\startwitheq
+  %   \strut
+  %   \hfill
+  %   \begin{minipage}[b]{0.25\linewidth}
+  %     \begin{equation}
+  %       \vcenter{\infer{\constructor{|}\,\term{x}\,\constructor{|} : \| \type{A} \|}{\term{x} : \type{A}}}
+  %     \end{equation}
+  %   \end{minipage}
+  %   \hfill
+  %   \begin{minipage}[b]{0.4\linewidth}
+  %     \begin{equation}
+  %       \vcenter{\infer{\constructor{squash}~\term{x}~\term{y} : \term{x} \equiv \term{y}}{\term{x}, \term{y} : \|\type{A}\|}}
+  %     \end{equation}
+  %   \end{minipage}
+  %   \hfill
+  %   \strut
+  % \end{defn}
+  \pause
   We can define set truncated quotients as the following HIT.
   \begin{defn}[Set Truncated Quotient]\setlengths \startwitheq
     \strut
@@ -568,7 +574,7 @@
     \hfill
     \begin{minipage}[b]{0.4\linewidth}
       \begin{equation}
-        \vcenter{\infer{\constructor{eq/}~\term{x}~\term{y}~\term{r} : \term{x} \equiv \term{y}}{\term{x}, \term{y} : \type{A} / \relation{\mathcal{R}} & \term{r} : \term{x}~\relation{\mathcal{R}}~\term{y}}}
+        \vcenter{\infer{\constructor{eq/}~\term{x}~\term{y}~\term{r} : \quotientconstructor{\term{x}} \equiv \quotientconstructor{\term{y}}}{\term{x}, \term{y} : \type{A} & \term{r} : \term{x}~\relation{\mathcal{R}}~\term{y}}}
       \end{equation}
     \end{minipage}
     \hfill
@@ -582,7 +588,11 @@
 \begin{frame}
   \frametitle{Partiality monad}
   \framesubtitle{Q\texttt{M}-type}
-  We would like to model equality of programs as two programs being equal if one terminates with a value then the other also terminates with the same value a finite number of steps later. This is model by quotienting the delay monad by a relation defined by the constructors
+  The partiality monad describes equality of partial computations.
+  \pause
+  \\[3mm]
+  We define the partiality monad by quotienting the delay monad by a relation defined by the constructors
+  \\
   \strut
   \hfill
   \begin{minipage}{0.4\linewidth}
@@ -615,28 +625,20 @@
   \hfill
   \strut
   \\[5mm]
-  This gives us a construction for a Q\texttt{M}-types.
+  the partiality monad is then given by the set truncated quotient
   \begin{equation}
     \typeformer{Delay}~\type{R}/\relation{\sim}
   \end{equation}
-\end{frame}
-
-\begin{frame}
-  \frametitle{Quotient Inductive-Inductive Type (QIIT)}
-  A QIIT is a type that is defined at the same time as a relation. That is
-  \begin{itemize}
-  \item Constructors may refer to previously defined constructors (recursive).
-  \item Constructors can be a point constructor or equality constructor.
-  \item Constructors may refer to constructors of the relation.
-  \item The type is set truncated.
-  \end{itemize}
-  And similarly for the constructors of the relation.
+  however we need the axiom of (countable) choice
 \end{frame}
 
 \begin{frame}
   \frametitle{Partiality Monad}
   \framesubtitle{QIIT}
-  We can define it by type constructors\\[-4mm]
+  A QIIT is a type that is defined at the same time as a relation and then set truncated.
+  \\[3mm]
+  \pause
+  We can define the partiality monad as a QIIT with type constructors\\[-4mm]
   \strut
   \hfill
   \begin{minipage}{0.25\linewidth}
@@ -679,7 +681,7 @@
   \begin{equation}
     \vcenter{\infer{\constructor{\alpha_{\bot}}~\term{p}~\term{q} : \term{x} \equiv \term{y}}{\term{x},\term{y} : \type{R}_\bot & \term{p} : \term{x}~\relation{\sqsubseteq_{\bot}}~\term{y} & \term{q} : \term{y}~\relation{\sqsubseteq_{\bot}}~\term{x}}}
   \end{equation}
-  where \(\constructor{\bot}\) is lowest in the order
+  where \(\constructor{\bot}\) is the smallest element in the order
   \begin{equation}
     \vcenter{\infer[\constructor{\sqsubseteq_{never}}]{\constructor{\bot}~\relation{\sqsubseteq_{\bot}}~\term{x}}{\term{x} : \type{R}_\bot}}
   \end{equation}
@@ -690,11 +692,11 @@
   \framesubtitle{QIIT}
   with an upper bound
   \begin{equation}
-    \vcenter{\infer{\constructor{\bigsqcup}~(\function{s},\function{b}) : \type{R}_\bot}{\function{s} : \mathbb{N} \rightarrow \type{R}_\bot & \function{b} : \prod_{(n : \mathbb{N})} \function{s}_n~\relation{\sqsubseteq_{\bot}}~\function{s}_{n+1} }}
+    \vcenter{\infer{\constructor{\bigsqcup}(\function{s},\function{b}) : \type{R}_\bot}{\function{s} : \mathbb{N} \rightarrow \type{R}_\bot & \function{b} : \prod_{(n : \mathbb{N})} \function{s}_n~\relation{\sqsubseteq_{\bot}}~\function{s}_{n+1} }}
   \end{equation}
   which gives a bound for a sequence
   \begin{equation}
-    \vcenter{\infer{\prod_{(n : \mathbb{N})} \function{s}_n~\relation{\sqsubseteq_{\bot}}~\bigsqcup(\function{s},\function{b})}{\function{s} : \mathbb{N} \rightarrow \type{R}_\bot & \function{b} : \prod_{(n : \mathbb{N})} \function{s}_n~\relation{\sqsubseteq_{\bot}}~\function{s}_{n+1} }}
+    \vcenter{\infer{\prod_{(n : \mathbb{N})} \function{s}_n~\relation{\sqsubseteq_{\bot}}~\constructor{\bigsqcup}(\function{s},\function{b})}{\function{s} : \mathbb{N} \rightarrow \type{R}_\bot & \function{b} : \prod_{(n : \mathbb{N})} \function{s}_n~\relation{\sqsubseteq_{\bot}}~\function{s}_{n+1} }}
   \end{equation}
   and which is a least upper bound
   \begin{equation}
@@ -725,24 +727,34 @@
 
 \begin{frame}
   \frametitle{Simple Partialty Monad QIIT}
-  We can see that the QIIT for the partiality monad is not trivial, however we can define quotients as QIITs rather trivially, however this would \emph{only} give us the constructors
-  \begin{equation}
-    \vcenter{\infer{\constructor{now}~\term{a}}{}}
-  \end{equation}
-  \begin{equation}
-    \vcenter{\infer{\constructor{later}~\term{x}}{\term{x}}}
-  \end{equation}
+  This construction is quite involved, however doing a trivial construction\\[3mm]
+  \strut\hfill
+  \begin{minipage}{0.3\linewidth}
+    \begin{equation}
+      \vcenter{\infer{\constructor{now}~\term{a} : \type{R}_\bot}{a : \type{R}}}
+    \end{equation}
+  \end{minipage}
+  \hfill
+  \begin{minipage}{0.4\linewidth}
+    \begin{equation}
+      \vcenter{\infer{\constructor{later}~\term{t} : \type{R}_\bot}{\term{t} : \type{R}_\bot}}
+    \end{equation}
+  \end{minipage}
+  \hfill\strut
   \begin{equation}
     \vcenter{\infer[\constructor{later_{\equiv}}]{\constructor{later}~\term{x} \equiv \term{y}}{\term{x} \equiv \term{y}}}
   \end{equation}
+  would not give us the intended functionality, so we need to think more about how we define the QIIT.
+  \\[3mm]
+  We have to think about how we define a Q\texttt{M}-type.
 \end{frame}
 
 \begin{frame}
   \frametitle{What do we want from a quotient \texttt{M}-type?}
   \begin{itemize}
   \item We would like to be able to construct a quotient from an \texttt{M}-type and a relation.
-  \item We should be able to take an element to its equality class without the axiom of choice
-  \item It should be equal to the set truncated quotient, if we assume the axiom of choice?
+  \item We should be able to lift constructors to the quotient without the axiom of choice.
+  \item The type should be equal to the type defined by the set truncated quotient if we assume the axiom of choice.
   \end{itemize}
 \end{frame}
 
@@ -776,6 +788,9 @@
     \end{tikzcd}
   \end{figure}
   For which \(\typeformer{M} \equiv \functor{P}\,\typeformer{M}\) and we would hope \(\typeformer{QM} \equiv \functor{F}\,\typeformer{QM}\), however this requires the axiom of choice.
+  \\[3mm]
+  \pause
+  However looking further into this is future research.
 \end{frame}
 
 \section{Conclusion}
